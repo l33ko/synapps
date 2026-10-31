@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>Mon cahier du CP</title>
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="icon" href="favicon-32.png" type="image/png" sizes="32x32">
@@ -102,7 +102,9 @@ textarea.inp{width:100%;min-height:90px;font-size:1rem;word-break:break-all;disp
 @keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 :focus-visible{outline:4px solid var(--good);outline-offset:3px}
-@media (max-width:380px){#app{padding-left:54px}.opt{font-size:1.6rem}}
+html,body{touch-action:pan-x pan-y;-webkit-text-size-adjust:100%}
+@media (max-width:640px){body{background-image:linear-gradient(90deg,transparent 15px,var(--margin) 15px,var(--margin) 17px,transparent 17px),linear-gradient(var(--line) 1px,transparent 1px)}#app{padding:14px 14px 70px 28px}}
+@media (max-width:380px){.opt{font-size:1.6rem}}
 </style>
 </head>
 <body>
@@ -110,6 +112,9 @@ textarea.inp{width:100%;min-height:90px;font-size:1rem;word-break:break-all;disp
 <div id="tm" class="tm" style="display:none"></div>
 <div id="ov"><div class="in" id="ovc"></div></div>
 <script>
+['gesturestart','gesturechange','gestureend'].forEach(t=>document.addEventListener(t,e=>e.preventDefault(),{passive:false}));
+document.addEventListener('touchmove',e=>{if(e.touches&&e.touches.length>1)e.preventDefault()},{passive:false});
+let _lt=0;document.addEventListener('touchend',e=>{const n=Date.now();if(n-_lt<350&&!(e.target.closest&&e.target.closest('input,textarea,select')))e.preventDefault();_lt=n},{passive:false});
 const WT=[
  [['lama','🦙'],['moto','🏍️'],['vélo','🚲'],['tomate','🍅'],['rose','🌹'],['lune','🌙'],['robe','👗'],['sac','🎒'],['lit','🛏️'],['bus','🚌'],['fée','🧚'],['rat','🐀']],
  [['chat','🐱'],['chien','🐶'],['loup','🐺'],['lion','🦁'],['singe','🐒'],['lapin','🐰'],['cheval','🐴'],['vache','🐄'],['souris','🐭'],['avion','✈️'],['arbre','🌳'],['fleur','🌸'],['pomme','🍎'],['livre','📖'],['dent','🦷'],['main','✋'],['ballon','⚽'],['mouton','🐑'],['banane','🍌'],['citron','🍋'],['cerise','🍒'],['glace','🍦'],['fraise','🍓'],['nuage','☁️'],['tortue','🐢'],['fourmi','🐜'],['dragon','🐉'],['girafe','🦒']],
