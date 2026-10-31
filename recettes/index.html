@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>Mes recettes · SynApps</title>
 <meta name="theme-color" content="#b5532f">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -27,7 +27,7 @@
       --accent:#e07a50; --accent-soft:#3d2a20; --shadow:none; }
   }
   *{box-sizing:border-box}
-  html{-webkit-text-size-adjust:100%}
+  html{-webkit-text-size-adjust:100%;touch-action:manipulation}
   body{margin:0;background:var(--bg);color:var(--ink);
     font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
     padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
@@ -137,6 +137,10 @@
 </head>
 <body>
 <div id="app"><div class="spin">Chargement…</div></div>
+<script>
+/* smartphone : pas de zoom au pincement (Safari iOS ignore user-scalable, d'où ces événements) ni au double toucher (touch-action: manipulation en CSS) */
+['gesturestart','gesturechange','gestureend'].forEach(function(n){document.addEventListener(n,function(ev){ev.preventDefault()})});
+</script>
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
