@@ -1,0 +1,82 @@
+# SynApps — contrôles automatiques de chaque pull request
+# À chaque pull request vers main (et à chaque nouveau commit poussé dessus), un robot GitHub :
+#   1. vérifie les règles du dépôt en lisant les fichiers (outils/controles.mjs) ;
+#   2. ouvre chaque page de la branche, servie en local, sur iPhone (moteur de Safari), Android et
+#      ordinateur simulés (outils/surveillance.mjs) : erreurs, page vide, débordement, bandeau à tort.
+# Le résultat s'affiche sur la pull request (✅ ou ❌) et dans un commentaire du robot, mis à jour à chaque contrôle.
+
+name: Contrôles
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: controles-${{ github.event.pull_request.number }}
+  cancel-in-progress: true      # un nouveau commit remplace le contrôle en cours
+
+jobs:
+  controler:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Règles du dépôt
+        id: regles
+        continue-on-error: true
+        run: node outils/controles.mjs
+
+      - name: Installer le navigateur
+        run: |
+          npm install --no-save --no-package-lock playwright@1
+          npx playwright install --with-deps chromium webkit
+
+      - name: Pages de la branche (iPhone, Android, ordinateur)
+        id: pages
+        continue-on-error: true
+        env:
+          BASE: http://localhost:8000
+          CONTROLE_PR: '1'
+          RAISON: pull request n°${{ github.event.pull_request.number }}
+        run: |
+          python3 -m http.server 8000 >/dev/null 2>&1 &
+          sleep 2
+          node outils/surveillance.mjs
+
+      - name: Compte rendu
+        if: ${{ !cancelled() }}     # pas de faux ❌ quand un nouveau commit remplace ce contrôle
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          {
+            if [ "${{ steps.regles.outcome }}" = success ] && [ "${{ steps.pages.outcome }}" = success ]; then
+              echo "## ✅ Contrôles automatiques : tout est bon"
+            else
+              echo "## ❌ Contrôles automatiques : des points à corriger"
+            fi
+            echo
+            [ -f regles.md ] && cat regles.md || echo "_Les règles n'ont pas pu être vérifiées._"
+            echo
+            [ -f rapport.md ] && sed '1,/^### Les pages/{/^### Les pages/!d}' rapport.md || echo "_Les pages n'ont pas pu être ouvertes._"
+            echo
+            echo "[Détail de l’exécution]($GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID)"
+          } > controles.md
+          cat controles.md >> "$GITHUB_STEP_SUMMARY"
+          # un seul commentaire du robot par pull request, mis à jour à chaque contrôle
+          gh pr comment "$PR" --edit-last --create-if-none --body-file controles.md
+
+      - name: Résultat
+        if: steps.regles.outcome != 'success' || steps.pages.outcome != 'success'
+        run: |
+          echo "::error::Des contrôles ont échoué : voir le compte rendu."
+          exit 1

@@ -8,7 +8,8 @@
 // Variables : BASE (adresse du site, par défaut la production), SUPABASE_SECRET_KEY (facultative,
 // secret GitHub : sans elle, les erreurs des visiteurs ne sont pas lues), JOURS (période lue, 7 par défaut),
 // MISE_EN_LIGNE=1 (après une fusion : seules les pages comptent ; les erreurs des visiteurs, qui peuvent
-// dater d'avant la correction, sont pour le rapport du lundi).
+// dater d'avant la correction, sont pour le rapport du lundi),
+// CONTROLE_PR=1 (contrôle d'une pull request sur une copie locale : pas d'erreurs de visiteurs, badge test attendu).
 
 import { chromium, webkit, devices } from 'playwright';
 import { writeFileSync } from 'node:fs';
@@ -19,6 +20,7 @@ const KEY = process.env.SUPABASE_SECRET_KEY || '';
 const JOURS = +process.env.JOURS || 7;
 const PROD = /^https:\/\/app\.synapsium\.com$/.test(BASE);
 const MISE_EN_LIGNE = process.env.MISE_EN_LIGNE === '1';
+const CONTROLE_PR = process.env.CONTROLE_PR === '1';
 
 const PAGES = [
   ['Accueil', '/'],
@@ -70,6 +72,7 @@ for (const [nom, chemin] of PAGES) {
       }));
       if (etat.maj) soucis.push(`${appareil} : le bandeau « Une nouvelle version est disponible » s’affiche alors que rien n’a changé`);
       if (etat.test && PROD) soucis.push(`${appareil} : le badge « Version test » s’affiche en production`);
+      if (!etat.test && CONTROLE_PR) soucis.push(`${appareil} : le badge « Version test » manque (script du badge absent ou cassé)`);
       if (etat.deborde && MOBILES.includes(appareil)) soucis.push(`${appareil} : la page déborde en largeur (défilement horizontal)`);
       if (etat.vide) soucis.push(`${appareil} : la page s’affiche vide`);
       for (const e of [...new Set(erreurs)].slice(0, 4)) soucis.push(`${appareil} : erreur JavaScript — \`${e.replace(/`/g, "'").slice(0, 200)}\``);
@@ -87,7 +90,9 @@ for (const n of new Set(Object.values(navigateurs))) await n.close();
 
 // ---------- 2. Les erreurs des visiteurs ----------
 const err = [];
-if (MISE_EN_LIGNE) {
+if (CONTROLE_PR) {
+  // pas concerné : la copie locale d'une branche n'a pas de visiteurs
+} else if (MISE_EN_LIGNE) {
   err.push('_Lues dans le rapport du lundi (après une mise en ligne, seules les pages sont vérifiées)._');
 } else if (!KEY) {
   err.push('_Non lues : le secret GitHub `SUPABASE_SECRET_KEY` n’est pas encore configuré._');
@@ -133,7 +138,7 @@ if (MISE_EN_LIGNE) {
 out.push(`## ${problemes ? `⚠️ ${problemes} point(s) à regarder` : '✅ Tout va bien'}`, '',
   `_${date} · ${process.env.RAISON || 'vérification manuelle'} · ${BASE}_`, '',
   '### Les pages', '', '| | Page | Résultat |', '|---|---|---|', ...lignes, '', ...(noteWebkit ? [noteWebkit, ''] : []),
-  '### Les erreurs des visiteurs', '', ...err, '');
+  ...(CONTROLE_PR ? [] : ['### Les erreurs des visiteurs', '', ...err, '']));
 if (problemes) out.push('> Pour corriger : ouvre une session Claude sur le dépôt et colle ce compte rendu.');
 
 writeFileSync('rapport.md', out.join('\n'));
