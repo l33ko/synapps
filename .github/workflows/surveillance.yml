@@ -79,7 +79,7 @@ jobs:
           if [ "$GITHUB_EVENT_NAME" = "push" ] && [ "$PROBLEMES" = "0" ]; then exit 0; fi
           N=$(gh issue list --state open --search 'in:title "Surveillance de la production"' --json number --jq '.[0].number // empty')
           if [ -z "$N" ]; then
-            URL=$(gh issue create --title "Surveillance de la production" --body "Journal du robot de surveillance (fichier \`.github/workflows/surveillance.yml\`). Un compte rendu est ajouté ici chaque lundi, et après une mise en ligne si quelque chose ne va pas. Garde cette issue ouverte et abonne-toi pour être prévenu.")
+            URL=$(gh issue create --title "Surveillance de la production" --label surveillance --label commun --body "Journal du robot de surveillance (fichier \`.github/workflows/surveillance.yml\`). Un compte rendu est ajouté ici chaque lundi, et après une mise en ligne si quelque chose ne va pas. Garde cette issue ouverte et abonne-toi pour être prévenu.")
             N=${URL##*/}
           fi
           gh issue comment "$N" --body-file rapport.md

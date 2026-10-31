@@ -1,0 +1,33 @@
+name: 💡 Nouvelle idée
+description: Une envie, une nouvelle fonction, une amélioration pour une app SynApps
+labels: ["idée"]
+body:
+  - type: dropdown
+    id: app
+    attributes:
+      label: Pour quelle app ?
+      options:
+        - Mon cahier du CP
+        - Synapse
+        - Lego Builder
+        - Pixel arts
+        - Rétro Console
+        - Mes recettes
+        - Mon jardin
+        - Page d'accueil
+        - Plusieurs apps / tout SynApps
+    validations:
+      required: true
+  - type: textarea
+    id: idee
+    attributes:
+      label: L'idée
+      description: Ce que tu aimerais, en quelques mots. Pour qui, et pourquoi, si c'est utile.
+      placeholder: "Ex. : pouvoir choisir le niveau soi-même dans le cahier"
+    validations:
+      required: true
+  - type: textarea
+    id: details
+    attributes:
+      label: Détails (facultatif)
+      description: Exemples, captures d'écran, liens…
