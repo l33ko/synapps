@@ -53,7 +53,7 @@ jobs:
           node outils/surveillance.mjs
 
       - name: Compte rendu
-        if: always()
+        if: ${{ !cancelled() }}     # pas de faux ❌ quand un nouveau commit remplace ce contrôle
         env:
           GH_TOKEN: ${{ github.token }}
           PR: ${{ github.event.pull_request.number }}
@@ -72,9 +72,12 @@ jobs:
             echo "[Détail de l’exécution]($GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID)"
           } > controles.md
           cat controles.md >> "$GITHUB_STEP_SUMMARY"
-          # commentaire sur la pull request seulement s'il y a un problème
+          # un seul commentaire du robot par pull request, mis à jour à chaque contrôle :
+          # créé au premier problème, repassé en ✅ quand tout redevient bon
           if [ "${{ steps.regles.outcome }}" != success ] || [ "${{ steps.pages.outcome }}" != success ]; then
-            gh pr comment "$PR" --body-file controles.md
+            gh pr comment "$PR" --edit-last --create-if-none --body-file controles.md
+          else
+            gh pr comment "$PR" --edit-last --body-file controles.md 2>/dev/null || true
           fi
 
       - name: Résultat

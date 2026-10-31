@@ -34,15 +34,18 @@ for (const p of pages) {
   else if (!/<script data-runtime>\s*\/\* SynApps — badge/.test(html))
     soucis.push(`${nom} : le script du badge doit porter \`data-runtime\` (sinon le bandeau « nouvelle version » s’affiche à tort)`);
   if (maj >= 0) {
-    // tout script placé après la détection de nouvelle version doit porter data-runtime
+    // tout script ou style placé après la détection de nouvelle version doit porter data-runtime
     const apres = html.slice(html.indexOf('</script>', maj));
-    for (const m of apres.matchAll(/<script(?![^>]*\bsrc=)([^>]*)>/g))
-      if (!/data-runtime/.test(m[1])) { soucis.push(`${nom} : un script placé après la détection de nouvelle version n’a pas \`data-runtime\``); break; }
+    for (const m of apres.matchAll(/<(script|style)(?![^>]*\bsrc=)([^>]*)>/g))
+      if (!/data-runtime/.test(m[2])) { soucis.push(`${nom} : un ${m[1] === 'style' ? 'style' : 'script'} placé après la détection de nouvelle version n’a pas \`data-runtime\``); break; }
   }
-  // Supabase : la constante SB doit choisir entre production et test
-  if (/qxwypwcxdhhtgmzaskzs\.supabase\.co/.test(html.replace(/\/\* SynApps — signalement[\s\S]*?<\/script>/, ''))
-      && !/zlfgcfexvawijldgiqbu\.supabase\.co[\s\S]*SB|SB[\s\S]*zlfgcfexvawijldgiqbu\.supabase\.co/.test(html.replace(/\/\* SynApps — signalement[\s\S]*?<\/script>/, '')))
-    soucis.push(`${nom} : la constante \`SB\` vise Synapps_public sans choisir Synapps_test hors production`);
+  // Supabase : la constante SB doit choisir entre production et test selon l'adresse
+  const horsSignal = html.replace(/\/\* SynApps — signalement[\s\S]*?<\/script>/, '');
+  if (/qxwypwcxdhhtgmzaskzs\.supabase\.co/.test(horsSignal)) {
+    const ligne = (horsSignal.match(/(?:const|let|var)\s+SB\s*=[^\n]*/) || [''])[0];
+    if (!(/app\\\.synapsium\\\.com/.test(ligne) && /location\.hostname/.test(ligne) && /zlfgcfexvawijldgiqbu\.supabase\.co/.test(ligne)))
+      soucis.push(`${nom} : la constante \`SB\` doit choisir Synapps_public en production et Synapps_test ailleurs, selon \`location.hostname\` (même expression que les autres apps)`);
+  }
   if (soucis.length === avant) ok.push(nom);
 }
 
