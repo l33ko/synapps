@@ -13,7 +13,7 @@ La branche à tester et, si possible, les apps concernées et ce qu'il faut rega
 1. Trouve les pages concernées : `git diff --name-only origin/main...HEAD` (les dossiers d'apps modifiés ; la page d'accueil si `index.html` à la racine change).
 2. Sers le dépôt en local : `python3 -m http.server <port>` lancé en arrière-plan depuis la racine du dépôt, sur un **port libre** (d'autres testeurs tournent peut-être en même temps : choisis un port au hasard entre 8800 et 8999 et vérifie qu'il répond). L'adresse `localhost` n'est pas la production : les apps y utilisent Synapps_test et le badge « Version test » doit s'afficher.
 3. Avec Playwright (déjà installé : `require('playwright')`, `chromium.launch()` sans option), pour chaque page :
-   - trois contextes : **iPhone** (`devices['iPhone 13']`, avec `webkit` — le moteur de Safari — s'il se lance, sinon `chromium` en le signalant), **Android** (`devices['Pixel 7']`, `chromium`) et **ordinateur** (1280 × 800, `chromium`) ;
+   - trois contextes : **iPhone** (`devices['iPhone 13']`, avec `webkit` — le moteur de Safari — s'il se lance ; sinon essaie une fois `npx playwright install webkit`, et à défaut prends `chromium` en le signalant dans ton compte rendu), **Android** (`devices['Pixel 7']`, `chromium`) et **ordinateur** (1280 × 800, `chromium`) ;
    - relève les erreurs (`pageerror`) et les messages `console` de niveau erreur ; ignore les échecs réseau vers Supabase ou Google Fonts, qui sont normaux hors ligne ;
    - vérifie qu'il n'y a **pas de défilement horizontal** sur iPhone et Android (`document.documentElement.scrollWidth <= innerWidth + 1`) ;
    - vérifie que le badge `#synappsTest` est présent ;
