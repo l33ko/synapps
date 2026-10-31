@@ -66,6 +66,18 @@ Si la version test n'est pas disponible, publier la page modifiée en aperçu pr
 - **Toute nouvelle app** est ajoutée à la liste `PAGES` de `outils/surveillance.mjs`.
 - Quand le propriétaire colle un compte rendu de la surveillance, traiter chaque point comme un bug (règle n°1 : branche, PR, validation).
 
+## Contrôles automatiques des pull requests
+
+À chaque pull request vers `main` (et à chaque commit poussé dessus), le robot **Contrôles** (`.github/workflows/controles.yml`) :
+1. vérifie les règles du dépôt en lisant les fichiers (`outils/controles.mjs`, utilisable en local avec `node outils/controles.mjs`) :
+   - scripts de signalement des erreurs, de nouvelle version et du badge test (avec `data-runtime`) ;
+   - constante `SB` qui choisit Synapps_test hors production ;
+   - chaque app présente dans la surveillance ;
+   - aucune clé secrète ;
+2. ouvre les pages de la branche, servies en local, sur iPhone (moteur de Safari), Android et ordinateur (`outils/surveillance.mjs` avec `CONTROLE_PR=1`).
+
+Le résultat (✅ / ❌) s'affiche sur la pull request, avec un commentaire en cas de problème. **Ne pas présenter une PR en ❌ au propriétaire** : corriger d'abord sur la même branche. Ces contrôles ne remplacent pas les agents : ils passent à chaque fois, les agents réfléchissent.
+
 ## Agents
 
 Des agents spécialisés sont définis dans `.claude/agents/`. Ce sont d'autres instances de Claude, lancées avec l'outil Agent, qui démarrent **sans connaître le travail en cours** : c'est ce qui rend leur regard utile. Leur donner dans la demande tout ce dont ils ont besoin (branche, but de la modification, apps concernées, parcours à tester).
