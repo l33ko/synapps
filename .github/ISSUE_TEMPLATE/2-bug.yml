@@ -1,0 +1,40 @@
+name: 🐞 Quelque chose ne marche pas
+description: Un bug, un affichage cassé, un comportement inattendu
+labels: ["bug"]
+body:
+  - type: dropdown
+    id: app
+    attributes:
+      label: Dans quelle app ?
+      options:
+        - Mon cahier du CP
+        - Synapse
+        - Lego Builder
+        - Pixel arts
+        - Rétro Console
+        - Mes recettes
+        - Mon jardin
+        - Page d'accueil
+        - Plusieurs apps / tout SynApps
+    validations:
+      required: true
+  - type: textarea
+    id: probleme
+    attributes:
+      label: Ce qui se passe
+      description: Ce que tu as fait, ce qui s'est passé, ce que tu attendais.
+    validations:
+      required: true
+  - type: dropdown
+    id: appareil
+    attributes:
+      label: Sur quel appareil ?
+      multiple: true
+      options:
+        - iPhone / iPad
+        - Android
+        - Ordinateur
+  - type: textarea
+    id: details
+    attributes:
+      label: Captures d'écran ou détails (facultatif)

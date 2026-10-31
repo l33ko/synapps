@@ -78,6 +78,16 @@ Si la version test n'est pas disponible, publier la page modifiée en aperçu pr
 
 Le résultat (✅ / ❌) s'affiche sur la pull request, avec un commentaire du robot mis à jour à chaque contrôle. **Ne pas présenter une PR en ❌ au propriétaire** : corriger d'abord sur la même branche. Ces contrôles ne remplacent pas les agents : ils passent à chaque fois, les agents réfléchissent.
 
+## Idées et bugs : les issues GitHub
+
+Les issues GitHub sont la **liste unique** des idées et des bugs de toutes les apps, partagée par toutes les sessions (une conversation par app ou non). Passer par l'API REST (`gh api repos/l33ko/synapps/issues…`) : GraphQL n'est pas disponible depuis les sessions.
+
+- **Capture** : dès que le propriétaire évoque, dans n'importe quelle conversation, une idée, une envie ou un bug **qui n'est pas traité tout de suite**, créer l'issue **sans attendre sa confirmation** et le lui signaler en une ligne, avec le lien. Le titre est court ; la description reprend ses mots, avec le contexte utile. Avant de créer, vérifier qu'une issue semblable n'est pas déjà ouverte (sinon, y ajouter un commentaire). Une pensée en l'air se ferme d'un clic.
+- **Étiquettes** : toujours celle de l'app (`accueil`, `cahier-du-cp`, `lego-builder`, `mon-jardin`, `pixel-arts`, `recettes`, `retro-console`, `synapse`, ou `commun` pour plusieurs apps, les outils ou les robots), plus le type (`idée`, `amélioration` ou `bug`), et `prioritaire` si le propriétaire le dit. Une issue créée par le formulaire GitHub n'a que son type : lui ajouter l'étiquette de l'app choisie dans le formulaire dès qu'on la lit.
+- **« Qu'est-ce qu'il reste à faire sur X ? »** : lister les issues ouvertes avec l'étiquette de X (les `prioritaire` d'abord), en une ligne chacune.
+- **Traiter une issue** : la pull request contient `Ferme #<numéro>` dans sa description. GitHub ferme alors l'issue à la fusion. Pour une grosse fonctionnalité (règle n°0), mettre aussi le lien des maquettes en commentaire de l'issue.
+- L'issue « Surveillance de la production » (étiquette `surveillance`) est le journal du robot : ne pas la fermer.
+
 ## Agents
 
 Des agents spécialisés sont définis dans `.claude/agents/`. Ce sont d'autres instances de Claude, lancées avec l'outil Agent, qui démarrent **sans connaître le travail en cours** : c'est ce qui rend leur regard utile. Leur donner dans la demande tout ce dont ils ont besoin (branche, but de la modification, apps concernées, parcours à tester).
