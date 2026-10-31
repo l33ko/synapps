@@ -1,0 +1,91 @@
+# SynApps — surveillance de la production
+# Après chaque mise en ligne (fusion dans main) et chaque lundi matin, un robot GitHub ouvre chaque app
+# sur app.synapsium.com (iPhone et ordinateur simulés), lit les erreurs remontées par les visiteurs,
+# et écrit son compte rendu dans l'issue « Surveillance de la production » :
+#   - chaque lundi, toujours (même si tout va bien) ;
+#   - après une mise en ligne, seulement s'il y a un problème.
+# On peut aussi la lancer à la main : onglet Actions > Surveillance de la production > Run workflow.
+
+name: Surveillance de la production
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '0 6 * * 1'      # lundi 6 h UTC = 7 h à Paris l'hiver, 8 h l'été
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+  pages: read
+
+concurrency:
+  group: surveillance
+  cancel-in-progress: false     # les vérifications s'enchaînent au lieu de s'annuler
+
+jobs:
+  surveiller:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0       # pour reconnaître une publication plus récente que ce commit
+
+      - name: Attendre la mise en ligne de GitHub Pages
+        if: github.event_name == 'push'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # attend que GitHub Pages ait publié CE commit (10 min au plus), puis laisse le cache se rafraîchir
+          for i in $(seq 1 40); do
+            B=$(gh api "repos/$GITHUB_REPOSITORY/pages/builds/latest" --jq '.status + " " + .commit' 2>/dev/null || true)
+            echo "Publication : $B"
+            # publié : ce commit, ou un commit plus récent qui le contient (deux fusions rapprochées)
+            if [ "${B%% *}" = "built" ] && git merge-base --is-ancestor "$GITHUB_SHA" "${B#* }" 2>/dev/null; then break; fi
+            sleep 15
+          done
+          sleep 60
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Installer le navigateur
+        run: |
+          npm install --no-save --no-package-lock playwright@1
+          npx playwright install --with-deps chromium
+
+      - name: Vérifier la production
+        id: verif
+        continue-on-error: true
+        env:
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+          RAISON: ${{ github.event_name == 'push' && 'après une mise en ligne' || github.event_name == 'schedule' && 'vérification du lundi' || 'vérification manuelle' }}
+          MISE_EN_LIGNE: ${{ github.event_name == 'push' && '1' || '0' }}
+        run: node outils/surveillance.mjs
+
+      - name: Publier le compte rendu
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          [ -f rapport.md ] || printf '## ⚠️ La surveillance n’a pas pu s’exécuter\n\nVoir le détail : %s\n' "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" > rapport.md
+          printf '\n[Détail de l’exécution](%s)\n' "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" >> rapport.md
+          cat rapport.md >> "$GITHUB_STEP_SUMMARY"
+          PROBLEMES=$(cat problemes.txt 2>/dev/null || echo 1)
+          # après une mise en ligne sans problème : pas de message
+          if [ "$GITHUB_EVENT_NAME" = "push" ] && [ "$PROBLEMES" = "0" ]; then exit 0; fi
+          N=$(gh issue list --state open --search 'in:title "Surveillance de la production"' --json number --jq '.[0].number // empty')
+          if [ -z "$N" ]; then
+            URL=$(gh issue create --title "Surveillance de la production" --body "Journal du robot de surveillance (fichier \`.github/workflows/surveillance.yml\`). Un compte rendu est ajouté ici chaque lundi, et après une mise en ligne si quelque chose ne va pas. Garde cette issue ouverte et abonne-toi pour être prévenu.")
+            N=${URL##*/}
+          fi
+          gh issue comment "$N" --body-file rapport.md
+
+      - name: Signaler un problème
+        if: steps.verif.outcome == 'failure'
+        run: |
+          echo "::error::La surveillance a trouvé des points à regarder (voir l'issue « Surveillance de la production »)."
+          exit 1

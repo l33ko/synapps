@@ -55,6 +55,17 @@ La version test a sa propre adresse : ses données locales (plans, réglages…)
 
 Si la version test n'est pas disponible, publier la page modifiée en aperçu privé et le signaler, sans fusionner pour autant.
 
+## Surveillance de la production
+
+- **Remontée des erreurs** : chaque page commence, juste après `<meta charset="utf-8">`, par le script « SynApps — signalement des erreurs ». Il envoie les erreurs JavaScript des visiteurs, sans donnée personnelle (paramètres d'adresse et e-mails retirés ; table protégée contre l'abus : date imposée par le serveur, 200 erreurs par heure et 1000 par jour au plus), dans la table `erreurs` (Synapps_public en production, Synapps_test ailleurs ; script `supabase-erreurs.sql` à la racine). La table est en écriture seule depuis les apps. **Toute nouvelle page reprend ce script.**
+- **Robot de surveillance** (GitHub Actions, `.github/workflows/surveillance.yml` et `outils/surveillance.mjs`). Il ouvre chaque page de production sur iPhone et ordinateur, lit les erreurs des visiteurs (secret GitHub `SUPABASE_SECRET_KEY`) et efface celles de plus de 90 jours. Il tourne :
+  - **après chaque fusion dans `main`**, une fois GitHub Pages publié : il ne vérifie que les pages et ne publie un compte rendu que s'il trouve un problème ;
+  - **chaque lundi à 7 h** (8 h en été), heure de Paris : pages et erreurs des visiteurs de la semaine, compte rendu systématique ;
+  - à la main, depuis l'onglet Actions.
+  Ses comptes rendus vont dans l'issue GitHub « Surveillance de la production ».
+- **Toute nouvelle app** est ajoutée à la liste `PAGES` de `outils/surveillance.mjs`.
+- Quand le propriétaire colle un compte rendu de la surveillance, traiter chaque point comme un bug (règle n°1 : branche, PR, validation).
+
 ## Agents
 
 Des agents spécialisés sont définis dans `.claude/agents/`. Ce sont d'autres instances de Claude, lancées avec l'outil Agent, qui démarrent **sans connaître le travail en cours** : c'est ce qui rend leur regard utile. Leur donner dans la demande tout ce dont ils ont besoin (branche, but de la modification, apps concernées, parcours à tester).
