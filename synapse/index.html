@@ -682,8 +682,13 @@ function verifyCode(){
 /* ---------- Sons légers (bonne / mauvaise réponse), coupables ---------- */
 var SND={on:true,ctx:null};
 try{SND.on=localStorage.getItem('synapse-son')!=='0'}catch(e){}
+/* iPhone : par défaut le web est coupé par le commutateur « silencieux » ; on demande la lecture « média » (Safari 16.4+),
+   et, sur les anciens iOS, on joue un court fichier muet pour ouvrir la session audio. Appelé pendant un toucher. */
+function unlockIOS(){
+ try{if(navigator.audioSession){navigator.audioSession.type='playback';return}}catch(e){}
+ try{var a=document.createElement('audio');a.setAttribute('playsinline','');a.src='data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=';var p=a.play();if(p&&p.catch)p.catch(function(){})}catch(e){}}
 function audioCtx(){
- if(!SND.ctx){var A=window.AudioContext||window.webkitAudioContext;if(!A)return null;try{SND.ctx=new A()}catch(e){return null}}
+ if(!SND.ctx){var A=window.AudioContext||window.webkitAudioContext;if(!A)return null;try{SND.ctx=new A()}catch(e){return null}unlockIOS()}
  if(SND.ctx.state==='suspended'){try{SND.ctx.resume()}catch(e){}}
  return SND.ctx}
 function tone(f,t0,d,type,vol,f2){
@@ -693,7 +698,7 @@ function tone(f,t0,d,type,vol,f2){
  o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+d+0.03)}
 function sfx(good){
  if(!SND.on)return;var c=audioCtx();if(!c)return;
- try{if(good){tone(660,0,0.12,'sine',0.11);tone(990,0.09,0.2,'sine',0.11)}else tone(200,0,0.24,'triangle',0.15,110)}catch(e){}}
+ try{if(good){tone(660,0,0.12,'sine',0.2);tone(990,0.09,0.2,'sine',0.2)}else tone(200,0,0.24,'triangle',0.25,110)}catch(e){}}
 function sonLabel(){return SND.on?'Son : oui':'Son : non'}
 function sonBtn(){return '<button class="lnk sonb" data-act="son" aria-pressed="'+SND.on+'">'+sonLabel()+'</button>'}
 function toggleSon(){
