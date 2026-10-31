@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <title>Lego Builder — Construis pas à pas</title>
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" href="favicon.ico" sizes="any">
@@ -18,7 +18,7 @@
     --radius:22px;
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-  html,body{margin:0;height:100%;background:var(--paper);color:var(--ink);
+  html,body{touch-action:manipulation;-webkit-text-size-adjust:100%;margin:0;height:100%;background:var(--paper);color:var(--ink);
     font-family:"Baloo 2",system-ui,-apple-system,"Segoe UI",sans-serif;overflow:hidden}
   button{font-family:inherit;cursor:pointer;border:0}
   .hidden{display:none!important}
@@ -164,6 +164,16 @@
 </section>
 <canvas id="confetti" class="hidden"></canvas>
 
+<script>
+/* Pas de zoom de la page sur smartphone (Safari iOS ignore user-scalable=no).
+   Le double-tap est neutralisé par touch-action:manipulation. Le pincement reste actif dans la vue 3D, où il zoome sur le modèle. */
+(function(){
+  const in3D = e => e.target && e.target.closest && e.target.closest('#stage canvas');
+  ['gesturestart','gesturechange','gestureend'].forEach(t=>
+    document.addEventListener(t, e=>{ if(!in3D(e)) e.preventDefault(); }, {passive:false}));
+  document.addEventListener('touchmove', e=>{ if(e.touches.length>1 && !in3D(e)) e.preventDefault(); }, {passive:false});
+})();
+</script>
 <script type="importmap">
 { "imports": {
   "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
