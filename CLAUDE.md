@@ -58,7 +58,7 @@ Si la version test n'est pas disponible, publier la page modifiée en aperçu pr
 ## Surveillance de la production
 
 - **Remontée des erreurs** : chaque page commence, juste après `<meta charset="utf-8">`, par le script « SynApps — signalement des erreurs ». Il envoie les erreurs JavaScript des visiteurs, sans donnée personnelle (paramètres d'adresse et e-mails retirés ; table protégée contre l'abus : date imposée par le serveur, 200 erreurs par heure et 1000 par jour au plus), dans la table `erreurs` (Synapps_public en production, Synapps_test ailleurs ; script `supabase-erreurs.sql` à la racine). La table est en écriture seule depuis les apps. **Toute nouvelle page reprend ce script.**
-- **Robot de surveillance** (GitHub Actions, `.github/workflows/surveillance.yml` et `outils/surveillance.mjs`). Il ouvre chaque page de production sur iPhone et ordinateur, lit les erreurs des visiteurs (secret GitHub `SUPABASE_SECRET_KEY`) et efface celles de plus de 90 jours. Il tourne :
+- **Robot de surveillance** (GitHub Actions, `.github/workflows/surveillance.yml` et `outils/surveillance.mjs`). Il ouvre chaque page de production sur iPhone (moteur WebKit, celui de Safari), Android et ordinateur, lit les erreurs des visiteurs (secret GitHub `SUPABASE_SECRET_KEY`) et efface celles de plus de 90 jours. Il tourne :
   - **après chaque fusion dans `main`**, une fois GitHub Pages publié : il ne vérifie que les pages et ne publie un compte rendu que s'il trouve un problème ;
   - **chaque lundi à 7 h** (8 h en été), heure de Paris : pages et erreurs des visiteurs de la semaine, compte rendu systématique ;
   - à la main, depuis l'onglet Actions.
@@ -73,7 +73,7 @@ Des agents spécialisés sont définis dans `.claude/agents/`. Ce sont d'autres 
 | Agent | Rôle | Quand |
 |---|---|---|
 | `relecteur` | Relit la branche à froid : bugs, règles du dépôt, secrets. Rend un verdict, ne modifie rien. | Avant chaque demande de validation, sauf toute petite retouche (voir plus bas). |
-| `testeur-appareils` | Ouvre les pages modifiées dans un iPhone et un ordinateur simulés, relève les erreurs, fait les captures. | Dès qu'une page change. |
+| `testeur-appareils` | Ouvre les pages modifiées dans un iPhone, un Android et un ordinateur simulés, relève les erreurs, fait les captures. | Dès qu'une page change. |
 | `gardien-supabase` | Vérifie qu'un script SQL ou une Edge Function est sûr pour la production et prépare le script ponctuel. | Dès qu'un `.sql` ou une Edge Function change. |
 | `maquettiste` | Dessine **une** piste de maquette. | Règle n°0 : un par piste, en parallèle. |
 | `utilisateur-temoin` | Parcourt les pistes ou un écran dans la peau du vrai public de l'app, relève ce qui bloque ou gêne. Ne juge pas le style : chaque app a volontairement le sien. | Règle n°0, avant de montrer les pistes ; en option sur une grosse modification d'écran. |
@@ -87,7 +87,7 @@ Des agents spécialisés sont définis dans `.claude/agents/`. Ce sont d'autres 
 
 - Une app = un dossier avec un seul `index.html` autonome (HTML, CSS, JS dans le fichier, sans outil de build). Page d'accueil : `index.html` à la racine.
 - Apps : `cahier-du-cp`, `lego-builder`, `mon-jardin`, `pixel-arts`, `recettes`, `retro-console`, `synapse`.
-- Interface et textes **en français**, pensés pour iPhone autant que pour ordinateur.
+- Interface et textes **en français**, pensés pour iPhone autant que pour ordinateur, sans oublier Android (les visiteurs ne sont pas tous sur iPhone).
 - Chaque page se termine par le script « SynApps — nouvelle version disponible ? » (bandeau de mise à jour contre le cache) : le conserver dans toute nouvelle page. Il compare les scripts et styles de la page affichée avec ceux de la page en ligne : **tout script placé après lui** (comme celui du badge « Version test ») doit porter l'attribut `data-runtime`, sinon le bandeau s'affiche à tort à chaque ouverture.
 - Synchronisation des apps publiques : projets Supabase **Synapps_public** / **Synapps_test** (voir plus haut ; URL et clé publique *publishable* dans la constante `SB` de chaque app), session commune `synapps-auth`, connexion par lien reçu par e-mail (envoi via Brevo). Les scripts `supabase.sql` de chaque app sont à exécuter par le propriétaire dans le SQL Editor. Ne jamais mettre de clé secrète (`service_role`, `sb_secret_…`) dans le dépôt.
 - Messages de commit et descriptions de pull request en français.

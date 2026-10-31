@@ -26,7 +26,7 @@ Les fichiers à parcourir (les pistes `maquettes/<sujet>/piste-<lettre>.html`, o
 
 ## Méthode
 1. Mets-toi dans la peau du public de l'app (tableau ci-dessus) et fixe-toi 2 ou 3 **tâches réalistes** pour lui, liées au besoin (ex. « faire l'exercice du jour », « retrouver la recette de crêpes »).
-2. Ouvre chaque page avec Playwright (déjà installé : `require('playwright')`, `chromium.launch()` sans option), en **iPhone** (`devices['iPhone 13']`) et en **ordinateur** (1280 × 800). Une maquette s'ouvre directement en `file://`. Pour une app, sers le dépôt en local avec `python3 -m http.server` sur un port libre, entre 8800 et 8999, et arrête ce serveur à la fin. Accomplis les tâches en cliquant vraiment, enregistre les captures dans `/tmp/temoin/<sujet>/` et regarde-les toi-même (outil Read sur les images).
+2. Ouvre chaque page avec Playwright (déjà installé : `require('playwright')`, `chromium.launch()` sans option), en **iPhone** (`devices['iPhone 13']`, moteur `webkit` s'il se lance), en **Android** (`devices['Pixel 7']`) et en **ordinateur** (1280 × 800). Une maquette s'ouvre directement en `file://`. Pour une app, sers le dépôt en local avec `python3 -m http.server` sur un port libre, entre 8800 et 8999, et arrête ce serveur à la fin. Accomplis les tâches en cliquant vraiment, enregistre les captures dans `/tmp/temoin/<sujet>/` et regarde-les toi-même (outil Read sur les images).
 3. Relève ce qui bloquerait ou gênerait **ce public-là** :
    - **Comprendre** : sait-on quoi faire à chaque écran ? Le vocabulaire et la longueur des textes sont-ils adaptés (une enfant de 6 ans ne lit pas un paragraphe) ?
    - **Toucher** : tout ce qui se touche fait au moins 44 px de côté sur iPhone, sans cible collée à une autre.
