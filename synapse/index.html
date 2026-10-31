@@ -925,8 +925,10 @@ function playFleches(e,L){
   key:function(k,it,submit){if(k==='ArrowLeft')submit(it.ans==='g');else if(k==='ArrowRight')submit(it.ans==='d')}})}
 
 function playVitesse(e,L){
- var k=symK(L),map=shuffle([0,1,2,3,4,5,6,7,8]).slice(0,k),prev=-1,i,lg='';
- for(i=0;i<k;i++)lg+='<span>'+glyph(map[i])+'<b>'+(i+1)+'</b></span>';
+ var k=symK(L),map=shuffle([0,1,2,3,4,5,6,7,8]).slice(0,k),prev=-1,i,lg='',ord,asc;
+ /* légende dans le désordre : les boutons (1, 2, 3…) ne sont jamais alignés avec elle, il faut vraiment lire le chiffre */
+ do{ord=shuffle(map.map(function(_,j){return j}));asc=ord.every(function(v,j){return v===j})}while(asc&&k>1);
+ for(i=0;i<k;i++)lg+='<span>'+glyph(map[ord[i]])+'<b>'+(ord[i]+1)+'</b></span>';
  playTimed(e,L,{
   top:'<div class="lg" aria-label="Légende des symboles">'+lg+'</div>',
   next:function(){var d;do{d=ri(1,k)}while(d===prev&&k>1);prev=d;return{d:d,ans:String(d)}},
