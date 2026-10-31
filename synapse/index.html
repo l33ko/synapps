@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>Synapse · SynApps</title>
 <meta name="theme-color" content="#1b46d1">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -56,6 +56,7 @@
 .t-mem{--tc:var(--c-mem)}.t-att{--tc:var(--c-att)}.t-vit{--tc:var(--c-vit)}.t-cal{--tc:var(--c-cal)}
 .t-log{--tc:var(--c-log)}.t-lan{--tc:var(--c-lan)}.t-vis{--tc:var(--c-vis)}
 *{box-sizing:border-box}
+html{touch-action:manipulation;-webkit-text-size-adjust:100%}
 body{
   background-color:var(--paper);
   background-image:linear-gradient(var(--rule) 1px,transparent 1px),linear-gradient(90deg,var(--rule) 1px,transparent 1px);
@@ -1159,6 +1160,8 @@ document.addEventListener('click',function(ev){if(SND.on&&!SND.ctx)audioCtx();va
 document.addEventListener('keydown',function(ev){if(ev.key==='Enter'&&ev.target&&ev.target.id==='em'){sendLink();return}if(ev.key==='Enter'&&ev.target&&ev.target.id==='cd'){verifyCode();return}
  if(CUR&&CUR.key&&!ev.metaKey&&!ev.ctrlKey&&!ev.altKey)CUR.key(ev.key)});
 
+/* smartphone : pas de zoom au pincement (Safari iOS ignore user-scalable, d'où ces événements) ni au double toucher (touch-action: manipulation en CSS) */
+['gesturestart','gesturechange','gestureend'].forEach(function(n){document.addEventListener(n,function(ev){ev.preventDefault()})});
 authLoad();
 S=loadLocal();
 render();
