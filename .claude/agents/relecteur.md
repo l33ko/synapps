@@ -19,7 +19,8 @@ Le nom de la branche, et en général une phrase sur le but de la modification.
    - **Règles du dépôt** :
      - une app = un `index.html` autonome, sans outil de build ;
      - textes en français, interface pensée pour iPhone ;
-     - script « SynApps — nouvelle version disponible ? » et script du badge « Version test » présents à la fin de chaque page ;
+     - script « SynApps — signalement des erreurs » au début de chaque page (juste après `<meta charset>`) ; scripts « SynApps — nouvelle version disponible ? » et du badge « Version test » (avec `data-runtime`) à la fin ;
+     - toute nouvelle app ajoutée à la liste `PAGES` de `outils/surveillance.mjs` ;
      - constante `SB` qui choisit Synapps_public ou Synapps_test selon l'adresse (même expression que les autres apps) ;
      - aucune clé secrète (`service_role`, `sb_secret_`, mot de passe, clé SMTP) ;
      - message de commit en français.

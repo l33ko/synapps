@@ -2,6 +2,48 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
+<script>
+/* SynApps — signalement des erreurs
+   Les erreurs JavaScript rencontrées par les visiteurs sont envoyées, sans donnée personnelle, dans la table
+   « erreurs » de Supabase (Synapps_public en production, Synapps_test ailleurs). Le robot de surveillance
+   GitHub les relit chaque semaine. Au plus 5 envois par page ouverte. */
+(function(){
+  if (!/^https?:$/.test(location.protocol) || !window.fetch) return;
+  var B = /^(app\.synapsium\.com|synapps-bhl\.pages\.dev|l33ko\.github\.io)$/.test(location.hostname)
+    ? {url:'https://qxwypwcxdhhtgmzaskzs.supabase.co', key:'sb_publishable_BZ9SxprfxkC-dUQZori4zA_txbvmngw'}
+    : {url:'https://zlfgcfexvawijldgiqbu.supabase.co', key:'sb_publishable_aLCilH09KKWb4IfJC4Sx1g_df2_RUrC'};
+  var n = 0, vus = {};
+  function net(t, max){                                   // retire tout ce qui pourrait être personnel
+    return String(t == null ? '' : t)
+      .replace(/(https?:\/\/[^\s?#()'"]+)[?#][^\s()'"]*?(:\d+:\d+)?(?=[\s()'"]|$)/g, '$1$2')  // paramètres d'adresse (jetons, code d'invitation…)
+      .replace(/(access_token|refresh_token|token|rejoindre|code)=[^&\s#"']+/gi, '$1=…')
+      .replace(/[^\s@"'<>()\/:]+@[^\s@"'<>()\/:]+\.[a-z]{2,}/gi, '…@…')       // adresses e-mail
+      .slice(0, max);
+  }
+  function app(){ var s = location.pathname.split('/')[1] || ''; return (!s || /\.html?$/.test(s)) ? 'accueil' : s.slice(0, 40); }
+  function envoyer(msg, src, l, c, pile){
+    msg = net(msg, 500); src = net(String(src || '').split(/[?#]/)[0], 300);
+    if (!msg || /^Script error\.?$/i.test(msg)) return;                                       // erreur d'un autre site, sans détail
+    if (/Failed to fetch|Load failed|NetworkError|network error|AbortError|The operation was aborted/i.test(msg)) return;  // réseau coupé
+    if (/^(chrome|moz|safari|safari-web)-extension:/.test(src)) return;                       // extension du navigateur
+    var k = msg + '|' + l; if (vus[k] || n >= 5) return; vus[k] = 1; n++;
+    try {
+      fetch(B.url + '/rest/v1/erreurs', {method:'POST', keepalive:true,
+        headers:{apikey:B.key, 'Content-Type':'application/json', Prefer:'return=minimal'},
+        body:JSON.stringify({app:app(), page:net(location.pathname, 200), message:msg, source:src,
+          ligne:l | 0, colonne:c | 0, pile:net(pile, 2000), navigateur:String(navigator.userAgent).slice(0, 300)})
+      }).catch(function(){});
+    } catch(e){}
+  }
+  addEventListener('error', function(e){
+    if (e.target && e.target !== window && !e.message) return;                                // image ou fichier qui ne charge pas
+    envoyer(e.message, e.filename, e.lineno, e.colno, e.error && e.error.stack);
+  }, true);
+  addEventListener('unhandledrejection', function(e){
+    var r = e.reason; envoyer(r && r.message || r, '', 0, 0, r && r.stack);
+  });
+})();
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>Mon jardin — éditeur de plan</title>
