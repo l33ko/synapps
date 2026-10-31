@@ -57,6 +57,7 @@ Les attendus de fin de CP en mathématiques ne mentionnent pas les tables de mul
 - **Bouton 🔊 Écouter** : selon l'exercice, il redit le mot à trouver (Lecture, Écriture, Mots à compléter) ou la consigne (Compléments, Intrus, Doubles et moitiés), et relit l'énoncé dans Problèmes. Il n'y en a pas dans Additions, Soustractions, Phrases, Compter et Suites.
 - **Retours** : une bonne réponse est signalée par un son seul, sans message. « Essaie encore » est dit et écrit en cas d'erreur. Un petit son accompagne aussi chaque bouton.
 - **Voix** : l'application choisit la meilleure voix française de l'appareil. La qualité dépend de l'appareil : pour une voix plus naturelle, installer une voix « améliorée » ou « premium » dans les réglages du système, puis la choisir dans la configuration.
+- **Smartphone** : le zoom est bloqué, et quand un exercice tient dans l'écran, le défilement est verrouillé pour que l'enfant ne fasse pas défiler la page sans le vouloir.
 - **Mode clair ou sombre** : un bouton du menu change les couleurs. Le mode clair, pastel et coloré, est le mode par défaut.
 
 ## Joueurs et sauvegarde
