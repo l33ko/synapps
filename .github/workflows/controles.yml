@@ -3,7 +3,7 @@
 #   1. vérifie les règles du dépôt en lisant les fichiers (outils/controles.mjs) ;
 #   2. ouvre chaque page de la branche, servie en local, sur iPhone (moteur de Safari), Android et
 #      ordinateur simulés (outils/surveillance.mjs) : erreurs, page vide, débordement, bandeau à tort.
-# Le résultat s'affiche sur la pull request (✅ ou ❌), et en commentaire en cas de problème.
+# Le résultat s'affiche sur la pull request (✅ ou ❌) et dans un commentaire du robot, mis à jour à chaque contrôle.
 
 name: Contrôles
 
@@ -72,13 +72,8 @@ jobs:
             echo "[Détail de l’exécution]($GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID)"
           } > controles.md
           cat controles.md >> "$GITHUB_STEP_SUMMARY"
-          # un seul commentaire du robot par pull request, mis à jour à chaque contrôle :
-          # créé au premier problème, repassé en ✅ quand tout redevient bon
-          if [ "${{ steps.regles.outcome }}" != success ] || [ "${{ steps.pages.outcome }}" != success ]; then
-            gh pr comment "$PR" --edit-last --create-if-none --body-file controles.md
-          else
-            gh pr comment "$PR" --edit-last --body-file controles.md 2>/dev/null || true
-          fi
+          # un seul commentaire du robot par pull request, mis à jour à chaque contrôle
+          gh pr comment "$PR" --edit-last --create-if-none --body-file controles.md
 
       - name: Résultat
         if: steps.regles.outcome != 'success' || steps.pages.outcome != 'success'

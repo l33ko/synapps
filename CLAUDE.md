@@ -76,7 +76,7 @@ Si la version test n'est pas disponible, publier la page modifiée en aperçu pr
    - aucune clé secrète ;
 2. ouvre les pages de la branche, servies en local, sur iPhone (moteur de Safari), Android et ordinateur (`outils/surveillance.mjs` avec `CONTROLE_PR=1`).
 
-Le résultat (✅ / ❌) s'affiche sur la pull request, avec un commentaire en cas de problème. **Ne pas présenter une PR en ❌ au propriétaire** : corriger d'abord sur la même branche. Ces contrôles ne remplacent pas les agents : ils passent à chaque fois, les agents réfléchissent.
+Le résultat (✅ / ❌) s'affiche sur la pull request, avec un commentaire du robot mis à jour à chaque contrôle. **Ne pas présenter une PR en ❌ au propriétaire** : corriger d'abord sur la même branche. Ces contrôles ne remplacent pas les agents : ils passent à chaque fois, les agents réfléchissent.
 
 ## Agents
 
