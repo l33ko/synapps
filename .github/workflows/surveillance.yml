@@ -1,6 +1,6 @@
 # SynApps — surveillance de la production
 # Après chaque mise en ligne (fusion dans main) et chaque lundi matin, un robot GitHub ouvre chaque app
-# sur app.synapsium.com (iPhone et ordinateur simulés), lit les erreurs remontées par les visiteurs,
+# sur app.synapsium.com (iPhone avec le moteur de Safari, Android et ordinateur simulés), lit les erreurs remontées par les visiteurs,
 # et écrit son compte rendu dans l'issue « Surveillance de la production » :
 #   - chaque lundi, toujours (même si tout va bien) ;
 #   - après une mise en ligne, seulement s'il y a un problème.
@@ -55,7 +55,7 @@ jobs:
       - name: Installer le navigateur
         run: |
           npm install --no-save --no-package-lock playwright@1
-          npx playwright install --with-deps chromium
+          npx playwright install --with-deps chromium webkit
 
       - name: Vérifier la production
         id: verif

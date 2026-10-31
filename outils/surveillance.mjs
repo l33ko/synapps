@@ -1,6 +1,7 @@
 // SynApps — surveillance de la production
 // Lancé par GitHub Actions (.github/workflows/surveillance.yml) après chaque mise en ligne et chaque lundi matin.
-// 1. Ouvre chaque page en production, sur iPhone et sur ordinateur, et vérifie qu'elle fonctionne.
+// 1. Ouvre chaque page en production sur iPhone (moteur WebKit, celui de Safari), Android (Chromium) et
+//    ordinateur (Chromium), et vérifie qu'elle fonctionne.
 // 2. Lit les erreurs JavaScript remontées par les visiteurs (table « erreurs » de Synapps_public).
 // Écrit le compte rendu dans rapport.md et le nombre de problèmes dans problemes.txt.
 //
@@ -9,7 +10,7 @@
 // MISE_EN_LIGNE=1 (après une fusion : seules les pages comptent ; les erreurs des visiteurs, qui peuvent
 // dater d'avant la correction, sont pour le rapport du lundi).
 
-import { chromium, devices } from 'playwright';
+import { chromium, webkit, devices } from 'playwright';
 import { writeFileSync } from 'node:fs';
 
 const BASE = (process.env.BASE || 'https://app.synapsium.com').replace(/\/$/, '');
@@ -30,9 +31,11 @@ const PAGES = [
   ['Mon jardin', '/mon-jardin/'],
 ];
 const APPAREILS = [
-  ['iPhone', devices['iPhone 13']],
-  ['ordinateur', { viewport: { width: 1280, height: 800 } }],
+  ['iPhone', 'webkit', devices['iPhone 13']],
+  ['Android', 'chromium', devices['Pixel 7']],
+  ['ordinateur', 'chromium', { viewport: { width: 1280, height: 800 } }],
 ];
+const MOBILES = ['iPhone', 'Android'];
 // Bruits normaux : polices, réseau, Supabase sans compte connecté
 const BRUIT = /Failed to load resource|net::ERR_|fonts\.(googleapis|gstatic)\.com|ERR_BLOCKED/i;
 
@@ -42,11 +45,14 @@ const date = new Date().toLocaleString('fr-FR', { timeZone: 'Europe/Paris', date
 
 // ---------- 1. Les pages ----------
 const lignes = [];
-const browser = await chromium.launch();
+const navigateurs = { chromium: await chromium.launch() };
+let noteWebkit = '';
+try { navigateurs.webkit = await webkit.launch(); }
+catch (e) { navigateurs.webkit = navigateurs.chromium; noteWebkit = '_Moteur WebKit indisponible : l’iPhone a été simulé avec Chromium._'; }
 for (const [nom, chemin] of PAGES) {
   const soucis = [];
-  for (const [appareil, options] of APPAREILS) {
-    const ctx = await browser.newContext(options);
+  for (const [appareil, moteur, options] of APPAREILS) {
+    const ctx = await navigateurs[moteur].newContext(options);
     await ctx.route('**/rest/v1/erreurs', r => r.fulfill({ status: 201, body: '', headers: { 'Access-Control-Allow-Origin': '*' } }));   // le robot ne se signale pas lui-même
     const page = await ctx.newPage();
     const erreurs = [];
@@ -64,7 +70,7 @@ for (const [nom, chemin] of PAGES) {
       }));
       if (etat.maj) soucis.push(`${appareil} : le bandeau « Une nouvelle version est disponible » s’affiche alors que rien n’a changé`);
       if (etat.test && PROD) soucis.push(`${appareil} : le badge « Version test » s’affiche en production`);
-      if (etat.deborde && appareil === 'iPhone') soucis.push('iPhone : la page déborde en largeur (défilement horizontal)');
+      if (etat.deborde && MOBILES.includes(appareil)) soucis.push(`${appareil} : la page déborde en largeur (défilement horizontal)`);
       if (etat.vide) soucis.push(`${appareil} : la page s’affiche vide`);
       for (const e of [...new Set(erreurs)].slice(0, 4)) soucis.push(`${appareil} : erreur JavaScript — \`${e.replace(/`/g, "'").slice(0, 200)}\``);
     } catch (e) {
@@ -75,9 +81,9 @@ for (const [nom, chemin] of PAGES) {
   problemes += soucis.length;
   lignes.push(soucis.length
     ? `| ⚠️ | **${nom}** | ${soucis.join('<br>')} |`
-    : `| ✅ | ${nom} | iPhone et ordinateur OK |`);
+    : `| ✅ | ${nom} | iPhone, Android et ordinateur OK |`);
 }
-await browser.close();
+for (const n of new Set(Object.values(navigateurs))) await n.close();
 
 // ---------- 2. Les erreurs des visiteurs ----------
 const err = [];
@@ -126,7 +132,7 @@ if (MISE_EN_LIGNE) {
 // ---------- Compte rendu ----------
 out.push(`## ${problemes ? `⚠️ ${problemes} point(s) à regarder` : '✅ Tout va bien'}`, '',
   `_${date} · ${process.env.RAISON || 'vérification manuelle'} · ${BASE}_`, '',
-  '### Les pages', '', '| | Page | Résultat |', '|---|---|---|', ...lignes, '',
+  '### Les pages', '', '| | Page | Résultat |', '|---|---|---|', ...lignes, '', ...(noteWebkit ? [noteWebkit, ''] : []),
   '### Les erreurs des visiteurs', '', ...err, '');
 if (problemes) out.push('> Pour corriger : ouvre une session Claude sur le dépôt et colle ce compte rendu.');
 
