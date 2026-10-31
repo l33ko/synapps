@@ -64,7 +64,7 @@ Si la version test n'est pas disponible, publier la page modifiée en aperçu pr
   - à la main, depuis l'onglet Actions.
   Ses comptes rendus vont dans l'issue GitHub « Surveillance de la production ».
 - **Toute nouvelle app** est ajoutée à la liste `PAGES` de `outils/surveillance.mjs`.
-- Quand le propriétaire colle un compte rendu de la surveillance, traiter chaque point comme un bug (règle n°1 : branche, PR, validation).
+- Quand le propriétaire colle un compte rendu de la surveillance, traiter chaque point comme un bug (règle n°1 : branche, PR, validation) ; un point qui n'est pas corrigé tout de suite devient une issue `bug` (voir « Idées et bugs »).
 
 ## Contrôles automatiques des pull requests
 
@@ -80,12 +80,15 @@ Le résultat (✅ / ❌) s'affiche sur la pull request, avec un commentaire du r
 
 ## Idées et bugs : les issues GitHub
 
-Les issues GitHub sont la **liste unique** des idées et des bugs de toutes les apps, partagée par toutes les sessions (une conversation par app ou non). Passer par l'API REST (`gh api repos/l33ko/synapps/issues…`) : GraphQL n'est pas disponible depuis les sessions.
+Les issues GitHub sont la **liste unique** des idées et des bugs de toutes les apps, partagée par toutes les sessions (une conversation par app ou non). Seule la session principale crée ou modifie des issues (pas les agents). Passer par l'API REST, car GraphQL n'est pas disponible depuis les sessions (`gh issue create` y échoue) :
+  - créer : `gh api repos/l33ko/synapps/issues -f title='…' -f body='…' -f 'labels[]=synapse' -f 'labels[]=idée'` ;
+  - lister celles d'une app : `gh api 'repos/l33ko/synapps/issues?state=open&labels=synapse&per_page=100'` ;
+  - chercher un doublon : `gh api 'search/issues?q=repo:l33ko/synapps+is:issue+is:open+<mots>'`.
 
 - **Capture** : dès que le propriétaire évoque, dans n'importe quelle conversation, une idée, une envie ou un bug **qui n'est pas traité tout de suite**, créer l'issue **sans attendre sa confirmation** et le lui signaler en une ligne, avec le lien. Le titre est court ; la description reprend ses mots, avec le contexte utile. Avant de créer, vérifier qu'une issue semblable n'est pas déjà ouverte (sinon, y ajouter un commentaire). Une pensée en l'air se ferme d'un clic.
 - **Étiquettes** : toujours celle de l'app (`accueil`, `cahier-du-cp`, `lego-builder`, `mon-jardin`, `pixel-arts`, `recettes`, `retro-console`, `synapse`, ou `commun` pour plusieurs apps, les outils ou les robots), plus le type (`idée`, `amélioration` ou `bug`), et `prioritaire` si le propriétaire le dit. Une issue créée par le formulaire GitHub n'a que son type : lui ajouter l'étiquette de l'app choisie dans le formulaire dès qu'on la lit.
 - **« Qu'est-ce qu'il reste à faire sur X ? »** : lister les issues ouvertes avec l'étiquette de X (les `prioritaire` d'abord), en une ligne chacune.
-- **Traiter une issue** : la pull request contient `Ferme #<numéro>` dans sa description. GitHub ferme alors l'issue à la fusion. Pour une grosse fonctionnalité (règle n°0), mettre aussi le lien des maquettes en commentaire de l'issue.
+- **Traiter une issue** : la pull request contient `Closes #<numéro>` dans sa description — **ce mot-clé reste en anglais** (GitHub ne reconnaît que `Closes`, `Fixes` ou `Resolves`), le reste de la description est en français. GitHub ferme alors l'issue à la fusion. Pour une grosse fonctionnalité (règle n°0), mettre aussi le lien des maquettes en commentaire de l'issue.
 - L'issue « Surveillance de la production » (étiquette `surveillance`) est le journal du robot : ne pas la fermer.
 
 ## Agents
