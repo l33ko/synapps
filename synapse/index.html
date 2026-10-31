@@ -694,6 +694,11 @@ function tone(f,t0,d,type,vol,f2){
 function sfx(good){
  if(!SND.on)return;var c=audioCtx();if(!c)return;
  try{if(good){tone(660,0,0.12,'sine',0.11);tone(990,0.09,0.2,'sine',0.11)}else tone(200,0,0.24,'triangle',0.15,110)}catch(e){}}
+/* une note par case (gamme pentatonique) pour chaque case juste de la séquence */
+var NOTES=[392,440,494,587,659,784,880,988,1175,1319,1568,1760,2093,2349,2637,3136];
+function sfxTap(c){
+ if(!SND.on)return;var ctx=audioCtx();if(!ctx)return;
+ try{tone(NOTES[c%NOTES.length],0,0.16,'sine',0.2)}catch(e){}}
 function sonLabel(){return SND.on?'Son : oui':'Son : non'}
 function sonBtn(){return '<button class="lnk sonb" data-act="son" aria-pressed="'+SND.on+'">'+sonLabel()+'</button>'}
 function toggleSon(){
@@ -1003,6 +1008,7 @@ function playMemoire(e,L){
  function play(i){if(i>=seq.length){accept=true;say('À toi');return}lit(seq[i],true);later(memLit(L),function(){lit(seq[i],false);later(220,function(){play(i+1)})})}
  function nextTrial(){
   if(trial>=5||koT>=2){endRun(e,{sc:best,ok:okT,ko:koT,dl:dlMem(best,len0)});return}
+  for(var q=0;q<btn.length;q++)btn[q].classList.remove('bad','tap','lit');
   trial++;seq=makeSeq(len,g*g);idx=0;accept=false;mt.textContent='Essai '+trial+' sur 5';ml.textContent='Longueur '+len;say('Regarde');
   later(500,function(){play(0)})}
  CUR={handle:function(a,v){
@@ -1012,6 +1018,7 @@ function playMemoire(e,L){
    b.classList.add('tap');later(180,function(){b.classList.remove('tap')});
    idx++;
    if(idx===seq.length){accept=false;sfx(true);okT++;best=Math.max(best,len);len++;say('Juste');later(800,nextTrial)}
+   else sfxTap(c);
   }else{accept=false;sfx(false);koT++;b.classList.add('bad');len=Math.max(2,len-1);say('Raté');later(1000,nextTrial)}}};
  nextTrial()}
 
