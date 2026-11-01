@@ -350,7 +350,8 @@ function genMath(op,L){L=L||1;
 function gen(id){return id==='lec'?genLec():id==='ecr'?genEcr():id==='pho'?genPho():id==='phr'?genPhr():id==='sui'?genSui():id==='pb'?genPb():id==='cpt'?genCpt():id==='int'?genInt():genMath(id==='mix'?pick(['add','sou','cmp','mul'].filter(o=>!OFF(o))):id,lv(id))}
 
 function start(id){if(STARTERS[id])return STARTERS[id]();Q={id,n:0,score:0,N:10};next()}
-function next(){if(Q.n>=Q.N)return end();Q.cur=gen(Q.id);Q.tries=0;Q.done=false;Q.hinted=false;draw();setTimeout(()=>{if(NAR()&&Q&&Q.cur&&!Q.done&&(Q.cur.sp||Q.cur.nr))say(Q.cur.sp||Q.cur.nr,Q.cur.rate)},350)}
+const sigQ=c=>c?[c.q,c.ws&&c.ws.join(' '),c.say,c.btn,c.nr,(c.opts||[]).filter(o=>o.ok).map(o=>o.h||o.t||o.v||'').join()].join('|'):'';
+function next(){if(Q.n>=Q.N)return end();Q.seen=Q.seen||new Set();let c,sg,k=0;do{c=gen(Q.id);sg=sigQ(c);k++}while(Q.seen.has(sg)&&k<60);Q.seen.add(sg);Q.cur=c;Q.tries=0;Q.done=false;Q.hinted=false;draw();setTimeout(()=>{if(NAR()&&Q&&Q.cur&&!Q.done&&(Q.cur.sp||Q.cur.nr))say(Q.cur.sp||Q.cur.nr,Q.cur.rate)},350)}
 function draw(){
  const c=Q.cur,m=MENU.find(x=>x.id===Q.id);if(c.type==='phr')return drawPhr(c,m);if(c.type==='txt')return drawTxt(c,m);if(c.key)return drawKey(c,m);
  app.innerHTML=`<div class="top"><button class="back" onclick="menu()" aria-label="Retour">←</button><div class="bar"><i style="width:${Q.n/Q.N*100}%"></i></div><span class="stars">${Q.n+1}/${Q.N}</span></div>
@@ -408,10 +409,10 @@ function genPho(){const L=lv('pho'),w=pick(wpool(L)),t=w[0];let p,k;
   else s2.add(Math.random()<.5?pick([...C+V])+miss.slice(1):miss.slice(0,-1)+pick([...C+V]))}
  return {nr:`Trouve ${k>1?'les lettres manquantes':'la lettre manquante'} pour former le mot ${t}.`,btn:t,q:`<div class="emo">${w[1]}</div><div class="word script">${t.slice(0,p)}<span class="blank">${miss}</span>${t.slice(p+k)}</div><p>${k>1?'Quelles lettres manquent ?':'Quelle lettre manque ?'}</p>`,opts:shuffle([...s2]).map(x=>({h:x,ok:x===miss,f:'script'}))}}
 /* phrases */
-const SENT={1:[['Le chat dort','🐱'],['Le chien court','🐶'],['La lune brille','🌙'],['Le soleil brille','☀️'],['Le bateau flotte','⛵'],['Le lion rugit','🦁'],['La vache mange','🐄']],
-2:[['Papa lit un livre','📖'],['Maman mange une pomme','🍎'],['Léa fait du vélo','🚲'],['Le poisson nage vite','🐟'],['Maman fait un gâteau','🍰']],
-3:[['Le lapin mange une banane','🐰'],['Léa mange une grosse glace','🍦'],['Le petit chat boit du lait','🐱'],['Papa roule en voiture rouge','🚗'],['La fleur pousse dans le jardin','🌸']],
-4:[['Où est le chat ?','🐱'],['Qui mange la pomme ?','🍎'],['Que fait le lapin ?','🐰'],['Quel beau soleil !','☀️'],['Le chien court vite !','🐶'],['Vive les vacances !','🏖️']]};
+const SENT={1:[['Le chat dort','🐱'],['Le chien court','🐶'],['La lune brille','🌙'],['Le soleil brille','☀️'],['Le bateau flotte','⛵'],['Le lion rugit','🦁'],['La vache mange','🐄'],['Le cheval galope','🐴'],['La poule pond','🐔'],['Le singe saute','🐵'],['Le vent souffle','💨']],
+2:[['Papa lit un livre','📖'],['Maman mange une pomme','🍎'],['Léa fait du vélo','🚲'],['Le poisson nage vite','🐟'],['Maman fait un gâteau','🍰'],['Papa lave la voiture','🚗'],['Le chat boit du lait','🥛'],['Paul joue au ballon','⚽'],['Le bébé dort bien','👶'],['Lola lit un livre','📚'],['Le chien mange un os','🦴']],
+3:[['Le lapin mange une banane','🐰'],['Léa mange une grosse glace','🍦'],['Le petit chat boit du lait','🐱'],['Papa roule en voiture rouge','🚗'],['La fleur pousse dans le jardin','🌸'],['Le petit oiseau chante dans l’arbre','🐦'],['Maman prépare une bonne soupe chaude','🍲'],['Le gros camion roule sur la route','🚚'],['Paul range ses jouets dans sa chambre','🧸'],['La petite souris mange du fromage','🐭']],
+4:[['Où est le chat ?','🐱'],['Qui mange la pomme ?','🍎'],['Que fait le lapin ?','🐰'],['Quel beau soleil !','☀️'],['Le chien court vite !','🐶'],['Vive les vacances !','🏖️'],['Comment tu t’appelles ?','🙋'],['Quel temps fait-il ?','🌦️'],['Bravo, tu as gagné !','🏆'],['Où va le train ?','🚂'],['Joyeux anniversaire !','🎂']]};
 function genPhr(){const L=lv('phr'),[s,e]=pick(SENT[L<=2?1:L<=4?2:L<=7?3:4]);const ws=s.split(' ');if(!/[.?!]$/.test(s))ws[ws.length-1]+='.';let t;do{t=shuffle(ws.map((w,i)=>({w,i})))}while(t.every((x,i)=>x.i===i));return {nr:null,nb:true,type:'phr',emo:e,ws,tiles:t,placed:[]}}
 function drawPhr(c,m){app.innerHTML=hdr(Q.n/Q.N,`${Q.n+1}/${Q.N}`)+`<div class="q" style="background:var(${m.c})"><div class="emo">${c.emo}</div><p>Remets les étiquettes dans l’ordre</p><div class="line">`+c.placed.map(i=>`<button class="tile" onclick="unplace(${i})">${c.ws[i]}</button>`).join('')+`</div></div><div class="pool">`+c.tiles.map(t=>`<button class="tile" ${c.placed.includes(t.i)?'disabled':''} onclick="place(${t.i})">${t.w}</button>`).join('')+`</div><div class="fb" id="fb" aria-live="polite"></div>`}
 const rp=()=>drawPhr(Q.cur,curM());
