@@ -96,6 +96,13 @@ Les issues GitHub sont la **liste unique** des idées et des bugs de toutes les 
 - **Étiquettes** : toujours celle de l'app (`accueil`, `cahier-du-cp`, `lego-builder`, `mon-jardin`, `pixel-arts`, `recettes`, `retro-console`, `synapse`, ou `commun` pour plusieurs apps, les outils ou les robots), plus le type (`idée`, `amélioration` ou `bug`), et `prioritaire` si le propriétaire le dit. Une issue créée par le formulaire GitHub n'a que son type : lui ajouter l'étiquette de l'app choisie dans le formulaire dès qu'on la lit.
 - **« Qu'est-ce qu'il reste à faire sur X ? »** : lister les issues ouvertes avec l'étiquette de X (les `prioritaire` d'abord), en une ligne chacune.
 - **Traiter une issue** : la pull request contient `Closes #<numéro>` dans sa description — **ce mot-clé reste en anglais** (GitHub ne reconnaît que `Closes`, `Fixes` ou `Resolves`), le reste de la description est en français. GitHub ferme alors l'issue à la fusion. Pour une grosse fonctionnalité (règle n°0), mettre aussi le lien des maquettes en commentaire de l'issue.
+- **Traiter plusieurs issues d'un coup** (« on s'attaque à #12, #15 et #18 », « traite les issues ouvertes du cahier ») :
+  - **même app et petites retouches** (textes, couleurs, petits bugs) → une seule branche et **une seule PR**, qui ferme toutes les issues (`Closes #12, closes #15`) ;
+  - **sinon** (apps différentes, ou modification importante) → **une branche et une PR par issue** ;
+  - **une grosse fonctionnalité** du lot passe d'abord par les maquettes (règle n°0) : faire avancer les autres jusqu'à la PR, et présenter ses maquettes à côté ;
+  - deux issues qui touchent le même fichier dans des PR séparées sont traitées l'une après l'autre (la seconde part de la première) ;
+  - les agents passent une fois le lot terminé, puis le propriétaire reçoit **un seul récapitulatif** : pour chaque issue, sa PR, le lien de la version test, les captures et le verdict des agents. Il valide tout ou partie (« validé tout », « validé #63 et #64, corrige #65 ») ;
+  - le propriétaire peut imposer le regroupement (« fais-en une seule PR » / « une PR par issue »).
 - L'issue « Surveillance de la production » (étiquette `surveillance`) est le journal du robot : ne pas la fermer.
 
 ## Agents
