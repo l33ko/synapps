@@ -2,6 +2,12 @@
 
 Dépôt des mini apps publiques de l33ko, publiées sur **https://app.synapsium.com** (GitHub Pages, branche `main`, fichier `CNAME`). Tout ce qui arrive sur `main` est **immédiatement en production**.
 
+## Avant toute nouvelle tâche : se mettre à jour
+
+Une conversation peut durer plusieurs jours, et ces règles changent. **Au début de chaque nouvelle demande du propriétaire** (pas à chaque message d'une même tâche) :
+1. `git fetch origin main`, puis repartir de `origin/main` à jour pour toute nouvelle branche ;
+2. si `CLAUDE.md` (ou un fichier de `.claude/agents/`) a changé sur `origin/main` depuis la dernière lecture (`git diff HEAD origin/main -- CLAUDE.md .claude/`), **le relire en entier et appliquer la nouvelle version**, en le signalant au propriétaire en une ligne (« Règles mises à jour : … »).
+
 ## Règle n°0 : maquettes validées avant de coder une grosse fonctionnalité
 
 **Grosse fonctionnalité** = nouvelle app, nouveau module ou nouvel écran, refonte d'un écran existant, nouveau parcours (connexion, partage, famille…). Les corrections de bugs, retouches de textes et petits ajustements passent directement par la règle n°1. En cas de doute, demander.
