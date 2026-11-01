@@ -15,8 +15,7 @@ L'interface imite un cahier à lignes Seyès, avec de gros boutons faciles à to
 **Mathématiques**
 - **Additions** et **soustractions** : de 0 à 5 jusqu'à 99, avec le passage de la dizaine aux niveaux avancés.
 - **Compléments** : 7 + ? = 10, puis jusqu'à 20 et 100.
-- **Problèmes** : petites histoires de la vie courante (donner des pommes, la monnaie rendue par la marchande, des boîtes qui contiennent le même nombre d'objets), lues lentement, phrase par phrase, avec des pauses. Aux niveaux avancés, certaines demandent deux étapes et d'autres un partage équitable.
-- **Compter** : dénombrer des objets à l'écran.
+- **Problèmes** : petites histoires de la vie courante (donner des pommes, la monnaie rendue par la marchande, des boîtes qui contiennent le même nombre d'objets, et à partir du niveau 5 des paquets de dix et des unités à dénombrer : « Combien y en a-t-il ? »), lues lentement, phrase par phrase, avec des pauses. Aux niveaux avancés, certaines demandent deux étapes et d'autres un partage équitable.
 - **Doubles et moitiés** : doubles, moitiés, groupes égaux, puis les tables de 2, 3, 4, 5 et 10 aux derniers niveaux seulement.
 - **Maths mélangées** : un défi qui combine additions, soustractions, compléments et doubles.
 
@@ -54,7 +53,7 @@ Les attendus de fin de CP en mathématiques ne mentionnent pas les tables de mul
 ## Confort et audio
 
 - **Consignes orales** : chaque exercice annonce sa consigne à voix haute, pour les enfants qui ne lisent pas encore, par exemple « Trouve le mot qui correspond à l'image » ou « Complète la suite ». En Lecture et en Écriture, le mot à trouver n'est pas dit dans la consigne ; dans Mots à compléter, le mot est prononcé.
-- **Bouton 🔊 Écouter** : selon l'exercice, il redit le mot à trouver (Lecture, Écriture, Mots à compléter) ou la consigne (Compléments, Intrus, Doubles et moitiés), et relit l'énoncé dans Problèmes. Il n'y en a pas dans Additions, Soustractions, Phrases, Compter et Suites.
+- **Bouton 🔊 Écouter** : selon l'exercice, il redit le mot à trouver (Lecture, Écriture, Mots à compléter) ou la consigne (Compléments, Doubles et moitiés), et relit l'énoncé dans Problèmes. Il n'y en a pas dans Additions, Soustractions, Phrases, Intrus et Suites.
 - **Retours** : une bonne réponse est signalée par un son seul, sans message. « Essaie encore » est dit et écrit en cas d'erreur. Un petit son accompagne aussi chaque bouton.
 - **Voix** : l'application choisit la meilleure voix française de l'appareil. La qualité dépend de l'appareil : pour une voix plus naturelle, installer une voix « améliorée » ou « premium » dans les réglages du système, puis la choisir dans la configuration.
 - **Smartphone** : le zoom est bloqué, et quand un exercice tient dans l'écran, le défilement est verrouillé pour que l'enfant ne fasse pas défiler la page sans le vouloir.
