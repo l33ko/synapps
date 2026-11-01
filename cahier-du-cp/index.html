@@ -71,6 +71,11 @@ h1{font-size:2rem;margin:.2em 0 0;line-height:1.2}
 .card .e{font-size:2.4rem;line-height:1}
 .card:last-child{grid-column:1/-1}
 .card{min-height:112px}
+.pg{display:flex;flex-direction:column;align-items:center;gap:3px;width:82%}
+.pgb{display:flex;gap:2px;width:100%}
+.pgb i{flex:1;height:7px;border-radius:3px;background:rgba(127,127,127,.3)}
+.pgb i.on{background:var(--ink,#2a3b5c)}
+.pgt{font-size:.75rem;font-weight:600;opacity:.8}
 .card small{font-weight:400;font-size:.85rem}
 .back{border-radius:14px;background:var(--card);font-size:1.4rem;padding:6px 14px}
 .bar{flex:1;height:18px;border:3px solid var(--sh);border-radius:99px;background:var(--card);overflow:hidden}
@@ -237,11 +242,12 @@ document.addEventListener('pointerdown',()=>{if(window.__vu)return;window.__vu=1
 function setVoice(n){try{if(n)localStorage.setItem('cp-voice',n);else localStorage.removeItem('cp-voice')}catch(e){}loadVoice();testVoice()}
 function testVoice(){VERR='';say('Bonjour ! Je suis la voix de ton cahier.');setTimeout(()=>{const m=document.getElementById('vm'),n=(()=>{try{return speechSynthesis.getVoices().length}catch(e){return 0}})();if(m)m.textContent=!window.speechSynthesis?'Ce navigateur ne sait pas parler.':`Voix : ${VOICE?VOICE.name:'aucune voix française trouvée'} (${n} voix sur l’appareil)${VERR?' · erreur : '+VERR:''}`},900)}
 
+function prog(id){const n=lvS(id);return `<span class="pg" aria-label="Niveau ${n} sur 10"><span class="pgb">${Array.from({length:10},(_,i)=>`<i${i<n?' class="on"':''}></i>`).join('')}</span><span class="pgt">Niveau ${n}</span></span>`}
 function menu(){
  Q=null;PLAY={};setTimeout(tick,0);
  app.innerHTML=`<div class="top"><h1>Salut ${esc(P)} ! 👋</h1><span class="stars">⭐ ${stars}</span></div>
  <button class="chip" onclick="parents()">⚙️ Parents</button> <button class="chip" onclick="who()">👤 Changer de joueur</button> <button class="chip" onclick="togTheme()">${TH==='dark'?'☀️ Mode clair':'🌙 Mode sombre'}</button><p class="sub">À quoi veux-tu jouer ?</p><div class="grid">`+
- MENU.filter(m=>!OFF(m.id)).map(m=>`<button class="card" style="background:var(${m.c})" onclick="lvl('${m.id}')"><span class="e">${m.e}</span>${m.t}</button>`).join('')+`</div>`;
+ MENU.filter(m=>!OFF(m.id)).map(m=>`<button class="card" style="background:var(${m.c})" onclick="lvl('${m.id}')"><span class="e">${m.e}</span>${m.t}${prog(m.id)}</button>`).join('')+`</div>`;
 }
 
 const R=(a,b)=>a+rnd(b-a+1);
