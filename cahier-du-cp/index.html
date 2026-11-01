@@ -242,7 +242,7 @@ document.addEventListener('pointerdown',()=>{if(window.__vu)return;window.__vu=1
 function setVoice(n){try{if(n)localStorage.setItem('cp-voice',n);else localStorage.removeItem('cp-voice')}catch(e){}loadVoice();testVoice()}
 function testVoice(){VERR='';say('Bonjour ! Je suis la voix de ton cahier.');setTimeout(()=>{const m=document.getElementById('vm'),n=(()=>{try{return speechSynthesis.getVoices().length}catch(e){return 0}})();if(m)m.textContent=!window.speechSynthesis?'Ce navigateur ne sait pas parler.':`Voix : ${VOICE?VOICE.name:'aucune voix française trouvée'} (${n} voix sur l’appareil)${VERR?' · erreur : '+VERR:''}`},900)}
 
-function prog(id){const n=lvS(id);return `<span class="pg" aria-label="Niveau ${n} sur 10"><span class="pgb">${Array.from({length:10},(_,i)=>`<i${i<n?' class="on"':''}></i>`).join('')}</span><span class="pgt">Niveau ${n}</span></span>`}
+function prog(id){const n=lvS(id);return `<span class="pg"><span class="pgb" aria-hidden="true">${Array.from({length:10},(_,i)=>`<i${i<n?' class="on"':''}></i>`).join('')}</span><span class="pgt">Niveau ${n} sur 10</span></span>`}
 function menu(){
  Q=null;PLAY={};setTimeout(tick,0);
  app.innerHTML=`<div class="top"><h1>Salut ${esc(P)} ! 👋</h1><span class="stars">⭐ ${stars}</span></div>
