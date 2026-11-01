@@ -465,7 +465,7 @@ function genPb(){const L=lv('pb'),n=pick(HEROES),f=pick(NAMES),[it,em0]=pick(ITE
  else if(T==='t'){const g=pick(NAMES.filter(x=>x!==f)),a=R(12,Math.min(MX,60)),b=R(2,Math.floor(a/3)),c=R(2,Math.floor(a/3));ans=a-b-c;t=`${n} a ${a} ${it}. ${n} en donne ${b} à ${f}, puis ${c} à ${g}. Combien de ${it} reste-t-il à ${n} ?`}
  else{const [g,e]=gl(()=>{const g=R(2,5),e=R(2,6);return g*e<=30&&[g,e]});ans=e;t=`${g*e} ${it} sont partagés équitablement entre ${g} enfants. Combien de ${it} chaque enfant reçoit-il ?`}
  const h=pk?pk+'<button class="tile" onclick="say(Q.cur.sp,.78)">🔊 Écouter</button>':`<div class="emo" style="font-size:3rem">${em}</div><p class="ptxt">${t}</p><button class="tile" onclick="say(Q.cur.sp,.78)">🔊 Écouter</button>`;
- const sp=['Écoute bien l’histoire.',...t.split(/(?<=[.?])\s+/)];
+ const sp=[...(pk?[]:['Écoute bien l’histoire.']),...t.split(/(?<=[.?])\s+/)];
  return {nr:t,sp,rate:.78,nb:true,q:h,opts:near(ans),say:t,key:L>=4?{html:h,ans,v:''}:null}}
 /* suites */
 const EMS=['🍎','🐱','⭐','🌙','🚗','🎈','🐟','🌸','🐶','🍌'];
