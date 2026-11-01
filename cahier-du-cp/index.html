@@ -60,6 +60,7 @@ html{scroll-padding-top:env(safe-area-inset-top,0px)}
 body{margin:0;min-height:100vh;min-height:100dvh;font-family:'Andika','Comic Sans MS',sans-serif;color:var(--ink);background-color:var(--paper);
 background-image:linear-gradient(var(--line) 1px,transparent 1px);background-size:100% 32px;-webkit-tap-highlight-color:transparent}
 #app{max-width:620px;margin:0 auto;padding:16px 16px 70px}
+@media (min-width:900px){body #app{padding-left:44px}body::before{content:'';position:fixed;top:0;bottom:0;left:calc(50% - 310px + 28px);width:2px;background:var(--margin);z-index:-1;pointer-events:none}}
 h1{font-size:2rem;margin:.2em 0 0;line-height:1.2}
 .sub{margin:0 0 18px;font-size:1.1rem}
 .top{display:flex;align-items:center;gap:12px;margin-bottom:14px}
@@ -75,7 +76,6 @@ h1{font-size:2rem;margin:.2em 0 0;line-height:1.2}
 .pgb{display:flex;gap:2px;width:100%}
 .pgb i{flex:1;height:7px;border-radius:3px;background:rgba(127,127,127,.3)}
 .pgb i.on{background:var(--ink,#2a3b5c)}
-.pgt{font-size:.75rem;font-weight:600;opacity:.8}
 .card small{font-weight:400;font-size:.85rem}
 .back{border-radius:14px;background:var(--card);font-size:1.4rem;padding:6px 14px}
 .bar{flex:1;height:18px;border:3px solid var(--sh);border-radius:99px;background:var(--card);overflow:hidden}
@@ -160,6 +160,7 @@ html,body{touch-action:pan-x pan-y;-webkit-text-size-adjust:100%}
 .emo{font-size:clamp(2.6rem,9vh,5.5rem)}
 .big{width:70px;height:70px;font-size:2rem}
 .word{font-size:clamp(2rem,5.5vh,3rem);line-height:1.3}
+.word.cursive{line-height:1.75}
 .math{font-size:clamp(2.2rem,6vh,3.4rem)}
 .opts{gap:10px}
 .opt{min-height:clamp(52px,9vh,76px);padding:6px;font-size:1.8rem}
@@ -242,12 +243,12 @@ document.addEventListener('pointerdown',()=>{if(window.__vu)return;window.__vu=1
 function setVoice(n){try{if(n)localStorage.setItem('cp-voice',n);else localStorage.removeItem('cp-voice')}catch(e){}loadVoice();testVoice()}
 function testVoice(){VERR='';say('Bonjour ! Je suis la voix de ton cahier.');setTimeout(()=>{const m=document.getElementById('vm'),n=(()=>{try{return speechSynthesis.getVoices().length}catch(e){return 0}})();if(m)m.textContent=!window.speechSynthesis?'Ce navigateur ne sait pas parler.':`Voix : ${VOICE?VOICE.name:'aucune voix française trouvée'} (${n} voix sur l’appareil)${VERR?' · erreur : '+VERR:''}`},900)}
 
-function prog(id){const n=lvS(id);return `<span class="pg"><span class="pgb" aria-hidden="true">${Array.from({length:10},(_,i)=>`<i${i<n?' class="on"':''}></i>`).join('')}</span><span class="pgt">Niveau ${n} sur 10</span></span>`}
+function prog(id){const n=lvS(id);return `<span class="pg"><span class="pgb" aria-hidden="true">${Array.from({length:10},(_,i)=>`<i${i<n?' class="on"':''}></i>`).join('')}</span></span>`}
 function menu(){
  Q=null;PLAY={};setTimeout(tick,0);
  app.innerHTML=`<div class="top"><h1>Salut ${esc(P)} ! 👋</h1><span class="stars">⭐ ${stars}</span></div>
  <button class="chip" onclick="parents()">⚙️ Parents</button> <button class="chip" onclick="who()">👤 Changer de joueur</button> <button class="chip" onclick="togTheme()">${TH==='dark'?'☀️ Mode clair':'🌙 Mode sombre'}</button><p class="sub">À quoi veux-tu jouer ?</p><div class="grid">`+
- MENU.filter(m=>!OFF(m.id)).map(m=>`<button class="card" style="background:var(${m.c})" onclick="lvl('${m.id}')"><span class="e">${m.e}</span>${m.t}${prog(m.id)}</button>`).join('')+`</div>`;
+ MENU.filter(m=>!OFF(m.id)).map(m=>`<button class="card" style="background:var(${m.c})" aria-label="${m.t}, niveau ${lvS(m.id)} sur 10" onclick="lvl('${m.id}')"><span class="e">${m.e}</span>${m.t}${prog(m.id)}</button>`).join('')+`</div>`;
 }
 
 const R=(a,b)=>a+rnd(b-a+1);
@@ -440,7 +441,7 @@ const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'
 const near=ans=>{const s=new Set([ans]);while(s.size<4){const d=ans+pick([-3,-2,-1,1,2,3]);if(d>=0)s.add(d)}return shuffle([...s]).map(x=>({h:x,ok:x===ans}))};
 /* joueurs et sauvegarde */
 function persist(){if(!P)return;D.profiles[P]={stars,lv:LV};D.last=P;try{localStorage.setItem('cp-data',JSON.stringify(D))}catch(e){}if(DBREF)DBREF.set({profiles:D.profiles,last:D.last,set:D.set,ver:2}).catch(()=>{});schedSync()}
-function who(){app.innerHTML=`<h1>Qui joue ?</h1><div class="grid">`+Object.keys(D.profiles).map(n=>`<button class="card" style="background:var(--c2)" data-n="${esc(n)}" onclick="pickP(this.dataset.n)"><span class="e">🧒</span>${esc(n)}<small>⭐ ${D.profiles[n].stars||0}</small></button>`).join('')+`</div><p class="sub" style="margin-top:18px">Nouveau joueur :</p><div class="top"><input id="nm" class="inp" maxlength="16" placeholder="Ton prénom" autocomplete="off"><button class="again" onclick="newP()">OK</button></div><p class="sub" style="margin-top:22px"><button class="chip" onclick="cloud('w')">☁️ Retrouver mes données</button> <button class="chip" onclick="backup()">💾 Avec un code</button></p>`}
+function who(){app.innerHTML=`<h1 style="margin-bottom:16px">Qui joue ?</h1><div class="grid">`+Object.keys(D.profiles).map(n=>`<button class="card" style="background:var(--c2)" data-n="${esc(n)}" onclick="pickP(this.dataset.n)"><span class="e">🧒</span>${esc(n)}<small>⭐ ${D.profiles[n].stars||0}</small></button>`).join('')+`</div><p class="sub" style="margin-top:18px">Nouveau joueur :</p><div class="top"><input id="nm" class="inp" maxlength="16" placeholder="Ton prénom" autocomplete="off"><button class="again" onclick="newP()">OK</button></div><p class="sub" style="margin-top:22px"><button class="chip" onclick="cloud('w')">☁️ Retrouver mes données</button> <button class="chip" onclick="backup()">💾 Avec un code</button></p>`}
 function pickP(n){P=n;D.last=n;initSession();D.profiles[n]=D.profiles[n]||{stars:0,lv:{}};stars=D.profiles[n].stars||0;LV=D.profiles[n].lv||{};persist();menu()}
 function newP(){const n=document.getElementById('nm').value.trim().slice(0,16);if(n)pickP(n)}
 (async()=>{try{if(typeof claude==='undefined')return;const db=await claude.use('db'),us=await claude.use('user');if(!db||!us)return;const uid=await us.id();if(!uid)return;DBREF=db.collection('data/users/'+uid).doc('cp');const s=await DBREF.get(),r=s.exists?s.data():null;
@@ -501,9 +502,9 @@ function genInt(){const L=lv('int'),top='<div class="emo" style="font-size:3rem"
   if(rule==='par'){const ev=Math.random()<.5;same=shuffle(pool.filter(x=>(x%2===0)===ev)).slice(0,3);odd=pick(pool.filter(x=>(x%2===0)!==ev))}
   else if(rule==='m5'){same=shuffle(pool.filter(x=>x%5===0)).slice(0,3);odd=pick(pool.filter(x=>x%5!==0))}
   else{same=shuffle(pool.filter(x=>x%10===0)).slice(0,3);odd=pick(pool.filter(x=>x%10!==0))}
-  return {nr:'Trouve l’intrus.',q:top+'<p>Trouve le nombre qui n’est pas comme les autres !</p>',opts:shuffle([...same,odd]).map(x=>({h:x,ok:x===odd}))}}
+  return {nr:'Trouve l’intrus.',nb:true,q:top+'<p>Trouve le nombre qui n’est pas comme les autres !</p>',opts:shuffle([...same,odd]).map(x=>({h:x,ok:x===odd}))}}
  const subtle=[['ferme','sauvages'],['fruits','legumes'],['mer','sauvages'],['mer','ferme']],[a,b]=L<=2?shuffle(['fruits','vehicules','vetements','ferme']).slice(0,2):L<=4?shuffle(Object.keys(GR)).slice(0,2):shuffle(pick(subtle)),same=shuffle(GR[a]).slice(0,3),odd=pick(GR[b]);
- return {nr:'Trouve l’intrus.',q:top+'<p>Trouve l’intrus : lequel n’est pas comme les autres ?</p>',opts:shuffle([...same,odd]).map(x=>({h:x,ok:x===odd}))}}
+ return {nr:'Trouve l’intrus.',nb:true,q:top+'<p>Trouve l’intrus : lequel n’est pas comme les autres ?</p>',opts:shuffle([...same,odd]).map(x=>({h:x,ok:x===odd}))}}
 /* temps de jeu, espace parents, sauvegarde */
 const DURS=[5,10,15,20,30,45,60,0];
 let SS=null,OVM='',GATE=null;
