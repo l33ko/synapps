@@ -150,6 +150,7 @@ textarea.inp{width:100%;min-height:90px;font-size:1rem;word-break:break-all;disp
 .msg{min-height:1.6em;font-weight:700;margin:8px 0}
 @keyframes pop{50%{transform:scale(1.07)}}
 @keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.chip.optb{text-align:left;border-radius:16px;padding:14px 18px;line-height:1.4}
 .sess{background:var(--card);border:3px solid var(--sh);border-radius:18px;padding:10px 14px;margin:0 0 14px;display:flex;align-items:center;gap:10px}
 .sess .bar{margin-top:4px}
 .bonus{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:20px}
@@ -272,7 +273,7 @@ function prog(id){const n=lvS(id);return `<span class="pg"><span class="pgb" ari
 /* mini-jeux bonus */
 const BMODE=()=>D.set&&D.set.bonus==='direct'?'direct':'coffre';
 const BEFF=()=>DUR()?BMODE():'direct';
-const BP=()=>D.set&&D.set.bp===4?4:5;
+const BP=()=>5;
 const BPLAYED=()=>SS&&+SS.bp||0;
 let BOPEN=false,BT=[];
 const stopBT=()=>{BT.forEach(t=>{clearInterval(t);clearTimeout(t)});BT=[]};
@@ -627,13 +628,14 @@ function gateOk(){const v=+document.getElementById('gin').value;
 const DIS=[['mix','Maths mélangées'],['pb','Problèmes'],['mul','Doubles et moitiés'],['cmp','Compléments']];
 function togMod(id){const a=(D.set.off||[]).filter(x=>x!==id);if(!OFF(id))a.push(id);D.set.off=a;saveD();persist();parentPanel()}
 function closeCfg(){closeOvT();if(!Q&&P)menu()}
-function parentPanel(){const cur=DUR(),left=SS?LEFT():0;const fr=frVoices();
+function parentPanel(){const ovEl=document.getElementById('ov'),h=ovEl.querySelector('h1'),keep=OVM==='other'&&ovEl.style.display==='block'&&h&&h.textContent.includes('Configuration')?ovEl.scrollTop:0;parentPanel0();ovEl.scrollTop=keep}
+function parentPanel0(){const cur=DUR(),left=SS?LEFT():0;const fr=frVoices();
  let pv='';try{pv=localStorage.getItem('cp-voice')||''}catch(e){}
  openOv('other',`<h1>⚙️ Configuration</h1>
 <h2 class="h2">⏱️ Temps de jeu</h2><div class="row">${DURS.map(m=>`<button class="chip ${m===cur?'on':''}" onclick="setDur(${m})">${m?m+' min':'Sans limite'}</button>`).join('')}</div><p class="sub">${!cur?'Pas de limite de temps.':left>0?'Temps restant : '+fmt(left):'Temps écoulé.'} Une nouvelle session démarre aussi chaque jour.</p><button class="again" onclick="startSess()">▶️ Nouvelle session</button>
 <h2 class="h2">🎮 Mini-jeux</h2><p class="sub" style="font-size:.95rem;margin-bottom:8px">Morpion, Puissance 4 et Attrape les étoiles.</p>
-<div class="row" style="flex-direction:column;align-items:stretch"><button class="chip ${BMODE()==='coffre'?'on':''}" style="text-align:left" onclick="setBonus('coffre')">${BMODE()==='coffre'?'● ':'○ '}<b>Bonus de fin de séance</b> (par défaut)<br><small>Visibles sur l'accueil, grisés avec un cadenas. Ils s'ouvrent dans un coffre à la fin de la séance.</small></button><button class="chip ${BMODE()==='direct'?'on':''}" style="text-align:left" onclick="setBonus('direct')">${BMODE()==='direct'?'● ':'○ '}<b>Toujours accessibles</b><br><small>Ouverts sur l'accueil, sans cadenas, dans la limite du temps de jeu. Pas de bonus en fin de séance.</small></button></div>
-${BMODE()==='coffre'&&cur?`<p class="sub" style="margin:0 0 6px">Parties bonus par séance :</p><div class="row">${[4,5].map(n=>`<button class="chip ${BP()===n?'on':''}" onclick="setBP(${n})">${n} parties</button>`).join('')}</div>`:''}${!cur?`<p class="sub" style="font-size:.9rem">Sans limite de temps, il n'y a pas de fin de séance : les jeux restent accessibles.</p>`:''}
+<div class="row" style="flex-direction:column;align-items:stretch"><button class="chip optb ${BMODE()==='coffre'?'on':''}" onclick="setBonus('coffre')">${BMODE()==='coffre'?'● ':'○ '}<b>Bonus de fin de séance</b> (par défaut)<br><small>Visibles sur l'accueil, grisés avec un cadenas. Ils s'ouvrent dans un coffre à la fin de la séance : 5 parties bonus.</small></button><button class="chip optb ${BMODE()==='direct'?'on':''}" onclick="setBonus('direct')">${BMODE()==='direct'?'● ':'○ '}<b>Toujours accessibles</b><br><small>Ouverts sur l'accueil, sans cadenas, dans la limite du temps de jeu. Pas de bonus en fin de séance.</small></button></div>
+${!cur?`<p class="sub" style="font-size:.9rem">Sans limite de temps, il n'y a pas de fin de séance : les jeux restent accessibles.</p>`:''}
 <h2 class="h2">🔊 Voix et consignes</h2><div class="row"><button class="chip ${NAR()?'on':''}" onclick="togNar()">${NAR()?'Consignes orales : oui':'Consignes orales : non'}</button></div>
 <select id="vsel" class="inp" style="width:100%;margin-bottom:10px" onchange="setVoice(this.value)"><option value="">Voix automatique</option>${fr.map(v=>`<option value="${esc(v.name)}" ${v.name===pv?'selected':''}>${HQ(v)?'★ ':''}${esc(v.name)}${v.localService?'':' (en ligne)'}</option>`).join('')}</select>
 <button class="chip" onclick="testVoice()">🔈 Tester la voix</button><p class="sub" style="font-size:.85rem;margin:10px 0 0">Pour une voix plus naturelle (★), installe une voix « améliorée » ou « premium » dans les réglages de ton appareil. Sur Mac : Réglages Système › Accessibilité › Contenu énoncé › Voix du système › Gérer les voix › Français.</p><p class="msg" id="vm" style="font-size:.85rem;font-weight:400"></p>
@@ -641,7 +643,6 @@ ${BMODE()==='coffre'&&cur?`<p class="sub" style="margin:0 0 6px">Parties bonus p
 <h2 class="h2">☁️ Retrouver mes données</h2><p class="sub">${cloudLine()}</p><div class="row"><button class="chip" onclick="cloud('p')">${AUTH?'Synchronisation':'Se connecter avec un e-mail'}</button><button class="chip" onclick="backup(1)">💾 Code de sauvegarde</button></div>
 <button class="again" style="margin-top:18px" onclick="closeCfg()">Fermer</button>`)}
 function setBonus(m){D.set.bonus=m;saveD();persist();parentPanel()}
-function setBP(n){D.set.bp=n;saveD();persist();parentPanel()}
 function setDur(m){D.set.min=m;saveD();persist();if(!SS)newSession();parentPanel()}
 function startSess(){newSession();closeOvT()}
 /* code de sauvegarde */
@@ -651,7 +652,7 @@ function applyCode(o,sets,quiet){let n=0;const ids=MENU.map(x=>x.id);
  for(const k in o.p){const nm=String(k).trim().slice(0,16);if(!nm||nm==='__proto__')continue;const b=o.p[k]||{},st=Math.min(99999,Math.max(0,parseInt(b.stars)||0)),l={};
   for(const id of ids){let v=parseInt((b.lv||{})[id]);if(!(v>=1))continue;if(o.v!==2)v=[1,4,7][v-1]||1;if(v>=1&&v<=10)l[id]=v}
   const a=D.profiles[nm];if(!a||st>(a.stars||0))D.profiles[nm]={stars:st,lv:l};n++}
- if(o.s&&sets!==false){if(DURS.includes(+o.s.min))D.set.min=+o.s.min;if(Array.isArray(o.s.off))D.set.off=o.s.off.filter(x=>typeof x==='string').slice(0,20);if(o.s.bonus==='direct'||o.s.bonus==='coffre')D.set.bonus=o.s.bonus;if(o.s.bp===4||o.s.bp===5)D.set.bp=o.s.bp}
+ if(o.s&&sets!==false){if(DURS.includes(+o.s.min))D.set.min=+o.s.min;if(Array.isArray(o.s.off))D.set.off=o.s.off.filter(x=>typeof x==='string').slice(0,20);if(o.s.bonus==='direct'||o.s.bonus==='coffre')D.set.bonus=o.s.bonus}
  if(P&&D.profiles[P]){stars=D.profiles[P].stars||0;LV=D.profiles[P].lv||{}}
  saveD();if(!quiet)persist();return n}
 let BKP=false;
