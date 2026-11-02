@@ -151,6 +151,10 @@ textarea.inp{width:100%;min-height:90px;font-size:1rem;word-break:break-all;disp
 @keyframes pop{50%{transform:scale(1.07)}}
 @keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
 .chip.optb{text-align:left;border-radius:16px;padding:14px 18px;line-height:1.4}
+.txt{font-size:1.25rem;line-height:1.75;text-align:left;margin:0 0 10px}
+.qq{background:var(--card);border:3px solid var(--sh);border-radius:14px;padding:8px 12px;margin-top:10px;text-align:center}
+.qq small{display:block;opacity:.75;font-size:.9rem}.qq b{font-size:1.2rem}
+.opt.rd{font-size:1.15rem;font-weight:700;min-height:56px;padding:8px;line-height:1.25}
 .sess{background:var(--card);border:3px solid var(--sh);border-radius:18px;padding:10px 14px;margin:0 0 14px;display:flex;align-items:center;gap:10px}
 .sess .bar{margin-top:4px}
 .bonus{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:20px}
@@ -314,8 +318,46 @@ const WSIM=[
  [['lit','🛏️'],['livre','📖'],['lion','🦁'],['lampe','💡']],
  [['rose','🌹'],['robe','👗'],['roi','👑'],['rat','🐀']],
  [['chien','🐶'],['cheval','🐴'],['chaise','🪑'],['chèvre','🐐']]];
+const TXA=[
+ [["Tom a un chien noir.","Le chien court dans le jardin."],"De quelle couleur est le chien ?","Noir",["Blanc","Marron","Gris"]],
+ [["Léa mange une pomme rouge.","Elle est très bonne."],"Que mange Léa ?","Une pomme",["Une poire","Un gâteau","Une banane"]],
+ [["Papa prépare le repas.","Il fait une soupe chaude."],"Qui prépare le repas ?","Papa",["Maman","Tom","Mamie"]],
+ [["Il pleut ce matin.","Nina prend son parapluie."],"Que prend Nina ?","Son parapluie",["Son manteau","Son sac","Son vélo"]],
+ [["Le chat boit du lait.","Puis il dort sur le canapé."],"Que fait le chat après avoir bu ?","Il dort",["Il joue","Il court","Il mange"]],
+ [["Mamie a trois poules.","Elles vivent dans le jardin."],"Combien de poules a Mamie ?","3",["2","4","5"]],
+ [["Sam range ses jouets.","Il les met dans une boîte bleue."],"Où Sam met-il ses jouets ?","Dans une boîte",["Dans un sac","Sous le lit","Sur la chaise"]],
+ [["La souris est petite et grise.","Elle mange du fromage."],"Qui mange du fromage ?","La souris",["Le chat","Le chien","L’oiseau"]],
+ [["Mia a un ballon jaune.","Elle joue avec Lou."],"Avec qui Mia joue-t-elle ?","Lou",["Tom","Léa","Papa"]],
+ [["Le soleil brille.","Les enfants vont à la plage."],"Où vont les enfants ?","À la plage",["À l’école","À la piscine","Au marché"]],
+ [["Lina a un vélo rouge.","Elle roule sur le chemin."],"Qu’est-ce que Lina a ?","Un vélo",["Un ballon","Un chat","Un bateau"]],
+ [["Le bébé dort dans son lit.","Maman chante une chanson douce."],"Qui chante ?","Maman",["Papa","Le bébé","Mamie"]],
+ [["Paul a faim.","Il prend du pain et du beurre."],"Que prend Paul ?","Du pain et du beurre",["Du lait et du riz","Des pâtes","Une pomme"]],
+ [["Le train arrive en gare.","Les voyageurs montent vite."],"Qu’est-ce qui arrive en gare ?","Le train",["Le bus","L’avion","Le bateau"]],
+ [["Ma sœur a un pull vert.","Il est trop grand pour elle."],"De quelle couleur est le pull ?","Vert",["Bleu","Rouge","Jaune"]],
+ [["Ce soir, il fait nuit.","On voit la lune et des étoiles."],"Que voit-on dans le ciel ce soir ?","La lune et des étoiles",["Le soleil","Un arc-en-ciel","Un nuage noir"]]],
+TXB=[
+ [["Le renard roux se cache dans la forêt.","Il guette une souris grise.","Soudain, il bondit !"],"De quelle couleur est le renard ?","Roux",["Gris","Blanc","Noir"]],
+ [["Ce matin, Zoé se lève tôt.","Elle met son manteau et ses bottes.","Puis elle sort dans la neige."],"Où sort Zoé ?","Dans la neige",["Dans le jardin","Dans la cour","Au parc"]],
+ [["Lucas veut faire un gâteau.","Il casse deux œufs et ajoute de la farine.","Maman met le gâteau au four."],"Qui met le gâteau au four ?","Maman",["Lucas","Papa","Mamie"]],
+ [["Le facteur arrive en vélo.","Il laisse une lettre dans la boîte.","Pia la lit avec joie."],"Comment le facteur arrive-t-il ?","À vélo",["En voiture","À pied","En bus"]],
+ [["Au zoo, Hugo voit un grand éléphant.","Il donne des cacahuètes à un singe.","Le soir, il est fatigué."],"Que donne Hugo au singe ?","Des cacahuètes",["Des bananes","Des carottes","Des pommes"]],
+ [["Emma a cinq billes dans sa poche.","Elle en perd deux dans la cour.","Elle rentre à la maison."],"Combien de billes a Emma en rentrant ?","3",["2","5","7"]],
+ [["Le dimanche, toute la famille va au parc.","Papa lance le ballon à Samir.","Samir le rattrape avec ses deux mains."],"Qui lance le ballon ?","Papa",["Samir","Maman","Le chien"]],
+ [["La petite fille ouvre la porte du jardin.","Elle découvre un hérisson sous un buisson.","Elle le regarde sans faire de bruit."],"Où est le hérisson ?","Sous un buisson",["Dans un arbre","Sur le toit","Dans l’herbe haute"]],
+ [["Samedi, Inès va chez sa grand-mère.","Elle prend le train avec son papa.","Mamie les attend sur le quai."],"Qui attend Inès sur le quai ?","Mamie",["Maman","Son papa","Son frère"]],
+ [["Dans la classe, la maîtresse lit une histoire.","Les élèves écoutent sans parler.","À la fin, tout le monde applaudit."],"Que font les élèves à la fin ?","Ils applaudissent",["Ils dorment","Ils chantent","Ils partent"]],
+ [["Karim cueille des fraises dans le jardin.","Il en met six dans un panier.","Il mange la plus grosse."],"Combien de fraises Karim met-il dans le panier ?","6",["4","8","10"]],
+ [["Le vieux bateau quitte le port.","Le vent pousse ses grandes voiles blanches.","Les mouettes le suivent en criant."],"Qu’est-ce qui suit le bateau ?","Les mouettes",["Les dauphins","Les pêcheurs","Les nuages"]],
+ [["Chloé a perdu son chapeau jaune.","Elle le cherche partout dans la maison.","Il était sous le canapé."],"Où était le chapeau de Chloé ?","Sous le canapé",["Sur le lit","Dans le jardin","Dans un sac"]],
+ [["Le boulanger se lève très tôt.","Il fait cuire des baguettes et des croissants.","Les clients arrivent à sept heures."],"Que fait cuire le boulanger ?","Des baguettes et des croissants",["Des gâteaux et des bonbons","Des pizzas","Des biscuits"]]];
+function genTxt(L){
+ const it=pick(L>=9&&Math.random()<(L>=10?.85:.6)?TXB:TXA),[ph,q,a,wr]=it,txt=ph.join(' ');
+ return {nr:'Lis le texte et réponds à la question.',nb:true,rd:true,
+  q:`<div class="txt script">${esc(txt)}</div><div class="qq"><b class="script">${esc(q)}</b></div>`,
+  opts:shuffle([a,...wr]).map(o=>({h:esc(o),ok:o===a,f:'script rd'}))}}
 function genLec(){
- const L=lv('lec'),pool=wpool(L),sim=L>=7&&Math.random()<[.35,.5,.65,.8][L-7],g=sim?pick(WSIM):null,w=sim?pick(g):pick(pool),
+ const L=lv('lec');if(L>=7)return genTxt(L);
+ const pool=wpool(L),sim=L>=7&&Math.random()<[.35,.5,.65,.8][L-7],g=sim?pick(WSIM):null,w=sim?pick(g):pick(pool),
   listen=Math.random()<(sim?.6:L>=5?.45:.3)&&!!window.speechSynthesis;
  const sc=x=>(x[0][0]===w[0][0]?0:3)+Math.abs(x[0].length-w[0].length)+Math.random();
  let dis=shuffle(pool.filter(x=>x!==w));
@@ -437,6 +479,9 @@ function ans(i,btn){
   
   setTimeout(()=>{Q.n++;next()},1100);
  }else{
+  if(Q.cur.rd){Q.tries++;btn.classList.add('bad');btn.disabled=true;sfx(false);
+   if(Q.tries>=2){Q.done=true;fbk('Voici la bonne réponse');const k=Q.cur.opts.findIndex(x=>x.ok),bs=document.querySelectorAll('.opt');if(bs[k])bs[k].classList.add('good');const q=Q.cur;setTimeout(()=>{if(Q&&Q.cur===q){Q.n++;next()}},1800)}
+   else fbk('Relis le texte 🔎');return}
   Q.tries++;btn.classList.add('bad');btn.disabled=true;sfx(false);fbk('Essaie encore 💪');
   if(Q.cur.hint&&!Q.hinted){Q.hinted=true;document.querySelector('.q').insertAdjacentHTML('beforeend',`<div class="emo">${Q.cur.hint}</div>`)}
  }
