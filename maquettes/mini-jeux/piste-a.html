@@ -138,7 +138,7 @@ const GAMES=[
  {id:'p4',nom:'Puissance 4',col:'var(--c2)',pv:'🔴🟡🔴<br>🔴🟡🟡<br>🟡🔴🔴',d:'Aligne 4 jetons !'},
  {id:'etoiles',nom:'Attrape les étoiles',col:'var(--c4)',pv:'✨⭐✨<br>⭐🌟⭐<br>✨⭐✨',d:'Touche-les vite !'}
 ];
-const S={screen:'home',coffre:false,played:0,total:5,mode:'visible',done:[false,false,false],bubble:''};
+const S={screen:'home',coffre:false,played:0,total:5,mode:'coffre',done:[false,false,false],bubble:''};
 const $=s=>document.querySelector(s), app=$('#app');
 const NAV=[['home','Accueil'],['endC','Fin de séance'],['endO','Coffre ouvert'],['morpion','Morpion'],['p4','Puissance 4'],['etoiles','Étoiles'],['parent','Réglage parent']];
 
@@ -160,24 +160,15 @@ function home(){
   let h=`<div class="top"><button class="gear" onclick="go('parent')" aria-label="Réglages parent">⚙️</button><div class="stars">⭐ 142</div></div>
   <h1>Mon cahier du CP</h1><p class="sub">Bonjour Lola ! On travaille un peu ?</p>
   <div class="sess"><span style="font-size:1.6rem">⏰</span><div style="flex:1"><b>Ma séance du jour</b><div class="bar"><i style="width:80%"></i></div></div><b>16 / 20 min</b></div>
-  ${S.mode==='visible'?bonusHTML():chestHTML()}
-  <div class="grid">${cards.map(c=>`<button class="card" style="background:var(--${c[2]})"><span class="e">${c[0]}</span>${c[1]}<small>${c[3]}</small></button>`).join('')}</div>`;
+  <div class="grid">${cards.map(c=>`<button class="card" style="background:var(--${c[2]})"><span class="e">${c[0]}</span>${c[1]}<small>${c[3]}</small></button>`).join('')}</div>${bonusHTML()}`;
   h+=`<button class="mqgo" onclick="go('endC')">▶ Maquette : « J'ai fini ma séance »</button>`;
   return h;
 }
-function bonusHTML(){return `<div class="h2" style="margin-top:6px">🎁 Mes jeux bonus <small style="font-weight:400;font-size:.8rem">(après la séance)</small></div>
-    <div class="bonus">${GAMES.map((g,i)=>`<button class="lock" id="lk${i}" onclick="locked(${i})"><span class="c">🔒</span><span class="e">${Array.from(g.pv)[0]}</span>${g.nom}</button>`).join('')}</div>
-    <div class="bubble"><span id="bub">${S.bubble||'Touche une carte…'}</span><button class="spk" onclick="speak()" aria-label="Écouter">🔊</button></div><div style="height:14px"></div>`;}
-function chestHTML(){return `<div class="chest-mini"><span class="e">🎁</span><span>Un coffre surprise t'attend à la fin de ta séance !</span></div><div style="height:14px"></div>`;}
-function speak(){try{const u=new SpeechSynthesisUtterance($('#bub').textContent.replace('🔒',''));u.lang='fr-FR';speechSynthesis.cancel();speechSynthesis.speak(u);}catch(e){}}
-function locked(i){
-  S.bubble='🔒 Finis ta séance pour ouvrir le coffre !';
-  $('#bub').textContent=S.bubble;
-  const el=$('#lk'+i);el.classList.remove('wob');void el.offsetWidth;el.classList.add('wob');
-}
-
+function bonusHTML(){const d=S.mode==='direct';return `<div class="bonus" style="margin-top:18px">${GAMES.map((g,i)=>d?`<button class="card gopen" style="background:${g.col};min-height:96px" onclick="go('${g.id}')"><span class="e">${Array.from(g.pv)[0]}</span><span style="font-size:.95rem">${g.nom}</span></button>`:`<button class="lock" id="lk${i}" onclick="locked(${i})" aria-label="${g.nom} (verrouillé)"><span class="c">🔒</span><span class="e">${Array.from(g.pv)[0]}</span>${g.nom}</button>`).join('')}</div>`;}
+function locked(i){const el=$('#lk'+i);el.classList.remove('wob');void el.offsetWidth;el.classList.add('wob');}
 /* ----- FIN DE SEANCE ----- */
 function end(){
+  if(S.mode==='direct') return `<div class="end"><div class="fete">🌟🎉🌟</div><h1>Bravo Lola !</h1><p class="sub">Ta séance est terminée.</p><div style="font-size:7rem">😊</div><button class="btn g" onclick="go('home')">🏠 Retour à l'accueil</button></div>`;
   if(S.played>=S.total) return `<div class="end"><div class="fete">🌟🎉🌟</div><h1>Le coffre est vide !</h1><p class="sub">Tu as joué tes ${S.total} parties bonus.<br>À demain pour une nouvelle surprise !</p><div style="font-size:7rem">😴</div><button class="btn g" onclick="S.played=0;S.coffre=false;go('home')">🏠 Retour à l'accueil</button></div>`;
   if(!S.coffre) return `<div class="end"><div class="fete">🎉⭐🎉</div><h1>Bravo Lola !</h1><p class="sub">Ta séance est terminée. Tu as gagné un cadeau !</p>
     <button class="coffre" id="cf" onclick="openC()" aria-label="Ouvrir le coffre">🎁</button><div class="tap">👆 Touche le coffre !</div></div>`;
@@ -189,10 +180,10 @@ function end(){
 function openC(){const c=$('#cf');c.classList.add('open');setTimeout(()=>{S.coffre=true;render();},550);}
 
 /* ----- JEUX ----- */
-function gHead(t){return `<div class="gh"><button class="back" onclick="go('endO')">⬅️</button><h1 style="margin:0;font-size:1.5rem">${t}</h1><span class="pill">Partie ${S.played+1}/${S.total}</span></div>${dots()}`;}
+function gHead(t){const d=S.mode==='direct';return `<div class="gh"><button class="back" onclick="go('${d?'home':'endO'}')">⬅️</button><h1 style="margin:0;font-size:1.5rem">${t}</h1>${d?'':`<span class="pill">Partie ${S.played+1}/${S.total}</span>`}</div>${d?'':dots()}`;}
 function finish(msg){
   $('#msg').textContent=msg;
-  $('#after').innerHTML=`<button class="btn g" onclick="S.played++;go('endO')">${S.played+1>=S.total?'🎁 Dernière partie finie !':'🎁 Retour au coffre'}</button>`;
+  $('#after').innerHTML=S.mode==='direct'?`<button class="btn g" onclick="go('home')">🏠 Retour à l'accueil</button>`:`<button class="btn g" onclick="S.played++;go('endO')">${S.played+1>=S.total?'🎁 Dernière partie finie !':'🎁 Retour au coffre'}</button>`;
 }
 /* morpion */
 let M;
@@ -250,18 +241,17 @@ function eStart(){
 
 /* ----- PARENT ----- */
 function parent(){
-  const m=S.mode;
+  const m=S.mode,c=m==='coffre';
+  const mini=Array.from({length:3},()=>c?'🔒':'🟩').join(' ');
   return `<div class="gh"><button class="back" onclick="go('home')">⬅️</button><h1 style="margin:0;font-size:1.5rem">🔧 Espace parent</h1></div>
-  <p class="hint">Réglages des mini-jeux bonus (Morpion, Puissance 4, Attrape les étoiles).</p>
-  <div class="panel"><h3>🎁 Où voir les mini-jeux ?</h3>
-    <button class="opt ${m==='visible'?'on':''}" onclick="S.mode='visible';go('parent')"><span class="rd"></span><span><b>Visibles sur l'accueil (grisés)</b><small>Trois cartes avec un cadenas. Ils s'ouvrent à la fin de la séance.</small></span></button>
-    <button class="opt ${m==='fin'?'on':''}" onclick="S.mode='fin';go('parent')"><span class="rd"></span><span><b>Seulement en bonus de fin de séance</b><small>Rien sur l'accueil : l'enfant découvre le coffre quand il a fini.</small></span></button>
-    <div class="pv-home"><b>Aperçu de l'accueil :</b> ${m==='visible'?'🔒 🔒 🔒 &nbsp;trois cartes grisées sous les matières':'🎁 un petit message « Un coffre surprise t\'attend… », sans les jeux'}</div>
+  <div class="panel"><h3>🎮 Les mini-jeux (Morpion, Puissance 4, Attrape les étoiles)</h3>
+    <button class="opt ${c?'on':''}" onclick="S.mode='coffre';go('parent')"><span class="rd"></span><span><b>Bonus de fin de séance (conseillé)</b><small>Visibles sur l'accueil, grisés avec un cadenas. Ils s'ouvrent dans un coffre à la fin de la séance.</small></span></button>
+    <button class="opt ${!c?'on':''}" onclick="S.mode='direct';go('parent')"><span class="rd"></span><span><b>Toujours accessibles</b><small>Les jeux sont ouverts sur l'accueil, sans cadenas. Pas de bonus ni de coffre en fin de séance.</small></span></button>
+    <div class="pv-home"><b>Aperçu du bas de l'accueil :</b><div style="display:flex;gap:8px;margin-top6px;margin-top:6px">${['⭐','🔴','✨'].map(e=>`<span style="flex:1;text-align:center;padding:8px;border-radius:14px;border:2px ${c?'dashed':'solid'} var(--sh);background:${c?'rgba(127,127,127,.18)':'var(--c4)'};${c?'opacity:.7':''}">${e}${c?' 🔒':''}</span>`).join('')}</div></div>
   </div>
-  <div class="panel"><h3>🎯 Parties bonus par séance</h3>
-    <div class="step">${[3,4,5].map(n=>`<button class="${S.total===n?'on':''}" onclick="S.total=${n};go('parent')">${n}</button>`).join('')}<span>parties</span></div>
-    <p class="note">Les parties bonus ne comptent pas dans le temps de séance (20 min). Le coffre s'ouvre uniquement à la fin de la séance.</p>
-  </div>
+  ${c?`<div class="panel"><h3>🎯 Parties bonus par séance</h3>
+    <div class="step">${[4,5].map(n=>`<button class="${S.total===n?'on':''}" onclick="S.total=${n};go('parent')">${n}</button>`).join('')}<span>parties</span></div>
+    <p class="note">Elles ne comptent pas dans le temps de séance.</p></div>`:''}
   <button class="btn g" onclick="go('home')">✔️ Enregistrer</button>`;
 }
 
