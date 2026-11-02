@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Maquette B — Jauge de récompense · Mon cahier du CP</title>
+<link href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Playwrite+FR+Trad&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#fffaf0;--line:#c9dcf7;--margin:#f4a0b8;--ink:#2b2d6e;--card:#fff;--c1:#ffc4d6;--c2:#bfe3ff;--c3:#c4f0b6;--c4:#ffe58f;--c5:#dacbff;--c6:#ffcfa0;--good:#2e9e4f;--bad:#d8553d;--sh:#2b2d6e}
+*{box-sizing:border-box}
+body{margin:0;min-height:100dvh;font-family:'Andika','Comic Sans MS',sans-serif;color:var(--ink);background-color:var(--paper);background-image:linear-gradient(var(--line) 1px,transparent 1px);background-size:100% 32px;-webkit-tap-highlight-color:transparent}
+button{font:inherit;color:inherit;cursor:pointer;border:3px solid var(--sh)}
+button:active{transform:scale(.97)}
+/* bandeau maquette */
+.mq{background:#fff;border-bottom:3px solid var(--sh);padding:10px 14px;font-size:.82rem;line-height:1.4}
+.mq-in{max-width:900px;margin:0 auto}
+.mq b.t{font-size:1rem}
+.mq .cols{display:grid;grid-template-columns:1fr 1fr;gap:4px 18px;margin-top:4px}
+.mq ul{margin:2px 0 0;padding-left:18px}
+.mq .ok{color:var(--good);font-weight:700}.mq .ko{color:var(--bad);font-weight:700}
+.mq .demo{margin-top:6px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.mq .demo button{border-width:2px;border-radius:99px;background:var(--c4);padding:2px 10px;font-size:.78rem}
+@media (max-width:600px){.mq .cols{grid-template-columns:1fr}}
+/* app */
+#app{max-width:620px;margin:0 auto;padding:16px 16px 40px;position:relative}
+@media (min-width:900px){#app{padding-left:44px}#app::before{content:'';position:absolute;top:0;bottom:0;left:28px;width:2px;background:var(--margin)}}
+.scr{display:none}.scr.on{display:block}
+h1{font-size:1.9rem;margin:.1em 0 0;line-height:1.2}
+.sub{margin:0 0 14px;font-size:1.05rem}
+.top{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.stars{margin-left:auto;font-weight:700;background:var(--c4);border:3px solid var(--sh);border-radius:99px;padding:4px 14px;white-space:nowrap}
+.back{border-radius:14px;background:var(--card);font-size:1.3rem;padding:6px 14px;min-height:44px;min-width:48px}
+.gear{border-radius:50%;width:44px;height:44px;background:var(--card);font-size:1.2rem;padding:0}
+/* jauge */
+.jauge{background:var(--card);border:3px solid var(--sh);border-radius:20px;padding:10px 14px;margin-bottom:16px}
+.jauge .l{display:flex;justify-content:space-between;font-weight:700;font-size:.95rem;margin-bottom:6px}
+.jr{display:flex;gap:6px}
+.jr i{flex:1;height:34px;border:3px solid var(--sh);border-radius:12px;background:var(--paper);display:flex;align-items:center;justify-content:center;font-style:normal;font-size:1.2rem;filter:grayscale(1);opacity:.45;transition:.3s}
+.jr i.on{background:var(--c4);filter:none;opacity:1;animation:pop .4s}
+@keyframes pop{50%{transform:scale(1.18)}}
+.cta{width:100%;background:var(--good);color:#fff;border-radius:99px;font-size:1.3rem;font-weight:700;padding:12px;margin-bottom:16px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.card{border-radius:22px;padding:8px 8px;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:1.05rem;font-weight:700;min-height:84px;justify-content:center}
+.card .e{font-size:1.9rem;line-height:1}
+.card small{font-weight:400;font-size:.8rem}
+/* récré */
+.recre{margin-top:14px;border-top:3px dashed var(--sh);padding-top:10px}
+.recre .h{display:flex;justify-content:space-between;align-items:baseline;font-size:.9rem;margin-bottom:8px}
+.recre .h b{font-size:1rem}
+.band{display:flex;gap:10px;justify-content:space-around}.band>div{display:flex;flex-direction:column;align-items:center;gap:4px;font-weight:700;font-size:.85rem;text-align:center;flex:1}
+.rb{width:72px;height:72px;border-radius:50%;font-size:2rem;padding:0;display:flex;align-items:center;justify-content:center;position:relative}
+.rb.lock{background:#e4e2de;border-style:dashed;filter:grayscale(1);opacity:.6;cursor:not-allowed}
+.rb.lock::after{content:'🔒';position:absolute;right:-6px;bottom:-6px;font-size:.9rem;filter:none}
+.band .note{font-size:.85rem;line-height:1.3;flex:1}
+.rb.a{background:var(--c1)}.rb.b{background:var(--c2)}.rb.c{background:var(--c4)}
+/* récré plein écran */
+.end{text-align:center}
+.end .s{font-size:3.4rem;letter-spacing:.1em}
+.end h1{font-size:2.4rem}
+.three{display:flex;justify-content:center;gap:18px;margin:22px 0 14px}
+.three div{display:flex;flex-direction:column;align-items:center;gap:6px;font-weight:700;font-size:.95rem}
+.rb.xl{width:96px;height:96px;font-size:2.8rem;box-shadow:0 5px 0 var(--sh)}
+.parties{display:inline-flex;gap:10px;background:var(--c4);border:3px solid var(--sh);border-radius:99px;padding:8px 18px;font-weight:700;align-items:center;font-size:1.1rem}
+.parties .p{width:14px;height:14px;border-radius:50%;border:2px solid var(--sh);background:var(--sh)}.parties .p.u{background:#fff}.parties .p.now{background:var(--good);transform:scale(1.25)}
+.stars.pt{font-size:.9rem;padding:4px 10px}
+.chip{background:var(--card);border-radius:99px;padding:10px 22px;margin-top:20px;min-height:48px;font-size:1rem}
+/* jeux */
+.board{background:var(--card);border:3px solid var(--sh);border-radius:24px;padding:16px;margin:14px 0;display:flex;justify-content:center}
+.m3{display:grid;grid-template-columns:repeat(3,76px);gap:6px}
+.m3 span{height:76px;background:var(--c2);border-radius:14px;border:3px solid var(--sh);display:flex;align-items:center;justify-content:center;font-size:2.2rem}
+.p4{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;background:var(--c2);border:3px solid var(--sh);border-radius:16px;padding:8px;width:100%;max-width:330px}
+.p4 span{aspect-ratio:1;border-radius:50%;background:var(--paper);border:2px solid var(--sh)}
+.p4 .r{background:#ff7a8a}.p4 .y{background:var(--c4)}
+.sky{position:relative;width:100%;max-width:330px;height:240px;background:linear-gradient(#bfe3ff,#e6f3ff);border:3px solid var(--sh);border-radius:16px;overflow:hidden;font-size:1.8rem}
+.sky span{position:absolute}
+.sky .pan{bottom:6px;left:42%;font-size:2.4rem}
+.info{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.go{background:var(--good);color:#fff;border-radius:99px;font-size:1.4rem;font-weight:700;padding:12px 28px}
+.go.alt{background:var(--c4);color:var(--ink);font-size:1rem;padding:10px 18px;min-height:48px}
+/* session */
+.q{background:var(--card);border:3px solid var(--sh);border-radius:24px;padding:18px;text-align:center;margin-bottom:16px}
+.q .emo{font-size:4.5rem}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.opt{background:var(--card);border-radius:20px;font-size:1.9rem;font-weight:700;min-height:70px}
+/* parent */
+.panel{background:var(--card);border:3px solid var(--sh);border-radius:22px;padding:16px;margin-bottom:14px}
+.panel h2{margin:0 0 4px;font-size:1.2rem}
+.panel p{margin:0 0 10px;font-size:.92rem}
+.radio{display:flex;gap:10px;align-items:flex-start;border:3px solid var(--line);border-radius:16px;padding:10px;margin-bottom:8px;cursor:pointer}
+.radio.sel{border-color:var(--sh);background:var(--c3)}
+.radio .d{width:22px;height:22px;border:3px solid var(--sh);border-radius:50%;flex:none;margin-top:2px;background:#fff}
+.radio.sel .d{background:var(--sh);box-shadow:inset 0 0 0 3px #fff}
+.radio small{display:block;font-weight:400}
+.step{display:flex;align-items:center;gap:12px;font-size:1.3rem;font-weight:700}
+.step button{width:48px;height:48px;border-radius:50%;background:var(--c4);font-size:1.3rem;padding:0}
+.mini{border:2px dashed var(--sh);border-radius:14px;padding:8px;background:var(--paper);margin-top:8px}
+</style>
+</head>
+<body>
+<div class="mq"><div class="mq-in">
+<b class="t">Piste B — « Jauge de récompense »</b> · Une jauge d'étoiles se remplit pendant la séance ; les jeux vivent dans une petite bande « Récré » en bas de l'accueil, et s'ouvrent dans un écran « Récré ! » à la fin.
+<div class="cols">
+<div><span class="ok">Points forts</span><ul><li>L'enfant voit combien il lui reste à faire : l'attente devient un but.</li><li>Accueil à peine alourdi : les matières restent au premier plan.</li><li>Écran de fin très simple : 3 gros boutons ronds.</li></ul></div>
+<div><span class="ko">Limites</span><ul><li>Les jeux sont petits et discrets : peu de curiosité pour eux avant la fin.</li><li>La jauge (nombre d'exercices) demande une règle claire côté parent.</li><li>Moins « fête » que les autres approches.</li></ul></div>
+</div>
+<div class="demo">Maquette cliquable :
+<button onclick="go('home')">Accueil</button>
+<button onclick="S.done=true;S.left=5;go('recre')">Fin de séance</button>
+<button onclick="go('parent')">Réglage parent</button>
+<button onclick="reset()">Remise à zéro</button></div>
+</div></div>
+
+<div id="app">
+
+<!-- ACCUEIL -->
+<section class="scr on" id="home">
+  <div class="top"><div><h1>Mon cahier du CP</h1></div><button class="gear" onclick="go('parent')" title="Espace parent">⚙️</button></div>
+  <div class="top" style="margin-top:-6px"><p class="sub" style="margin:0">Bonjour Léa ! Prête ?</p><span class="stars">⭐ 128</span></div>
+
+  <div class="jauge">
+    <div class="l"><span>Ma séance du jour</span><span id="jtxt">0 / 5</span></div>
+    <div class="jr" id="jr1"></div>
+  </div>
+  <button class="cta" id="cta" onclick="startSession()">▶ Commencer ma séance</button>
+
+  <div class="grid">
+    <button class="card" style="background:var(--c1)"><span class="e">📖</span>Lire<small>Les sons</small></button>
+    <button class="card" style="background:var(--c2)"><span class="e">✏️</span>Écrire<small>Attachée</small></button>
+    <button class="card" style="background:var(--c3)"><span class="e">🔢</span>Calculer<small>Additions</small></button>
+    <button class="card" style="background:var(--c5)"><span class="e">🧠</span>Mémoire<small>Paires</small></button>
+  </div>
+
+  <div class="recre" id="recreBand">
+    <div class="h"><b>🎈 Récré</b><span id="rstat"></span></div>
+    <div class="band" id="bandBtns"></div>
+  </div>
+</section>
+
+<!-- SESSION -->
+<section class="scr" id="sess">
+  <div class="top"><button class="back" onclick="go('home')">←</button><span class="stars">⭐ 128</span></div>
+  <div class="jauge">
+    <div class="l"><span>Encore un peu...</span><span id="jtxt2">1 / 5</span></div>
+    <div class="jr" id="jr2"></div>
+  </div>
+  <div class="q"><div class="emo">🐱 🐱 🐱</div><p style="margin:6px 0 0;font-size:1.15rem">Combien y a-t-il de chats ?</p></div>
+  <div class="opts"><button class="opt" onclick="answer()">2</button><button class="opt" onclick="answer()">3</button><button class="opt" onclick="answer()">4</button><button class="opt" onclick="answer()">5</button></div>
+  <p style="text-align:center;margin-top:16px;font-size:.9rem">Chaque bonne réponse remplit une étoile de la jauge.</p>
+</section>
+
+<!-- FIN DE SESSION -->
+<section class="scr end" id="recre">
+  <div class="s">⭐⭐⭐⭐⭐</div>
+  <h1>Récré !</h1>
+  <p class="sub">Bravo Léa, ta séance est finie. Choisis un jeu !</p>
+  <div class="parties" id="pties"></div>
+  <div class="three">
+    <div><button class="rb xl a" onclick="game('morpion')">❌</button>Morpion</div>
+    <div><button class="rb xl b" onclick="game('p4')">🔴</button>Puissance 4</div>
+    <div><button class="rb xl c" onclick="game('stars')">🌟</button>Étoiles</div>
+  </div>
+  <button class="chip" onclick="S.done=false;go('home')">J'ai fini, à demain 👋</button>
+</section>
+
+<!-- JEUX -->
+<section class="scr" id="morpion">
+  <div class="top"><button class="back" onclick="go('recre')">←</button><h1 style="font-size:1.5rem">Morpion</h1><span class="stars pt" id="g1c"></span></div>
+  <p class="sub">Aligne 3 croix avant le robot !</p>
+  <div class="board"><div class="m3"><span>❌</span><span>⭕</span><span></span><span></span><span>❌</span><span>⭕</span><span></span><span></span><span></span></div></div>
+  <div class="info"><span>À toi de jouer ❌</span><button class="go alt" onclick="endPartie()">Finir la partie</button></div>
+</section>
+<section class="scr" id="p4">
+  <div class="top"><button class="back" onclick="go('recre')">←</button><h1 style="font-size:1.5rem">Puissance 4</h1><span class="stars pt" id="g2c"></span></div>
+  <p class="sub">Aligne 4 jetons rouges !</p>
+  <div class="board"><div class="p4" id="p4g"></div></div>
+  <div class="info"><span>À toi de jouer 🔴</span><button class="go alt" onclick="endPartie()">Finir la partie</button></div>
+</section>
+<section class="scr" id="stars">
+  <div class="top"><button class="back" onclick="go('recre')">←</button><h1 style="font-size:1.5rem">Attrape les étoiles</h1><span class="stars pt" id="g3c"></span></div>
+  <p class="sub">Glisse le panier pour attraper les étoiles !</p>
+  <div class="board"><div class="sky"><span style="left:12%;top:8%">⭐</span><span style="left:48%;top:30%">🌟</span><span style="left:78%;top:12%">⭐</span><span style="left:30%;top:58%">✨</span><span style="left:70%;top:52%">⭐</span><span class="pan">🧺</span></div></div>
+  <div class="info"><span>Attrapées : 7 ⭐</span><button class="go alt" onclick="endPartie()">Finir la partie</button></div>
+</section>
+
+<!-- FIN DES PARTIES -->
+<section class="scr end" id="bye">
+  <div class="s">🌙</div>
+  <h1>À demain !</h1>
+  <p class="sub">Tu as joué tes 5 parties. Les jeux reviennent après ta prochaine séance.</p>
+  <button class="go" onclick="S.done=false;S.left=5;S.g=0;go('home')">Retour à l'accueil</button>
+</section>
+
+<!-- PARENT -->
+<section class="scr" id="parent">
+  <div class="top"><button class="back" onclick="go('home')">←</button><h1 style="font-size:1.5rem">Espace parent</h1></div>
+  <div class="panel">
+    <h2>🎈 Mini-jeux « Récré »</h2>
+    <p>Morpion, Puissance 4 et Attrape les étoiles : un bonus après la séance. Ils ne comptent pas dans le temps de séance.</p>
+    <div class="radio sel" id="m1" onclick="setMode('menu')"><span class="d"></span><span><b>Visibles sur l'accueil, grisés</b><small>Une bande « Récré » rappelle qu'ils se gagnent à la fin.</small></span></div>
+    <div class="radio" id="m2" onclick="setMode('fin')"><span class="d"></span><span><b>Seulement en bonus de fin de séance</b><small>Rien sur l'accueil : ils n'apparaissent qu'à la fin.</small></span></div>
+  </div>
+  <div class="panel">
+    <h2>Parties bonus</h2>
+    <p>Nombre de parties offertes après chaque séance.</p>
+    <div class="step"><button onclick="setN(-1)">−</button><span id="nn">5</span> parties<button onclick="setN(1)">+</button></div>
+  </div>
+  <div class="panel">
+    <h2>Longueur de la séance</h2>
+    <p>Nombre d'exercices qui remplissent la jauge.</p>
+    <div class="step"><button>−</button><span>5</span> exercices<button>+</button></div>
+  </div>
+  <button class="cta" onclick="go('home')">Enregistrer</button>
+</section>
+</div>
+
+<script>
+var S={done:false,mode:'menu',n:5,left:5,g:0,cur:'home'};
+function $(i){return document.getElementById(i)}
+function go(id){document.querySelectorAll('.scr').forEach(function(s){s.classList.remove('on')});$(id).classList.add('on');S.cur=id;render();scrollTo(0,0)}
+function jauge(el,n){var h='';for(var i=0;i<5;i++)h+='<i class="'+(i<n?'on':'')+'">⭐</i>';$(el).innerHTML=h}
+function render(){
+  jauge('jr1',S.g);jauge('jr2',S.g);
+  $('jtxt').textContent=S.g+' / 5';$('jtxt2').textContent=S.g+' / 5';
+  var band=$('recreBand');band.style.display=S.mode==='menu'?'block':'none';
+  var lock=!S.done,cls=['a','b','c'],em=['❌','🔴','🌟'],g=['morpion','p4','stars'],h='';
+  var nm=['Morpion','Puissance 4','Étoiles'];
+  for(var i=0;i<3;i++)h+='<div><button class="rb '+(lock?'lock':cls[i])+'" '+(lock?'aria-disabled="true"':'onclick="game(\''+g[i]+'\')"')+'>'+em[i]+'</button>'+nm[i]+'</div>';
+  $('bandBtns').innerHTML=h;
+  $('rstat').textContent=S.done?'C\'est la récré ! Touche un jeu.':'🔒 Termine ta séance pour jouer';
+  $('cta').textContent=S.done?'✅ Séance terminée':'▶ Commencer ma séance';
+  var cur=S.n-S.left+1,p='<span>Partie '+cur+' sur '+S.n+'</span>';for(var j=0;j<S.n;j++)p+='<span class="p '+(j+1<cur?'':(j+1===cur?'now':'u'))+'"></span>';$('pties').innerHTML=p;
+  ['g1c','g2c','g3c'].forEach(function(k){$(k).textContent='Partie '+(S.n-S.left+1)+' sur '+S.n});
+  $('m1').classList.toggle('sel',S.mode==='menu');$('m2').classList.toggle('sel',S.mode==='fin');
+  $('nn').textContent=S.n;
+}
+function startSession(){S.g=1;go('sess')}
+function answer(){S.g++;if(S.g>=5){S.g=5;S.done=true;S.left=S.n;go('recre')}else render()}
+function game(id){if(S.left<1){go('bye');return}go(id)}
+function endPartie(){S.left--;if(S.left<1){S.done=false;go('bye')}else go('recre')}
+function setMode(m){S.mode=m;render()}
+function setN(d){S.n=Math.max(4,Math.min(5,S.n+d));S.left=S.n;render()}
+function reset(){S={done:false,mode:'menu',n:5,left:5,g:0,cur:'home'};go('home')}
+(function(){var c=['','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','r','y','','','','','r','y','r','','','','','y','r','y','','','y','r','r','y','','',''];var h='';for(var i=0;i<42;i++){var v=c[i]||'';h+='<span class="'+v+'"></span>'}$('p4g').innerHTML=h})();
+render();
+</script>
+</body>
+</html>

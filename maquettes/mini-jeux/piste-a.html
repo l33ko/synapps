@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Piste A — Le coffre bonus (maquette)</title>
+<link href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Playwrite+FR+Trad&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#fffaf0;--line:#c9dcf7;--margin:#f4a0b8;--ink:#2b2d6e;--card:#fff;--c1:#ffc4d6;--c2:#bfe3ff;--c3:#c4f0b6;--c4:#ffe58f;--c5:#dacbff;--c6:#ffcfa0;--good:#2e9e4f;--bad:#d8553d;--sh:#2b2d6e}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;font-family:'Andika','Comic Sans MS',sans-serif;color:var(--ink);background-color:var(--paper);background-image:linear-gradient(var(--line) 1px,transparent 1px);background-size:100% 32px;-webkit-tap-highlight-color:transparent}
+button{font:inherit;color:inherit;cursor:pointer}
+/* ---- bandeau maquette ---- */
+.mq{background:#2b2d6e;color:#fff;padding:10px 14px;font-size:.82rem;line-height:1.4}
+.mq-in{max-width:980px;margin:0 auto;display:grid;gap:6px 24px}
+@media(min-width:800px){.mq-in{grid-template-columns:1.1fr 1fr 1fr}}
+.mq b.t{font-size:.95rem;display:block}
+.mq .ok{color:#c4f0b6}.mq .ko{color:#ffcfa0}
+.mq ul{margin:2px 0 0;padding-left:16px}
+.nav{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;padding:8px 10px;background:#fff8;border-bottom:2px dashed var(--sh)}
+.nav span{font-size:.75rem;align-self:center;opacity:.7}
+.nav button{border:2px dashed var(--sh);background:var(--card);border-radius:99px;padding:3px 10px;font-size:.78rem}
+.nav button.on{background:var(--c4);border-style:solid}
+/* ---- app ---- */
+#app{max-width:620px;margin:0 auto;padding:16px 16px 60px}
+@media(min-width:900px){#app{max-width:760px;padding-left:48px;position:relative}
+body::before{content:'';position:fixed;top:0;bottom:0;left:calc(50% - 380px + 28px);width:2px;background:var(--margin);z-index:-1}}
+h1{font-size:1.9rem;margin:.2em 0 0;line-height:1.2}
+.sub{margin:2px 0 14px;font-size:1.05rem}
+.top{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.stars{margin-left:auto;font-weight:700;background:var(--c4);border:3px solid var(--sh);border-radius:99px;padding:4px 14px;white-space:nowrap}
+.back{border:3px solid var(--sh);border-radius:14px;background:var(--card);font-size:1.3rem;padding:4px 14px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.card{border:3px solid var(--sh);border-radius:22px;padding:14px 8px;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:1.1rem;font-weight:700;min-height:104px;justify-content:center;transition:transform .08s}
+.card:active{transform:scale(.97)}
+.card .e{font-size:2.3rem;line-height:1}
+.card small{font-weight:400;font-size:.82rem}
+.sess{background:var(--card);border:3px solid var(--sh);border-radius:18px;padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px}
+.bar{flex:1;height:16px;border:3px solid var(--sh);border-radius:99px;background:var(--card);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--good)}
+.h2{font-size:1.2rem;margin:20px 0 4px;display:flex;align-items:center;gap:8px}
+.hint{font-size:.9rem;margin:0 0 10px}
+/* cartes bonus verrouillées */
+.bonus{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.lock{position:relative;border:3px dashed var(--sh);border-radius:20px;background:rgba(127,127,127,.14);padding:12px 4px 10px;display:flex;flex-direction:column;align-items:center;gap:2px;min-height:112px;justify-content:center;font-size:.95rem;font-weight:700}
+.lock .e{font-size:2rem;filter:grayscale(1);opacity:.45}
+.lock .c{position:absolute;top:-12px;right:-6px;font-size:1.5rem;background:var(--card);border:3px solid var(--sh);border-radius:99px;width:38px;height:38px;display:flex;align-items:center;justify-content:center}
+.lock span.n{opacity:.55}
+.lock.wob{animation:shake .4s}
+.bubble{margin-top:10px;background:var(--c4);border:3px solid var(--sh);border-radius:16px;padding:8px 12px;font-weight:700;text-align:center;min-height:44px;display:flex;align-items:center;justify-content:center}
+.chest-mini{display:flex;align-items:center;gap:8px;border:3px solid var(--sh);background:var(--c4);border-radius:18px;padding:8px 12px;font-weight:700;margin-top:6px}
+.chest-mini .e{font-size:1.9rem}
+.mqgo{margin:22px auto 0;display:block;border:3px dashed var(--sh);background:var(--c5);border-radius:99px;padding:8px 18px;font-weight:700}
+/* ---- fin de séance / coffre ---- */
+.end{text-align:center}
+.end h1{font-size:1.8rem}
+.fete{font-size:2.2rem;letter-spacing:.2em;animation:pop .6s}
+.coffre{border:none;background:none;font-size:9rem;line-height:1;padding:0;margin:4px auto;display:block;animation:wiggle 1.6s infinite;filter:drop-shadow(0 8px 0 rgba(43,45,110,.18))}
+.coffre.open{animation:burst .6s forwards}
+.tap{display:inline-block;background:var(--c4);border:3px solid var(--sh);border-radius:99px;padding:8px 20px;font-weight:700;font-size:1.15rem;animation:pulse 1.2s infinite}
+.confetti{font-size:1.8rem;letter-spacing:.3em;margin:0 0 4px;animation:pop .5s}
+.choose{display:grid;gap:12px;margin:14px 0}
+@media(min-width:640px){.choose{grid-template-columns:repeat(3,1fr)}}
+.gcard{border:3px solid var(--sh);border-radius:26px;padding:14px;display:flex;align-items:center;gap:14px;text-align:left;box-shadow:0 6px 0 var(--sh);animation:rise .5s both;transition:transform .08s,box-shadow .08s}
+.gcard:nth-child(2){animation-delay:.12s}.gcard:nth-child(3){animation-delay:.24s}
+.gcard:active{transform:translateY(5px);box-shadow:0 1px 0 var(--sh)}
+.gcard .pv{font-size:1.15rem;line-height:1.25;background:var(--card);border:3px solid var(--sh);border-radius:18px;width:92px;height:92px;flex:none;display:flex;align-items:center;justify-content:center;text-align:center}
+.gcard b{font-size:1.35rem;display:block}
+.gcard small{font-size:.9rem;font-weight:400}
+@media(min-width:640px){.gcard{flex-direction:column;text-align:center;padding:18px 12px}.gcard .pv{width:130px;height:130px;font-size:1.6rem}}
+.dots{display:flex;gap:8px;justify-content:center;margin:6px 0}
+.dots i{width:22px;height:22px;border-radius:99px;border:3px solid var(--sh);background:var(--card);display:block}
+.dots i.d{background:var(--c3)}.dots i.c{background:var(--c4);transform:scale(1.2)}
+.later{border:3px solid var(--sh);background:var(--card);border-radius:99px;padding:8px 20px;font-weight:700;margin-top:8px}
+/* ---- jeux ---- */
+.gh{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.pill{margin-left:auto;font-weight:700;background:var(--c4);border:3px solid var(--sh);border-radius:99px;padding:4px 14px}
+.msg{text-align:center;font-size:1.4rem;font-weight:700;min-height:48px;margin:10px 0}
+.m3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:360px;margin:0 auto}
+.m3 button{aspect-ratio:1;border:3px solid var(--sh);border-radius:18px;background:var(--card);font-size:3rem;padding:0}
+.m3 button.w{background:var(--c3)}
+.p4{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;background:#4d7be6;border:3px solid var(--sh);border-radius:16px;padding:8px;max-width:420px;margin:0 auto}
+.p4 button{aspect-ratio:1;border-radius:99px;border:none;background:var(--paper);padding:0;font-size:0;position:relative}
+.p4 button.r{background:#e8483f}.p4 button.y{background:#ffd23f}.p4 button.w{outline:4px solid #fff}
+.arrows{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;max-width:420px;margin:0 auto 4px;padding:0 11px;text-align:center;font-size:1.2rem}
+.sky{position:relative;height:380px;max-width:520px;margin:0 auto;border:3px solid var(--sh);border-radius:24px;background:linear-gradient(#1e2358,#4a3f9c);overflow:hidden}
+.sky .s{position:absolute;border:none;background:none;font-size:2.8rem;padding:0;animation:float 3s ease-in-out infinite;line-height:1}
+.sky .s.got{animation:none;transform:scale(1.8);opacity:0;transition:.3s}
+.after{text-align:center;margin-top:12px}
+.btn{border:3px solid var(--sh);border-radius:99px;background:var(--c4);font-weight:700;font-size:1.2rem;padding:10px 26px;box-shadow:0 4px 0 var(--sh)}
+.btn.g{background:var(--c3)}
+/* ---- parent ---- */
+.panel{background:var(--card);border:3px solid var(--sh);border-radius:22px;padding:14px 16px;margin-bottom:14px}
+.panel h3{margin:0 0 8px;font-size:1.1rem}
+.opt{display:flex;gap:12px;align-items:flex-start;border:3px solid var(--sh);border-radius:16px;padding:10px 12px;margin-bottom:10px;width:100%;text-align:left;background:var(--paper)}
+.opt.on{background:var(--c3);box-shadow:0 0 0 3px var(--good)}
+.opt .rd{width:24px;height:24px;border:3px solid var(--sh);border-radius:99px;flex:none;margin-top:2px;background:var(--card)}
+.opt.on .rd{background:var(--good);box-shadow:inset 0 0 0 4px var(--card)}
+.opt small{display:block;font-weight:400;font-size:.88rem;margin-top:2px}
+.step{display:flex;align-items:center;gap:12px}
+.step button{width:44px;height:44px;border-radius:12px;border:3px solid var(--sh);background:var(--card);font-size:1.5rem;font-weight:700}
+.step button.on{background:var(--c4)}
+.note{font-size:.88rem;margin:8px 0 0}
+.pv-home{font-size:.85rem;border:2px dashed var(--sh);border-radius:14px;padding:8px 10px;margin-top:6px;background:var(--paper)}
+@keyframes pop{0%{transform:scale(.5);opacity:0}70%{transform:scale(1.15)}100%{transform:scale(1);opacity:1}}
+@keyframes shake{25%{transform:translateX(-6px) rotate(-2deg)}75%{transform:translateX(6px) rotate(2deg)}}
+@keyframes wiggle{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(4deg) scale(1.04)}}
+@keyframes pulse{50%{transform:scale(1.06)}}
+@keyframes burst{0%{transform:scale(1)}40%{transform:scale(1.25) rotate(-6deg)}100%{transform:scale(.55)}}
+@keyframes rise{0%{transform:translateY(40px) scale(.7);opacity:0}100%{transform:none;opacity:1}}
+@keyframes float{50%{transform:translateY(-10px) rotate(8deg)}}
+.gear{border:3px solid var(--sh);border-radius:99px;background:var(--card);font-size:1.5rem;width:48px;height:48px;padding:0}
+.arrows span{display:block}
+.spk{border:3px solid var(--sh);border-radius:99px;background:var(--card);min-width:44px;min-height:44px;margin-left:10px;font-size:1.2rem;padding:0 8px}
+.back,.later{min-height:44px}
+.bubble{margin-top:10px}
+.bonus{margin-top:14px}
+@media(max-width:700px){.nav{flex-wrap:nowrap;overflow-x:auto;justify-content:flex-start}.nav button,.nav span{white-space:nowrap;flex:none}
+.sub{margin-bottom:8px}h1{font-size:1.6rem}.sess{margin-bottom:8px;padding:6px 12px}.lock{min-height:92px}.top{margin-bottom:4px}.gear{width:44px;height:44px}}
+</style>
+</head>
+<body>
+
+<details class="mq" id="mq"><summary style="cursor:pointer;font-weight:700">Piste A — « Le coffre bonus » (points forts et limites)</summary><div class="mq-in">
+  <div><b class="t">Piste A — « Le coffre bonus »</b>La fin de la séance fait apparaître un gros coffre cadeau ; l'enfant le touche et il révèle 3 grosses cartes de jeux à choisir. À chaque partie finie, on revient au coffre.</div>
+  <div><b class="t ok">Points forts</b><ul><li>Vraie récompense : le déblocage est une fête, pas un menu qui se dégrise</li><li>Choix simple : 3 grosses cartes, rien d'autre à lire</li><li>Le compteur de parties (1/5) est une rangée de pastilles lisible sans savoir compter</li></ul></div>
+  <div><b class="t ko">Limites</b><ul><li>Un écran de plus (le coffre) avant de jouer</li><li>Les jeux changent à chaque partie : un enfant qui veut rejouer au même doit repasser par le coffre</li><li>Les cartes grisées de l'accueil restent « décoratives » : un peu frustrant</li></ul></div>
+</div></details>
+
+<div class="nav" id="nav"><span>Maquette, aller à :</span></div>
+
+<div id="app"></div>
+
+<script>
+if(innerWidth>=800)document.getElementById('mq').open=true;
+const GAMES=[
+ {id:'morpion',nom:'Morpion',col:'var(--c1)',pv:'⭐🍄⭐<br>🍄⭐🍄<br>⭐🍄⭐',d:'Aligne 3 étoiles !'},
+ {id:'p4',nom:'Puissance 4',col:'var(--c2)',pv:'🔴🟡🔴<br>🔴🟡🟡<br>🟡🔴🔴',d:'Aligne 4 jetons !'},
+ {id:'etoiles',nom:'Attrape les étoiles',col:'var(--c4)',pv:'✨⭐✨<br>⭐🌟⭐<br>✨⭐✨',d:'Touche-les vite !'}
+];
+const S={screen:'home',coffre:false,played:0,total:5,mode:'visible',done:[false,false,false],bubble:''};
+const $=s=>document.querySelector(s), app=$('#app');
+const NAV=[['home','Accueil'],['endC','Fin de séance'],['endO','Coffre ouvert'],['morpion','Morpion'],['p4','Puissance 4'],['etoiles','Étoiles'],['parent','Réglage parent']];
+
+function go(sc){
+  S.screen=sc;
+  if(sc==='endC'){S.screen='end';S.coffre=false;}
+  if(sc==='endO'){S.screen='end';S.coffre=true;}
+  render();window.scrollTo(0,0);
+}
+function nav(){
+  const cur=S.screen==='end'?(S.coffre?'endO':'endC'):S.screen;
+  $('#nav').innerHTML='<span>Maquette, aller à :</span>'+NAV.map(([k,l])=>`<button class="${k===cur?'on':''}" onclick="go('${k}')">${l}</button>`).join('');
+}
+function dots(){let h='<div class="dots" aria-label="Parties">';for(let i=0;i<S.total;i++)h+=`<i class="${i<S.played?'d':i===S.played?'c':''}"></i>`;return h+'</div>';}
+
+/* ----- ACCUEIL ----- */
+function home(){
+  const cards=[['📖','Lecture','c1','12 mots lus'],['✏️','Écriture','c2','Attachée'],['➕','Calcul','c3','Niveau 2'],['🧠','Mémoire','c5','Paires'],['🔤','Sons','c6','ou, on, an'],['🎧','Dictée','c4','Écoute']];
+  let h=`<div class="top"><button class="gear" onclick="go('parent')" aria-label="Réglages parent">⚙️</button><div class="stars">⭐ 142</div></div>
+  <h1>Mon cahier du CP</h1><p class="sub">Bonjour Lola ! On travaille un peu ?</p>
+  <div class="sess"><span style="font-size:1.6rem">⏰</span><div style="flex:1"><b>Ma séance du jour</b><div class="bar"><i style="width:80%"></i></div></div><b>16 / 20 min</b></div>
+  ${S.mode==='visible'?bonusHTML():chestHTML()}
+  <div class="grid">${cards.map(c=>`<button class="card" style="background:var(--${c[2]})"><span class="e">${c[0]}</span>${c[1]}<small>${c[3]}</small></button>`).join('')}</div>`;
+  h+=`<button class="mqgo" onclick="go('endC')">▶ Maquette : « J'ai fini ma séance »</button>`;
+  return h;
+}
+function bonusHTML(){return `<div class="h2" style="margin-top:6px">🎁 Mes jeux bonus <small style="font-weight:400;font-size:.8rem">(après la séance)</small></div>
+    <div class="bonus">${GAMES.map((g,i)=>`<button class="lock" id="lk${i}" onclick="locked(${i})"><span class="c">🔒</span><span class="e">${Array.from(g.pv)[0]}</span>${g.nom}</button>`).join('')}</div>
+    <div class="bubble"><span id="bub">${S.bubble||'Touche une carte…'}</span><button class="spk" onclick="speak()" aria-label="Écouter">🔊</button></div><div style="height:14px"></div>`;}
+function chestHTML(){return `<div class="chest-mini"><span class="e">🎁</span><span>Un coffre surprise t'attend à la fin de ta séance !</span></div><div style="height:14px"></div>`;}
+function speak(){try{const u=new SpeechSynthesisUtterance($('#bub').textContent.replace('🔒',''));u.lang='fr-FR';speechSynthesis.cancel();speechSynthesis.speak(u);}catch(e){}}
+function locked(i){
+  S.bubble='🔒 Finis ta séance pour ouvrir le coffre !';
+  $('#bub').textContent=S.bubble;
+  const el=$('#lk'+i);el.classList.remove('wob');void el.offsetWidth;el.classList.add('wob');
+}
+
+/* ----- FIN DE SEANCE ----- */
+function end(){
+  if(S.played>=S.total) return `<div class="end"><div class="fete">🌟🎉🌟</div><h1>Le coffre est vide !</h1><p class="sub">Tu as joué tes ${S.total} parties bonus.<br>À demain pour une nouvelle surprise !</p><div style="font-size:7rem">😴</div><button class="btn g" onclick="S.played=0;S.coffre=false;go('home')">🏠 Retour à l'accueil</button></div>`;
+  if(!S.coffre) return `<div class="end"><div class="fete">🎉⭐🎉</div><h1>Bravo Lola !</h1><p class="sub">Ta séance est terminée. Tu as gagné un cadeau !</p>
+    <button class="coffre" id="cf" onclick="openC()" aria-label="Ouvrir le coffre">🎁</button><div class="tap">👆 Touche le coffre !</div></div>`;
+  return `<div class="end"><div class="confetti">🎊✨🎊✨🎊</div><h1>Choisis ton jeu bonus !</h1>
+    <p class="sub">Partie ${S.played+1} sur ${S.total}</p>${dots()}
+    <div class="choose">${GAMES.map(g=>`<button class="gcard" style="background:${g.col}" onclick="go('${g.id}')"><span class="pv">${g.pv}</span><span><b>${g.nom}</b><small>${g.d}</small></span></button>`).join('')}</div>
+    <button class="later" onclick="go('home')">Je rejouerai plus tard</button></div>`;
+}
+function openC(){const c=$('#cf');c.classList.add('open');setTimeout(()=>{S.coffre=true;render();},550);}
+
+/* ----- JEUX ----- */
+function gHead(t){return `<div class="gh"><button class="back" onclick="go('endO')">⬅️</button><h1 style="margin:0;font-size:1.5rem">${t}</h1><span class="pill">Partie ${S.played+1}/${S.total}</span></div>${dots()}`;}
+function finish(msg){
+  $('#msg').textContent=msg;
+  $('#after').innerHTML=`<button class="btn g" onclick="S.played++;go('endO')">${S.played+1>=S.total?'🎁 Dernière partie finie !':'🎁 Retour au coffre'}</button>`;
+}
+/* morpion */
+let M;
+function morpion(){
+  M={b:Array(9).fill(''),over:false};
+  setTimeout(()=>{},0);
+  return gHead('Morpion ⭕')+`<p class="msg" id="msg">À toi ! Tu es les ⭐</p><div class="m3" id="m3"></div><div class="after" id="after"></div>`;
+}
+const L3=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+function mDraw(){const w=mWin();$('#m3').innerHTML=M.b.map((v,i)=>`<button class="${w&&w.includes(i)?'w':''}" onclick="mPlay(${i})">${v}</button>`).join('');}
+function mWin(){for(const l of L3){const[a,b,c]=l;if(M.b[a]&&M.b[a]===M.b[b]&&M.b[a]===M.b[c])return l;}return null;}
+function mPlay(i){
+  if(M.over||M.b[i])return;M.b[i]='⭐';
+  if(mWin()){M.over=true;mDraw();return finish('🎉 Bravo, tu as gagné !');}
+  if(!M.b.includes('')){M.over=true;mDraw();return finish('😊 Égalité, bien joué !');}
+  const free=M.b.map((v,k)=>v?-1:k).filter(k=>k>=0);
+  let pick=null;
+  for(const l of L3){const vs=l.map(k=>M.b[k]);if(vs.filter(v=>v==='🍄').length===2&&vs.includes('')){pick=l[vs.indexOf('')];break;}}
+  if(pick===null)pick=free[Math.floor(Math.random()*free.length)];
+  M.b[pick]='🍄';
+  if(mWin()){M.over=true;mDraw();return finish('🍄 Le champignon a gagné… Bien essayé !');}
+  mDraw();
+}
+/* puissance 4 */
+let P;
+function p4(){
+  P={g:Array(42).fill(''),over:false};
+  return gHead('Puissance 4')+`<p class="msg" id="msg">À toi ! Touche une colonne.</p><div class="arrows">${[0,1,2,3,4,5,6].map(()=>'<span>👇</span>').join('')}</div><div class="p4" id="p4"></div><div class="after" id="after"></div>`;
+}
+function pWin(c){const D=[[1,0],[0,1],[1,1],[1,-1]];for(let r=0;r<6;r++)for(let k=0;k<7;k++){const v=P.g[r*7+k];if(!v)continue;for(const[dx,dy]of D){const cells=[];for(let n=0;n<4;n++){const x=k+dx*n,y=r+dy*n;if(x<0||x>6||y<0||y>5||P.g[y*7+x]!==v)break;cells.push(y*7+x);}if(cells.length===4)return cells;}}return null;}
+function pDraw(w){let h='';for(let r=0;r<6;r++)for(let c=0;c<7;c++){const v=P.g[r*7+c];h+=`<button class="${v}${w&&w.includes(r*7+c)?' w':''}" onclick="pPlay(${c})">.</button>`;}$('#p4').innerHTML=h;}
+function drop(c,v){for(let r=5;r>=0;r--)if(!P.g[r*7+c]){P.g[r*7+c]=v;return true;}return false;}
+function pPlay(c){
+  if(P.over||!drop(c,'r'))return;
+  let w=pWin();if(w){P.over=true;pDraw(w);return finish('🎉 Bravo, 4 jetons alignés !');}
+  let t=0,cc;do{cc=Math.floor(Math.random()*7);t++}while(!drop(cc,'y')&&t<40);
+  w=pWin();if(w){P.over=true;pDraw(w);return finish('🟡 Le jaune a gagné… Bien essayé !');}
+  pDraw();
+}
+/* étoiles */
+let E;
+function etoiles(){
+  E={n:0,t:15,timer:null,stars:0};
+  return gHead('Attrape les étoiles')+`<p class="msg" id="msg">⭐ <span id="sc">0</span> étoiles &nbsp;·&nbsp; ⏱️ <span id="tm">15</span> s</p><div class="sky" id="sky"></div><div class="after" id="after"></div>`;
+}
+function eStart(){
+  clearInterval(E.timer);
+  const sky=$('#sky');
+  const add=()=>{const b=document.createElement('button');b.className='s';b.textContent=['⭐','🌟','✨'][Math.floor(Math.random()*3)];
+    b.style.left=(5+Math.random()*80)+'%';b.style.top=(5+Math.random()*80)+'%';b.style.animationDelay=(-Math.random()*3)+'s';
+    b.onclick=()=>{b.classList.add('got');b.onclick=null;E.n++;$('#sc').textContent=E.n;setTimeout(()=>b.remove(),300);};sky.appendChild(b);setTimeout(()=>b.remove(),2600);};
+  for(let i=0;i<6;i++)add();
+  E.timer=setInterval(()=>{E.t--;if($('#tm'))$('#tm').textContent=E.t;if(E.t%1===0&&E.t>0)add();if(E.t<=0){clearInterval(E.timer);sky.innerHTML='<div style="color:#fff;text-align:center;padding-top:150px;font-size:2.4rem">🌙<br>'+E.n+' étoiles !</div>';finish('🎉 Bravo, '+E.n+' étoiles attrapées !');}},1000);
+}
+
+/* ----- PARENT ----- */
+function parent(){
+  const m=S.mode;
+  return `<div class="gh"><button class="back" onclick="go('home')">⬅️</button><h1 style="margin:0;font-size:1.5rem">🔧 Espace parent</h1></div>
+  <p class="hint">Réglages des mini-jeux bonus (Morpion, Puissance 4, Attrape les étoiles).</p>
+  <div class="panel"><h3>🎁 Où voir les mini-jeux ?</h3>
+    <button class="opt ${m==='visible'?'on':''}" onclick="S.mode='visible';go('parent')"><span class="rd"></span><span><b>Visibles sur l'accueil (grisés)</b><small>Trois cartes avec un cadenas. Ils s'ouvrent à la fin de la séance.</small></span></button>
+    <button class="opt ${m==='fin'?'on':''}" onclick="S.mode='fin';go('parent')"><span class="rd"></span><span><b>Seulement en bonus de fin de séance</b><small>Rien sur l'accueil : l'enfant découvre le coffre quand il a fini.</small></span></button>
+    <div class="pv-home"><b>Aperçu de l'accueil :</b> ${m==='visible'?'🔒 🔒 🔒 &nbsp;trois cartes grisées sous les matières':'🎁 un petit message « Un coffre surprise t\'attend… », sans les jeux'}</div>
+  </div>
+  <div class="panel"><h3>🎯 Parties bonus par séance</h3>
+    <div class="step">${[3,4,5].map(n=>`<button class="${S.total===n?'on':''}" onclick="S.total=${n};go('parent')">${n}</button>`).join('')}<span>parties</span></div>
+    <p class="note">Les parties bonus ne comptent pas dans le temps de séance (20 min). Le coffre s'ouvre uniquement à la fin de la séance.</p>
+  </div>
+  <button class="btn g" onclick="go('home')">✔️ Enregistrer</button>`;
+}
+
+function render(){
+  let h;
+  switch(S.screen){
+    case 'home':h=home();break;
+    case 'end':h=end();break;
+    case 'morpion':h=morpion();break;
+    case 'p4':h=p4();break;
+    case 'etoiles':h=etoiles();break;
+    case 'parent':h=parent();break;
+  }
+  app.innerHTML=h;nav();
+  if(S.screen==='morpion')mDraw();
+  if(S.screen==='p4')pDraw();
+  if(S.screen==='etoiles')eStart();
+  else if(E)clearInterval(E.timer);
+}
+render();
+</script>
+</body>
+</html>

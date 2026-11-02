@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Piste C — Carnet de jeux et tickets</title>
+<link href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Playwrite+FR+Trad&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#fffaf0;--line:#c9dcf7;--margin:#f4a0b8;--ink:#2b2d6e;--card:#fff;--c1:#ffc4d6;--c2:#bfe3ff;--c3:#c4f0b6;--c4:#ffe58f;--c5:#dacbff;--c6:#ffcfa0;--good:#2e9e4f;--bad:#d8553d;--sh:#2b2d6e}
+*{box-sizing:border-box}
+body{margin:0;font-family:'Andika','Comic Sans MS',sans-serif;color:var(--ink);background:#eceaf5}
+button{font:inherit;color:inherit;cursor:pointer}
+.cursive{font-family:'Playwrite FR Trad','Brush Script MT',cursive}
+/* bandeau maquette */
+.mq{background:#2b2d6e;color:#fff;padding:10px 14px;font-size:.82rem;line-height:1.4}
+.mq b{color:#ffe58f}.mq .cols{display:grid;grid-template-columns:1fr 1fr;gap:4px 18px;margin-top:4px}
+.mq ul{margin:2px 0 0;padding-left:16px}
+.mq details summary{cursor:pointer;font-weight:700}
+@media(max-width:700px){.mq .cols{grid-template-columns:1fr}}
+.nav{display:flex;gap:6px;flex-wrap:wrap;padding:8px 10px;background:#dcd8ee;font-size:.78rem;align-items:center}
+.nav button{border:2px solid var(--sh);background:#fff;border-radius:10px;padding:4px 9px}
+.nav button.on{background:var(--c4);font-weight:700}
+.nav span{opacity:.7}
+/* app */
+.stage{display:flex;justify-content:center;padding:14px}
+.app{width:100%;max-width:520px;min-height:720px;position:relative;border:3px solid var(--sh);border-radius:26px;overflow:hidden;box-shadow:6px 6px 0 var(--sh);
+ background-color:var(--paper);
+ background-image:linear-gradient(90deg,transparent 38px,var(--margin) 38px,var(--margin) 40px,transparent 40px),linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
+ background-size:100% 100%,24px 24px,24px 24px}
+@media(min-width:900px){.app{max-width:980px;min-height:640px}}
+@media(max-width:700px){.stage{padding:0}.app{border-radius:0;border-width:0;box-shadow:none;min-height:calc(100vh - 160px)}}
+.scr{display:none;padding:16px 16px 28px 54px;animation:in .25s}
+.scr.on{display:block}
+@keyframes in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+h1,h2{margin:0}
+.top{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.top h1{font-size:1.3rem;flex:1}
+.btn{border:3px solid var(--sh);background:var(--c4);border-radius:16px;padding:10px 16px;font-weight:700;box-shadow:3px 3px 0 var(--sh);font-size:1rem}
+.btn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--sh)}
+.btn.big{font-size:1.2rem;padding:14px 22px}.btn.green{background:var(--c3)}.btn.off{background:#e6e3ee;opacity:.6;box-shadow:none}
+.round{width:48px;height:48px;flex:none;border-radius:50%;border:3px solid var(--sh);background:#fff;font-size:1.3rem}
+/* ticket */
+.ticket{display:inline-flex;align-items:center;gap:8px;background:var(--c4);border:3px dashed var(--sh);border-radius:14px;padding:6px 14px;font-weight:700;position:relative}
+.ticket::before,.ticket::after{content:"";position:absolute;top:50%;width:14px;height:14px;border-radius:50%;background:var(--paper);border:3px solid var(--sh);transform:translateY(-50%)}
+.ticket::before{left:-10px}.ticket::after{right:-10px}
+.ticket.lg{font-size:1.8rem;padding:8px 26px}
+.ticket.empty{background:#eee;border-color:#9a9ab8;color:#9a9ab8}
+.ticket.empty::before,.ticket.empty::after{border-color:#9a9ab8}
+.tk-row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:10px 0}
+.tk{width:46px;height:64px;background:var(--c4);border:3px solid var(--sh);border-radius:10px;display:grid;place-items:center;font-size:1.5rem;transform:rotate(var(--r,0deg));box-shadow:2px 2px 0 var(--sh)}
+.tk.used{background:#f0eef5;border:3px dashed #aaa;opacity:.55;filter:grayscale(1)}
+/* accueil */
+.hello{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.hello .cursive{font-size:1.15rem}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(min-width:900px){.grid.home{grid-template-columns:repeat(3,1fr)}}
+.card{border:3px solid var(--sh);border-radius:20px;padding:14px;text-align:center;font-weight:700;box-shadow:4px 4px 0 var(--sh);background:var(--c1);position:relative;font-size:1rem}
+.card .em{font-size:2.4rem;display:block}
+.card small{display:block;font-weight:400;font-size:.8rem;margin-top:2px}
+.sec{margin:18px 0 8px;font-size:1rem;font-weight:700;display:flex;align-items:center;gap:8px}
+/* carnet de jeux (accueil grisé) */
+.carnet{position:relative;border:3px solid var(--sh);border-radius:20px;background:#efedf6;padding:12px;box-shadow:4px 4px 0 var(--sh);display:flex;gap:12px;align-items:center;flex-wrap:wrap;cursor:not-allowed}
+.carnet .cov{width:64px;height:84px;border-radius:6px 14px 14px 6px;background:#c9c6dc;border:3px solid #8f8cb0;display:grid;place-items:center;font-size:1.8rem;flex:none;border-left-width:10px}
+.carnet .txt{flex:1;min-width:150px;color:#6b6990}
+.carnet .minis{display:flex;gap:6px;filter:grayscale(1);opacity:.55;font-size:1.6rem}
+.lock{position:absolute;right:10px;top:8px;font-size:1.3rem}
+.hint{font-size:.85rem;color:#6b6990;margin-top:4px}
+/* fin de session */
+.fin{text-align:center}
+.fin h2{font-size:1.5rem;margin:6px 0}
+.stars{font-size:2.4rem;letter-spacing:6px}
+.pop{animation:pop .6s both}.pop:nth-child(2){animation-delay:.12s}.pop:nth-child(3){animation-delay:.24s}.pop:nth-child(4){animation-delay:.36s}.pop:nth-child(5){animation-delay:.48s}
+@keyframes pop{0%{transform:scale(0) rotate(-40deg)}70%{transform:scale(1.2) rotate(var(--r,0deg))}100%{transform:scale(1) rotate(var(--r,0deg))}}
+.note{background:var(--card);border:3px solid var(--sh);border-radius:16px;padding:10px 14px;margin:12px auto;max-width:420px;font-size:.92rem}
+/* salle de jeux */
+.page{background:#fffdf6;border:3px solid var(--sh);border-radius:6px 22px 22px 6px;padding:14px;box-shadow:4px 4px 0 var(--sh);border-left-width:12px;position:relative}
+.stick{border:4px solid #fff;outline:3px solid var(--sh);border-radius:22px;padding:12px 10px;text-align:center;font-weight:700;background:var(--bg);transform:rotate(var(--r));box-shadow:3px 4px 0 rgba(43,45,110,.35);cursor:pointer;position:relative;transition:transform .15s}
+.stick:hover{transform:rotate(0) scale(1.04)}
+.stick .em{font-size:2.2rem;display:block;white-space:nowrap}
+.stick .cost{display:inline-block;margin-top:6px;background:#fff;border:2px dashed var(--sh);border-radius:10px;padding:1px 8px;font-size:.85rem}
+.stick.empty{filter:grayscale(1);opacity:.55;cursor:not-allowed}
+.counter{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+/* jeu */
+.board{margin:12px auto;border:3px solid var(--sh);border-radius:16px;background:#fff;padding:10px;width:max-content;max-width:100%}
+.m3{display:grid;grid-template-columns:repeat(3,64px);gap:6px}
+.m3 i{height:64px;border:3px solid var(--sh);border-radius:12px;display:grid;place-items:center;font-style:normal;font-size:2rem;background:var(--c2)}
+.p4{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;background:#5b7cf0;padding:8px;border-radius:12px;width:min(310px,100%)}
+.p4 i{aspect-ratio:1;border-radius:50%;background:#fff}.p4 i.r{background:#ff6b6b}.p4 i.y{background:#ffd93b}
+.sky{width:min(320px,70vw);height:200px;border-radius:12px;background:linear-gradient(#2b2d6e,#5b4fb0);position:relative;overflow:hidden}
+.sky span{position:absolute;font-size:1.6rem;animation:fl 2.5s ease-in-out infinite alternate}
+@keyframes fl{to{transform:translateY(14px) rotate(20deg)}}
+.pc{display:flex;gap:10px;justify-content:center;align-items:center;flex-wrap:wrap}
+/* parent */
+.par{max-width:560px;margin:auto}
+.pbox{background:var(--card);border:3px solid var(--sh);border-radius:18px;padding:14px;margin-bottom:12px}
+.pbox h3{margin:0 0 8px;font-size:1rem}
+.opt{display:flex;gap:10px;align-items:flex-start;padding:10px;border:3px solid var(--sh);border-radius:14px;margin-top:8px;cursor:pointer;background:#fff}
+.opt.on{background:var(--c3)}
+.opt .dot{width:22px;height:22px;border-radius:50%;border:3px solid var(--sh);flex:none;margin-top:2px;background:#fff}
+.opt.on .dot{background:var(--sh);box-shadow:inset 0 0 0 4px var(--c3)}
+.step{display:flex;align-items:center;gap:14px;justify-content:center}
+.step b{font-size:2rem;min-width:40px;text-align:center}
+.toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:var(--sh);color:#fff;padding:10px 16px;border-radius:14px;font-size:.9rem;opacity:0;pointer-events:none;transition:.25s;z-index:9;max-width:90vw;text-align:center}
+.toast.on{opacity:1}
+</style></head><body>
+
+<div class="mq">
+ <b>Piste C — Carnet de jeux et tickets.</b> L'enfant gagne 5 « tickets de jeu » à la fin de sa session et les dépense dans une « salle de jeux » : un carnet de collage où chaque jeu est un autocollant.
+ <details open><summary>Points forts et limites</summary><div class="cols">
+ <div><b>Points forts</b><ul><li>Le compteur de tickets rend le « 4-5 parties » concret et visible, sans lire un chiffre abstrait.</li><li>Une seule entrée grisée (le carnet) sur l'accueil : pas de 3 cartes qui frustrent.</li><li>Le parent règle un nombre de tickets : simple à comprendre.</li></ul></div>
+ <div><b>Limites</b><ul><li>Une couche de plus (carnet puis jeu), mais un seul toucher sur l'autocollant lance la partie.</li><li>Règle : le ticket n'est débité qu'à la fin de la partie ; une partie abandonnée ne coûte rien (à expliquer à l'enfant).</li><li>Moins direct que 3 cartes de jeux visibles dès l'accueil.</li></ul></div>
+ </div></details>
+</div>
+<div class="nav" id="nav"><span>Aller à :</span>
+ <button data-go="home">1 Accueil</button><button data-go="fin">2 Fin de session</button><button data-go="salle">3 Salle de jeux</button><button data-go="jeu">4 Un jeu</button><button data-go="salle0">5 Plus de tickets</button><button data-go="parent">6 Parent</button>
+</div>
+
+<div class="stage"><div class="app">
+
+<!-- 1 ACCUEIL -->
+<section class="scr" id="home">
+ <div class="hello"><span style="font-size:2.2rem">🦊</span><div class="cursive" style="flex:1">Bonjour Léa !</div><button class="round" data-go="parent" aria-label="Réglages parents">⚙️</button></div>
+ <div class="grid home">
+  <div class="card" style="background:var(--c1)"><span class="em">📖</span>Lecture<small>Session du jour</small></div>
+  <div class="card" style="background:var(--c2)"><span class="em">✏️</span>Écriture<small>Session du jour</small></div>
+  <div class="card" style="background:var(--c3)"><span class="em">🔢</span>Calcul<small>Session du jour</small></div>
+ </div>
+ <div class="sec">🎟️ Après ta session</div>
+ <div class="carnet" id="carnetLock" data-msg="Termine ta session pour gagner tes tickets !">
+  <span class="lock">🔒</span>
+  <div class="cov">📒</div>
+  <div class="txt"><b style="font-size:1.1rem">Mon carnet de jeux</b><div class="hint">Finis ta session pour gagner <span class="nbT">5</span> tickets !</div>
+   <div class="minis" style="margin-top:6px"><span>⭕</span><span>🔴</span><span>⭐</span></div></div>
+  <div class="ticket empty">🎟️ 0 / <span class="nbT">5</span></div>
+ </div>
+ <p class="hint" id="homeMode" style="display:none">Le carnet n'apparaît pas dans le menu : il s'ouvre seulement à la fin de la session (réglage parent).</p>
+</section>
+
+<!-- 2 FIN DE SESSION -->
+<section class="scr fin" id="fin">
+ <div class="stars">⭐⭐⭐</div>
+ <h2 class="cursive">Bravo Léa !</h2>
+ <div>Tu as fini ta session de lecture.</div>
+ <div class="note">🎁 Tu gagnes <b><span class="nbT">5</span> tickets de jeu</b> !</div>
+ <div class="tk-row" id="finTk"></div>
+ <button class="btn big green" data-go="salle">🎟️ Aller à la salle de jeux</button>
+ <div style="margin-top:14px"><button class="btn" data-go="home" style="font-size:.9rem">Plus tard, retour à l'accueil</button></div>
+ <p class="hint">Les tickets sont gardés jusqu'à demain si tu ne les utilises pas.</p>
+</section>
+
+<!-- 3 SALLE DE JEUX -->
+<section class="scr" id="salle">
+ <div class="top"><button class="round" data-go="home" aria-label="Retour">←</button><h1 class="cursive">Ma salle de jeux</h1></div>
+ <div class="counter"><div class="ticket lg" id="cnt">🎟️ <span id="tleft">5</span> tickets</div><div class="hint" style="max-width:240px">1 ticket = 1 partie. Touche un autocollant pour jouer !</div></div>
+ <div class="tk-row" id="rowTk"></div>
+ <div class="page">
+  <div class="grid" id="stickers">
+   <div class="stick" style="--bg:var(--c2);--r:-3deg" data-jeu="morpion"><span class="em">⭕❌</span>Morpion<br><span class="cost">🎟️ 1 ticket</span></div>
+   <div class="stick" style="--bg:var(--c1);--r:2deg" data-jeu="p4"><span class="em">🔴🟡</span>Puissance 4<br><span class="cost">🎟️ 1 ticket</span></div>
+   <div class="stick" style="--bg:var(--c4);--r:-1.5deg;grid-column:1/-1" data-jeu="etoiles"><span class="em">⭐✨</span>Attrape les étoiles<br><span class="cost">🎟️ 1 ticket</span></div>
+  </div>
+ </div>
+ <p class="hint" id="vide" style="display:none;text-align:center;font-size:1rem">Plus de tickets ! À demain pour de nouveaux jeux 🌙</p>
+</section>
+
+<!-- 4 JEU -->
+<section class="scr" id="jeu">
+ <div class="top"><button class="round" data-go="salle" aria-label="Retour">←</button><h1 class="cursive" id="jTitre">Morpion</h1><div class="ticket">🎟️ <span class="tleft2">5</span></div></div>
+ <div class="counter" style="justify-content:center"><div class="note" style="margin:0">Partie <b id="jNum">1</b> sur <b class="nbT">5</b></div></div>
+ <div class="pc" id="jBoard"></div>
+ <p class="hint" style="text-align:center" id="jRegle"></p><p class="hint" style="text-align:center">🎟️ Le ticket est utilisé quand la partie se termine. Si tu arrêtes avant, il ne coûte rien.</p>
+ <div class="pc" style="margin-top:8px"><button class="btn green big" id="jouer">🏁 Fin de la partie (démo)</button><button class="btn" data-go="salle">Abandonner (gratuit)</button></div>
+</section>
+
+<!-- 5 PARENT -->
+<section class="scr" id="parent">
+ <div class="top"><button class="round" data-go="home" aria-label="Retour">←</button><h1>⚙️ Espace parent</h1></div>
+ <div class="par">
+  <div class="pbox"><h3>🎟️ Tickets de jeu par session</h3>
+   <div class="step"><button class="round" id="moins">−</button><b id="nb">5</b><button class="round" id="plus">+</button></div>
+   <div class="hint" style="text-align:center">1 ticket = 1 partie. 4 ou 5 tickets. Une partie abandonnée ne coûte aucun ticket. Les parties ne comptent pas dans le temps de session.</div>
+   <div class="tk-row" id="pTk"></div></div>
+  <div class="pbox"><h3>📒 Où voir le carnet de jeux ?</h3>
+   <div class="opt on" data-mode="menu"><span class="dot"></span><div><b>Dans le menu d'accueil (grisé)</b><div class="hint">Léa voit le carnet, verrouillé jusqu'à la fin de la session.</div></div></div>
+   <div class="opt" data-mode="fin"><span class="dot"></span><div><b>Seulement à la fin de la session</b><div class="hint">Rien dans le menu : le carnet apparaît avec les tickets.</div></div></div></div>
+  <div class="pbox"><h3>Aperçu pour l'enfant</h3><div class="hint" id="resume">Léa gagne 5 tickets après chaque session. Le carnet est visible (grisé) dans le menu.</div></div>
+ </div>
+</section>
+
+</div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+const S={nb:5,left:5,mode:'menu',jeu:'morpion',partie:1};
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const JEUX={
+ morpion:{t:'Morpion',r:'Aligne 3 ❌ avant le renard !',b:()=>'<div class="board"><div class="m3">'+['❌','','⭕','','❌','','⭕','','❌'].map(x=>'<i>'+x+'</i>').join('')+'</div></div>'},
+ p4:{t:'Puissance 4',r:'Aligne 4 jetons rouges.',b:()=>{const g=['','r','y','r','','',''];let h='';for(let i=0;i<42;i++){h+='<i class="'+(i>=35?(['r','y','r','y','','r',''][i-35]):i>=28?(['','r','y','','','y',''][i-28]):'')+'"></i>'}return '<div class="board"><div class="p4">'+h+'</div></div>'}},
+ etoiles:{t:'Attrape les étoiles',r:'Touche les étoiles avant qu\'elles tombent !',b:()=>{const p=[[8,10],[60,30],[30,70],[78,12],[48,120],[12,140],[70,150],[40,25]];return '<div class="board"><div class="sky">'+p.map((q,i)=>'<span style="left:'+q[0]+'%;top:'+q[1]+'px;animation-delay:'+i*.3+'s">'+(i%3?'⭐':'🌟')+'</span>').join('')+'<span style="left:44%;top:165px;font-size:2rem">🧺</span></div></div>'}}
+};
+function tickets(el,total,left,rot){el.innerHTML='';for(let i=0;i<total;i++){const d=document.createElement('div');d.className='tk pop'+(i>=left?' used':'');d.style.setProperty('--r',(i%2?3:-4)+'deg');d.textContent='🎟️';el.appendChild(d)}}
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(t._);t._=setTimeout(()=>t.classList.remove('on'),2200)}
+function refresh(){
+ $$('.nbT').forEach(e=>e.textContent=S.nb);
+ $('#tleft').textContent=S.left;$$('.tleft2').forEach(e=>e.textContent=S.left);
+ $('#nb').textContent=S.nb;
+ tickets($('#rowTk'),S.nb,S.left);tickets($('#pTk'),S.nb,S.nb);tickets($('#finTk'),S.nb,S.nb);
+ $('#cnt').firstChild.textContent='🎟️ ';
+ $('#tleft').nextSibling.textContent=S.left>1?' tickets':' ticket';
+ $$('.stick').forEach(s=>s.classList.toggle('empty',S.left<1));
+ $('#vide').style.display=S.left<1?'block':'none';
+ $('#carnetLock').style.display=S.mode==='menu'?'flex':'none';
+ $('#homeMode').style.display=S.mode==='menu'?'none':'block';
+ $('.sec').style.display=S.mode==='menu'?'flex':'none';
+ $('#resume').textContent='Léa gagne '+S.nb+' tickets après chaque session. '+(S.mode==='menu'?'Le carnet est visible (grisé) dans le menu.':'Le carnet n\'apparaît qu\'à la fin de la session.');
+}
+function go(id){
+ if(id==='salle0'){S.left=0;id='salle'}
+ else if(id==='salle'&&S.left<1&&false){}
+ else if(id==='fin'||id==='home'&&false){S.left=S.nb}
+ $$('.scr').forEach(s=>s.classList.toggle('on',s.id===id));
+ $$('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.go===id||(id==='salle'&&S.left<1&&b.dataset.go==='salle0')));
+ if(id==='jeu')openJeu();
+ refresh();scrollTo(0,0);
+}
+function openJeu(){const j=JEUX[S.jeu];$('#jTitre').textContent=j.t;$('#jBoard').innerHTML=j.b();$('#jRegle').textContent=j.r;S.partie=Math.min(S.nb,S.nb-S.left+1);$('#jNum').textContent=S.partie}
+document.addEventListener('click',e=>{
+ const g=e.target.closest('[data-go]');if(g){go(g.dataset.go);return}
+ const st=e.target.closest('.stick');if(st){if(S.left<1)return toast('Plus de tickets, à demain !');S.jeu=st.dataset.jeu;go('jeu');return}
+ if(e.target.closest('#carnetLock'))return toast('Termine ta session pour gagner tes tickets !');
+ if(e.target.closest('#jouer')){if(S.left<1)return;S.left--;toast('Partie terminée ! Il te reste '+S.left+' ticket'+(S.left>1?'s':''));if(S.left<1){setTimeout(()=>go('salle'),900)}else openJeu();refresh();return}
+ if(e.target.id==='plus'&&S.nb<5){S.nb++;S.left=S.nb;refresh()}
+ if(e.target.id==='moins'&&S.nb>4){S.nb--;S.left=S.nb;refresh()}
+ const o=e.target.closest('.opt');if(o){S.mode=o.dataset.mode;$$('.opt').forEach(x=>x.classList.toggle('on',x===o));refresh()}
+});
+go('home');
+</script>
+</body></html>
