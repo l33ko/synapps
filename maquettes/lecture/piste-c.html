@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Piste C — Mini-histoire en images (Lecture, niveaux 7-10)</title>
+<link href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Playwrite+FR+Trad&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#fffaf0;--line:#c9dcf7;--margin:#f4a0b8;--ink:#2b2d6e;--card:#fff;--c1:#ffc4d6;--c2:#bfe3ff;--c3:#c4f0b6;--c4:#ffe58f;--c5:#dacbff;--c6:#ffcfa0;--good:#2e9e4f;--bad:#d8553d;--sh:#2b2d6e}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;font-family:'Andika','Comic Sans MS',sans-serif;color:var(--ink);background-color:var(--paper);background-image:linear-gradient(var(--line) 1px,transparent 1px);background-size:100% 32px;-webkit-tap-highlight-color:transparent}
+/* bandeau de maquette */
+.mq{background:#2b2d6e;color:#fff;padding:10px 14px;font-size:.82rem;line-height:1.4}
+.mq b.t{font-size:.95rem}
+.mq .cols{display:flex;gap:18px;flex-wrap:wrap;margin-top:4px}
+.mq .cols div{flex:1;min-width:230px}
+.mq ul{margin:2px 0 0;padding-left:18px}
+.mq .ok{color:#9be8b0;font-weight:700}.mq .ko{color:#ffb4a2;font-weight:700}
+#app{max-width:620px;margin:0 auto;padding:16px 16px 70px}
+@media(min-width:900px){#app{padding-left:44px}body::before{content:'';position:fixed;top:0;bottom:0;left:calc(50% - 310px + 28px);width:2px;background:var(--margin);z-index:-1}}
+.top{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.back,.big,.opt,.again,.next,.ear{font:inherit;color:inherit;cursor:pointer;border:3px solid var(--sh);transition:transform .08s}
+.back:active,.opt:active,.big:active,.next:active,.ear:active{transform:scale(.97)}
+.back{border-radius:14px;background:var(--card);font-size:1.4rem;padding:6px 14px}
+.bar{flex:1;height:18px;border:3px solid var(--sh);border-radius:99px;background:var(--card);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--good);transition:width .3s}
+.stars{font-weight:700;background:var(--c4);border:3px solid var(--sh);border-radius:99px;padding:4px 14px;white-space:nowrap}
+.chips{display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap}
+.chip{border:3px solid var(--sh);border-radius:99px;padding:3px 12px;font-weight:700;font-size:.95rem}
+.chip.niv{background:var(--c5)}.chip.type{background:var(--c2)}
+.scene{background:linear-gradient(#dff1ff 0 62%,#c4f0b6 62%);border:3px solid var(--sh);border-radius:24px;padding:14px 10px 8px;text-align:center;position:relative;min-height:150px;display:flex;align-items:flex-end;justify-content:center;gap:6px;overflow:hidden}
+.scene span{font-size:4.6rem;line-height:1.1;display:inline-block;animation:bob 2.4s ease-in-out infinite}
+.scene span:nth-child(2){animation-delay:.4s}.scene span:nth-child(3){animation-delay:.8s}
+.scene span.sm{font-size:3rem}
+.scene .sky{position:absolute;top:8px;right:14px;font-size:1.8rem;animation:none}
+@keyframes bob{50%{transform:translateY(-6px)}}
+.ear{display:flex;align-items:center;gap:8px;background:var(--c2);border-radius:99px;padding:8px 18px;font-size:1.2rem;font-weight:700;margin:-18px auto 0;position:relative;z-index:2}
+.story{background:var(--card);border:3px solid var(--sh);border-radius:24px;padding:18px 14px 8px;margin:12px 0;text-align:center}
+.hint{font-size:.95rem;opacity:.75;margin:0 0 4px}
+.sent{font-family:'Playwrite FR Trad','Brush Script MT',cursive;font-size:1.65rem;line-height:2.05;padding-bottom:6px}
+.sent+.sent{border-top:2px dashed var(--line);margin-top:4px}
+.w{display:inline-flex;align-items:center;justify-content:center;min-width:44px;min-height:44px;padding:0 .3em;margin:0 .02em;border-radius:10px;cursor:pointer;transition:background .15s,transform .15s}
+.w.on{background:var(--c4);transform:scale(1.12);box-shadow:0 0 0 3px var(--c4)}
+.story.reread{background:var(--c4);border-color:var(--bad);animation:shake .3s}
+.mono{filter:grayscale(1) opacity(.7)}
+.gap{display:inline-block;min-width:3.4em;border-bottom:5px solid var(--bad);text-align:center;color:var(--good);font-weight:700}
+.gap.full{border-bottom-color:var(--good);background:var(--c3);border-radius:10px}
+.qbox{background:var(--c1);border:3px solid var(--sh);border-radius:20px;padding:10px 14px;margin:6px 0 14px;display:flex;gap:10px;align-items:center;justify-content:center;font-size:1.35rem;font-weight:700;text-align:center}
+.qbox .qe{font-size:2rem}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.opts.three{grid-template-columns:1fr 1fr 1fr}
+.opt{background:var(--card);border-radius:20px;padding:10px 6px;font-size:1.7rem;font-weight:700;min-height:68px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;line-height:1.15}
+.opt .oe{font-size:2.6rem;line-height:1.1}
+.opt.txtx{font-family:'Playwrite FR Trad','Brush Script MT',cursive;font-weight:400;font-size:1.5rem;min-height:76px}
+.opt.good{background:var(--c3);border-color:var(--good);animation:pop .4s}
+.opt.bad{background:var(--c6);border-color:var(--bad);opacity:.6;animation:shake .3s}
+@keyframes pop{50%{transform:scale(1.08)}}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.fb{display:flex;gap:12px;align-items:center;justify-content:center;flex-wrap:wrap;text-align:center;font-size:1.3rem;font-weight:700;min-height:52px;margin-top:8px}
+.next{display:inline-block;margin:0;background:var(--c4);border-radius:99px;font-size:1.3rem;font-weight:700;padding:10px 28px}
+.end{text-align:center;padding-top:20px}.end .s{font-size:3.6rem;letter-spacing:.1em}
+.end .big{display:block}
+.again{background:var(--c4);border-radius:99px;font-size:1.3rem;font-weight:700;padding:12px 26px;margin:6px}
+.menu{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.card{font:inherit;color:inherit;cursor:pointer;border:3px solid var(--sh);border-radius:22px;padding:14px 8px;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:1.1rem;font-weight:700;min-height:112px;justify-content:center;background:var(--c3)}
+.card .e{font-size:2.3rem}.card small{font-weight:400;font-size:.85rem}
+.pgb{display:flex;gap:2px;width:80%}.pgb i{flex:1;height:7px;border-radius:3px;background:rgba(127,127,127,.3)}.pgb i.on{background:var(--ink)}
+@media(min-width:900px){.sent{font-size:2rem}.scene{min-height:190px}.scene span{font-size:5.6rem}.scene span.sm{font-size:3.6rem}}
+@media(max-width:600px){#app{padding:10px 12px 20px}.top{margin-bottom:8px}.scene{min-height:104px;padding-top:8px}.scene span{font-size:3.3rem}.sent{font-size:1.45rem;line-height:1.5;padding-bottom:2px}.story{padding:8px 10px 6px;margin:8px 0}.hint{font-size:.85rem;margin:0}.qbox{margin:4px 0 10px;padding:6px 10px;font-size:1.15rem}.qbox .qe{font-size:1.5rem}.opt{min-height:60px;font-size:1.4rem;border-radius:16px}.opts{gap:8px}.ear{padding:5px 16px;font-size:1.05rem;margin-top:-16px}.chips{margin-bottom:8px}.chip{font-size:.85rem;padding:1px 10px}.mq{padding:6px 12px}}
+@media(max-width:380px){.sent{font-size:1.4rem}.opt{font-size:1.15rem}}
+</style>
+</head>
+<body>
+<details class="mq" id="mq"><summary style="cursor:pointer"><b class="t">Piste C — « Mini-histoire en images »</b> <span style="opacity:.7">· points forts et limites ▾</span></summary>
+  Une petite scène animée illustre la phrase ; l'enfant la lit mot à mot (le mot touché se surligne et se prononce), puis répond à une question illustrée (Qui ? Quoi ? Quelle couleur ?).
+  <div class="cols">
+    <div><span class="ok">Points forts</span><ul><li>L'image soutient la lecture : on décode pour vérifier l'histoire, pas dans le vide.</li><li>Toucher un mot pour l'entendre aide à débloquer un mot difficile.</li><li>Réponses en images : pas besoin de lire les choix, la difficulté reste sur la phrase.</li></ul></div>
+    <div><span class="ko">Limites</span><ul><li>L'image peut donner la réponse sans lire (à nuancer aux niveaux 9-10 avec des détails absents de la scène).</li><li>Il faut une scène emoji par phrase : banque de contenu plus lourde à écrire.</li><li>Écran plus chargé et plus haut ; 2 phrases demandent un peu de défilement sur petit iPhone.</li></ul></div>
+  </div>
+</details>
+<div id="app"></div>
+
+<script>
+// Données fictives (niveaux 7 à 10 de Lecture)
+const SERIE=[
+ {niv:7,type:'completer',scene:['👧','🍽️'],phrases:[['Léa','mange','une','_']],q:'Que mange Léa ?',qe:'🍽️',opts:['pomme','lune','robe'],ok:0},
+ {niv:8,type:'comprendre',scene:['🥛','❓'],phrases:[['Le','chat','boit','du','lait.']],q:'Qui boit du lait ?',qe:'❓',opts:['le chat','le chien','Léa'],ok:0},
+ {niv:9,type:'completer',scene:['🐶','💤'],phrases:[['Le','chien','dort','dans','sa','_']],q:'Dans quoi dort le chien ?',qe:'💤',opts:['niche','voiture','plume'],ok:0},
+ {niv:9,type:'comprendre',scene:['🧒','🎈'],mono:[1],phrases:[['Tom','a','un','ballon','rouge.']],q:'De quelle couleur est le ballon ?',qe:'🎨',opts:['bleu','rouge','vert'],ok:1},
+ {niv:10,type:'comprendre',scene:['👧','🌳'],phrases:[['Mina','va','au','parc.'],['Elle','joue','avec','son','chien.']],q:'Avec qui joue Mina ?',qe:'🌳',opts:['son chien','son chat','son frère'],ok:0}
+];
+const TYPES={completer:['✏️','Phrase à compléter'],comprendre:['🔍','Comprendre la phrase']};
+const app=document.getElementById('app');if(innerWidth>=900)document.getElementById('mq').open=true;
+let i=0,stars=0,answered=false,wrong=false,timer=null;
+
+function speak(t){try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t.replace('_','…'));u.lang='fr-FR';u.rate=.8;speechSynthesis.speak(u)}catch(e){}}
+
+function menu(){
+  app.innerHTML=`<div class="top"><button class="back" disabled style="opacity:.3">←</button><div style="font-size:1.8rem;font-weight:700;line-height:1.2">Lecture</div><div class="stars">⭐ 42</div></div>
+  <p style="margin:0 0 14px;font-size:1.05rem">Choisis ton niveau :</p>
+  <div class="menu">
+   ${[1,2,3,4,5,6,7,8,9,10].map(n=>`<button class="card" ${n>=7?'':'style="opacity:.55;background:var(--card)"'} onclick="${n>=7?'start()':''}"><span class="e">${n<7?'📖':n<9?'🏡':'🌳'}</span>Niveau ${n}${n>=7?'<small>+ histoires en images</small>':''}<div class="pgb">${[0,1,2,3,4].map(k=>`<i class="${n<7||k<2?'on':''}"></i>`).join('')}</div></button>`).join('')}
+  </div>
+  <p style="text-align:center;font-size:.9rem;opacity:.7;margin-top:18px">Maquette : touche un niveau 7 à 10 pour lancer une série.</p>`;
+}
+function start(){i=0;stars=0;show()}
+
+function sentHTML(q){
+  return q.phrases.map((p,si)=>`<div class="sent">${p.map((w,wi)=>{
+    if(w==='_')return `<span class="gap" id="gap">&nbsp;</span>`;
+    const k=`${si}-${wi}`;return `<span class="w" data-s="${si}" data-i="${wi}" onclick="tap(this)">${w}</span>`}).join(' ')}</div>`).join('');
+}
+function show(){
+  answered=false;wrong=false;
+  const q=SERIE[i],t=TYPES[q.type];
+  const pct=Math.round(i/SERIE.length*100);
+  app.innerHTML=`<div class="top"><button class="back" onclick="menu()">←</button><div class="bar"><i style="width:${pct}%"></i></div><div class="stars">⭐ ${stars}</div></div>
+  <div class="chips"><span class="chip niv">Niveau ${q.niv}</span><span class="chip type">${t[0]} ${t[1]}</span><span class="chip" style="background:var(--card)">${i+1} / ${SERIE.length}</span></div>
+  <div class="scene">${q.niv>=10?'<span class="sky">☀️</span>':''}${q.scene.map((e,k)=>`<span class="${q.mono&&q.mono.includes(k)?'mono':''}">${e}</span>`).join('')}</div>
+  <button class="ear" onclick="listen()">🔊 Écouter</button>
+  <div class="story"><p class="hint">${q.type==='completer'?'Lis la phrase, puis trouve le mot qui manque.':'Lis l\'histoire. Touche un mot pour l\'entendre.'}</p>${sentHTML(q)}</div>
+  <div class="qbox"><span class="qe">${q.qe}</span><span>${q.q}</span></div>
+  <div class="opts ${q.opts.length===3?'three':''}">${q.opts.map((o,k)=>`<button class="opt" onclick="pick(${k},this)">${o}</button>`).join('')}</div>
+  <div class="fb" id="fb"></div>`;
+}
+function tap(el){
+  document.querySelectorAll('.w.on').forEach(x=>x.classList.remove('on'));
+  el.classList.add('on');speak(el.textContent);
+  setTimeout(()=>el.classList.remove('on'),900);
+}
+function listen(){
+  clearInterval(timer);const ws=[...document.querySelectorAll('.w')];let k=0;
+  speak(SERIE[i].phrases.map(p=>p.join(' ')).join(' '));
+  timer=setInterval(()=>{ws.forEach(x=>x.classList.remove('on'));if(k>=ws.length){clearInterval(timer);return}ws[k++].classList.add('on')},520);
+}
+function pick(k,btn){
+  if(answered)return;const q=SERIE[i],fb=document.getElementById('fb');
+  if(k===q.ok){
+    answered=true;btn.classList.add('good');if(!wrong)stars++;
+    const g=document.getElementById('gap');if(g){g.textContent=q.opts[q.ok];g.classList.add('full')}
+    document.querySelectorAll('.opt').forEach(o=>{if(o!==btn)o.style.opacity=.45});
+    fb.innerHTML=`<span style="color:var(--good)">${wrong?'Bien joué !':'Bravo ! ⭐'}</span> <button class="next" onclick="next()">${i<SERIE.length-1?'Suite →':'Terminer'}</button>`;
+    speak(q.type==='completer'?q.phrases[0].join(' ').replace('_',q.opts[q.ok]):'Bravo');
+  }else{
+    wrong=true;btn.classList.add('bad');
+    document.querySelector('.story').classList.add('reread');
+    fb.innerHTML=`<span style="color:var(--bad)">Relis la phrase 🔎</span>`;speak('Relis la phrase');
+  }
+}
+function next(){i++;if(i>=SERIE.length)return fin();show()}
+function fin(){
+  app.innerHTML=`<div class="end"><div style="font-size:4.5rem">🎉</div><h1 style="font-size:2rem;margin:.2em 0">Bravo !</h1><p style="font-size:1.2rem">Tu as lu ${SERIE.length} histoires.</p><div class="s">${'⭐'.repeat(Math.max(1,stars))}</div><p style="font-size:1.1rem">${stars} / ${SERIE.length} du premier coup</p><button class="again" onclick="start()">Rejouer 🔁</button><button class="again" style="background:var(--c2)" onclick="menu()">Retour aux niveaux</button></div>`;
+}
+menu();
+</script>
+</body>
+</html>

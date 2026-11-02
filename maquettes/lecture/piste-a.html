@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Maquette Lecture – piste A</title>
+<style>
+:root{--paper:#fffaf0;--line:#c9dcf7;--margin:#f4a0b8;--ink:#2b2d6e;--card:#fff;--c1:#ffc4d6;--c2:#bfe3ff;--c3:#c4f0b6;--c4:#ffe58f;--c5:#dacbff;--c6:#ffcfa0;--good:#2e9e4f;--bad:#d8553d;--sh:#2b2d6e}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;font-family:'Andika','Comic Sans MS',sans-serif;color:var(--ink);background-color:var(--paper);background-image:linear-gradient(var(--line) 1px,transparent 1px);background-size:100% 32px;-webkit-tap-highlight-color:transparent}
+@media (min-width:900px){body::before{content:'';position:fixed;top:0;bottom:0;left:calc(50% - 310px + 28px);width:2px;background:var(--margin);z-index:-1}}
+.mq{background:#2b2d6e;color:#fff;font:14px/1.45 system-ui,sans-serif;padding:10px 14px}
+.mq b{color:#ffe58f}.mq .cols{display:flex;gap:18px;flex-wrap:wrap;margin-top:4px}.mq .cols div{flex:1;min-width:230px}
+.mq ul{margin:2px 0 0;padding-left:18px}
+#app{max-width:620px;margin:0 auto;padding:16px 16px 60px}
+@media (min-width:900px){#app{padding-left:44px}}
+button{font:inherit;color:inherit;cursor:pointer;border:3px solid var(--sh);transition:transform .08s}
+button:active{transform:scale(.97)}
+h1{font-size:2rem;margin:.2em 0 0;line-height:1.2}
+.sub{margin:0 0 18px;font-size:1.1rem}
+.top{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.back{border-radius:14px;background:var(--card);font-size:1.4rem;padding:6px 14px}
+.bar{flex:1;height:18px;border:3px solid var(--sh);border-radius:99px;background:var(--card);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--good);transition:width .3s}
+.stars{font-weight:700;background:var(--c4);border:3px solid var(--sh);border-radius:99px;padding:4px 12px;white-space:nowrap}
+.lv{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:14px}
+.lv button{border-radius:18px;background:var(--c2);font-size:1.5rem;font-weight:700;padding:12px 0;position:relative}
+.lv button.new{background:var(--c5)}
+.lv button.new::after{content:'★';position:absolute;top:-8px;right:-4px;font-size:1.1rem;background:var(--c4);border:2px solid var(--sh);border-radius:99px;width:24px;height:24px;line-height:20px}
+.legend{font-size:1rem;margin:0 0 16px}
+.go{background:var(--good);color:#fff;border-radius:99px;font-size:1.4rem;font-weight:700;padding:14px 30px;display:block;margin:10px auto}
+.chip{display:inline-block;background:var(--c5);border:3px solid var(--sh);border-radius:99px;padding:3px 14px;font-weight:700;font-size:1rem}
+.chip.u{background:var(--c4)}
+.q{background:var(--card);border:3px solid var(--sh);border-radius:24px;padding:14px;text-align:center;margin-bottom:12px;min-height:200px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;position:relative}
+.emo{font-size:4.2rem;line-height:1.1}
+.phr{font-family:'Playwrite FR Trad','Brush Script MT',cursive;font-size:1.5rem;line-height:1.7;margin:0}
+.phr .blank{display:inline-block;min-width:3.2em;border-bottom:5px solid var(--bad);color:transparent;margin:0 .1em}
+.phr .blank.ok{color:var(--good);border-color:var(--good);font-weight:700}
+.ask{font-size:1.35rem;font-weight:700;margin:0;background:var(--c4);border-radius:14px;padding:6px 14px}
+.ear{background:var(--c2);border-radius:99px;font-size:1.15rem;font-weight:700;padding:8px 18px}
+.opts{display:grid;grid-template-columns:1fr;gap:12px}
+.opt{background:var(--card);border-radius:20px;padding:10px 6px;font-family:'Playwrite FR Trad','Brush Script MT',cursive;font-size:1.6rem;min-height:60px}
+.opt.good{background:var(--c3);border-color:var(--good);animation:pop .4s}
+.opt.bad{background:var(--c6);border-color:var(--bad);opacity:.65;animation:shake .3s}
+.opt:disabled{cursor:default}
+.fb{text-align:center;font-size:1.3rem;font-weight:700;min-height:56px;margin-top:8px}
+.fb .hint{font-weight:400;font-size:1.05rem;display:block}
+.next{background:var(--c4);border-radius:99px;font-size:1.3rem;font-weight:700;padding:10px 26px;display:block;margin:8px auto 0;position:sticky;bottom:12px;visibility:hidden;box-shadow:0 0 0 8px var(--paper)}
+.ear.mini{padding:2px 10px;font-size:1rem;margin-left:4px;vertical-align:middle}
+.end{text-align:center}.end .s{font-size:3.4rem;letter-spacing:.1em}
+.again{background:var(--c4);border-radius:99px;font-size:1.3rem;font-weight:700;padding:12px 26px;margin:6px}
+.word{font-family:'Playwrite FR Trad','Brush Script MT',cursive;font-size:3rem;line-height:1.6}
+@keyframes pop{50%{transform:scale(1.06)}}
+@keyframes shake{25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+@media (min-width:900px){.opts{grid-template-columns:repeat(3,1fr)}.opt{min-height:96px}.phr{font-size:2.1rem}}
+</style></head><body>
+<div class="mq"><b>Piste A – « Texte + gros boutons »</b> : la phrase en grand en haut, trois gros boutons de réponse en bas, une seule action par écran.
+<div class="cols"><div><b>Points forts</b><ul><li>Très lisible, même geste que les autres exercices</li><li>Facile à coder : on réutilise la carte question et les boutons</li><li>Le même écran sert aux 2 types</li></ul></div>
+<div><b>Limites</b><ul><li>Peu de nouveauté visuelle : l'enfant peut survoler</li><li>Compréhension : la phrase reste affichée, donc moins exigeante</li><li>Phrases longues : la carte devient haute sur petit écran</li></ul></div></div></div>
+<div id="app"></div>
+<script>
+const app=document.getElementById('app');
+// Série du niveau 8 : mélange des types (mot isolé existant, phrase à compléter, compréhension)
+const SERIE=[
+ {t:'mot',emo:'🐱',txt:'Quel mot est écrit ?',opts:['chat','chou','rat'],ok:0},
+ {t:'cpl',phr:['Le chat boit du','.'],opts:['lait','lit','loup'],ok:0,full:'Le chat boit du lait.'},
+ {t:'cmp',phr:'Léa mange une pomme rouge.',q:'Qu’est-ce que Léa mange ?',opts:['un fruit','un gâteau','un jouet'],ok:0,hint:'Relis la phrase : qu\u2019est-ce qui est rouge ?'},
+ {t:'cpl',phr:['Papa lit un','sur le canapé.'],opts:['livre','vélo','chien'],ok:0,full:'Papa lit un livre sur le canapé.'},
+ {t:'cmp',phr:'Tom a un chien noir qui court dans le jardin.',q:'Où le chien court-il ?',opts:['dehors','à l\u2019école','dans la cuisine'],ok:0,hint:'Relis la fin de la phrase.'},
+ {t:'cmp',phr:'Maman prépare un gâteau pour Nina.',q:'Qui fait le gâteau ?',opts:['la maman','le papa','la maîtresse'],ok:0,hint:'Relis le début de la phrase.'}
+];
+let i=0,stars=0,fails=0;
+function home(){
+ app.innerHTML=`<div class="top"><button class="back">←</button><div><h1>📖 Lecture</h1></div></div>
+ <p class="sub">Choisis ton niveau</p>
+ <div class="lv">${[1,2,3,4,5,6,7,8,9,10].map(n=>`<button class="${n>=7?'new':''}" data-n="${n}">${n}</button>`).join('')}</div>
+ <p class="legend">★ Niveaux 7 à 10 : <b>phrases à compléter</b> et <b>petites histoires</b> à comprendre.</p>
+ <button class="go" id="start">Jouer au niveau 8 ▶</button>`;
+ app.querySelectorAll('.lv button').forEach(b=>b.onclick=()=>{app.querySelectorAll('.lv button').forEach(x=>x.style.outline='');b.style.outline='4px solid var(--good)'});
+ app.querySelector('#start').onclick=()=>{i=0;stars=0;show()};
+ app.querySelector('.back').onclick=()=>{};
+}
+function say(t){try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='fr-FR';u.rate=.85;speechSynthesis.speak(u)}catch(e){}}
+function show(){
+ if(i>=SERIE.length){return end()}
+ const s=SERIE[i];fails=0;
+ let card='';
+ if(s.t==='mot')card=`<span class="chip u">Quel mot ?</span><div class="emo">${s.emo}</div><p style="margin:0;font-size:1.15rem">${s.txt}</p>`;
+ if(s.t==='cpl')card=`<span class="chip">✏️ Phrase à compléter</span><p class="phr">${s.phr[0]} <span class="blank" id="bl">${s.opts[s.ok]}</span> ${s.phr[1]}</p><button class="ear" data-say="${s.phr[0]} … ${s.phr[1].length>1?s.phr[1]:''}">🔊 Écouter</button>`;
+ if(s.t==='cmp')card=`<span class="chip">💭 Je comprends</span><p class="phr">${s.phr}</p><button class="ear" data-say="${s.phr}">🔊 Lire la phrase</button><p class="ask">${s.q} <button class="ear mini" data-say="${s.q}" aria-label="Écouter la question">🔊</button></p>`;
+ app.innerHTML=`<div class="top"><button class="back" id="bk">←</button><div class="bar"><i style="width:${i/SERIE.length*100}%"></i></div><div class="stars">⭐ ${stars}</div></div>
+ <div class="q">${card}</div>
+ <div class="opts">${s.opts.map((o,k)=>`<button class="opt" data-k="${k}">${o}</button>`).join('')}</div>
+ <div class="fb" id="fb"></div><button class="next" id="nx">Suivant ▶</button>`;
+ app.querySelector('#bk').onclick=home;
+ app.querySelectorAll('.ear').forEach(b=>b.onclick=()=>say(b.dataset.say));
+ app.querySelectorAll('.opt').forEach(b=>b.onclick=()=>pick(b,s));
+}
+function pick(b,s){
+ const k=+b.dataset.k,fb=app.querySelector('#fb');
+ if(k===s.ok){
+  b.classList.add('good');app.querySelectorAll('.opt').forEach(x=>x.disabled=true);
+  const bl=app.querySelector('#bl');if(bl)bl.classList.add('ok');
+  if(fails===0)stars++;
+  fb.innerHTML='🎉 Bravo !';say(s.full||'Bravo !');
+  const nx=app.querySelector('#nx');nx.style.visibility='visible';nx.onclick=()=>{i++;show()};
+ }else{
+  fails++;b.classList.add('bad');b.disabled=true;
+  say('Essaie encore !'+(s.hint?' '+s.hint:''));fb.innerHTML=`🙂 Essaie encore !${s.hint&&fails>0?`<span class="hint">💡 ${s.hint}</span>`:''}`;
+ }
+}
+function end(){
+ app.innerHTML=`<div class="end"><h1>Bravo !</h1><div class="s">⭐⭐⭐</div><p style="font-size:1.3rem">Tu as lu ${SERIE.length} questions.</p><button class="again" id="ag">Rejouer</button><button class="again" id="hm" style="background:var(--c2)">Retour</button></div>`;
+ app.querySelector('#ag').onclick=()=>{i=0;stars=0;show()};app.querySelector('#hm').onclick=home;
+}
+home();
+// démarrage direct sur la série pour la maquette si ?s dans l'URL
+if(location.hash==='#serie'){i=2;show()}
+</script></body></html>

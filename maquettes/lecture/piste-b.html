@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Maquette Lecture — piste B : glisser-déposer</title>
+<link href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Playwrite+FR+Trad&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#fffaf0;--line:#c9dcf7;--margin:#f4a0b8;--ink:#2b2d6e;--card:#fff;--c1:#ffc4d6;--c2:#bfe3ff;--c3:#c4f0b6;--c4:#ffe58f;--c5:#dacbff;--c6:#ffcfa0;--good:#2e9e4f;--bad:#d8553d;--sh:#2b2d6e}
+*{box-sizing:border-box}
+body{margin:0;min-height:100dvh;font-family:'Andika','Comic Sans MS',sans-serif;color:var(--ink);background-color:var(--paper);background-image:linear-gradient(var(--line) 1px,transparent 1px);background-size:100% 32px;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+/* bandeau de maquette (hors app) */
+.mq{background:#2b2d6e;color:#fff;font:14px/1.45 system-ui,sans-serif;padding:10px 14px}
+.mq b.t{font-size:15px}
+.mq .cols{display:grid;grid-template-columns:1fr 1fr;gap:4px 18px;margin-top:6px}
+.mq ul{margin:2px 0 0;padding-left:16px}
+.mq h4{margin:0;font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:#ffe58f}
+.mq h4.l{color:#ffcfa0}
+.mq .nav{margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.mq .nav button{font:inherit;font-size:12px;border:0;border-radius:99px;padding:4px 10px;background:#fff;color:#2b2d6e;cursor:pointer}
+@media(max-width:600px){.mq .cols{grid-template-columns:1fr}.mq{font-size:12.5px;padding:8px 12px}}
+#app{max-width:620px;margin:0 auto;padding:14px 16px 60px;position:relative}
+@media (min-width:900px){#app{padding-left:44px}body::before{content:'';position:fixed;top:0;bottom:0;left:calc(50% - 310px + 28px);width:2px;background:var(--margin);z-index:-1}}
+.top{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.back,.big,.again,.opt,.tile,.pic,.wd{font:inherit;color:inherit;cursor:pointer;border:3px solid var(--ink);transition:transform .08s}
+.back{border-radius:14px;background:var(--card);font-size:1.4rem;padding:6px 14px}
+.bar{flex:1;height:18px;border:3px solid var(--ink);border-radius:99px;background:var(--card);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--good);transition:width .3s}
+.stars{font-weight:700;background:var(--c4);border:3px solid var(--ink);border-radius:99px;padding:4px 14px;white-space:nowrap}
+.lvl{font-size:.95rem;margin:0 0 8px;text-align:center}
+.lvl span{background:var(--c5);border:2px solid var(--ink);border-radius:99px;padding:2px 12px}
+.q{background:var(--card);border:3px solid var(--ink);border-radius:24px;padding:16px 14px;text-align:center;margin-bottom:16px;display:flex;flex-direction:column;align-items:center;gap:10px}
+.cons{margin:0;font-size:1.1rem;font-weight:700}
+.row{display:flex;align-items:center;gap:12px;justify-content:center;width:100%}
+.big{background:var(--c2);border-radius:99px;font-size:2rem;width:70px;height:70px;flex:none}
+.big:active,.tile:active,.opt:active,.pic:active,.again:active{transform:scale(.95)}
+.emo{font-size:4.2rem;line-height:1.1}
+.cursive{font-family:'Playwrite FR Trad','Brush Script MT',cursive}
+.sent{font-size:1.65rem;line-height:2.3;margin:0;text-align:center}
+.gap{display:inline-block;vertical-align:middle;min-width:90px;height:52px;margin:0 4px;border:3px dashed var(--bad);border-radius:12px;background:var(--c4);position:relative;top:-.15rem;transition:background .15s,transform .15s}
+.gap.hot{background:var(--c3);border-color:var(--good);transform:scale(1.12)}
+.gap.ok{border:3px solid var(--good);background:var(--c3);min-width:90px;padding:0 .6ch;line-height:46px;font-weight:700;animation:pop .4s}
+.gap::after{content:'';}
+.pool{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;min-height:70px;padding-top:6px}
+.tile{background:var(--card);border-radius:16px;padding:10px 20px;font-size:1.7rem;touch-action:none;user-select:none;-webkit-user-select:none;box-shadow:0 4px 0 var(--ink);font-family:'Andika',sans-serif}
+.tile.cursive{font-family:'Playwrite FR Trad',cursive;font-size:1.4rem;padding:6px 18px 14px}
+.tile.used{visibility:hidden}
+.tile.bad{background:var(--c6);border-color:var(--bad);animation:shake .35s}
+.tile.drag{position:fixed;z-index:50;pointer-events:none;transform:scale(1.12) rotate(-3deg);box-shadow:0 10px 0 rgba(43,45,110,.25)}
+.hint{text-align:center;font-size:.95rem;margin:6px 0 0;opacity:.8}
+.pics{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;width:100%}
+.pic{background:var(--card);border-radius:20px;font-size:3.6rem;padding:10px 0;line-height:1.15;display:flex;flex-direction:column;align-items:center;gap:2px}
+.pic small{font-size:.8rem;opacity:0}
+.pic.good{background:var(--c3);border-color:var(--good);animation:pop .4s}
+.pic.bad{background:var(--c6);border-color:var(--bad);opacity:.6;animation:shake .35s}
+.wd{background:var(--card);border-radius:12px;padding:0 8px;margin:0 2px;font-family:'Playwrite FR Trad',cursive;font-size:1.4rem;line-height:2.1;border-width:3px;border-style:dashed;border-color:var(--c5);display:inline-block}
+.wd.good{background:var(--c3);border:3px solid var(--good);animation:pop .4s}
+.wd.bad{background:var(--c6);border-color:var(--bad);animation:shake .35s}
+.opt{background:var(--card);border-radius:20px;padding:12px 6px;font-size:2rem;font-weight:700;min-height:76px}
+.opt.good{background:var(--c3);border-color:var(--good);animation:pop .4s}
+.opt.bad{background:var(--c6);border-color:var(--bad);opacity:.6;animation:shake .3s}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.fb{text-align:center;font-size:1.4rem;font-weight:700;min-height:44px;margin-top:12px}
+.next{display:block;margin:6px auto 0;font:inherit;font-weight:700;font-size:1.3rem;background:var(--good);color:#fff;border:3px solid var(--ink);border-radius:99px;padding:10px 30px;cursor:pointer;animation:pop .4s}
+.end{text-align:center}.end .s{font-size:4rem;letter-spacing:.1em}
+.again{border-radius:99px;background:var(--c4);font-size:1.3rem;font-weight:700;padding:12px 26px;margin:6px}
+.listen-on{animation:pulse .6s 3}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--ink);color:#fff;border-radius:99px;padding:8px 18px;font-size:1rem;z-index:60;opacity:0;transition:opacity .2s;pointer-events:none;max-width:90vw;text-align:center}
+.toast.on{opacity:1}
+@keyframes pop{0%{transform:scale(.8)}60%{transform:scale(1.15)}100%{transform:scale(1)}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+@keyframes pulse{50%{transform:scale(1.15);background:var(--c4)}}
+@media (min-width:900px){.sent{font-size:2rem}.tile{font-size:1.9rem}.pic{font-size:4.4rem}}
+</style>
+</head>
+<body>
+<div class="mq">
+  <b class="t">Piste B — glisser-déposer</b> · Le mot manquant se glisse (ou se touche) dans le trou de la phrase ; en compréhension, on touche l'image ou le mot qui répond.
+  <div class="cols">
+    <div><h4>Points forts</h4><ul><li>Très tactile : on « construit » la phrase, aucune lecture de consigne longue</li><li>Le geste (toucher OU glisser) marche pour tous les doigts de 6 ans</li><li>Réponses en images : la compréhension ne dépend pas de l'écriture</li></ul></div>
+    <div><h4 class="l">Limites</h4><ul><li>Glisser demande plus de dextérité (d'où l'alternative « toucher le mot »)</li><li>Plus de code (zones de dépôt, écran qui défile pendant le glisser)</li><li>Trou de 1 seul mot : pas de phrases à plusieurs trous</li></ul></div>
+  </div>
+  <div class="nav">Démo, aller à :
+    <button onclick="go(1)">Phrase à compléter</button><button onclick="go(2)">Compréhension (image)</button><button onclick="go(4)">Compréhension (mot)</button><button onclick="go(6)">Fin de série</button>
+  </div>
+</div>
+
+<div id="app"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+// Série fictive : niveau 8 de Lecture, mélange de questions habituelles et des 2 nouveaux types
+const S=[
+ {t:'mot',e:'🐸',mot:'grenouille',opts:['grenouille','girafe','guitare','gomme'],ok:0},
+ {t:'phr',avant:'Le chat boit du',apres:'.',opts:['lait','sable','bois'],ok:0,img:'🐱🥛',lire:'Le chat boit du, blanc.'},
+ {t:'cmp',phrase:'Le chien dort sur le lit.',q:'Qui dort ?',mode:'img',opts:[['🐶','chien'],['🐱','chat'],['🐭','souris']],ok:0},
+ {t:'phr',avant:'Maman lit un',apres:'.',opts:['livre','pain','pied'],ok:0,img:'👩📖',lire:'Maman lit un, blanc.'},
+ {t:'cmp',phrase:'Léa mange une pomme rouge.',q:'Que mange Léa ?',mode:'mot',mots:['Léa','mange','une','pomme','rouge'],ok:3},
+ {t:'cmp',phrase:'Le chien court dans le jardin.',q:'Où court le chien ?',mode:'img',opts:[['🌳','jardin'],['🏠','maison'],['🏊','piscine']],ok:0}
+];
+let i=0,stars=0,done=false;
+const $=s=>document.querySelector(s),app=$('#app');
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('on'),2000)}
+function go(n){i=n;if(n===0)stars=0;render()}
+function head(){return `<div class="top"><button class="back" onclick="toast('Retour au menu')">←</button><div class="bar"><i style="width:${Math.min(100,i/S.length*100)}%"></i></div><div class="stars">⭐ ${stars}</div></div>`}
+function listen(txt,btn){
+  btn.classList.add('listen-on');setTimeout(()=>btn.classList.remove('listen-on'),1900);
+  if('speechSynthesis' in window){try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(txt);u.lang='fr-FR';u.rate=.8;speechSynthesis.speak(u);return}catch(e){}}
+  toast('🔊 '+txt)
+}
+function render(){
+  done=false;
+  if(i>=S.length){app.innerHTML=head()+`<div class="q end"><div class="s">⭐⭐⭐</div><h2 style="margin:.2em 0">Bravo !</h2><p style="margin:0">${S.length} questions lues, ${stars} étoiles.</p></div><div style="text-align:center"><button class="again" onclick="go(0)">Rejouer</button><button class="again" style="background:var(--c2)" onclick="toast('Retour au menu')">Menu</button></div>`;return}
+  const q=S[i];
+  const lvl=`<p class="lvl"><span>Niveau 8 · question ${i+1} sur ${S.length}</span></p>`;
+  if(q.t==='mot'){
+    app.innerHTML=head()+lvl+`<div class="q"><p class="cons">Quel mot vois-tu ?</p><div class="emo">${q.e}</div></div><div class="opts">${q.opts.map((o,k)=>`<button class="opt" data-k="${k}">${o}</button>`).join('')}</div><div class="fb" id="fb"></div><p class="hint">Question habituelle du cahier</p>`;
+    app.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{if(done)return;if(+b.dataset.k===q.ok)win(b,'.opt');else lose(b)});
+  }
+  if(q.t==='phr'){
+    app.innerHTML=head()+lvl+`<div class="q"><div class="row"><button class="big" id="ec" aria-label="Écouter">🔊</button><p class="cons">Quel mot manque ?</p></div><p class="sent cursive">${q.avant} <span class="gap" id="gap"></span>${q.apres}</p></div>
+    <div class="pool" id="pool">${q.opts.map((o,k)=>`<button class="tile cursive" data-k="${k}">${o}</button>`).join('')}</div><div class="fb" id="fb"></div><p class="hint" id="hint">Glisse le mot dans le trou, ou touche-le.</p>`;
+    $('#ec').onclick=e=>listen('Quel mot manque ? '+q.lire.replace('blanc','…'),e.currentTarget);
+    initDrag(q);
+  }
+  if(q.t==='cmp'){
+    let body;
+    if(q.mode==='img') body=`<div class="q"><div class="row"><button class="big" id="ec" aria-label="Écouter">🔊</button></div><p class="sent cursive">${q.phrase}</p><p class="cons">${q.q}</p></div><div class="pics">${q.opts.map((o,k)=>`<button class="pic" data-k="${k}"><span>${o[0]}</span></button>`).join('')}</div>`;
+    else body=`<div class="q"><div class="row"><button class="big" id="ec" aria-label="Écouter">🔊</button></div><p class="cons">${q.q} <span style="font-weight:400">Touche le mot.</span></p><p class="sent">${q.mots.map((m,k)=>`<button class="wd" data-k="${k}">${m}</button>`).join(' ')}.</p></div>`;
+    app.innerHTML=head()+lvl+body+`<div class="fb" id="fb"></div><p class="hint">${q.mode==='img'?'Touche la bonne image.':'Touche le bon mot dans la phrase.'}</p>`;
+    $('#ec').onclick=e=>listen(q.phrase?q.phrase+' '+q.q:q.mots.join(' ')+'. '+q.q,e.currentTarget);
+    app.querySelectorAll('.pic,.wd').forEach(b=>b.onclick=()=>{if(b.classList.contains('wd')&&'speechSynthesis' in window){try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(b.textContent);u.lang='fr-FR';u.rate=.8;speechSynthesis.speak(u)}catch(e){}}else if(b.classList.contains('wd'))toast('🔊 '+b.textContent);if(done)return;if(+b.dataset.k===q.ok)win(b,'');else lose(b)});
+  }
+}
+function win(el,_){
+  done=true;stars++;el.classList.remove('bad');el.classList.add('good');
+  $('.stars').textContent='⭐ '+stars;
+  $('#fb').innerHTML=`<span style="color:var(--good)">Bravo ! 🎉</span><button class="next" onclick="i++;render()">Suite ➜</button>`;
+  $('.bar i').style.width=((i+1)/S.length*100)+'%';
+}
+function lose(el){
+  el.classList.remove('bad');void el.offsetWidth;el.classList.add('bad');
+  $('#fb').innerHTML=`<span style="color:var(--bad)">Essaie encore 🙂</span><div style="font-size:1rem;font-weight:400">Astuce : appuie sur 🔊 et écoute bien.</div>`;
+  setTimeout(()=>{if(!done)$('#fb').textContent=''},1800);
+}
+/* Glisser-déposer (pointeur) + toucher = même résultat */
+function initDrag(q){
+  const gap=$('#gap'),pool=$('#pool');
+  pool.querySelectorAll('.tile').forEach(t=>{
+    t.addEventListener('pointerdown',e=>{
+      if(done)return;e.preventDefault();
+      const r=t.getBoundingClientRect(),ox=e.clientX-r.left,oy=e.clientY-r.top;
+      let moved=false,ghost=null;
+      const sx=e.clientX,sy=e.clientY;
+      const over=(x,y)=>{const g=gap.getBoundingClientRect(),p=30;return x>g.left-p&&x<g.right+p&&y>g.top-p&&y<g.bottom+p};
+      const mv=ev=>{
+        if(!moved&&Math.hypot(ev.clientX-sx,ev.clientY-sy)>20){moved=true;ghost=t.cloneNode(true);ghost.classList.add('drag');ghost.style.width=r.width+'px';document.body.appendChild(ghost);t.style.opacity='.25'}
+        if(moved){ghost.style.left=(ev.clientX-ox)+'px';ghost.style.top=(ev.clientY-oy)+'px';gap.classList.toggle('hot',over(ev.clientX,ev.clientY))}
+      };
+      const up=ev=>{
+        window.removeEventListener('pointermove',mv);window.removeEventListener('pointerup',up);window.removeEventListener('pointercancel',up);
+        if(ghost)ghost.remove();t.style.opacity='';gap.classList.remove('hot');
+        if(!moved||over(ev.clientX,ev.clientY))drop(t,q);else{$('#fb').innerHTML='<span style="color:var(--bad)">Essaie dans le trou 👆</span>';setTimeout(()=>{if(!done)$('#fb').textContent=''},1800)}
+      };
+      window.addEventListener('pointermove',mv);window.addEventListener('pointerup',up);window.addEventListener('pointercancel',up);
+    });
+  });
+}
+function drop(t,q){
+  if(+t.dataset.k===q.ok){
+    done=true;stars++;$('.stars').textContent='⭐ '+stars;
+    const g=$('#gap');g.classList.add('ok');g.textContent=t.textContent;t.classList.add('used');
+    $('#hint').textContent='';
+    $('#fb').innerHTML=`<span style="color:var(--good)">Bravo ! 🎉</span><button class="next" onclick="i++;render()">Suite ➜</button>`;
+    $('.bar i').style.width=((i+1)/S.length*100)+'%';
+  } else {
+    t.classList.remove('bad');void t.offsetWidth;t.classList.add('bad');
+    $('#fb').innerHTML=`<span style="color:var(--bad)">Pas celui-là, le mot revient ! 🙂</span><div style="font-size:1rem;font-weight:400">Astuce : appuie sur 🔊 et écoute la phrase.</div>`;
+    setTimeout(()=>{t.classList.remove('bad');if(!done)$('#fb').textContent=''},2600);
+  }
+}
+render();
+</script>
+</body>
+</html>
