@@ -155,10 +155,10 @@ textarea.inp{width:100%;min-height:90px;font-size:1rem;word-break:break-all;disp
 .bonus{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:20px}
 .bonus .card:last-child:nth-child(odd){grid-column:auto}
 .bonus .card{min-height:96px;font-size:.95rem;padding:12px 4px}
-.lock{position:relative;font:inherit;color:inherit;border:3px dashed var(--sh);border-radius:20px;background:rgba(127,127,127,.14);padding:12px 4px 10px;display:flex;flex-direction:column;align-items:center;gap:2px;min-height:96px;justify-content:center;font-size:.95rem;font-weight:700;cursor:pointer}
-.lock .e{font-size:2rem;filter:grayscale(1);opacity:.45}
-.lock .c{position:absolute;top:-12px;right:-6px;font-size:1.3rem;background:var(--card);border:3px solid var(--sh);border-radius:99px;width:38px;height:38px;display:flex;align-items:center;justify-content:center}
-.lock.wob{animation:shake .4s}
+.gl{position:relative;font:inherit;color:inherit;border:3px dashed var(--sh);border-radius:20px;background:rgba(127,127,127,.14);padding:12px 4px 10px;display:flex;flex-direction:column;align-items:center;gap:2px;min-height:96px;justify-content:center;font-size:.95rem;font-weight:700;cursor:pointer}
+.gl .e{font-size:2rem;filter:grayscale(1);opacity:.45}
+.gl .c{position:absolute;top:-12px;right:-6px;font-size:1.3rem;background:var(--card);border:3px solid var(--sh);border-radius:99px;width:38px;height:38px;display:flex;align-items:center;justify-content:center}
+.gl.wob{animation:shake .4s}
 .coffre{border:none;background:none;font-size:8rem;line-height:1;padding:0;margin:4px auto;display:block;cursor:pointer;animation:wiggle 1.6s infinite}
 .coffre.open{animation:burst .6s forwards}
 @keyframes wiggle{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(4deg)}}
@@ -169,8 +169,8 @@ textarea.inp{width:100%;min-height:90px;font-size:1rem;word-break:break-all;disp
 .choose{display:grid;gap:12px;margin:14px 0}
 .gcard{font:inherit;color:inherit;display:flex;align-items:center;gap:14px;text-align:left;border:3px solid var(--sh);border-radius:22px;padding:12px 16px;min-height:88px;cursor:pointer}
 .gcard .pv{font-size:2.8rem}.gcard b{display:block;font-size:1.25rem}.gcard small{font-size:.9rem}
-.p4{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;background:var(--c1);border:3px solid var(--sh);border-radius:18px;padding:8px}
-.p4 .pa{font:inherit;border:none;background:none;font-size:1.4rem;padding:0;min-height:44px;cursor:pointer}
+.p4{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;background:var(--c1);border:3px solid var(--sh);border-radius:18px;padding:8px}
+.p4 .pa{font:inherit;border:none;background:none;font-size:1.3rem;padding:0;min-height:48px;cursor:pointer}
 .p4 .pc{aspect-ratio:1;border-radius:50%;background:var(--card);border:2px solid var(--sh)}
 .p4 .pc.R{background:#e5484d}.p4 .pc.Y{background:#f5c518}.p4 .pc.w{outline:4px solid var(--good);outline-offset:1px}
 .ast{position:relative;height:min(52vh,420px);min-height:300px;background:var(--c1);border:3px dashed var(--sh);border-radius:20px;overflow:hidden;touch-action:manipulation}
@@ -289,7 +289,7 @@ function openChest(){const c=document.getElementById('cf');if(c)c.classList.add(
 function pickBonus(id){closeOv();startBonus(id)}
 const bDots=()=>`<div class="dots" aria-hidden="true">${Array.from({length:BP()},(_,i)=>`<i class="${i<BPLAYED()?'on':''}"></i>`).join('')}</div>`;
 function bonusHome(){
- if(BEFF()==='coffre')return `<div class="bonus">${BONUS.map(g=>`<button class="lock" onclick="shakeLock(this)" aria-label="${g.t} (verrouillé)"><span class="c">🔒</span><span class="e">${g.e}</span>${g.t}</button>`).join('')}</div>`;
+ if(BEFF()==='coffre')return `<div class="bonus">${BONUS.map(g=>`<button class="gl" onclick="shakeLock(this)" aria-label="${g.t} (verrouillé)"><span class="c">🔒</span><span class="e">${g.e}</span>${g.t}</button>`).join('')}</div>`;
  return `<div class="bonus">${BONUS.map(g=>`<button class="card" style="background:var(${g.c})" onclick="startBonus('${g.id}')"><span class="e" style="font-size:2rem">${g.e}</span>${g.t}</button>`).join('')}</div>`}
 function sessBar(){if(!DUR()||!SS)return '';const T=DUR(),u=Math.min(T,Math.floor(SS.used/60000));return `<div class="sess"><span style="font-size:1.6rem">⏰</span><div style="flex:1"><b>Ma séance du jour</b><div class="bar"><i style="width:${Math.min(100,SS.used/(T*600))}%"></i></div></div><b>${u} / ${T} min</b></div>`}
 function menu(){
