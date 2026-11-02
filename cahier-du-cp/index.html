@@ -234,8 +234,7 @@ const MENU=[
  {id:'pho',t:'Mots à compléter',e:'🔤',s:'lettres manquantes',c:'--c5'},
  {id:'phr',t:'Phrases',e:'🧩',s:'remets les étiquettes',c:'--c6'},
  {id:'mem',t:'Memory',e:'🃏',s:'image et mot',c:'--c2'},
- {id:'add',t:'Additions',e:'<b class="sym" style="background:#2e9e4f">+</b>',s:'des petits aux grands nombres',c:'--c3'},
- {id:'sou',t:'Soustractions',e:'<b class="sym" style="background:#e08a1e">−</b>',s:'des petits aux grands nombres',c:'--c4'},
+ {id:'add',t:'Additions et soustractions',e:'<b class="sym" style="background:#2e9e4f">+</b> <b class="sym" style="background:#e08a1e">−</b>',s:'des petits aux grands nombres',c:'--c3'},
  {id:'cmp',t:'Compléments',e:'🧮',s:'7 + ? = 10, puis 20, 100',c:'--c3'},
  {id:'mul',t:'Doubles et moitiés',e:'<b class="sym" style="background:#7a5bd6">×</b>',s:'puis les tables',c:'--c5'},
  {id:'pb',t:'Problèmes',e:'🛒',s:'pommes, monnaie…',c:'--c4'},
@@ -459,7 +458,10 @@ function genMath(op,L){L=L||1;
  if(cm)return {nr,nb,q:`<div class="math">${a} + ? = ${t}</div>`,opts,key:kb?{ml:`${a} +`,mr:`= ${t}`,ans,v:''}:null};
  return {nr,nb,q:`<div class="math"${fs}>${txt} = ?</div>`,opts,key:kb?{txt,ans,v:''}:null};
 }
-function gen(id){return id==='lec'?genLec():id==='ecr'?genEcr():id==='pho'?genPho():id==='phr'?genPhr():id==='sui'?genSui():id==='pb'?genPb():id==='int'?genInt():genMath(id==='mix'?pick(['add','sou','cmp','mul'].filter(o=>!OFF(o))):id,lv(id))}
+/* additions et soustractions : que des additions aux niveaux faciles, soustractions faciles dès le niveau 4 */
+const SOUM=[0,0,0,1,2,3,4,6,8,10],SOUP=[0,0,0,.25,.35,.45,.5,.5,.5,.5];
+function genAS(){const L=lv('add');return Math.random()<SOUP[L-1]?genMath('sou',SOUM[L-1]):genMath('add',L)}
+function gen(id){return id==='add'?genAS():id==='lec'?genLec():id==='ecr'?genEcr():id==='pho'?genPho():id==='phr'?genPhr():id==='sui'?genSui():id==='pb'?genPb():id==='int'?genInt():genMath(id==='mix'?pick(['add','sou','cmp','mul'].filter(o=>!OFF(o))):id,lv(id))}
 
 function start(id){if(STARTERS[id])return STARTERS[id]();Q={id,n:0,score:0,N:10};next()}
 const sigQ=c=>c?[c.q,c.ws&&c.ws.join(' '),c.say,c.btn,c.nr,(c.opts||[]).filter(o=>o.ok).map(o=>o.h||o.t||o.v||'').join()].join('|'):'';
