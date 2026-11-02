@@ -123,7 +123,7 @@ h1{font-size:2rem;margin:.2em 0 0;line-height:1.2}
 .mc:disabled{opacity:1}
 .slots{display:flex;flex-wrap:wrap;justify-content:center;gap:5px;margin:6px 0}
 .slot{width:2rem;height:2.7rem;border-bottom:4px solid var(--sh);display:inline-flex;align-items:flex-end;justify-content:center;font-size:2rem;font-weight:700;line-height:1.3}
-.slot.r{color:var(--good)}.slot.bad{color:var(--bad)}.slot.lk{color:var(--good)}.slot.hint{color:#c98a00}
+.slot.r{color:var(--good)}.slot.bad{color:var(--bad)}.slot.lk{color:var(--good)}.slot.hint{color:#c98a00;border-bottom-style:dashed}
 .kr{display:flex;gap:4px;justify-content:center;margin-bottom:6px}
 .kk{font:inherit;color:inherit;flex:1 1 0;min-width:0;max-width:46px;height:50px;padding:0;border:3px solid var(--sh);border-radius:10px;background:var(--card);font-size:1.4rem;font-weight:700;cursor:pointer}
 .kk:active{transform:scale(.97)}
@@ -302,11 +302,15 @@ function tchk(){const c=Q.cur;drawTxt(c,curM());if(emptySlot(c)>=0)return;
  if(Q.tries>=3){c.rev=true;drawTxt(c,curM());const f=document.getElementById('fb');if(f)f.textContent='Voici le mot';say(['Voici le mot.',c.w]);setTimeout(()=>{Q.n++;next()},2300);return}
  c.bad=true;drawTxt(c,curM());fbk(Q.tries===1?'Essaie encore 💪':'Presque ! Un coup de pouce 💡');
  setTimeout(()=>{
+  if(!Q||Q.cur!==c)return;
   /* les bonnes lettres bien placées restent pour l'essai suivant */
   c.v.forEach((x,i)=>{if(!x)return;if(x.ch===c.w[i])x.lock=true;else{if(x.bi>=0)c.bank[x.bi].used=false;c.v[i]=null}});
   /* 2e erreur : une lettre de plus est donnée */
   if(Q.tries===2){const k=emptySlot(c);if(k>=0){const ch=c.w[k],bi=c.bank?c.bank.findIndex(b=>!b.used&&b.ch===ch):-1;c.v[k]={ch,bi,lock:true,hint:true};if(bi>=0)c.bank[bi].used=true}}
-  c.bad=false;Q.done=false;drawTxt(c,curM());
+  c.bad=false;
+  /* l'indice a complété le mot : on le valide (sans point, car il y a eu des erreurs) */
+  if(emptySlot(c)<0){c.rev=true;drawTxt(c,curM());sfx(true);say(c.w);setTimeout(()=>{if(Q&&Q.cur===c){Q.n++;next()}},1500);return}
+  Q.done=false;drawTxt(c,curM());
   /* 1re erreur : le mot est redit */
   if(Q.tries===1)say(c.w)},1300)}
 function genEcrM(){
