@@ -343,7 +343,7 @@ const twHtml=t=>t.replace(/([\p{L}\d]+(?:['’][\p{L}\d]+)?)|([^\p{L}\d]+)/gu,(m
 function genTxt(L){
  const it=pick(L>=9&&Math.random()<(L>=10?.85:.6)?TXB:TXA),[ph,q,a,wr]=it,txt=ph.join(' ');
  return {nr:'Lis le texte, puis réponds à la question.',nb:true,rd:true,btn:[txt,q],sp:['Lis le texte, puis réponds à la question.',txt,q],
-  q:`<div class="txt script">${twHtml(txt)}</div><button class="tile" onclick="say(Q.cur.btn)" aria-label="Écouter le texte et la question">🔊 Écouter</button><div class="qq"><small>Lis le texte et réponds à la question.</small><b class="script">${esc(q)}</b></div>`,
+  q:`<div class="txt script">${twHtml(txt)}</div><button class="tile" style="min-height:44px" onclick="say(Q.cur.btn)" aria-label="Écouter le texte et la question">🔊 Écouter</button><div class="qq"><small>Lis le texte et réponds à la question.</small><b class="script">${esc(q)}</b></div>`,
   opts:shuffle([a,...wr]).map(o=>({h:esc(o),ok:o===a,f:'script rd'}))}}
 function genLec(){
  const L=lv('lec');if(L>=7&&Math.random()<[.3,.4,.5,.6][L-7])return genTxt(L);
