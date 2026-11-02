@@ -22,7 +22,7 @@ L'interface imite un cahier à lignes Seyès, avec de gros boutons faciles à to
 **Jeux**
 - **Memory** : associer chaque image à son mot.
 - **Suites** : trouver ce qui vient ensuite dans une suite d'images ou de nombres.
-- **Morpion** : jouer contre l'ordinateur, qui devient plus fort avec le niveau. À partir du niveau 4, le premier joueur est tiré au hasard.
+- **Mini-jeux bonus** : Morpion, Puissance 4 et Attrape les étoiles, contre l'ordinateur ou le chronomètre. Par défaut, ils sont visibles en bas de l'accueil (grisés, avec un cadenas) et s'ouvrent dans un coffre à la fin de la séance : 4 ou 5 parties bonus, hors temps de séance. Dans l'espace parents, on peut aussi les laisser toujours accessibles (sans bonus). Sans limite de temps, il n'y a pas de fin de séance : les jeux restent accessibles.
 - **Intrus** : trouver l'élément qui n'est pas comme les autres.
 
 ## Lien avec le programme de CP

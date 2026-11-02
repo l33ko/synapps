@@ -150,6 +150,32 @@ textarea.inp{width:100%;min-height:90px;font-size:1rem;word-break:break-all;disp
 .msg{min-height:1.6em;font-weight:700;margin:8px 0}
 @keyframes pop{50%{transform:scale(1.07)}}
 @keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.chip.optb{text-align:left;border-radius:16px;padding:14px 18px;line-height:1.4}
+.sess{background:var(--card);border:3px solid var(--sh);border-radius:18px;padding:10px 14px;margin:0 0 14px;display:flex;align-items:center;gap:10px}
+.sess .bar{margin-top:4px}
+.bonus{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:20px}
+.bonus .card:last-child:nth-child(odd){grid-column:auto}
+.bonus .card{min-height:96px;font-size:.95rem;padding:12px 4px}
+.gl{position:relative;font:inherit;color:inherit;border:3px dashed var(--sh);border-radius:20px;background:rgba(127,127,127,.14);padding:12px 4px 10px;display:flex;flex-direction:column;align-items:center;gap:2px;min-height:96px;justify-content:center;font-size:.95rem;font-weight:700;cursor:pointer}
+.gl .e{font-size:2rem;filter:grayscale(1);opacity:.45}
+.gl .c{position:absolute;top:-12px;right:-6px;font-size:1.3rem;background:var(--card);border:3px solid var(--sh);border-radius:99px;width:38px;height:38px;display:flex;align-items:center;justify-content:center}
+.gl.wob{animation:shake .4s}
+.coffre{border:none;background:none;font-size:8rem;line-height:1;padding:0;margin:4px auto;display:block;cursor:pointer;animation:wiggle 1.6s infinite}
+.coffre.open{animation:burst .6s forwards}
+@keyframes wiggle{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(4deg)}}
+@keyframes burst{to{transform:scale(1.6);opacity:0}}
+.tap{display:inline-block;background:var(--c4);border:3px solid var(--sh);border-radius:99px;padding:8px 20px;font-weight:700;font-size:1.15rem;animation:pop 1.2s infinite}
+.fete{font-size:2.2rem;letter-spacing:.2em}
+.dots{display:flex;justify-content:center;gap:8px;margin:0 0 10px}.dots i{width:22px;height:22px;border-radius:50%;border:3px solid var(--sh);background:var(--card)}.dots i.on{background:var(--good)}
+.choose{display:grid;gap:12px;margin:14px 0}
+.gcard{font:inherit;color:inherit;display:flex;align-items:center;gap:14px;text-align:left;border:3px solid var(--sh);border-radius:22px;padding:12px 16px;min-height:88px;cursor:pointer}
+.gcard .pv{font-size:2.8rem}.gcard b{display:block;font-size:1.25rem}.gcard small{font-size:.9rem}
+.p4{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;background:var(--c1);border:3px solid var(--sh);border-radius:18px;padding:8px}
+.p4 .pa{font:inherit;border:none;background:none;font-size:1.3rem;padding:0;min-height:48px;cursor:pointer}
+.p4 .pc{aspect-ratio:1;border-radius:50%;background:var(--card);border:2px solid var(--sh)}
+.p4 .pc.R{background:#e5484d}.p4 .pc.Y{background:#f5c518}.p4 .pc.w{outline:4px solid var(--good);outline-offset:1px}
+.ast{position:relative;height:min(52vh,420px);min-height:300px;background:var(--c1);border:3px dashed var(--sh);border-radius:20px;overflow:hidden;touch-action:manipulation}
+.ast button{position:absolute;width:60px;height:60px;border:none;background:none;font-size:2.6rem;line-height:1;padding:0;cursor:pointer;animation:pop .6s}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 :focus-visible{outline:4px solid var(--good);outline-offset:3px}
 html,body{touch-action:pan-x pan-y;-webkit-text-size-adjust:100%}
@@ -211,8 +237,7 @@ const MENU=[
  {id:'pb',t:'Problèmes',e:'🛒',s:'pommes, monnaie…',c:'--c4'},
  {id:'sui',t:'Suites',e:'🔗',s:'que vient ensuite ?',c:'--c5'},
  {id:'mix',t:'Maths mélangées',e:'🎲',s:'le grand défi',c:'--c6'},
- {id:'int',t:'Intrus',e:'🕵️',s:'lequel est différent ?',c:'--c1'},
- {id:'mor',t:'Morpion',e:'⭕',s:'contre l’ordinateur',c:'--c6'}];
+ {id:'int',t:'Intrus',e:'🕵️',s:'lequel est différent ?',c:'--c1'}];
 const app=document.getElementById('app');
 let TH=(()=>{try{return localStorage.getItem('cp-theme')||'light'}catch(e){return'light'}})();document.documentElement.dataset.theme=TH;
 function togTheme(){TH=TH==='dark'?'light':'dark';try{localStorage.setItem('cp-theme',TH)}catch(e){}document.documentElement.dataset.theme=TH;menu()}
@@ -245,11 +270,34 @@ function setVoice(n){try{if(n)localStorage.setItem('cp-voice',n);else localStora
 function testVoice(){VERR='';say('Bonjour ! Je suis la voix de ton cahier.');setTimeout(()=>{const m=document.getElementById('vm'),n=(()=>{try{return speechSynthesis.getVoices().length}catch(e){return 0}})();if(m)m.textContent=!window.speechSynthesis?'Ce navigateur ne sait pas parler.':`Voix : ${VOICE?VOICE.name:'aucune voix française trouvée'} (${n} voix sur l’appareil)${VERR?' · erreur : '+VERR:''}`},900)}
 
 function prog(id){const n=lvS(id);return `<span class="pg"><span class="pgb" aria-hidden="true">${Array.from({length:10},(_,i)=>`<i${i<n?' class="on"':''}></i>`).join('')}</span></span>`}
+/* mini-jeux bonus */
+const BMODE=()=>D.set&&D.set.bonus==='direct'?'direct':'coffre';
+const BEFF=()=>DUR()?BMODE():'direct';
+const BP=()=>5;
+const BPLAYED=()=>SS&&+SS.bp||0;
+let BOPEN=false,BT=[];
+const stopBT=()=>{BT.forEach(t=>{clearInterval(t);clearTimeout(t)});BT=[]};
+const BONUS=[{id:'mor',t:'Morpion',e:'⭕',d:'aligne 3 croix',c:'--c6'},{id:'p4',t:'Puissance 4',e:'🔴',d:'aligne 4 jetons',c:'--c1'},{id:'ast',t:'Attrape les étoiles',e:'⭐',d:'touche-les vite !',c:'--c4'}];
+const bonusOver=()=>BEFF()==='coffre'&&DUR()&&SS&&LEFT()<=0;
+const bLabel=n=>bonusOver()?`Partie ${BPLAYED()+1}/${BP()}`:n;
+function startBonus(id){stopBT();({mor:startMor,p4:startP4,ast:startAst})[id]()}
+function shakeLock(el){el.classList.remove('wob');void el.offsetWidth;el.classList.add('wob')}
+function bonusEnd(id){stopBT();
+ if(bonusOver()){Q=null;SS.bp=BPLAYED()+1;saveSS();BOPEN=true;showLock();return}
+ if(DUR()&&SS&&LEFT()<=0){Q=null;showLock();return}
+ app.innerHTML=`<div class="end"><h1>Bien joué !</h1><div class="s">🎉</div><button class="again" onclick="startBonus('${id}')">🔁 Rejouer</button><button class="again" onclick="menu()">🏠 Menu</button></div>`}
+function openChest(){const c=document.getElementById('cf');if(c)c.classList.add('open');setTimeout(()=>{BOPEN=true;showLock()},550)}
+function pickBonus(id){closeOv();startBonus(id)}
+const bDots=()=>`<div class="dots" aria-hidden="true">${Array.from({length:BP()},(_,i)=>`<i class="${i<BPLAYED()?'on':''}"></i>`).join('')}</div>`;
+function bonusHome(){
+ if(BEFF()==='coffre')return `<div class="bonus">${BONUS.map(g=>`<button class="gl" onclick="shakeLock(this)" aria-label="${g.t} (verrouillé)"><span class="c">🔒</span><span class="e">${g.e}</span>${g.t}</button>`).join('')}</div>`;
+ return `<div class="bonus">${BONUS.map(g=>`<button class="card" style="background:var(${g.c})" onclick="startBonus('${g.id}')"><span class="e" style="font-size:2rem">${g.e}</span>${g.t}</button>`).join('')}</div>`}
+function sessBar(){if(!DUR()||!SS)return '';const T=DUR(),u=Math.min(T,Math.floor(SS.used/60000));return `<div class="sess"><span style="font-size:1.6rem">⏰</span><div style="flex:1"><b>Ma séance du jour</b><div class="bar"><i style="width:${Math.min(100,SS.used/(T*600))}%"></i></div></div><b>${u} / ${T} min</b></div>`}
 function menu(){
- Q=null;PLAY={};setTimeout(tick,0);
+ stopBT();Q=null;PLAY={};setTimeout(tick,0);
  app.innerHTML=`<div class="top"><h1>Salut ${esc(P)} ! 👋</h1><span class="stars">⭐ ${stars}</span></div>
- <button class="chip" onclick="parents()">⚙️ Parents</button> <button class="chip" onclick="who()">👤 Changer de joueur</button> <button class="chip" onclick="togTheme()">${TH==='dark'?'☀️ Mode clair':'🌙 Mode sombre'}</button><p class="sub">À quoi veux-tu jouer ?</p><div class="grid">`+
- MENU.filter(m=>!OFF(m.id)).map(m=>`<button class="card" style="background:var(${m.c})" aria-label="${m.t}, niveau ${lvS(m.id)} sur 10" onclick="lvl('${m.id}')"><span class="e">${m.e}</span>${m.t}${prog(m.id)}</button>`).join('')+`</div>`;
+ <button class="chip" onclick="parents()">⚙️ Parents</button> <button class="chip" onclick="who()">👤 Changer de joueur</button> <button class="chip" onclick="togTheme()">${TH==='dark'?'☀️ Mode clair':'🌙 Mode sombre'}</button><p class="sub">À quoi veux-tu jouer ?</p>${sessBar()}<div class="grid">`+
+ MENU.filter(m=>!OFF(m.id)).map(m=>`<button class="card" style="background:var(${m.c})" aria-label="${m.t}, niveau ${lvS(m.id)} sur 10" onclick="lvl('${m.id}')"><span class="e">${m.e}</span>${m.t}${prog(m.id)}</button>`).join('')+`</div>${bonusHome()}`;
 }
 
 const R=(a,b)=>a+rnd(b-a+1);
@@ -501,15 +549,35 @@ function genSui(){const L=lv('sui');
  return {nb:true,nr:'Complète la suite.',q:`<div class="word" style="font-size:2.2rem;line-height:1.5">${sh.join(' ')} <span class="kv">❓</span></div><p>Que vient ensuite ?</p>`,opts:shuffle(pool).map(x=>({h:x,ok:x===ans}))}}
 /* morpion */
 const WL=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]],win=(b,s)=>WL.some(l=>l.every(i=>b[i]===s));
-function startMor(){Q={id:'mor',n:0,score:0,N:10,b:Array(9).fill(''),over:false,busy:false};const first=lv('mor')>=4&&Math.random()<.5;if(first){Q.busy=true;drawMor('🐶 commence…');setTimeout(comp,900)}else{drawMor();if(NAR())say('À toi de jouer ! Tu es le chat.')}}
-function drawMor(msg){app.innerHTML=hdr(Q.b.filter(x=>x).length/9,'Morpion')+`<div class="q" style="background:var(--c6);min-height:0"><p>${msg||'À toi : tu es 🐱 !'}</p></div><div class="mem">`+Q.b.map((v,i)=>`<button class="mc" onclick="mor(${i})" ${v||Q.over?'disabled':''}>${v}</button>`).join('')+`</div>`}
-function mor(i){if(Q.over||Q.busy||Q.b[i])return;Q.b[i]='🐱';if(win(Q.b,'🐱'))return fin('win');if(Q.b.every(x=>x))return fin('draw');Q.busy=true;drawMor('Au tour de 🐶…');setTimeout(comp,700)}
-function comp(){const b=Q.b,L=lv('mor'),sure=Math.random()<[.3,.4,.5,.6,.7,.8,.85,.9,.95,1][L-1],f=s=>{for(const l of WL){const e=l.filter(i=>!b[i]);if(e.length===1&&l.filter(i=>b[i]===s).length===2)return e[0]}return -1};
+function startMor(){Q={id:'mor',bonus:true,n:0,score:0,N:10,b:Array(9).fill(''),over:false,busy:false};const first=Math.random()<.5;if(first){Q.busy=true;drawMor('🐶 commence…');BT.push(setTimeout(comp,900))}else{drawMor();if(NAR())say('À toi de jouer ! Tu es le chat.')}}
+function drawMor(msg){app.innerHTML=hdr(Q.b.filter(x=>x).length/9,bLabel('Morpion'))+`<div class="q" style="background:var(--c6);min-height:0"><p>${msg||'À toi : tu es 🐱 !'}</p></div><div class="mem">`+Q.b.map((v,i)=>`<button class="mc" onclick="mor(${i})" ${v||Q.over?'disabled':''}>${v}</button>`).join('')+`</div>`}
+function mor(i){if(Q.over||Q.busy||Q.b[i])return;Q.b[i]='🐱';if(win(Q.b,'🐱'))return fin('win');if(Q.b.every(x=>x))return fin('draw');Q.busy=true;drawMor('Au tour de 🐶…');BT.push(setTimeout(comp,700))}
+function comp(){if(!Q||Q.id!=='mor')return;const b=Q.b,L=5,sure=Math.random()<[.3,.4,.5,.6,.7,.8,.85,.9,.95,1][L-1],f=s=>{for(const l of WL){const e=l.filter(i=>!b[i]);if(e.length===1&&l.filter(i=>b[i]===s).length===2)return e[0]}return -1};
  let m=-1;if(sure){m=f('🐶');if(m<0)m=f('🐱')}
  if(m<0&&L>2&&sure){const cs=[0,2,6,8].filter(i=>!b[i]);m=!b[4]?4:cs.length?pick(cs):-1}
  if(m<0)m=pick(b.map((v,i)=>v?-1:i).filter(i=>i>=0));
  b[m]='🐶';Q.busy=false;if(win(b,'🐶'))return fin('lose');if(b.every(x=>x))return fin('draw');drawMor()}
-function fin(r){Q.over=true;Q.score=r==='win'?10:r==='draw'?7:4;drawMor(r==='win'?'Bravo, tu as gagné ! 🎉':r==='draw'?'Égalité !':'🐶 a gagné… retente !');sfx(r==='win');setTimeout(end,1800)}
+function fin(r){Q.over=true;Q.score=r==='win'?10:r==='draw'?7:4;drawMor(r==='win'?'Bravo, tu as gagné ! 🎉':r==='draw'?'Égalité !':'🐶 a gagné… retente !');sfx(r==='win');const q=Q;setTimeout(()=>{if(Q===q)bonusEnd('mor')},1800)}
+/* puissance 4 */
+const p4i=(r,c)=>r*7+c,p4drop=(g,c)=>{for(let r=5;r>=0;r--)if(!g[p4i(r,c)])return p4i(r,c);return -1};
+function p4w(g,s){for(let r=0;r<6;r++)for(let c=0;c<7;c++)for(const[dr,dc]of[[0,1],[1,0],[1,1],[1,-1]]){const l=[0,1,2,3].map(k=>[r+dr*k,c+dc*k]);if(l.every(([a,b])=>a>=0&&a<6&&b>=0&&b<7&&g[p4i(a,b)]===s))return l.map(([a,b])=>p4i(a,b))}return null}
+function startP4(){Q={id:'p4',bonus:true,n:0,score:0,N:1,g:Array(42).fill(''),over:false,busy:false,win:null};drawP4();if(NAR())say('À toi de jouer ! Aligne quatre jetons rouges.')}
+function drawP4(msg){app.innerHTML=hdr(Q.g.filter(x=>x).length/42,bLabel('Puissance 4'))+`<div class="q" style="background:var(--c6);min-height:0"><p>${msg||'À toi : tu es 🔴 !'}</p></div><div class="p4">${[0,1,2,3,4,5,6].map(c=>`<button class="pa" onclick="p4(${c})" aria-label="Colonne ${c+1}" ${Q.over?'disabled':''}>👇</button>`).join('')}${Q.g.map((v,i)=>`<div class="pc ${v} ${Q.win&&Q.win.includes(i)?'w':''}"></div>`).join('')}</div>`}
+function p4(c){if(Q.over||Q.busy)return;const i=p4drop(Q.g,c);if(i<0)return;Q.g[i]='R';
+ const w=p4w(Q.g,'R');if(w){Q.win=w;return p4fin('win')}if(Q.g.every(x=>x))return p4fin('draw');Q.busy=true;drawP4('Au tour de 🟡…');BT.push(setTimeout(p4comp,700))}
+function p4comp(){if(!Q||Q.id!=='p4')return;const g=Q.g,cols=[0,1,2,3,4,5,6].filter(c=>p4drop(g,c)>=0),
+ tryc=s=>{for(const c of cols){const i=p4drop(g,c);g[i]=s;const w=p4w(g,s);g[i]='';if(w)return c}return -1};
+ let m=Math.random()<.9?tryc('Y'):-1;if(m<0&&Math.random()<.75)m=tryc('R');
+ if(m<0){const pref=[3,2,4,1,5,0,6].filter(c=>cols.includes(c));m=Math.random()<.5?pref[0]:pick(cols)}
+ const i=p4drop(g,m);g[i]='Y';Q.busy=false;const w=p4w(g,'Y');if(w){Q.win=w;return p4fin('lose')}if(g.every(x=>x))return p4fin('draw');drawP4()}
+function p4fin(r){Q.over=true;drawP4(r==='win'?'Bravo, tu as gagné ! 🎉':r==='draw'?'Égalité !':'🟡 a gagné… retente !');sfx(r==='win');const q=Q;setTimeout(()=>{if(Q===q)bonusEnd('p4')},2200)}
+/* attrape les étoiles */
+function startAst(){Q={id:'ast',bonus:true,n:0,score:0,N:1,t:20,over:false};const q=Q;drawAst();if(NAR())say('Touche les étoiles le plus vite possible !');
+ const sp=()=>{const a=document.getElementById('ast');if(!a||Q!==q||q.over)return;const b=document.createElement('button');b.textContent='⭐';b.setAttribute('aria-label','Étoile');b.style.left=(5+Math.random()*(a.clientWidth-70))+'px';b.style.top=(5+Math.random()*(a.clientHeight-70))+'px';
+  b.onclick=()=>{if(b.parentNode){b.remove();q.score++;sfx(true);const c=document.getElementById('astn');if(c)c.textContent=q.score}};a.appendChild(b);BT.push(setTimeout(()=>b.remove(),1500))};
+ BT.push(setInterval(sp,650));sp();
+ BT.push(setInterval(()=>{if(Q!==q)return stopBT();q.t--;const t=document.getElementById('astt');if(t)t.textContent=q.t;if(q.t<=0){q.over=true;stopBT();const a=document.getElementById('ast');if(a)a.innerHTML='';const m=document.getElementById('astm');if(m)m.textContent=`Bien joué ! ${q.score} étoile${q.score>1?'s':''} attrapée${q.score>1?'s':''} 🎉`;sfx(true);BT.push(setTimeout(()=>{if(Q===q)bonusEnd('ast')},2200))}},1000))}
+function drawAst(){app.innerHTML=hdr(0,bLabel('Étoiles'))+`<div class="q" style="background:var(--c4);min-height:0"><p id="astm">Touche les étoiles ! ⏱️ <b id="astt">${Q.t}</b> s · ⭐ <b id="astn">0</b></p></div><div class="ast" id="ast"></div>`}
 /* intrus */
 const GR={fruits:['🍎','🍌','🍇','🍓','🍊','🍒'],legumes:['🥕','🌽','🥦','🥔','🧅'],ferme:['🐄','🐷','🐔','🐑','🐴'],sauvages:['🦁','🐘','🦒','🐯','🐒'],mer:['🐟','🐙','🐬','🦀','🐳'],vehicules:['🚗','🚌','🚲','🚂','🚑'],vetements:['👕','👖','🧦','🧢','👗']};
 function genInt(){const L=lv('int'),top='<div class="emo" style="font-size:3rem">🕵️</div>';
@@ -530,7 +598,7 @@ const LEFT=()=>DUR()*60000-SS.used;
 const fmt=ms=>{const s=Math.max(0,Math.ceil(ms/1000));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')};
 function saveSS(){try{localStorage.setItem('cp-sess',JSON.stringify(SS))}catch(e){}}
 function saveD(){try{localStorage.setItem('cp-data',JSON.stringify(D))}catch(e){}}
-function newSession(){SS={used:0,day:today()};saveSS();tick()}
+function newSession(){SS={used:0,day:today(),bp:0};BOPEN=false;saveSS();tick()}
 function initSession(){if(!SS||typeof SS.used!=='number'||!isFinite(SS.used)||SS.day!==today())newSession()}
 function openOv(mode,html){OVM=mode;document.getElementById('ovc').innerHTML=html;const o=document.getElementById('ov');o.style.display='block';o.scrollTop=0;document.getElementById('tm').style.display='none'}
 function closeOv(){document.getElementById('ov').style.display='none';OVM=''}
@@ -540,11 +608,15 @@ function tick(){const b=document.getElementById('tm');if(!b)return;
  if(SS.day!==today())return newSession();
  if(!OVM&&document.visibilityState==='visible'&&LEFT()>0){SS.used+=1000;saveSS()}
  const left=LEFT();
- if(left<=0){if(Q&&!OVM){b.style.display='';b.textContent='⏱️ Dernier exercice';b.classList.add('low');return}b.style.display='none';if(!OVM&&!Q)showLock();return}
+ if(left<=0){if(Q&&!OVM){if(Q.bonus){b.style.display='none';return}b.style.display='';b.textContent='⏱️ Dernier exercice';b.classList.add('low');return}b.style.display='none';if(!OVM&&!Q)showLock();return}
  if(OVM==='lock')closeOv();
  b.style.display=OVM?'none':'';b.textContent='⏱️ '+fmt(left);b.classList.toggle('low',left<60000)}
 setInterval(tick,1000);
 function showLock(){try{speechSynthesis.cancel()}catch(e){}
+ if(P&&BEFF()==='coffre'){const n=BPLAYED(),T=BP(),par='<button class="chip" onclick="parents()">🔒 Parents</button>';
+  if(n>=T)return openOv('lock',`<div class="end"><div class="fete">🌟🎉🌟</div><h1>Le coffre est vide !</h1><p class="sub">Tu as joué tes ${T} parties bonus.<br>À demain pour une nouvelle surprise !</p><div class="emo" style="font-size:6rem">😴</div>${par}</div>`);
+  if(!BOPEN)return openOv('lock',`<div class="end"><div class="fete">🎉⭐🎉</div><h1>Bravo ${esc(P)} !</h1><p class="sub">Ta séance est terminée. Tu as gagné un cadeau !</p><button class="coffre" id="cf" onclick="openChest()" aria-label="Ouvrir le coffre">🎁</button><div class="tap">👆 Touche le coffre !</div><p>${par}</p></div>`);
+  return openOv('lock',`<div class="end"><h1>Choisis ton jeu bonus !</h1><p class="sub">Partie ${n+1} sur ${T}</p>${bDots()}<div class="choose">${BONUS.map(g=>`<button class="gcard" style="background:var(${g.c})" onclick="pickBonus('${g.id}')"><span class="pv">${g.e}</span><span><b>${g.t}</b><small>${g.d}</small></span></button>`).join('')}</div>${par}</div>`)}
  openOv('lock',`<div class="end"><div class="emo">😴</div><h1>C’est fini pour aujourd’hui !</h1><p class="sub">Le temps de jeu est terminé. À bientôt !</p><button class="again" onclick="parents()">🔒 Parents</button></div>`)}
 function parents(){gate(parentPanel)}
 function gate(ok){const a=6+rnd(4),b=3+rnd(2);GATE={a,b,ok};
@@ -556,16 +628,21 @@ function gateOk(){const v=+document.getElementById('gin').value;
 const DIS=[['mix','Maths mélangées'],['pb','Problèmes'],['mul','Doubles et moitiés'],['cmp','Compléments']];
 function togMod(id){const a=(D.set.off||[]).filter(x=>x!==id);if(!OFF(id))a.push(id);D.set.off=a;saveD();persist();parentPanel()}
 function closeCfg(){closeOvT();if(!Q&&P)menu()}
-function parentPanel(){const cur=DUR(),left=SS?LEFT():0;const fr=frVoices();
+function parentPanel(){const ovEl=document.getElementById('ov'),h=ovEl.querySelector('h1'),keep=OVM==='other'&&ovEl.style.display==='block'&&h&&h.textContent.includes('Configuration')?ovEl.scrollTop:0;parentPanel0();ovEl.scrollTop=keep}
+function parentPanel0(){const cur=DUR(),left=SS?LEFT():0;const fr=frVoices();
  let pv='';try{pv=localStorage.getItem('cp-voice')||''}catch(e){}
  openOv('other',`<h1>⚙️ Configuration</h1>
 <h2 class="h2">⏱️ Temps de jeu</h2><div class="row">${DURS.map(m=>`<button class="chip ${m===cur?'on':''}" onclick="setDur(${m})">${m?m+' min':'Sans limite'}</button>`).join('')}</div><p class="sub">${!cur?'Pas de limite de temps.':left>0?'Temps restant : '+fmt(left):'Temps écoulé.'} Une nouvelle session démarre aussi chaque jour.</p><button class="again" onclick="startSess()">▶️ Nouvelle session</button>
+<h2 class="h2">🎮 Mini-jeux</h2><p class="sub" style="font-size:.95rem;margin-bottom:8px">Morpion, Puissance 4 et Attrape les étoiles.</p>
+<div class="row" style="flex-direction:column;align-items:stretch"><button class="chip optb ${BMODE()==='coffre'?'on':''}" onclick="setBonus('coffre')">${BMODE()==='coffre'?'● ':'○ '}<b>Bonus de fin de séance</b> (par défaut)<br><small>Visibles sur l'accueil, grisés avec un cadenas. Ils s'ouvrent dans un coffre à la fin de la séance : 5 parties bonus.</small></button><button class="chip optb ${BMODE()==='direct'?'on':''}" onclick="setBonus('direct')">${BMODE()==='direct'?'● ':'○ '}<b>Toujours accessibles</b><br><small>Ouverts sur l'accueil, sans cadenas, dans la limite du temps de jeu. Pas de bonus en fin de séance.</small></button></div>
+${!cur?`<p class="sub" style="font-size:.9rem">Sans limite de temps, il n'y a pas de fin de séance : les jeux restent accessibles.</p>`:''}
 <h2 class="h2">🔊 Voix et consignes</h2><div class="row"><button class="chip ${NAR()?'on':''}" onclick="togNar()">${NAR()?'Consignes orales : oui':'Consignes orales : non'}</button></div>
 <select id="vsel" class="inp" style="width:100%;margin-bottom:10px" onchange="setVoice(this.value)"><option value="">Voix automatique</option>${fr.map(v=>`<option value="${esc(v.name)}" ${v.name===pv?'selected':''}>${HQ(v)?'★ ':''}${esc(v.name)}${v.localService?'':' (en ligne)'}</option>`).join('')}</select>
 <button class="chip" onclick="testVoice()">🔈 Tester la voix</button><p class="sub" style="font-size:.85rem;margin:10px 0 0">Pour une voix plus naturelle (★), installe une voix « améliorée » ou « premium » dans les réglages de ton appareil. Sur Mac : Réglages Système › Accessibilité › Contenu énoncé › Voix du système › Gérer les voix › Français.</p><p class="msg" id="vm" style="font-size:.85rem;font-weight:400"></p>
 <h2 class="h2">🧩 Modules proposés</h2><p class="sub">Touche pour activer ou désactiver :</p><div class="row">${DIS.map(d=>`<button class="chip ${OFF(d[0])?'':'on'}" onclick="togMod('${d[0]}')">${OFF(d[0])?'✖ ':'✓ '}${d[1]}</button>`).join('')}</div>
 <h2 class="h2">☁️ Retrouver mes données</h2><p class="sub">${cloudLine()}</p><div class="row"><button class="chip" onclick="cloud('p')">${AUTH?'Synchronisation':'Se connecter avec un e-mail'}</button><button class="chip" onclick="backup(1)">💾 Code de sauvegarde</button></div>
 <button class="again" style="margin-top:18px" onclick="closeCfg()">Fermer</button>`)}
+function setBonus(m){D.set.bonus=m;saveD();persist();parentPanel()}
 function setDur(m){D.set.min=m;saveD();persist();if(!SS)newSession();parentPanel()}
 function startSess(){newSession();closeOvT()}
 /* code de sauvegarde */
@@ -575,7 +652,7 @@ function applyCode(o,sets,quiet){let n=0;const ids=MENU.map(x=>x.id);
  for(const k in o.p){const nm=String(k).trim().slice(0,16);if(!nm||nm==='__proto__')continue;const b=o.p[k]||{},st=Math.min(99999,Math.max(0,parseInt(b.stars)||0)),l={};
   for(const id of ids){let v=parseInt((b.lv||{})[id]);if(!(v>=1))continue;if(o.v!==2)v=[1,4,7][v-1]||1;if(v>=1&&v<=10)l[id]=v}
   const a=D.profiles[nm];if(!a||st>(a.stars||0))D.profiles[nm]={stars:st,lv:l};n++}
- if(o.s&&sets!==false){if(DURS.includes(+o.s.min))D.set.min=+o.s.min;if(Array.isArray(o.s.off))D.set.off=o.s.off.filter(x=>typeof x==='string').slice(0,20)}
+ if(o.s&&sets!==false){if(DURS.includes(+o.s.min))D.set.min=+o.s.min;if(Array.isArray(o.s.off))D.set.off=o.s.off.filter(x=>typeof x==='string').slice(0,20);if(o.s.bonus==='direct'||o.s.bonus==='coffre')D.set.bonus=o.s.bonus}
  if(P&&D.profiles[P]){stars=D.profiles[P].stars||0;LV=D.profiles[P].lv||{}}
  saveD();if(!quiet)persist();return n}
 let BKP=false;
@@ -645,7 +722,7 @@ if(CLOUD()&&AUTH)syncNow(true).then(()=>{if(P&&D.profiles[P]){stars=D.profiles[P
 /* sons des boutons */
 function tap(k){try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();if(k==='card')[440,660].forEach((f,i)=>tone(f,i*.06,.12,'sine',.12));else if(k==='back')tone(330,0,.12,'sine',.12);else tone(620,0,.07,'triangle',.12)}catch(e){}}
 document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('button');if(!b||b.disabled)return;const cl=b.classList;if(cl.contains('opt')&&!cl.contains('k'))return;tap(cl.contains('card')||cl.contains('again')||cl.contains('chip')?'card':cl.contains('back')?'back':'pop')},true);
-const STARTERS={mem:startMem,mor:startMor},GAMES=['mem','mor'];
+const STARTERS={mem:startMem},GAMES=['mem'];
 
 if(P)initSession();tick();P?menu():who();
 </script>
