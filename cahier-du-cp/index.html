@@ -123,7 +123,7 @@ h1{font-size:2rem;margin:.2em 0 0;line-height:1.2}
 .mc:disabled{opacity:1}
 .slots{display:flex;flex-wrap:wrap;justify-content:center;gap:5px;margin:6px 0}
 .slot{width:2rem;height:2.7rem;border-bottom:4px solid var(--sh);display:inline-flex;align-items:flex-end;justify-content:center;font-size:2rem;font-weight:700;line-height:1.3}
-.slot.r{color:var(--good)}.slot.bad{color:var(--bad)}.slot.lk{color:var(--good)}.slot.hint{color:#c98a00;border-bottom-style:dashed}
+.slot.r{color:var(--good)}.slot.bad{color:var(--bad)}.slot.lk{color:var(--good)}.slot.cur{border-bottom-color:#e0457b;background:rgba(255,200,0,.28);border-radius:8px 8px 0 0;animation:curb 1s ease-in-out infinite}@keyframes curb{50%{background:rgba(255,200,0,.08)}}
 .kr{display:flex;gap:4px;justify-content:center;margin-bottom:6px}
 .kk{font:inherit;color:inherit;flex:1 1 0;min-width:0;max-width:46px;height:50px;padding:0;border:3px solid var(--sh);border-radius:10px;background:var(--card);font-size:1.4rem;font-weight:700;cursor:pointer}
 .kk:active{transform:scale(.97)}
@@ -288,7 +288,7 @@ function genEcr(){
  const top=mode==='copy'?`<div class="emo">${e}</div><div class="word ${cur?'cursive':'script'}">${w}</div><p>Écris le mot</p>`:mode==='pic'?`<div class="emo">${e}</div><p>Regarde l’image et écris le mot</p>`:`<button class="big" onclick="say('${w}')" aria-label="Écouter">🔊</button>${L<=8?`<div class="emo" style="font-size:3.5rem">${e}</div>`:''}<p>Écoute le mot et écris-le</p>`;
  const nr=mode==='copy'?'Écris le mot.':mode==='pic'?'Regarde l’image et écris le mot.':'Écoute le mot et écris-le.';
  return {type:'txt',w,kb,bank,v:[...w].map(()=>null),top,nr,nb:mode!=='copy',btn:w,sp:mode==='dic'?[nr,w]:null}}
-function drawTxt(c,m){const sl=[...c.w].map((x,i)=>`<span class="slot ${c.rev?'r':c.v[i]&&c.v[i].hint?'hint':c.v[i]&&c.v[i].lock?'lk':c.bad&&c.v[i]?'bad':''}">${c.rev?x:c.v[i]?c.v[i].ch:''}</span>`).join('');
+function drawTxt(c,m){const ek=c.rev?-1:emptySlot(c);const sl=[...c.w].map((x,i)=>`<span class="slot ${c.rev?'r':c.v[i]&&c.v[i].hint?'':c.v[i]&&c.v[i].lock?'lk':c.bad&&c.v[i]?'bad':''}${i===ek?' cur':''}">${c.rev?x:c.v[i]?c.v[i].ch:''}</span>`).join('');
  const keys=c.kb?AZ.map((r,k)=>`<div class="kr">${[...r].map(ch=>`<button class="kk" onclick="tk2('${ch}')">${ch}</button>`).join('')}${k===2?'<button class="kk del" onclick="tdel()" aria-label="Effacer">⌫</button>':''}</div>`).join('')+`<div class="kr">${[...ACC].map(ch=>`<button class="kk acc" onclick="tk2('${ch}')">${ch}</button>`).join('')}</div>`
   :`<div class="kr bank">${c.bank.map((b,i)=>`<button class="kk" ${b.used?'disabled':''} onclick="tk1(${i})">${b.ch}</button>`).join('')}<button class="kk del" onclick="tdel()" aria-label="Effacer">⌫</button></div>`;
  app.innerHTML=hdr(Q.n/Q.N,`${Q.n+1}/${Q.N}`)+`<div class="q" style="background:var(${m.c})">${c.top}<div class="slots">${sl}</div>${spk(c)}</div>${keys}<div class="fb" id="fb" aria-live="polite"></div>`}
@@ -306,11 +306,13 @@ function tchk(){const c=Q.cur;drawTxt(c,curM());if(emptySlot(c)>=0)return;
   /* les bonnes lettres bien placées restent pour l'essai suivant */
   c.v.forEach((x,i)=>{if(!x)return;if(x.ch===c.w[i])x.lock=true;else{if(x.bi>=0)c.bank[x.bi].used=false;c.v[i]=null}});
   /* 2e erreur : une lettre de plus est donnée */
-  if(Q.tries===2){const k=emptySlot(c);if(k>=0){const ch=c.w[k],bi=c.bank?c.bank.findIndex(b=>!b.used&&b.ch===ch):-1;c.v[k]={ch,bi,lock:true,hint:true};if(bi>=0)c.bank[bi].used=true}}
+  let gave=false;
+  if(Q.tries===2){const k=emptySlot(c);if(k>=0){const ch=c.w[k],bi=c.bank?c.bank.findIndex(b=>!b.used&&b.ch===ch):-1;c.v[k]={ch,bi,lock:true,hint:true};if(bi>=0)c.bank[bi].used=true;gave=true}}
   c.bad=false;
   /* l'indice a complété le mot : on le valide (sans point, car il y a eu des erreurs) */
   if(emptySlot(c)<0){c.rev=true;drawTxt(c,curM());sfx(true);say(c.w);setTimeout(()=>{if(Q&&Q.cur===c){Q.n++;next()}},1500);return}
   Q.done=false;drawTxt(c,curM());
+  if(gave)fbk("Voici une lettre pour t'aider 💡");
   /* 1re erreur : le mot est redit */
   if(Q.tries===1)say(c.w)},1300)}
 function genEcrM(){
