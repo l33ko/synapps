@@ -247,7 +247,6 @@ function parent(){
   <div class="panel"><h3>🎮 Les mini-jeux (Morpion, Puissance 4, Attrape les étoiles)</h3>
     <button class="opt ${c?'on':''}" onclick="S.mode='coffre';go('parent')"><span class="rd"></span><span><b>Bonus de fin de séance (conseillé)</b><small>Visibles sur l'accueil, grisés avec un cadenas. Ils s'ouvrent dans un coffre à la fin de la séance.</small></span></button>
     <button class="opt ${!c?'on':''}" onclick="S.mode='direct';go('parent')"><span class="rd"></span><span><b>Toujours accessibles</b><small>Les jeux sont ouverts sur l'accueil, sans cadenas. Pas de bonus ni de coffre en fin de séance.</small></span></button>
-    <div class="pv-home"><b>Aperçu du bas de l'accueil :</b><div style="display:flex;gap:8px;margin-top6px;margin-top:6px">${['⭐','🔴','✨'].map(e=>`<span style="flex:1;text-align:center;padding:8px;border-radius:14px;border:2px ${c?'dashed':'solid'} var(--sh);background:${c?'rgba(127,127,127,.18)':'var(--c4)'};${c?'opacity:.7':''}">${e}${c?' 🔒':''}</span>`).join('')}</div></div>
   </div>
   ${c?`<div class="panel"><h3>🎯 Parties bonus par séance</h3>
     <div class="step">${[4,5].map(n=>`<button class="${S.total===n?'on':''}" onclick="S.total=${n};go('parent')">${n}</button>`).join('')}<span>parties</span></div>
