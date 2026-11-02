@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Maquette Lecture – piste D (Lis et réponds)</title>
+<link href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Playwrite+FR+Trad&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#fffaf0;--line:#c9dcf7;--margin:#f4a0b8;--ink:#2b2d6e;--card:#fff;--c1:#ffc4d6;--c2:#bfe3ff;--c3:#c4f0b6;--c4:#ffe58f;--c5:#dacbff;--c6:#ffcfa0;--good:#2e9e4f;--bad:#d8553d;--sh:#2b2d6e}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{font-family:'Andika','Comic Sans MS',sans-serif;color:var(--ink);background-color:var(--paper);background-image:linear-gradient(var(--line) 1px,transparent 1px);background-size:100% 32px;-webkit-tap-highlight-color:transparent;display:flex;flex-direction:column;height:100vh;height:100dvh;overflow:hidden}
+@media (min-width:900px){body::before{content:'';position:fixed;top:0;bottom:0;left:calc(50% - 380px + 36px);width:2px;background:var(--margin);z-index:-1}}
+/* bandeau maquette */
+.mq{background:#2b2d6e;color:#fff;font:13px/1.4 system-ui,sans-serif;padding:6px 12px;flex:none;max-height:40vh;overflow:auto}
+.mq summary{cursor:pointer;min-height:24px;display:flex;align-items:center}
+.mq b{color:#ffe58f}.mq .cols{display:flex;gap:18px;flex-wrap:wrap;margin-top:6px}.mq .cols div{flex:1;min-width:230px}
+.mq ul{margin:2px 0 4px;padding-left:18px}
+#app{flex:1;min-height:0;width:100%;max-width:760px;margin:0 auto;display:flex;flex-direction:column;padding:8px 14px 0}
+@media (min-width:900px){#app{padding:18px 20px 0 56px}}
+button{font:inherit;color:inherit;cursor:pointer;border:3px solid var(--sh);transition:transform .08s;-webkit-appearance:none;appearance:none}
+button:active:not(:disabled){transform:scale(.97)}
+.cur{font-family:'Playwrite FR Trad','Brush Script MT',cursive}
+/* en-tête */
+.top{display:flex;align-items:center;gap:10px;flex:none}
+.back{border-radius:14px;background:var(--card);font-size:1.3rem;min-width:48px;min-height:44px}
+.dots{flex:1;display:flex;gap:6px;justify-content:center}
+.dots i{flex:1;max-width:60px;height:16px;border:3px solid var(--sh);border-radius:99px;background:var(--card)}
+.dots i.done{background:var(--good)}.dots i.now{background:var(--c4)}
+.stars{font-weight:700;background:var(--c4);border:3px solid var(--sh);border-radius:99px;padding:6px 12px;white-space:nowrap;min-height:44px;display:flex;align-items:center}
+.lvl{align-self:center;margin:8px 0 6px;background:var(--c5);border:3px solid var(--sh);border-radius:99px;padding:2px 14px;font-weight:700;font-size:.95rem;flex:none}
+/* écran principal */
+.scr{flex:1;min-height:0;display:flex;flex-direction:column}
+.zone{flex:1;min-height:0;overflow:auto;display:flex;flex-direction:column;gap:8px;padding:2px 10px 6px;margin:0 -10px}
+.card{background:var(--card);border:3px solid var(--sh);border-radius:22px;padding:12px 12px 10px;position:relative;box-shadow:0 4px 0 var(--sh)}
+.card.relis{animation:glow 1.2s ease 2}
+.txt{margin:0;font-size:1.22rem;line-height:1.75;text-align:left}
+.w{display:inline-block;border-radius:8px;padding:0 2px;cursor:pointer;min-height:1.2em}
+.w:active,.w.say{background:var(--c4)}
+.p{white-space:pre-wrap}.nb{white-space:nowrap}
+.ear{display:flex;align-items:center;gap:8px;margin:8px auto 0;background:var(--c2);border-radius:99px;font-size:1.05rem;font-weight:700;padding:6px 18px;min-height:44px}
+.ear.on{background:var(--c4)}
+.ear.pulse{animation:pulse .9s ease 3}
+.ask{margin:0;text-align:center;font-size:1.1rem;font-weight:700;background:var(--c4);border-radius:14px;padding:6px 12px;border:2px solid var(--sh)}
+.ask small{display:block;font-weight:400;font-size:.8rem;opacity:.75}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.opt{background:var(--card);border-radius:18px;padding:6px 6px;min-height:62px;font-size:1.05rem;line-height:1.35;display:flex;align-items:center;justify-content:center;text-align:center}
+.opt.good{background:var(--c3);border-color:var(--good);animation:pop .4s}
+.opt.bad{background:var(--c6);border-color:var(--bad);opacity:.6;animation:shake .3s}
+.opt:disabled{cursor:default}
+/* pied */
+.foot{flex:none;padding:6px 0 calc(8px + env(safe-area-inset-bottom));background:var(--paper);border-top:3px dashed var(--line)}
+.fb{text-align:center;font-weight:700;font-size:1.05rem;min-height:2.7em;display:flex;flex-direction:column;justify-content:center;line-height:1.25}
+.fb small{font-weight:400;font-size:.92rem}
+.fb.ok{color:var(--good)}.fb.ko{color:var(--bad)}
+.next{display:block;margin:2px auto 0;width:100%;max-width:360px;min-height:52px;background:var(--c4);border-radius:99px;font-size:1.3rem;font-weight:700;padding:8px 26px}
+.next:disabled{background:#f1ead2;border-color:#b8b6d0;color:#9a98b8;cursor:default}
+/* accueil et fin */
+.center{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:12px;padding:8px}
+.center h1{margin:0;font-size:1.8rem;line-height:1.25}
+.center p{margin:0;font-size:1.1rem}
+.go{background:var(--good);color:#fff;border-radius:99px;font-size:1.4rem;font-weight:700;padding:12px 30px;min-height:56px}
+.lvs{display:flex;gap:8px}.lvs span{background:var(--c2);border:3px solid var(--sh);border-radius:16px;padding:8px 0;width:58px;font-weight:700;font-size:1.3rem}
+.lvs span:nth-child(2){background:var(--c3)}.lvs span:nth-child(3){background:var(--c4)}.lvs span:nth-child(4){background:var(--c6)}
+.big{font-size:3rem;letter-spacing:.08em}
+.bilan{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}.bilan span{background:var(--card);border:3px solid var(--sh);border-radius:14px;padding:4px 10px;font-weight:700}
+@keyframes pop{50%{transform:scale(1.06)}}
+@keyframes shake{25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+@keyframes pulse{50%{transform:scale(1.08);background:var(--c4)}}
+@keyframes glow{50%{background:var(--c4)}}
+@media (min-width:900px){
+ .txt{font-size:1.75rem;line-height:1.8}.card{padding:16px 26px 12px}
+ .ask{font-size:1.5rem}.ask small{font-size:.95rem}
+ .opt{font-size:1.5rem;min-height:84px;border-radius:22px}.opts{gap:16px}
+ .zone{gap:16px}.ear{font-size:1.25rem}.fb{font-size:1.3rem}
+}
+@media (min-height:760px) and (max-width:600px){.txt{font-size:1.4rem}.opt{min-height:76px;font-size:1.2rem}.zone{gap:12px}}
+@media (max-height:700px) and (max-width:600px){.txt{font-size:1.12rem;line-height:1.65}.opt{min-height:56px}}
+</style></head><body>
+<details class="mq" id="mq"><summary><span><b>Piste D – « Texte complet, 4 réponses »</b> &nbsp;(touche pour lire les points forts et limites)</span></summary>
+<div>Un texte de 2 à 3 phrases en cursive, une question, quatre gros boutons en 2 × 2. Tout tient sur un écran, « Suivant » reste collé en bas. Un mot touché est prononcé ; « Écouter » lit le texte puis la question, jamais les réponses.</div>
+<div class="cols"><div><b>Points forts</b><ul><li>Tout est visible d'un coup : texte, question, réponses, « Suivant », sans défiler sur iPhone.</li><li>Un seul geste d'aide à la fois : mot touché = mot lu ; après une erreur, « Relis le texte » fait clignoter le texte et le bouton Écouter.</li><li>Les mauvaises réponses reprennent des mots du texte (plausibles) ; la bonne ne le recopie jamais.</li></ul></div>
+<div><b>Limites</b><ul><li>Texte et réponses sont serrés : au-delà de 3 phrases il faudrait défiler.</li><li>Les réponses en 2 × 2 imposent des réponses courtes (4 ou 5 mots au plus).</li><li>Pas de surlignage de la phrase qui contient la réponse : l'enfant doit chercher seul.</li></ul></div></div>
+</details>
+<div id="app"></div>
+
+<script>
+// Mini-série fictive : niveaux 7 à 10. Aucune donnée enregistrée.
+const Q=[
+ {n:7,t:"Léa a un chat. Il dort sur le lit.",q:"Qui dort ?",kind:"Qui ?",o:["Le chat","Léa","Le chien","Papa"],a:0},
+ {n:8,t:"Papa fait un gâteau. Il met trois œufs dans le bol.",q:"Combien d'œufs Papa met-il dans le bol ?",kind:"Combien ?",o:["2","3","4","5"],a:1},
+ {n:9,t:"Nina est dans le jardin de mamie. Elle cueille des fraises. Elles sont rouges.",q:"Où est Nina ?",kind:"Où ?",o:["À l'école","Au jardin","À la plage","Au marché"],a:1},
+ {n:10,t:"Ce matin, Hugo met son manteau et ses bottes. Il prend aussi un parapluie. Dehors, la pluie tombe fort.",q:"Quel temps fait-il dehors ?",kind:"Quoi ?",o:["Il neige","Il y a du soleil","Il pleut","Il y a du vent"],a:2},
+ {n:10,t:"Le renard roux se cache dans la forêt. Il guette une souris grise. Soudain, il bondit !",q:"De quelle couleur est le renard ?",kind:"Quelle couleur ?",o:["Gris","Blanc","Noir","Orange"],a:3}
+];
+let i=0,tries=0,done=false,score=0,res=[],speaking=false;
+const $=s=>document.querySelector(s),app=$('#app');
+const synth=window.speechSynthesis;
+function voice(){const v=(synth&&synth.getVoices())||[];return v.find(x=>/^fr/i.test(x.lang))||null}
+function say(txt,cb,onw){
+  if(!synth){cb&&cb();return}
+  const u=new SpeechSynthesisUtterance(txt);u.lang='fr-FR';u.rate=.8;const v=voice();if(v)u.voice=v;
+  u.onend=()=>cb&&cb();u.onerror=()=>cb&&cb();if(onw)u.onboundary=onw;
+  synth.speak(u);
+}
+function stop(){synth&&synth.cancel();speaking=false;document.querySelectorAll('.w.say').forEach(e=>e.classList.remove('say'));const b=$('#ear');if(b){b.classList.remove('on');b.firstChild.nextSibling.textContent=' Écouter'}}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;')}
+function words(t){return t.replace(/([\p{L}\d]+(?:['’][\p{L}\d]+)?)([.,!?;:]*)|([^\p{L}\d]+)/gu,(m,w,pu,p)=>w?`<span class="nb"><span class="w" data-w="${esc(w)}">${esc(w)}</span>${esc(pu)}</span>`:`<span class="p">${esc(p)}</span>`)}
+function start(){
+  stop();i=0;score=0;res=[];
+  app.innerHTML=`<div class="center"><h1 class="cur">Lis et réponds</h1><p>Lis le texte, puis choisis la bonne réponse.</p><div class="lvs cur"><span>7</span><span>8</span><span>9</span><span>10</span></div><p>5 questions, de plus en plus longues.</p><button class="go" id="go">Commencer</button></div>`;
+  $('#go').onclick=show;
+}
+function show(){
+  stop();tries=0;done=false;const d=Q[i];
+  app.innerHTML=`
+  <div class="top"><button class="back" id="bk" aria-label="Retour">←</button>
+   <div class="dots">${Q.map((_,k)=>`<i class="${k<i?'done':k==i?'now':''}"></i>`).join('')}</div>
+   <div class="stars">★ ${score}</div></div>
+  <div class="lvl">Niveau ${d.n}</div>
+  <div class="scr"><div class="zone">
+   <div class="card" id="card"><p class="txt cur" id="txt">${words(d.t)}</p>
+    <button class="ear" id="ear"><span aria-hidden="true">🔊</span> Écouter</button></div>
+   <p class="ask"><small>Lis le texte et réponds à la question.</small>${esc(d.q)}</p>
+   <div class="opts">${d.o.map((o,k)=>`<button class="opt cur" data-k="${k}">${esc(o)}</button>`).join('')}</div>
+  </div>
+  <div class="foot"><div class="fb" id="fb"><small>Touche un mot pour l'entendre.</small></div>
+   <button class="next" id="nx" disabled>Suivant</button></div></div>`;
+  $('#bk').onclick=()=>{if(confirm('Quitter l’exercice ?'))start()};
+  $('#txt').onclick=e=>{const w=e.target.closest('.w');if(!w)return;stop();w.classList.add('say');say(w.dataset.w,()=>w.classList.remove('say'))};
+  $('#ear').onclick=listen;
+  document.querySelectorAll('.opt').forEach(b=>b.onclick=()=>pick(+b.dataset.k,b));
+  $('#nx').onclick=()=>{i++;i<Q.length?show():end()};
+}
+function listen(){
+  const b=$('#ear');if(speaking){stop();return}
+  stop();speaking=true;b.classList.remove('pulse');b.classList.add('on');b.firstChild.nextSibling.textContent=' Stop';
+  const d=Q[i];
+  // le texte, puis la question — jamais les réponses
+  say(d.t,()=>{if(!speaking)return;say(d.q,()=>stop())});
+}
+function pick(k,b){
+  if(done)return;const d=Q[i],fb=$('#fb');stop();
+  if(k===d.a){
+    done=true;b.classList.add('good');
+    const s=tries===0?2:1;score+=s;res.push(s);
+    $('.stars').textContent='★ '+score;
+    fb.className='fb ok';fb.innerHTML=tries===0?'Bravo ! ★★':'Bien joué ! ★';
+    lock();finish();
+  }else{
+    tries++;b.classList.add('bad');b.disabled=true;
+    if(tries===1){
+      fb.className='fb ko';fb.innerHTML='Pas tout à fait. Essaie encore !<small>Indice : relis le texte.</small>';
+      $('#card').classList.add('relis');$('#ear').classList.add('pulse');
+    }else{
+      done=true;res.push(0);
+      document.querySelectorAll('.opt')[d.a].classList.add('good');
+      fb.className='fb ko';fb.innerHTML='Ce n\'était pas ça. La bonne réponse est en vert.';
+      lock();finish();
+    }
+  }
+}
+function lock(){document.querySelectorAll('.opt').forEach(o=>o.disabled=true)}
+function finish(){const n=$('#nx');n.disabled=false;n.textContent=i<Q.length-1?'Suivant':'Terminer'}
+function end(){
+  stop();
+  app.innerHTML=`<div class="center"><div class="big">${'★'.repeat(Math.min(3,Math.max(1,Math.round(score/ (Q.length*2)*3))))}</div><h1 class="cur">Bravo !</h1><p>Tu as gagné ${score} étoiles sur ${Q.length*2}.</p>
+  <div class="bilan">${res.map((s,k)=>`<span>${k+1} : ${s==2?'★★':s==1?'★':'–'}</span>`).join('')}</div>
+  <button class="go" id="again">Rejouer</button></div>`;
+  $('#again').onclick=start;
+}
+if(synth)synth.onvoiceschanged=()=>{};
+start();
+</script>
+</body></html>
