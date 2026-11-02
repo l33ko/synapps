@@ -14,7 +14,7 @@ L'interface imite un cahier à lignes Seyès, avec de gros boutons faciles à to
 - **Phrases** : remettre des étiquettes dans l'ordre pour construire une phrase, avec la majuscule au début et le point à la fin. Chaque étiquette touchée est lue à voix haute.
 
 **Mathématiques**
-- **Additions** et **soustractions** : de 0 à 5 jusqu'à 99, avec le passage de la dizaine aux niveaux avancés.
+- **Calcul** (additions et soustractions) : un seul exercice. Que des additions simples aux niveaux 1 à 3, puis des soustractions faciles mélangées dès le niveau 4 (de plus en plus difficiles ensuite). De 0 à 5 jusqu'à 99, avec le passage de la dizaine aux niveaux avancés.
 - **Compléments** : 7 + ? = 10, puis jusqu'à 20 et 100.
 - **Problèmes** : petites histoires de la vie courante (donner des pommes, la monnaie rendue par la marchande, des boîtes qui contiennent le même nombre d'objets, et à partir du niveau 5 des paquets de dix et des unités à dénombrer : « Combien y en a-t-il ? »), lues lentement, phrase par phrase, avec des pauses. Aux niveaux avancés, certaines demandent deux étapes et d'autres un partage équitable.
 - **Doubles et moitiés** : doubles, moitiés, groupes égaux, puis les tables de 2, 3, 4, 5 et 10 aux derniers niveaux seulement.
