@@ -73,6 +73,7 @@
   --screen:#16202a;
   --screen-ink:#eef3f6;
   --lit:#ffd23f;
+  --bad-bg:#fde8e6;
   --on-tc:#ffffff;
   --c-mem:#2447d6;
   --c-att:#d1334a;
@@ -86,13 +87,13 @@
 @media (prefers-color-scheme:dark){
   :root:not([data-theme="light"]){
     --paper:#0d1620;--rule:#18242f;--card:#131f2a;--ink:#e6edf2;--ink2:#93a5b2;--edge:#2b3b48;
-    --accent:#86a0ff;--accent-ink:#0d1620;--ok:#5fd39a;--bad:#ff8a80;--screen:#0a1118;--on-tc:#0d1620;
+    --accent:#86a0ff;--accent-ink:#0d1620;--ok:#5fd39a;--bad:#ff8a80;--screen:#0a1118;--on-tc:#0d1620;--bad-bg:#3a1714;
     --c-mem:#86a0ff;--c-att:#ff7f90;--c-vit:#4fd6c3;--c-cal:#b79cff;--c-log:#f2b94b;--c-lan:#7ddc7d;--c-vis:#f08bd9;color-scheme:dark;
   }
 }
 :root[data-theme="dark"]{
   --paper:#0d1620;--rule:#18242f;--card:#131f2a;--ink:#e6edf2;--ink2:#93a5b2;--edge:#2b3b48;
-  --accent:#86a0ff;--accent-ink:#0d1620;--ok:#5fd39a;--bad:#ff8a80;--screen:#0a1118;--on-tc:#0d1620;
+  --accent:#86a0ff;--accent-ink:#0d1620;--ok:#5fd39a;--bad:#ff8a80;--screen:#0a1118;--on-tc:#0d1620;--bad-bg:#3a1714;
   --c-mem:#86a0ff;--c-att:#ff7f90;--c-vit:#4fd6c3;--c-cal:#b79cff;--c-log:#f2b94b;--c-lan:#7ddc7d;--c-vis:#f08bd9;color-scheme:dark;
 }
 .t-mem{--tc:var(--c-mem)}.t-att{--tc:var(--c-att)}.t-vit{--tc:var(--c-vit)}.t-cal{--tc:var(--c-cal)}
@@ -210,6 +211,7 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--accent);outline-off
 
 .nav{position:fixed;left:0;right:0;bottom:0;z-index:5;background:var(--card);border-top:1px solid var(--edge);display:flex;justify-content:center;padding:0 max(16px,env(safe-area-inset-right,0px)) env(safe-area-inset-bottom,0px) max(16px,env(safe-area-inset-left,0px))}
 .nav-in{display:flex;width:100%;max-width:34rem}
+.nav[hidden]{display:none}
 .nav button{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:58px;background:none;border:0;cursor:pointer;color:var(--ink2);font-size:.8rem}
 .nav button svg{width:24px;height:24px;display:block}
 .nav button[aria-current="page"]{color:var(--accent);font-weight:700}
@@ -261,6 +263,84 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--accent);outline-off
 .fc{aspect-ratio:1;background:#2b3a48;color:var(--screen-ink);border:0;border-radius:4px;font-family:var(--f);font-weight:800;cursor:pointer;padding:0}
 .shp svg{width:90px;height:90px;display:block}
 .rt svg{width:min(46vw,150px);height:auto;display:block}
+/* ---------- Essai guidé : consigne en 3 bulles, puis 3 essais sans chrono (rien n'est compté) ---------- */
+.ttl{display:flex;flex-direction:column;gap:6px}
+.ttl .row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.pill{display:inline-flex;align-items:center;gap:6px;border:1.5px solid var(--tc);color:var(--ink);border-radius:999px;padding:2px 10px;font-size:.85rem;font-weight:600;background:var(--card)}
+.pill i{width:8px;height:8px;border-radius:2px;background:var(--tc);display:block}
+.lnk.strong{font-weight:700;white-space:nowrap}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;list-style:none;margin:0;padding:0}
+.steps li{display:flex;flex-direction:column;gap:5px;font-size:.78rem;color:var(--ink2);text-align:center}
+.steps li b{display:block;height:6px;border-radius:3px;background:var(--rule);border:1px solid var(--edge)}
+.steps li.ok b{background:var(--accent);border-color:var(--accent)}
+.steps li.on{color:var(--ink);font-weight:700}
+.steps li.on b{background:linear-gradient(90deg,var(--accent) 50%,var(--rule) 50%);border-color:var(--accent)}
+.stage{display:flex;flex-direction:column;gap:12px}
+.stage .screen{transition:box-shadow .25s}
+.dim{opacity:.28}
+.hl{box-shadow:0 0 0 3px var(--lit),0 0 0 7px rgba(255,210,63,.28);border-radius:6px}
+.hl2{box-shadow:0 0 0 3px var(--lit);border-radius:4px}
+.ink-hl{text-decoration:underline wavy var(--lit) 3px;text-underline-offset:10px}
+.aw.mid{color:var(--lit)}
+.bub{position:relative;background:var(--accent);color:var(--accent-ink);border-radius:8px;padding:14px 16px;font-size:1.08rem;line-height:1.35;font-weight:600;display:flex;flex-direction:column;gap:10px;animation:pop .25s ease-out}
+.bub::before{content:"";position:absolute;left:var(--px,50%);margin-left:-10px;border:10px solid transparent}
+.bub.pu::before{top:-19px;border-bottom-color:var(--accent)}
+.bub.pd::before{bottom:-19px;border-top-color:var(--accent)}
+.bub .bc{font-size:.8rem;font-weight:500;opacity:.85}
+.bub .bf{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.bub .bf:empty{display:none}
+.bub .bn{background:var(--accent-ink);color:var(--accent);border:0;border-radius:4px;min-height:44px;padding:8px 18px;font-weight:700;cursor:pointer}
+.bub .bp{background:none;border:0;color:var(--accent-ink);min-height:44px;padding:8px 4px;cursor:pointer;text-decoration:underline;text-underline-offset:3px;font-weight:500}
+.sw{display:inline-block;width:.9em;height:.9em;border-radius:3px;vertical-align:-.08em;border:2px solid var(--accent-ink);margin-right:2px}
+.kbd{display:inline-block;border:1.5px solid currentColor;border-radius:4px;padding:0 6px;font-size:.9em;line-height:1.3}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.op,.fc,.cell{position:relative}
+.mk{display:flex;flex:none;animation:pop .2s ease-out}
+.op .mk svg,.op.pat .mk svg,.fc .mk svg,.cell .mk svg{width:18px;height:18px}
+.op.pat .mk,.fc .mk,.cell .mk{position:absolute;top:4px;right:4px}
+.cell .mk{top:50%;right:50%;transform:translate(50%,-50%)}
+.op.right,.fc.right{border-color:var(--ok);box-shadow:inset 0 0 0 1.5px var(--ok)}
+.op.right .mk{color:var(--ok)}
+.fc.right{box-shadow:0 0 0 3px #5fd39a}
+.fc.right .mk{color:#5fd39a}
+.op.miss{border:2px solid var(--bad);background:var(--bad-bg);color:var(--bad);animation:shake .35s ease-in-out}
+.op.miss .mk{color:var(--bad)}
+.op.miss .mk svg,.op.pat.miss .mk svg,.fc.miss .mk svg,.cell.bad .mk svg,.ab .mk svg{width:28px;height:28px}
+.fc.miss{background:#5a2420;color:#ffb4ab;box-shadow:0 0 0 3px #ff6b60;animation:shake .35s ease-in-out}
+.fc.miss .mk{color:#ff6b60}
+.cell.bad .mk{color:#2b0d0a}
+.cell.okc{background:#3fd16f}
+.cell.okc .mk{color:#0d2a17}
+.cell.num{background:#2b3a48;color:var(--screen-ink);font-weight:800;font-size:1.3rem}
+.cell.lit{color:#13212b;font-weight:800;font-size:1.3rem}
+.ab.right,.qa.right{color:#5fd39a}
+.ab.miss,.qa.miss{color:#ff8a80}
+.ab .mk,.qa .mk{display:inline-flex;vertical-align:middle;margin-left:8px}
+.shk{animation:shake .35s ease-in-out}
+@keyframes shake{20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.lock{pointer-events:none}
+.calm{text-align:center;font-size:.9rem;color:var(--ink2);min-height:52px;display:flex;align-items:center;justify-content:center;margin:0}
+.calm .btn{width:auto;min-width:12rem}
+.glow{box-shadow:0 0 0 3px var(--lit),0 0 0 8px rgba(255,210,63,.35);animation:glow 1.3s ease-in-out infinite;z-index:1}
+@keyframes glow{50%{box-shadow:0 0 0 3px var(--lit),0 0 0 12px rgba(255,210,63,.12)}}
+@keyframes pop{from{transform:translateY(6px);opacity:0}to{transform:none;opacity:1}}
+.cell .mk,.ab .mk,.qa .mk{animation:none}
+@media (prefers-reduced-motion:reduce){.bub,.mk,.glow,.op.miss,.fc.miss,.shk{animation:none}}
+.card.tight{gap:8px;padding:14px 16px}
+.toast{background:var(--card);border:1px solid var(--edge);border-left:4px solid var(--accent);border-radius:4px;padding:10px 12px;font-size:.92rem}
+.alt{display:flex;flex-direction:column;gap:4px}
+.alt .note{text-align:center}
+@media (max-width:640px){
+  .ttl.tpl .sub{display:none}
+  .stage .screen{min-height:120px;padding:14px}
+  .stage .rt svg{width:min(32vw,120px)}
+  .stage .op.pat>svg{width:min(100%,76px)}
+  .stage .op.pat{min-height:0;padding:6px}
+}
+.go-card{text-align:center}.go-card h2{margin:.2em 0}.go-pre{margin:0;opacity:.75}
+.go-num{font-size:64px;font-weight:800;line-height:1.1;margin:.15em 0;animation:goPop 1s ease-out infinite}
+@keyframes goPop{from{transform:scale(1.25);opacity:.4}25%{transform:scale(1);opacity:1}}
+@media (prefers-reduced-motion:reduce){.go-num{animation:none}}
 </style>
 </head>
 <body>
@@ -609,7 +689,7 @@ var EX=[
 {id:'intrus',nom:'Langage',jeu:'Intrus',dur:'45 s',t:'Quatre mots s’affichent, trois appartiennent à la même famille. Touche l’intrus. 45 secondes.'},
 {id:'nback',nom:'Mémoire',jeu:'Même lettre',dur:'45 s',t:'Une lettre s’affiche à la fois. Dis si elle est la même que la précédente. À partir d’un certain niveau, c’est la même que celle d’il y a deux lettres. 45 secondes.'},
 {id:'different',nom:'Attention',jeu:'Différence',dur:'45 s',t:'Une grille de lettres presque toutes identiques. Touche celle qui est différente. 45 secondes.'},
-{id:'gonogo',nom:'Attention',jeu:'Cible',dur:'45 s',t:'Une forme colorée s’affiche. Touche « Touche » seulement si elle correspond à la cible indiquée, sinon « Passe ». 45 secondes.'},
+{id:'gonogo',nom:'Attention',jeu:'Cible',dur:'45 s',t:'Une forme colorée s’affiche. Touche « Touche » seulement si elle correspond à la cible indiquée, sinon « Passe ». 45 secondes.'},
 {id:'plusgrand',nom:'Vitesse',jeu:'Plus grand',dur:'45 s',t:'Deux nombres s’affichent. Touche le plus grand, le plus vite possible. 45 secondes.'},
 {id:'vraifaux',nom:'Calcul mental',jeu:'Vrai ou faux',dur:'45 s',t:'Un calcul s’affiche avec son résultat. Dis s’il est juste ou faux. 45 secondes.'},
 {id:'operateur',nom:'Calcul mental',jeu:'Opération',dur:'45 s',t:'Il manque le signe d’une opération. Touche celui qui rend l’égalité exacte. 45 secondes.'},
@@ -681,16 +761,17 @@ function syncErr(e){
 function redraw(){
  var el=document.activeElement;if(el&&(el.tagName==='INPUT'||el.tagName==='TEXTAREA'))return;
  if(V.name==='home'||V.name==='detail'||V.name==='jeux'||V.name==='compte')render()}
-function pullRemote(){return api('/rest/v1/synapse_profil?select=data&limit=1').then(function(rows){var d=rows&&rows[0]&&rows[0].data;return d&&Array.isArray(d.runs)?cleanRuns(d.runs):[]})}
+function pullRemote(){return api('/rest/v1/synapse_profil?select=data&limit=1').then(function(rows){var d=rows&&rows[0]&&rows[0].data;mergeSeen(d&&Array.isArray(d.vus)?d.vus:[]);return d&&Array.isArray(d.runs)?cleanRuns(d.runs):[]})}
 function pushDb(){
  if(!AUTH||ACC.state!=='on')return;
  if(pushing){pending=true;return}
  pushing=true;
- api('/rest/v1/synapse_profil?on_conflict=user_id',{method:'POST',prefer:'resolution=merge-duplicates,return=minimal',body:{user_id:AUTH.uid,data:{v:1,runs:S.runs.map(function(r){return{ts:r.ts,d:r.d,ex:r.ex,sc:r.sc,ok:r.ok,ko:r.ko,dl:r.dl}})},updated:Date.now()}})
+ api('/rest/v1/synapse_profil?on_conflict=user_id',{method:'POST',prefer:'resolution=merge-duplicates,return=minimal',body:{user_id:AUTH.uid,data:{v:1,runs:S.runs.map(function(r){return{ts:r.ts,d:r.d,ex:r.ex,sc:r.sc,ok:r.ok,ko:r.ko,dl:r.dl}}),vus:seenList()},updated:Date.now()}})
  .then(function(){ACC.last=Date.now();ACC.err=''},function(e){ACC.err=syncErr(e)})
  .then(function(){pushing=false;if(pending){pending=false;pushDb()}else redraw()})}
 function pullMerge(remote){
- var merged=mergeRuns(S.runs,remote),changed=merged.length!==S.runs.length,needPush=merged.length!==remote.length;
+ PULLED=true;
+ var merged=mergeRuns(S.runs,remote),changed=merged.length!==S.runs.length,needPush=merged.length!==remote.length||seenPush;
  if(changed){S=mk(merged);saveLocal()}
  ACC.state='on';ACC.last=Date.now();ACC.err='';
  if(needPush)pushDb()}
@@ -886,7 +967,7 @@ function viewCompte(){
 
 function demo(e){
  var i,s;
- if(e.id==='attention')return '<div class="screen sm"><span class="wd" style="color:'+colOf('bleu').hex+'">ROUGE</span></div><p class="note">Ici, la bonne réponse est « bleu ».</p>';
+ if(e.id==='attention')return '<div class="screen sm"><span class="wd" style="color:'+colOf('bleu').hex+'">ROUGE</span></div><p class="note">Ici, la bonne réponse est « bleu ».</p>';
  if(e.id==='memoire'){s='';for(i=0;i<9;i++)s+='<span class="cell'+(i===4?' lit':'')+'" style="pointer-events:none"></span>';return '<div class="screen sm"><div class="gr" style="grid-template-columns:repeat(3,1fr);width:132px">'+s+'</div></div>'}
  if(e.id==='vitesse')return '<div class="lg"><span>'+glyph(1)+'<b>1</b></span><span>'+glyph(3)+'<b>2</b></span><span>'+glyph(0)+'<b>3</b></span></div><div class="screen sm"><span class="gs">'+glyph(3)+'</span></div><p class="note">Ici, la bonne réponse est 2.</p>';
  if(e.id==='calcul')return '<div class="screen sm"><span class="qa">47 + 38</span></div><p class="note">Tu tapes 8 puis 5.</p>';
@@ -894,24 +975,25 @@ function demo(e){
  if(e.id==='fleches')return '<div class="screen sm"><div class="arrows">'+arrow('g')+arrow('g')+arrow('d')+arrow('g')+arrow('g')+'</div></div><p class="note">Ici, la bonne réponse est droite.</p>';
  if(e.id==='suites')return '<div class="screen sm"><div class="seqs"><span>3</span><span>6</span><span>9</span><span>12</span><span class="q">?</span></div></div><p class="note">La bonne réponse est 15.</p>';
  if(e.id==='rotation'){var t=[1,1,0,0,1,0,0,0,0];return '<div class="screen sm"><div class="rt">'+patSvg(t,3)+'</div></div><p class="note">Tu cherches la même figure, tournée.</p>'}
- if(e.id==='nback')return '<div class="screen sm"><span class="scr">K</span></div><p class="note">Si la lettre d’avant était aussi K, touche « Pareil ».</p>';
+ if(e.id==='nback')return '<div class="screen sm"><span class="scr">K</span></div><p class="note">Si la lettre d’avant était aussi K, touche « Pareil ».</p>';
  if(e.id==='different')return '<div class="screen sm"><span class="qs" style="letter-spacing:.3em">O O O<br>O Q O<br>O O O</span></div><p class="note">Ici, la différente est le Q.</p>';
- if(e.id==='gonogo')return '<div class="screen sm"><span class="shp"><svg viewBox="0 0 90 90" aria-hidden="true"><circle cx="45" cy="45" r="30" fill="'+colOf('rouge').hex+'"/></svg></span></div><p class="note">Cible : le rouge. Tu touches « Touche ».</p>';
+ if(e.id==='gonogo')return '<div class="screen sm"><span class="shp"><svg viewBox="0 0 90 90" aria-hidden="true"><circle cx="45" cy="45" r="30" fill="'+colOf('rouge').hex+'"/></svg></span></div><p class="note">Cible : le rouge. Tu touches « Touche ».</p>';
  if(e.id==='plusgrand')return '<div class="screen sm"><span class="qa">48 · 84</span></div><p class="note">Tu touches 84.</p>';
  if(e.id==='vraifaux')return '<div class="screen sm"><span class="qa">7 × 8 = 54</span></div><p class="note">Faux : 7 × 8 = 56.</p>';
  if(e.id==='operateur')return '<div class="screen sm"><span class="qa">6 ? 4 = 24</span></div><p class="note">Tu touches ×.</p>';
  if(e.id==='lettres')return '<div class="screen sm"><div class="seqs"><span>B</span><span>D</span><span>F</span><span>H</span><span class="q">?</span></div></div><p class="note">La bonne réponse est J.</p>';
  if(e.id==='miroir'){var m=[1,1,0,0,1,0,0,0,0];return '<div class="screen sm"><div class="rt">'+patSvg(m,3)+'</div><div class="rt">'+patSvg(mirror(m,3),3)+'</div></div><p class="note">À droite, le reflet de la figure de gauche.</p>'}
- if(e.id==='contraire')return '<div class="screen sm"><span class="qs">Chaud</span></div><p class="note">Tu touches « froid ».</p>';
- if(e.id==='ortho')return '<div class="screen sm"><span class="qs">pharmacie · farmacie · pharmasie</span></div><p class="note">La bonne est « pharmacie ».</p>';
- if(e.id==='intrus')return '<div class="screen sm"><span class="qs">Pomme · Poire · Cerise · Carotte</span></div><p class="note">L’intrus est « Carotte ».</p>';
- return '<div class="screen sm"><span class="scr">BTALE</span></div><p class="note">La bonne réponse est « TABLE ».</p>'}
+ if(e.id==='contraire')return '<div class="screen sm"><span class="qs">Chaud</span></div><p class="note">Tu touches « froid ».</p>';
+ if(e.id==='ortho')return '<div class="screen sm"><span class="qs">pharmacie · farmacie · pharmasie</span></div><p class="note">La bonne est « pharmacie ».</p>';
+ if(e.id==='intrus')return '<div class="screen sm"><span class="qs">Pomme · Poire · Cerise · Carotte</span></div><p class="note">L’intrus est « Carotte ».</p>';
+ return '<div class="screen sm"><span class="scr">BTALE</span></div><p class="note">La bonne réponse est « TABLE ».</p>'}
 
 function viewIntro(){
  var e=V.ex,idx=plan().indexOf(e);
  return '<div class="bk"><button class="lnk" data-act="home">Quitter</button><span class="ex">'+(SESS&&!SESS.single&&idx>-1?'Exercice '+(idx+1)+' sur '+NEED:'Entraînement libre')+'</span></div>'+
  '<div><h1>'+e.jeu+'</h1><p class="sub">'+e.nom+' · niveau '+fr(S.lv[e.id],1)+'</p></div>'+
- '<div class="card"><p>'+e.t+'</p>'+demo(e)+'</div><button class="btn" data-act="go">Commencer</button>'}
+ '<div class="card"><p>'+e.t+'</p>'+demo(e)+'</div><button class="btn" data-act="go">Commencer</button>'+
+ '<div class="alt"><button class="btn s" data-act="tprac">S’entraîner</button><p class="note">'+(e.span?'3 séquences courtes':'3 questions')+' sans chrono. Rien n’est compté.</p></div>'}
 
 function viewResult(){
  var e=V.ex,r=V.run,n=r.ok+r.ko,acc=n?Math.round(r.ok/n*100):0,msg=r.dl>0.3?'Niveau en hausse.':r.dl<-0.3?'Niveau ajusté pour rester dans la bonne zone.':'Niveau stable.';
@@ -928,6 +1010,7 @@ function viewSum(){
  return '<h1>Séance terminée</h1><div class="card"><dl class="kv">'+rows+'</dl><p class="note">'+(st>1?st+' jours d’affilée.':'Premier jour de la série.')+' Rendez-vous demain.</p></div><button class="btn" data-act="home">Retour à l’accueil</button>'}
 
 function render(){
+ if(V.name==='trial'&&TR){trialRender();return}
  var n=V.name,tab=n==='home'||n==='detail'||n==='jeux'||n==='compte';
  app.innerHTML=n==='home'?viewHome():n==='detail'?viewDetail():n==='jeux'?viewJeux():n==='compte'?viewCompte():n==='intro'?viewIntro():n==='result'?viewResult():n==='sum'?viewSum():'';
  nav.hidden=!tab;
@@ -953,40 +1036,40 @@ function playTimed(e,L,cfg){
 
 function ansHandle(a,v,it,submit){if(a==='ans')submit(v===it.ans)}
 
-function playAttention(e,L){
+function cfgAttention(L){
  var n=stroopN(L),set=shuffle(COL.slice(0,n)),cols=n===4?2:3;
- playTimed(e,L,{
+ return {
   next:function(){var it=stroopItem(L);it.ans=it.ink;return it},
   show:function(it,stim,ctl){
    stim.innerHTML='<span class="wd" style="color:'+colOf(it.ink).hex+'">'+it.w.toUpperCase()+'</span>';
    ctl.innerHTML='<div class="opts" style="--cols:'+cols+'">'+set.map(function(c){return '<button class="op" data-act="ans" data-v="'+c.id+'">'+c.id+'</button>'}).join('')+'</div>'},
-  handle:ansHandle})}
+  handle:ansHandle}}
 
-function playFleches(e,L){
- playTimed(e,L,{
+function cfgFleches(L){
+ return {
   next:function(){return arrowItem(L)},
   show:function(it,stim,ctl){
    var s='',i;for(i=0;i<it.n;i++)s+=arrow(it.flank);s+=arrow(it.dir);for(i=0;i<it.n;i++)s+=arrow(it.flank);
    stim.innerHTML='<div class="arrows" aria-label="Flèches à observer">'+s+'</div>';
    ctl.innerHTML='<div class="opts" style="--cols:2"><button class="op" data-act="ans" data-v="g" aria-label="Gauche">'+arrow('g')+'</button><button class="op" data-act="ans" data-v="d" aria-label="Droite">'+arrow('d')+'</button></div>'},
   handle:ansHandle,
-  key:function(k,it,submit){if(k==='ArrowLeft')submit(it.ans==='g');else if(k==='ArrowRight')submit(it.ans==='d')}})}
+  key:function(k,it,submit){if(k==='ArrowLeft')submit(it.ans==='g');else if(k==='ArrowRight')submit(it.ans==='d')}}}
 
-function playVitesse(e,L){
+function cfgVitesse(L){
  var k=symK(L),map=shuffle([0,1,2,3,4,5,6,7,8]).slice(0,k),prev=-1,i,lg='',ord,asc;
  /* légende dans le désordre : les boutons (1, 2, 3…) ne sont jamais alignés avec elle, il faut vraiment lire le chiffre */
  do{ord=shuffle(map.map(function(_,j){return j}));asc=ord.every(function(v,j){return v===j})}while(asc&&k>1);
- for(i=0;i<k;i++)lg+='<span>'+glyph(map[ord[i]])+'<b>'+(ord[i]+1)+'</b></span>';
- playTimed(e,L,{
+ for(i=0;i<k;i++)lg+='<span data-d="'+(ord[i]+1)+'">'+glyph(map[ord[i]])+'<b>'+(ord[i]+1)+'</b></span>';
+ return {
   top:'<div class="lg" aria-label="Légende des symboles">'+lg+'</div>',
   next:function(){var d;do{d=ri(1,k)}while(d===prev&&k>1);prev=d;return{d:d,ans:String(d)}},
   show:function(it,stim,ctl){
    stim.innerHTML='<span class="gs">'+glyph(map[it.d-1])+'</span>';
    var b='',j;for(j=1;j<=k;j++)b+='<button class="op" data-act="ans" data-v="'+j+'">'+j+'</button>';
    ctl.innerHTML='<div class="opts num">'+b+'</div>'},
-  handle:ansHandle})}
+  handle:ansHandle}}
 
-function playCalcul(e,L){
+function cfgCalcul(L){
  var buf='',prevQ='';
  function showBuf(){var el=document.getElementById('ab');if(el)el.textContent=buf||' '}
  function press(k,it,submit){
@@ -996,49 +1079,49 @@ function playCalcul(e,L){
   if(buf.length>=len)return;
   buf+=k;showBuf();
   if(buf.length===len)submit(Number(buf)===it.a)}
- playTimed(e,L,{
+ return {
   next:function(){var it;do{it=genCalc(L)}while(it.q===prevQ);prevQ=it.q;return it},
   show:function(it,stim,ctl){
    buf='';
    stim.innerHTML='<span class="qa">'+it.q+' =</span><span class="ab" id="ab"> </span>';
    ctl.innerHTML=keypad()},
   handle:function(a,v,it,submit){if(a==='key')press(v,it,submit)},
-  key:function(k,it,submit){if(k==='Backspace')press('del',it,submit);else press(k,it,submit)}})}
+  key:function(k,it,submit){if(k==='Backspace')press('del',it,submit);else press(k,it,submit)}}}
 
-function playLangage(e,L){
+function cfgLangage(L){
  var used={};
- playTimed(e,L,{
+ return {
   next:function(){var it=genWord(L,used);it.ans=it.w;return it},
   show:function(it,stim,ctl){
    stim.innerHTML='<span class="scr" aria-label="Lettres mélangées">'+it.scr+'</span>';
    ctl.innerHTML='<div class="opts" style="--cols:2">'+it.opts.map(function(w){return '<button class="op" data-act="ans" data-v="'+w+'">'+w+'</button>'}).join('')+'</div>'},
-  handle:ansHandle})}
+  handle:ansHandle}}
 
-function playIntrus(e,L){
+function cfgIntrus(L){
  var prev='';
- playTimed(e,L,{
+ return {
   next:function(){var it;do{it=genIntrus(L)}while(it.w===prev);prev=it.w;return it},
   show:function(it,stim,ctl){
    stim.innerHTML='<span class="qs">Quel est l’intrus ?</span>';
    ctl.innerHTML='<div class="opts" style="--cols:2">'+it.opts.map(function(w){return '<button class="op" data-act="ans" data-v="'+w+'">'+cap(w)+'</button>'}).join('')+'</div>'},
-  handle:ansHandle})}
+  handle:ansHandle}}
 
-function playSuites(e,L){
+function cfgSuites(L){
  var prev='';
- playTimed(e,L,{
+ return {
   next:function(){var it;do{it=genSuite(L)}while(it.shown.join()===prev);prev=it.shown.join();return it},
   show:function(it,stim,ctl){
    stim.innerHTML='<div class="seqs" aria-label="Suite de nombres">'+it.shown.map(function(n){return '<span>'+n+'</span>'}).join('')+'<span class="q">?</span></div>';
    ctl.innerHTML='<div class="opts" style="--cols:2">'+it.opts.map(function(n){return '<button class="op" data-act="ans" data-v="'+n+'">'+n+'</button>'}).join('')+'</div>'},
-  handle:ansHandle})}
+  handle:ansHandle}}
 
-function playRotation(e,L){
- playTimed(e,L,{
+function cfgRotation(L){
+ return {
   next:function(){return genRot(L)},
   show:function(it,stim,ctl){
    stim.innerHTML='<div class="rt" aria-label="Figure à retrouver">'+patSvg(it.target,it.n)+'</div>';
    ctl.innerHTML='<div class="opts" style="--cols:2">'+it.opts.map(function(p,i){return '<button class="op pat" data-act="ans" data-v="'+i+'" aria-label="Proposition '+(i+1)+'">'+patSvg(p,it.n)+'</button>'}).join('')+'</div>'},
-  handle:ansHandle})}
+  handle:ansHandle}}
 
 /* Exercices à essais : Séquence (cases) et Chiffres */
 function playMemoire(e,L){
@@ -1094,91 +1177,366 @@ function shape(sh,hex){
 var SHN={c:'rond',s:'carré',t:'triangle'};
 function twoBtns(a,b){return '<div class="opts" style="--cols:2"><button class="op" data-act="ans" data-v="'+a[0]+'">'+a[1]+'</button><button class="op" data-act="ans" data-v="'+b[0]+'">'+b[1]+'</button></div>'}
 
-function playNback(e,L){
+function cfgNback(L){
  var hist=[],n=nbackN(L);
- playTimed(e,L,{
+ return {
   top:'<p class="note" style="text-align:center">Même lettre que '+(n===1?'la précédente':'celle d’il y a '+n+' lettres')+' ?</p>',
   next:function(){var it=nbackNext(hist,L);hist.push(it.c);return it},
   show:function(it,stim,ctl){stim.innerHTML='<span class="scr" aria-label="Lettre">'+it.c+'</span>';ctl.innerHTML=twoBtns(['o','Pareil'],['n','Différent'])},
-  handle:ansHandle})}
+  handle:ansHandle}}
 
-function playDifferent(e,L){
- playTimed(e,L,{
+function cfgDifferent(L){
+ return {
   next:function(){return genDiff(L)},
   show:function(it,stim,ctl){
    var c='',i,fs=it.n<=3?'2rem':it.n===4?'1.7rem':it.n===5?'1.4rem':'1.15rem';
    for(i=0;i<it.n*it.n;i++)c+='<button class="fc" style="font-size:'+fs+'" data-act="ans" data-v="'+i+'" aria-label="Case '+(i+1)+'">'+(i===it.pos?it.odd:it.base)+'</button>';
    stim.innerHTML='<div class="fg" style="grid-template-columns:repeat('+it.n+',1fr)">'+c+'</div>';ctl.innerHTML=''},
-  handle:ansHandle})}
+  handle:ansHandle}}
 
-function playGonogo(e,L){
+function cfgGonogo(L){
  var combo=L>=9,set=COL.slice(0,Math.min(6,3+Math.floor(L/4))),tg={col:pick(set).id,sh:pick(GSH)};
- playTimed(e,L,{
+ return {tg:tg,combo:combo,
   top:'<p class="note" style="text-align:center">Cible : <b>'+(combo?SHN[tg.sh]+' ':'')+tg.col+'</b>'+(combo?'' :'')+'</p>',
   next:function(){return genGo(L,tg)},
   show:function(it,stim,ctl){stim.innerHTML=shape(it.sh,colOf(it.col).hex);ctl.innerHTML=twoBtns(['go','Touche'],['no','Passe'])},
-  handle:ansHandle})}
+  handle:ansHandle}}
 
-function playPlusgrand(e,L){
- playTimed(e,L,{
+function cfgPlusgrand(L){
+ return {
   next:function(){return genBig(L)},
   show:function(it,stim,ctl){stim.innerHTML='<span class="qs">Quel est le plus grand ?</span>';ctl.innerHTML='<div class="opts" style="--cols:2"><button class="op" data-act="ans" data-v="0" style="font-size:1.6rem">'+it.o[0]+'</button><button class="op" data-act="ans" data-v="1" style="font-size:1.6rem">'+it.o[1]+'</button></div>'},
-  handle:ansHandle})}
+  handle:ansHandle}}
 
-function playVraifaux(e,L){
- playTimed(e,L,{
+function cfgVraifaux(L){
+ return {
   next:function(){return genTF(L)},
   show:function(it,stim,ctl){stim.innerHTML='<span class="qa">'+it.q+' = '+it.shown+'</span>';ctl.innerHTML=twoBtns(['v','Vrai'],['f','Faux'])},
-  handle:ansHandle})}
+  handle:ansHandle}}
 
-function playOperateur(e,L){
- playTimed(e,L,{
+function cfgOperateur(L){
+ return {
   next:function(){return genOp(L)},
   show:function(it,stim,ctl){stim.innerHTML='<span class="qa">'+it.a+' ? '+it.b+' = '+it.c+'</span>';ctl.innerHTML='<div class="opts" style="--cols:'+it.ops.length+'">'+it.ops.map(function(o){return '<button class="op" data-act="ans" data-v="'+o+'" style="font-size:1.6rem">'+o+'</button>'}).join('')+'</div>'},
-  handle:ansHandle})}
+  handle:ansHandle}}
 
-function playLettres(e,L){
- playTimed(e,L,{
+function cfgLettres(L){
+ return {
   next:function(){return genLet(L)},
   show:function(it,stim,ctl){stim.innerHTML='<div class="seqs" aria-label="Suite de lettres">'+it.shown.map(function(n){return '<span>'+n+'</span>'}).join('')+'<span class="q">?</span></div>';ctl.innerHTML='<div class="opts" style="--cols:2">'+it.opts.map(function(n){return '<button class="op" data-act="ans" data-v="'+n+'">'+n+'</button>'}).join('')+'</div>'},
-  handle:ansHandle})}
+  handle:ansHandle}}
 
-function playMiroir(e,L){
- playTimed(e,L,{
+function cfgMiroir(L){
+ return {
   top:'<p class="note" style="text-align:center">Touche le reflet, gauche ↔ droite.</p>',
   next:function(){return genMir(L)},
   show:function(it,stim,ctl){
    stim.innerHTML='<div class="rt" aria-label="Figure à refléter">'+patSvg(it.target,it.n)+'</div>';
    ctl.innerHTML='<div class="opts" style="--cols:2">'+it.opts.map(function(p,i){return '<button class="op pat" data-act="ans" data-v="'+i+'" aria-label="Proposition '+(i+1)+'">'+patSvg(p,it.n)+'</button>'}).join('')+'</div>'},
-  handle:ansHandle})}
+  handle:ansHandle}}
 
-function playContraire(e,L){
+function cfgContraire(L){
  var prev='';
- playTimed(e,L,{
+ return {
   next:function(){var it=genAnt(L,prev);prev=it.key;return it},
   show:function(it,stim,ctl){
    stim.innerHTML='<span class="note" style="color:var(--screen-ink)">Contraire de</span><span style="font-size:clamp(1.6rem,8vw,2.2rem);font-weight:800">'+cap(it.w)+'</span>';
    ctl.innerHTML='<div class="opts" style="--cols:2">'+it.opts.map(function(w){return '<button class="op" data-act="ans" data-v="'+w+'">'+w+'</button>'}).join('')+'</div>'},
-  handle:ansHandle})}
+  handle:ansHandle}}
 
-function playOrtho(e,L){
+function cfgOrtho(L){
  var prev='';
- playTimed(e,L,{
+ return {
   next:function(){var it=genOrtho(L,prev);prev=it.key;return it},
   show:function(it,stim,ctl){
    stim.innerHTML='<span class="qs">Quelle est la bonne orthographe ?</span>';
    ctl.innerHTML='<div class="opts" style="--cols:1">'+it.opts.map(function(w){return '<button class="op" data-act="ans" data-v="'+w+'">'+w+'</button>'}).join('')+'</div>'},
-  handle:ansHandle})}
+  handle:ansHandle}}
 
 function startPlay(e){
- stopRun();
+ stopRun();TR=null;
  var L=Math.floor(S.lv[e.id]);
  V={name:'play',ex:e};nav.hidden=true;window.scrollTo(0,0);
- var fn={memoire:playMemoire,chiffres:playChiffres,attention:playAttention,fleches:playFleches,vitesse:playVitesse,calcul:playCalcul,suites:playSuites,rotation:playRotation,langage:playLangage,intrus:playIntrus,nback:playNback,different:playDifferent,gonogo:playGonogo,plusgrand:playPlusgrand,vraifaux:playVraifaux,operateur:playOperateur,lettres:playLettres,miroir:playMiroir,contraire:playContraire,ortho:playOrtho}[e.id];
- fn(e,L)}
+ if(e.id==='memoire')playMemoire(e,L);
+ else if(e.id==='chiffres')playChiffres(e,L);
+ else playTimed(e,L,CFG[e.id](L))}
+var CFG={attention:cfgAttention,fleches:cfgFleches,vitesse:cfgVitesse,calcul:cfgCalcul,suites:cfgSuites,rotation:cfgRotation,langage:cfgLangage,intrus:cfgIntrus,nback:cfgNback,different:cfgDifferent,gonogo:cfgGonogo,plusgrand:cfgPlusgrand,vraifaux:cfgVraifaux,operateur:cfgOperateur,lettres:cfgLettres,miroir:cfgMiroir,contraire:cfgContraire,ortho:cfgOrtho};
+
+/* ---------- Essai guidé (issue #72) ----------
+   Première fois qu'on rencontre un exercice : la consigne en 3 bulles posées sur le vrai écran de jeu,
+   puis 3 essais sans chrono ni explication. Rien n'est compté (ni score, ni niveau, ni séance du jour).
+   Exercice déjà connu : bouton « S'entraîner » sur l'écran d'introduction. */
+var SEEN_KEY='synapse-essais',SEEN={},seenPush=false;
+try{var sv0=JSON.parse(localStorage.getItem(SEEN_KEY));if(sv0&&typeof sv0==='object')EXIDS.forEach(function(id){if(sv0[id])SEEN[id]=1})}catch(e){}
+function saveSeen(){try{localStorage.setItem(SEEN_KEY,JSON.stringify(SEEN))}catch(e){}}
+function seenList(){return EXIDS.filter(function(id){return SEEN[id]})}
+var PULLED=false;   // pas d'envoi tant que le profil en ligne n'a pas été lu une première fois (sinon on écraserait l'historique)
+function markSeen(id){if(SEEN[id])return;SEEN[id]=1;saveSeen();if(PULLED)pushDb()}
+function mergeSeen(list){
+ var add=false;list.forEach(function(id){if(EXIDS.indexOf(id)>-1&&!SEEN[id]){SEEN[id]=1;add=true}});
+ if(add)saveSeen();seenPush=seenList().some(function(id){return list.indexOf(id)<0})}
+function isKnown(id){return!!SEEN[id]||runsOf(id).length>0}
+
+var KB=!!(window.matchMedia&&matchMedia('(hover:hover) and (pointer:fine)').matches);
+var CROSS='<svg viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15"/></svg>';
+function mkSpan(ok){return '<span class="mk">'+(ok?CHECK:CROSS)+'</span>'}
+function swatch(id){return '<span class="sw" style="background:'+colOf(id).hex+'"></span>'}
+function TLv(L){return Math.min(L,START)}           // essais faciles : jamais au-dessus du niveau de départ
+function genU(f,ok){var it,k=0;do{it=f()}while(!ok(it)&&++k<300);return it}
+function mixed(f,a,b){return shuffle([genU(f,function(x){return x.ans===a}),genU(f,function(x){return x.ans===b}),f()])}
+function three(f){return[f(),f(),f()]}
+var FEM={rouge:'rouge',bleu:'bleue',vert:'verte',jaune:'jaune',violet:'violette',orange:'orange'};
+function glowKeys(ctl,digits){var bs=ctl.querySelectorAll('[data-act="key"]'),i;for(i=0;i<bs.length;i++)bs[i].classList.add(digits.indexOf(bs[i].getAttribute('data-v'))>-1?'glow':'dim')}
+function markScr(el,txt,ok){if(!el)return;el.textContent=txt;el.classList.add(ok?'right':'miss');el.insertAdjacentHTML('beforeend',mkSpan(ok))}
+function fromCfg(c,o){
+ var k={top:c.top||'',
+  render:function(it,stim,ctl){c.show(it,stim,ctl)},
+  handle:function(a,v,it,answer){c.handle(a,v,it,function(g){answer(g,v)})},
+  key:c.key?function(x,it,answer){c.key(x,it,function(g){answer(g,x==='ArrowLeft'?'g':x==='ArrowRight'?'d':x)})}:null},p;
+ for(p in o)k[p]=o[p];
+ if(!k.demo)k.demo=c.next();
+ if(!k.items)k.items=three(c.next);
+ return k}
+
+/* Les 3 bulles de chaque exercice. tg : ce que la bulle montre (top = légende ou cible, stim = écran, ctl = boutons) ;
+   in : un détail à surligner dans cet élément. À la 3e bulle, la bonne réponse brille : on la touche pour commencer. */
+var KIT={
+ attention:function(L){var c=cfgAttention(TLv(L)),inc=function(x){return x.ink!==x.w};
+  return fromCfg(c,{demo:genU(c.next,inc),items:[genU(c.next,inc),genU(c.next,function(x){return x.ink===x.w}),genU(c.next,inc)],
+   tuto:[{tg:'stim',t:'Un mot de couleur s’affiche ici.'},
+    {tg:'stim',in:'.wd',cls:'ink-hl',t:function(it){return 'Regarde la couleur de ses lettres : ici, il est écrit en '+swatch(it.ink)+' '+it.ink+'.'}},
+    {tg:'ctl',t:function(it){return 'Touche la couleur de l’encre, pas celle que dit le mot. À toi : touche « '+it.ink+' ».'}}]})},
+ fleches:function(L){var c=cfgFleches(TLv(L)),inc=function(x){return x.dir!==x.flank};
+  return fromCfg(c,{demo:genU(c.next,inc),items:[genU(c.next,function(x){return x.dir===x.flank}),genU(c.next,inc),genU(c.next,inc)],
+   tuto:[{tg:'stim',t:'Cinq flèches s’affichent ici.'},
+    {tg:'stim',fx:function(stim){var a=stim.querySelectorAll('.aw'),m=(a.length-1)/2,i;for(i=0;i<a.length;i++)a[i].classList.add(i===m?'mid':'dim');return a[m]},t:'Seule la flèche du milieu compte. Les autres sont là pour te distraire.'},
+    {tg:'ctl',t:function(it){return 'Touche sa direction : ici, elle pointe à '+(it.dir==='g'?'gauche':'droite')+'. À toi : touche la flèche qui brille.'+(KB?' Au clavier : <span class="kbd">←</span> <span class="kbd">→</span>.':'')}}]})},
+ vitesse:function(L){var c=cfgVitesse(TLv(L));
+  return fromCfg(c,{tuto:[{tg:'stim',t:'Un symbole s’affiche ici.'},
+    {tg:'top',in:function(it){return '[data-d="'+it.d+'"]'},t:function(it){return 'Cherche-le dans la légende : il y porte le chiffre '+it.d+'.'}},
+    {tg:'ctl',t:function(it){return 'Touche ce chiffre en bas. À toi : touche '+it.d+'.'}}]})},
+ calcul:function(L){var c=cfgCalcul(TLv(L));
+  function typed(){var el=document.getElementById('ab');return el?el.textContent.trim():''}
+  return fromCfg(c,{
+   handle:function(a,v,it,answer){c.handle(a,v,it,function(g){answer(g,typed())})},
+   key:function(x,it,answer){c.key(x,it,function(g){answer(g,typed())})},
+   glow:function(stim,ctl,it){glowKeys(ctl,String(it.a).split(''))},
+   mark:function(stim,ctl,it,pick,ok){markScr(document.getElementById('ab'),pick,ok);if(!ok)stim.classList.add('shk')},
+   tuto:[{tg:'stim',in:'.qa',t:'Un calcul s’affiche ici.'},
+    {tg:'stim',t:function(it){return 'Calcule-le de tête : ici, '+it.q+' = '+it.a+'.'}},
+    {tg:'ctl',t:function(it){return 'Tape le résultat'+(KB?' sur le pavé ou au clavier':' sur le pavé')+' : il part tout seul au dernier chiffre. À toi : tape '+String(it.a).split('').join(' puis ')+'.'}}]})},
+ langage:function(L){var c=cfgLangage(TLv(L));
+  return fromCfg(c,{tuto:[{tg:'stim',t:'Les lettres d’un mot sont mélangées ici.'},
+    {tg:'ctl',t:'Un seul de ces mots s’écrit avec exactement ces lettres.'},
+    {tg:'ctl',t:function(it){return 'Touche-le. À toi : ici, c’est « '+it.w+' ».'}}]})},
+ suites:function(L){var c=cfgSuites(TLv(L));
+  return fromCfg(c,{demo:{shown:[2,5,8,11,14],ans:'17',opts:shuffle(['16','17','18','20'])},
+   tuto:[{tg:'stim',t:'Une suite de nombres s’affiche ici.'},
+    {tg:'stim',in:'.q',t:'Elle suit une règle : ici, on ajoute 3 à chaque fois. Le « ? » est le nombre suivant.'},
+    {tg:'ctl',t:'Touche ce nombre. À toi : touche 17.'}]})},
+ rotation:function(L){var c=cfgRotation(TLv(L));
+  return fromCfg(c,{tuto:[{tg:'stim',t:'Voici une figure.'},
+    {tg:'ctl',t:'Une seule proposition est la même figure, juste tournée. Les autres sont retournées comme dans un miroir, ou modifiées.'},
+    {tg:'ctl',t:'À toi : touche celle qui brille. C’est bien la même figure, tournée.'}]})},
+ intrus:function(L){var c=cfgIntrus(TLv(L));
+  return fromCfg(c,{demo:{w:'carotte',opts:['pomme','poire','carotte','cerise'],ans:'carotte'},
+   items:three(function(){return genU(c.next,function(x){return x.w!=='carotte'})}),
+   tuto:[{tg:'stim',t:'La question est toujours la même : trouve l’intrus.'},
+    {tg:'ctl',t:'Trois de ces mots sont de la même famille : ici, des fruits.'},
+    {tg:'ctl',t:'Touche celui qui n’en fait pas partie. À toi : touche « Carotte ».'}]})},
+ nback:function(L){var c=cfgNback(L),n=nbackN(L),ls=NBL.slice(0,Math.max(5,10-Math.floor(L/3)));
+  function mkIt(same){var pre=[],x,i;for(i=0;i<n;i++){do{x=pick(ls)}while(pre.length&&x===pre[pre.length-1]);pre.push(x)}
+   if(same)x=pre[0];else{do{x=pick(ls)}while(x===pre[0]||x===pre[pre.length-1])}
+   return{pre:pre,c:x,ans:same?'o':'n'}}
+  function big(l){return '<span class="scr" aria-label="Lettre">'+(l||' ')+'</span>'}
+  return fromCfg(c,{demo:n===1?{pre:['K'],c:'K',ans:'o'}:{pre:['K','M'],c:'K',ans:'o'},
+   items:shuffle([mkIt(true),mkIt(false),mkIt(Math.random()<0.5)]),go:'Pareil ou différent ?',
+   render:function(it,stim,ctl,ph,step){
+    var l=ph==='tuto'?(step===0?it.pre[0]:it.c):(TR&&TR.res?it.c:''),cap=ph==='tuto'&&step>0?'<span class="note" style="color:var(--screen-ink)">Avant : '+it.pre.join(', ')+'</span>':'';
+    stim.innerHTML=cap+big(l);ctl.innerHTML=twoBtns(['o','Pareil'],['n','Différent'])},
+   play:function(it,stim,ctl,done){var s=stim.querySelector('.scr'),all=it.pre.concat([it.c]);
+    function p(i){s.textContent=all[i];if(i===all.length-1){done();return}later(1100,function(){s.textContent=' ';later(300,function(){p(i+1)})})}
+    later(400,function(){p(0)})},
+   tuto:[{tg:'stim',t:'Les lettres s’affichent ici, une à la fois.'},
+    {tg:'stim',t:n===1?'Compare chaque lettre avec celle d’avant. Ici, juste avant ce K, il y avait aussi un K.':'Compare chaque lettre avec celle d’il y a deux lettres. Ici, deux lettres avant ce K, il y avait aussi un K.'},
+    {tg:'ctl',t:'Même lettre : touche « Pareil ». Sinon : « Différent ». À toi : touche « Pareil ».'}]})},
+ different:function(L){var c=cfgDifferent(TLv(L));
+  return fromCfg(c,{demo:{n:3,base:'O',odd:'Q',pos:5,ans:'5'},
+   tuto:[{tg:'stim',t:'Une grille de lettres presque toutes identiques s’affiche ici.'},
+    {tg:'stim',in:function(it){return '[data-v="'+it.pos+'"]'},t:'Une seule est différente : ici, un Q parmi les O.'},
+    {tg:'stim',t:'Touche-la. À toi : touche celle qui brille.'}]})},
+ gonogo:function(L){var c=cfgGonogo(L),tg=c.tg,cb=c.combo;
+  return fromCfg(c,{demo:{col:tg.col,sh:tg.sh,ans:'go'},items:mixed(c.next,'go','no'),
+   tuto:[{tg:'top',t:cb?'Voici la cible : une forme et une couleur à guetter.':'Voici la cible : la couleur à guetter.'},
+    {tg:'stim',t:cb?'Une forme s’affiche ici. Ce '+SHN[tg.sh]+' '+tg.col+', c’est la cible.':'Une forme s’affiche ici. Elle est '+FEM[tg.col]+' : c’est la cible.'},
+    {tg:'ctl',t:'Si c’est la cible, touche « Touche ». Sinon, « Passe ». À toi : touche « Touche ».'}]})},
+ plusgrand:function(L){var c=cfgPlusgrand(TLv(L));
+  return fromCfg(c,{demo:{o:['48','84'],ans:'1'},
+   tuto:[{tg:'stim',t:'La question est toujours la même : lequel est le plus grand ?'},
+    {tg:'ctl',t:'Les deux nombres sont ici. Compare-les bien, chiffre par chiffre.'},
+    {tg:'ctl',t:'Touche le plus grand, le plus vite possible. À toi : touche 84.'}]})},
+ vraifaux:function(L){var c=cfgVraifaux(TLv(L));
+  return fromCfg(c,{demo:{q:'7 × 8',shown:54,ans:'f'},items:mixed(c.next,'v','f'),
+   tuto:[{tg:'stim',t:'Un calcul s’affiche ici, avec un résultat.'},
+    {tg:'stim',t:'Vérifie-le de tête : ici, 7 × 8 font 56, pas 54.'},
+    {tg:'ctl',t:'Touche « Vrai » s’il est juste, « Faux » sinon. À toi : touche « Faux ».'}]})},
+ operateur:function(L){var c=cfgOperateur(TLv(L));
+  return fromCfg(c,{demo:{a:9,b:5,c:4,ops:genOp(TLv(L)).ops,ans:'−'},
+   tuto:[{tg:'stim',t:'Il manque un signe à la place du « ? ».'},
+    {tg:'stim',t:'Cherche celui qui rend l’égalité juste : ici, 9 − 5 = 4.'},
+    {tg:'ctl',t:'Touche ce signe. À toi : touche « − ».'}]})},
+ lettres:function(L){var c=cfgLettres(TLv(L));
+  return fromCfg(c,{demo:{shown:['B','D','F','H','J'],ans:'L',opts:shuffle(['K','L','M','N'])},
+   tuto:[{tg:'stim',t:'Une suite de lettres s’affiche ici.'},
+    {tg:'stim',in:'.q',t:'Elle suit une règle dans l’alphabet : ici, on saute une lettre à chaque fois. Le « ? » est la lettre suivante.'},
+    {tg:'ctl',t:'Touche cette lettre. À toi : touche L.'}]})},
+ miroir:function(L){var c=cfgMiroir(TLv(L));
+  return fromCfg(c,{tuto:[{tg:'stim',t:'Voici une figure.'},
+    {tg:'ctl',t:'Imagine-la dans un miroir : ce qui est à gauche passe à droite. Une figure juste tournée n’est pas son reflet.'},
+    {tg:'ctl',t:'Touche son reflet. À toi : touche celui qui brille.'}]})},
+ contraire:function(L){var c=cfgContraire(TLv(L));
+  return fromCfg(c,{demo:{w:'chaud',key:'chaud',ans:'froid',opts:shuffle(['froid','lent','vide','grand'])},
+   items:three(function(){return genU(c.next,function(x){return x.key!=='chaud'})}),
+   tuto:[{tg:'stim',t:'Un mot s’affiche ici.'},
+    {tg:'ctl',t:'Parmi ces quatre mots, un seul veut dire le contraire.'},
+    {tg:'ctl',t:'Touche-le. À toi : le contraire de « chaud », c’est « froid ».'}]})},
+ ortho:function(L){var c=cfgOrtho(TLv(L));
+  return fromCfg(c,{demo:{key:'pharmacie',ans:'pharmacie',opts:shuffle(['farmacie','pharmacie','pharmasie'])},
+   items:three(function(){return genU(c.next,function(x){return x.key!=='pharmacie'})}),
+   tuto:[{tg:'stim',t:'Un même mot s’écrit ici de trois façons.'},
+    {tg:'ctl',t:'Une seule est juste. Les deux autres ont une petite faute.'},
+    {tg:'ctl',t:'Touche la bonne. À toi : touche « pharmacie ».'}]})},
+ memoire:function(L){
+  var st={idx:0};
+  function grid(){var s='',i;for(i=0;i<9;i++)s+='<button class="cell" data-act="cell" data-v="'+i+'" aria-label="Case '+(i+1)+'"></button>';return '<div class="gr" style="grid-template-columns:repeat(3,1fr);width:min(100%,210px)">'+s+'</div>'}
+  return{top:'',demo:{seq:[1,5]},items:[{seq:makeSeq(2,9)},{seq:makeSeq(3,9)},{seq:makeSeq(3,9)}],go:'À toi : touche les cases dans l’ordre.',
+   tuto:[{tg:'stim',t:'Des cases vont s’allumer ici, l’une après l’autre.'},
+    {tg:'stim',t:'Retiens bien l’ordre : ici, d’abord la case 1, puis la case 2.'},
+    {tg:'stim',t:'Quand c’est fini, touche-les dans le même ordre. À toi : touche la case 1, puis la case 2.'}],
+   render:function(it,stim,ctl,ph,step){
+    st.idx=0;stim.innerHTML=grid();ctl.innerHTML='';var b=stim.querySelectorAll('.cell');
+    if(ph==='tuto'){if(step===0)b[it.seq[0]].classList.add('lit');else it.seq.forEach(function(c,i){b[c].classList.add(step===1?'lit':'num');b[c].textContent=i+1})}},
+   glow:function(stim,ctl,it){var b=stim.querySelectorAll('.cell'),i;for(i=0;i<b.length;i++)b[i].classList.add(it.seq.indexOf(i)>-1?'glow':'dim')},
+   play:function(it,stim,ctl,done){var b=stim.querySelectorAll('.cell');
+    function p(i){if(i>=it.seq.length){done();return}b[it.seq[i]].classList.add('lit');later(650,function(){b[it.seq[i]].classList.remove('lit');later(250,function(){p(i+1)})})}
+    later(500,function(){p(0)})},
+   handle:function(a,v,it,answer){
+    if(a!=='cell')return;var c=+v,b=app.querySelectorAll('#stim .cell')[c];if(!b)return;
+    if(c===it.seq[st.idx]){st.idx++;if(st.idx===it.seq.length)answer(true,c);else{sfxTap(c);b.classList.add('tap');later(200,function(){b.classList.remove('tap')})}}
+    else answer(false,c)},
+   mark:function(stim,ctl,it,pick,ok){var b=stim.querySelectorAll('.cell');
+    if(ok)it.seq.forEach(function(c){b[c].classList.add('okc')});else stim.classList.add('shk');
+    b[pick].classList.add(ok?'okc':'bad');b[pick].innerHTML=mkSpan(ok)}}},
+ chiffres:function(L){
+  var st={buf:''};
+  function dg(){return document.getElementById('dg')}
+  function show(){var d=dg();if(d)d.textContent=st.buf?st.buf.split('').join(' '):' '}
+  function press(x,it,answer){
+   if(x==='del'){st.buf=st.buf.slice(0,-1);show();return}
+   if(!/^\d$/.test(x)||st.buf.length>=it.seq.length)return;
+   st.buf+=x;show();if(st.buf.length===it.seq.length)answer(st.buf===it.seq.join(''),st.buf.split('').join(' '))}
+  return{top:'',demo:{seq:[4,7]},items:[{seq:makeSeq(2,10)},{seq:makeSeq(3,10)},{seq:makeSeq(3,10)}],go:'À toi : tape les chiffres dans l’ordre.',
+   tuto:[{tg:'stim',t:'Des chiffres s’affichent ici, un par un.'},
+    {tg:'stim',t:'Retiens-les dans l’ordre : ici, 4 puis 7.'},
+    {tg:'ctl',t:'Quand ils ont disparu, tape-les dans le même ordre. À toi : tape 4 puis 7.'}],
+   render:function(it,stim,ctl,ph,step){st.buf='';stim.innerHTML='<span class="qa" id="dg">'+(ph==='tuto'&&step<2?(step===0?it.seq[0]:it.seq.join(' ')):' ')+'</span>';ctl.innerHTML=keypad()},
+   glow:function(stim,ctl,it){glowKeys(ctl,it.seq.map(String))},
+   play:function(it,stim,ctl,done){var d=dg();
+    function p(i){if(i>=it.seq.length){d.textContent=' ';done();return}d.textContent=it.seq[i];later(800,function(){d.textContent=' ';later(250,function(){p(i+1)})})}
+    later(500,function(){p(0)})},
+   handle:function(a,v,it,answer){if(a==='key')press(v,it,answer)},
+   key:function(x,it,answer){press(x==='Backspace'?'del':x,it,answer)},
+   mark:function(stim,ctl,it,pick,ok){markScr(dg(),pick,ok);if(!ok)stim.classList.add('shk')}}}
+};
+
+var TR=null;
+function trialStart(e,known){
+ stopRun();
+ TR={e:e,known:known,k:KIT[e.id](Math.floor(S.lv[e.id])),ph:'tuto',step:0,qi:0,res:null,pick:null,busy:false};
+ V={name:'trial',ex:e};nav.hidden=true;trialRender();window.scrollTo(0,0)}
+function trialSteps(T){
+ var cur=T.ph==='tuto'?0:T.ph==='q'?T.qi+1:4;
+ return '<ol class="steps" aria-label="Avancement de l’essai">'+['Consigne','Essai 1','Essai 2','Essai 3'].map(function(l,i){
+  var c=i<cur||(i===cur&&T.ph==='q'&&T.res==='ok')?'ok':i===cur?'on':'';
+  return '<li class="'+c+'"'+(i===cur?' aria-current="step"':'')+'><b></b>'+l+'</li>'}).join('')+'</ol>'}
+function trialBubble(T,b){
+ var t=typeof b.t==='function'?b.t(T.k.demo):b.t;
+ return '<div class="bub '+(b.tg==='ctl'?'pd':'pu')+'" id="bub" role="status"><span class="bc">'+(T.step+1)+' sur 3</span><span>'+t+'</span><div class="bf">'+
+  (T.step>0?'<button class="bp" data-act="tprev">Retour</button>':'<span></span>')+(T.step<2?'<button class="bn" data-act="tnext">Suivant</button>':'')+'</div></div>'}
+function pointBubble(pt){
+ var bb=document.getElementById('bub');if(!bb||!pt||!pt.getBoundingClientRect)return;
+ var r=pt.getBoundingClientRect(),q=bb.getBoundingClientRect();if(!q.width||!r.width)return;
+ bb.style.setProperty('--px',Math.round(clamp(r.left+r.width/2-q.left,22,q.width-22))+'px')}
+function glowAns(stim,ctl,it){var bs=app.querySelectorAll('.stage [data-act="ans"]'),i,a=String(it.ans);for(i=0;i<bs.length;i++)bs[i].classList.add(bs[i].getAttribute('data-v')===a?'glow':'dim')}
+function markAns(stim,ctl,it,pk,ok){var bs=app.querySelectorAll('.stage [data-act="ans"]'),i;for(i=0;i<bs.length;i++)if(bs[i].getAttribute('data-v')===String(pk)){bs[i].classList.add(ok?'right':'miss');bs[i].insertAdjacentHTML('beforeend',mkSpan(ok))}}
+function tutoDone(good){var T=TR;if(!T)return;sfx(good);if(good){T.ph='q';T.qi=0;T.res=null;T.pick=null}trialRender()}
+function trialAnswer(good,v){
+ var T=TR;if(!T)return;sfx(good);T.res=good?'ok':'ko';T.pick=v;trialRender();
+ if(good)later(900,function(){if(TR!==T)return;if(T.qi<T.k.items.length-1){T.qi++;T.res=null;T.pick=null}else{T.ph='end';markSeen(T.e.id)}trialRender()})}
+function trialRender(){
+ stopRun();
+ var T=TR,e=T.e,k=T.k,th=themeOf(e.id),idx=plan().indexOf(e),run=T.ph!=='end';
+ var h='<div class="bk"><button class="lnk" data-act="home">Quitter</button><span class="ex">'+(SESS&&!SESS.single&&idx>-1?'Exercice '+(idx+1)+' sur '+NEED:'')+'</span>'+
+  (run?'<button class="lnk strong" data-act="tskip">Lancer l’exercice</button>':'<span style="width:44px"></span>')+'</div>'+
+  '<div class="ttl t-'+th.id+(run?' tpl':'')+'"><h1>'+e.jeu+'</h1><div class="row"><span class="sub">'+e.nom+' · '+(T.known?'niveau '+fr(S.lv[e.id],1):'nouveau jeu')+'</span>'+
+  (run?'<span class="pill"><i></i>Explications</span>':'')+'</div></div>'+trialSteps(T);
+ if(!run){countdown(T,false);return}
+ var tuto=T.ph==='tuto',b=tuto?k.tuto[T.step]:null,it=tuto?k.demo:k.items[T.qi];
+ app.innerHTML=h+'<div class="stage">'+(k.top?'<div id="ttop">'+k.top+'</div>':'')+(tuto&&b.tg==='top'?trialBubble(T,b):'')+'<div class="screen" id="stim"></div>'+
+  (tuto&&b.tg!=='top'?trialBubble(T,b):'')+'<div id="ctl"></div>'+(tuto?'':'<p class="calm" id="calm" role="status"></p>')+'</div>';
+ var stim=document.getElementById('stim'),ctl=document.getElementById('ctl'),calm=document.getElementById('calm'),el={top:document.getElementById('ttop'),stim:stim,ctl:ctl},pt=null;
+ k.render(it,stim,ctl,T.ph,T.step);
+ if(tuto){
+  if(T.step===2){(k.glow||glowAns)(stim,ctl,it);pt=app.querySelector('.stage .glow')}
+  else{
+   if(el[b.tg])el[b.tg].classList.add('hl');
+   if(b.tg!=='ctl')ctl.classList.add('dim');
+   if(b.in){var ins=(el[b.tg]||stim).querySelectorAll(typeof b.in==='function'?b.in(it):b.in),i;for(i=0;i<ins.length;i++)ins[i].classList.add(b.cls||'hl2');pt=ins[0]}
+   if(b.fx)pt=b.fx(stim,ctl,it)||pt}
+  pointBubble(pt);if(T.step===2)trialFit();
+  CUR={handle:function(a,v){if(TR===T&&T.step===2)k.handle(a,v,it,tutoDone)},key:function(x){if(TR===T&&T.step===2&&k.key)k.key(x,it,tutoDone)}};
+  return}
+ if(T.res){
+  stim.classList.add('lock');ctl.classList.add('lock');
+  (k.mark||markAns)(stim,ctl,it,T.pick,T.res==='ok');
+  if(T.res==='ok'){stim.classList.add('good');calm.innerHTML='<span class="sr">Juste</span>'}
+  else{calm.innerHTML='<span class="sr">Pas cette fois.</span><button class="btn" data-act="tretry">Réessayer</button>';
+   var rb=calm.querySelector('.btn');try{rb.focus({preventScroll:true});rb.scrollIntoView({block:'nearest'})}catch(x){}}
+ }else if(k.play){
+  T.busy=true;stim.classList.add('lock');ctl.classList.add('lock');calm.textContent='Regarde…';
+  k.play(it,stim,ctl,function(){T.busy=false;stim.classList.remove('lock');ctl.classList.remove('lock');calm.textContent=k.go||'À toi.'})
+ }else calm.textContent='À toi de jouer !';
+ if(!T.res)trialFit();
+ CUR={handle:function(a,v){if(TR===T&&!T.res&&!T.busy)k.handle(a,v,it,trialAnswer)},key:function(x){if(TR===T&&!T.res&&!T.busy&&k.key)k.key(x,it,trialAnswer)}}}
+/* sur petit écran : faire entrer les boutons de réponse dans la vue, sans faire sortir la bulle par le haut */
+function trialFit(){
+ var st=app.querySelector('.stage');if(!st)return;
+ var r=st.getBoundingClientRect(),over=r.bottom-window.innerHeight+8,b=document.getElementById('bub'),top=(b||st).getBoundingClientRect().top-8;
+ if(over>0&&top>0)window.scrollBy(0,Math.min(over,top))}
+/* Écran « L'exercice commence » : 3 secondes, puis la vraie partie (après l'essai ou « Passer l'essai ») */
+function countdown(T,skipped){
+ stopRun();
+ var e=T.e,idx=plan().indexOf(e),th=themeOf(e.id),n=3;
+ app.innerHTML='<div class="bk"><button class="lnk" data-act="home">Quitter</button><span class="ex">'+(SESS&&!SESS.single&&idx>-1?'Exercice '+(idx+1)+' sur '+NEED:'')+'</span><span style="width:44px"></span></div>'+
+  '<div class="ttl t-'+th.id+'"><h1>'+e.jeu+'</h1><div class="row"><span class="sub">'+e.nom+'</span></div></div>'+
+  '<div class="card tight go-card" role="status">'+(skipped?'':'<p class="go-pre">Essai terminé, bravo !</p>')+'<h2>L’exercice commence</h2>'+
+  '<div class="go-num" id="goNum" aria-hidden="true">3</div><p>'+(e.span?'<b>5 essais</b>, de plus en plus longs.':'<b>45 secondes</b>, chronométré.')+'</p>'+'</div>';
+ markSeen(e.id);
+ (function tick(){later(1000,function(){n--;var el=document.getElementById('goNum');
+  if(n>0){if(el)el.textContent=n;tick()}else startPlay(e)})})();
+}
+function trialFocus(){var b=app.querySelector('.bub .bn')||app.querySelector('.bub .bp');if(b)try{b.focus({preventScroll:true})}catch(x){}}
+function trialAct(a){
+ var T=TR;if(!T)return false;
+ if(a==='tnext'){if(T.step<2)T.step++;trialRender();trialFocus();return true}
+ if(a==='tprev'){T.step=Math.max(0,T.step-1);trialRender();trialFocus();return true}
+ if(a==='tretry'){T.res=null;T.pick=null;trialRender();return true}
+ if(a==='tagain'){trialStart(T.e,T.known);return true}
+ if(a==='tskip'){countdown(T,true);return true}
+ return false}
 
 /* ---------- Navigation ---------- */
-function openIntro(e){go({name:'intro',ex:e})}
+function openIntro(e){if(isKnown(e.id))go({name:'intro',ex:e});else trialStart(e,false)}
 function act(a,v){
  if(a==='home'){SESS=null;go({name:'home'});return}
  if(a==='tab'){SESS=null;go({name:v});return}
@@ -1193,7 +1551,9 @@ function act(a,v){
  if(a==='logout'){doLogout();return}
  if(a==='son'){toggleSon();return}
  if(a==='train'){SESS={single:true,from:V.name==='jeux'?'jeux':'detail'};openIntro(exById(v));return}
- if(a==='go'){startPlay(V.ex);return}
+ if(a==='go'){if(V.ex)markSeen(V.ex.id);startPlay(V.ex);return}
+ if(a==='tprac'){trialStart(V.ex,true);return}
+ if(trialAct(a))return;
  if(a==='after'){
   if(SESS&&SESS.single){var fr2=SESS.from;DET.theme=themeOf(V.ex.id).id;SESS=null;go({name:fr2==='jeux'?'jeux':'detail'});return}
   var nx=nextUndone();if(nx)openIntro(nx);else go({name:'sum'});return}
