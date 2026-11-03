@@ -175,10 +175,100 @@
   .famb.on{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
   .by{margin-top:6px}
   .login .msg{text-align:left}
+
+  /* ---- recherche sur le web (piste A : sous les résultats du carnet) ---- */
+  .search-row{position:relative}
+  .search-row input{padding-right:44px;min-height:46px}
+  .search-row input::-webkit-search-cancel-button{-webkit-appearance:none;display:none}
+  .clear{position:absolute;right:0;top:50%;transform:translateY(-50%);border:0;background:none;width:44px;height:44px;cursor:pointer;display:grid;place-items:center;padding:0}
+  .clear[hidden]{display:none}
+  .clear span{width:26px;height:26px;border-radius:50%;background:var(--line);display:grid;place-items:center;font-size:13px;color:var(--muted)}
+  body.cherche .fab,body.cherche .fab2{display:none}
+  .count{min-height:22px}
+  .jump{border:0;background:none;color:var(--accent);font-weight:600;display:inline-flex;align-items:center;min-height:44px;padding:0 6px;margin:-12px 0;cursor:pointer;font-size:14px}
+  .card .src{font-size:12.5px;color:var(--ok);font-weight:600;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .sec-h{display:flex;align-items:baseline;gap:8px;margin:22px 2px 4px;flex-wrap:wrap}
+  .sec-h h2{font-size:21px}
+  .sec-h .muted{font-size:13.5px}
+  .sorts{display:flex;gap:8px;margin:6px 0 10px;flex-wrap:wrap;align-items:center}
+  .sorts .chip{padding:0 14px;min-height:44px}
+  .sites{color:var(--muted);font-size:12.5px;margin:0 2px 10px}
+  .wlist{display:flex;flex-direction:column;gap:10px}
+  .wcard{display:flex;gap:12px;background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:10px;cursor:pointer;align-items:center;text-align:left;position:relative}
+  .vg{background:linear-gradient(135deg,#f6dfa8,#d99a4e) center/cover no-repeat;display:grid;place-items:center}
+  .wcard .vg{width:84px;height:84px;border-radius:12px;flex:none;font-size:36px}
+  .wcard .bd{flex:1;min-width:0}
+  .wcard h3{font-size:17px;margin-bottom:3px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+  .wcard .site{font-size:13px;font-weight:600;margin-bottom:2px}
+  .wcard .meta{font-size:13px;gap:8px}
+  .wcard .add{flex:none;width:48px;height:48px;border-radius:50%;border:0;background:var(--accent-soft);color:var(--accent);font-size:22px;font-weight:600;cursor:pointer;display:grid;place-items:center}
+  .wcard .add.ok{background:var(--ok);color:#fff;font-size:17px}
+  .wcard .add:disabled{opacity:.6}
+  .badge{display:inline-block;background:var(--accent-soft);color:var(--accent);border-radius:999px;padding:1px 8px;font-size:12px;font-weight:600;margin-bottom:3px}
+  .badge.ok{background:#e3eedf;color:var(--ok)}
+  @media (prefers-color-scheme:dark){ .badge.ok{background:#25331f;color:#9fcf8f} }
+  .noavis{font-style:italic}
+  .more{display:block;margin:14px auto 0;min-height:44px}
+  .flash{animation:fl 1.6s ease-out}
+  @keyframes fl{0%,40%{box-shadow:0 0 0 3px var(--ok)}100%{box-shadow:var(--shadow)}}
+  .src-panel{padding:11px 14px;display:flex;gap:10px;align-items:center;margin-bottom:0}
+  .src-panel a{white-space:nowrap;min-height:44px;display:inline-flex;align-items:center}
+  /* aperçu : feuille glissante (téléphone) / panneau à droite (ordinateur) */
+  .veil{position:fixed;inset:0;background:rgba(30,20,12,.42);opacity:0;pointer-events:none;transition:opacity .25s;z-index:20}
+  .veil.on{opacity:1;pointer-events:auto}
+  .sheet{position:fixed;left:0;right:0;bottom:0;max-height:90vh;max-height:90dvh;background:var(--bg);border-radius:20px 20px 0 0;
+    transform:translateY(105%);visibility:hidden;transition:transform .3s cubic-bezier(.2,.8,.2,1),visibility 0s .3s;z-index:21;display:flex;flex-direction:column;
+    box-shadow:0 -8px 30px rgba(40,25,10,.2)}
+  .sheet.on{transform:none;visibility:visible;transition:transform .3s cubic-bezier(.2,.8,.2,1)}
+  .grab{padding:8px 0 2px;display:grid;place-items:center;cursor:pointer;flex:none;border:0;background:none;width:100%;min-height:24px}
+  .grab i{width:40px;height:5px;border-radius:3px;background:var(--line);display:block}
+  .sh-top{display:flex;align-items:center;gap:8px;padding:2px 14px 6px;flex:none}
+  .sh-top .sp{flex:1}
+  .sh-top .icon-btn{width:44px;height:44px;font-size:17px}
+  .sh-body{overflow-y:auto;padding:0 16px 16px;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;flex:1}
+  .sh-foot{flex:none;padding:10px 16px calc(12px + env(safe-area-inset-bottom));border-top:1px solid var(--line);background:var(--bg);display:flex;flex-direction:column;gap:8px}
+  .sh-foot .btn{width:100%;padding:14px 16px;font-size:16.5px;min-height:48px}
+  .sh-foot .btn.done{background:var(--ok)}
+  .rangee{display:flex;align-items:center;gap:10px;font-size:14.5px}
+  .rangee select{width:auto;flex:1;padding:0 10px;min-height:44px}
+  .pv-hero{height:130px;border-radius:var(--radius);font-size:60px;margin:2px 0 12px}
+  .pv h1{font-size:25px;margin:0 0 6px}
+  .pv .site{font-weight:600;font-size:14.5px}
+  .trust{display:flex;gap:14px;flex-wrap:wrap;background:var(--card);border-radius:12px;box-shadow:var(--shadow);padding:10px 12px;margin:10px 0 4px;font-size:14px}
+  .trust div{display:flex;flex-direction:column}
+  .trust b{font-size:16px}
+  .trust span{color:var(--muted);font-size:12.5px}
+  .trust .star{color:#e0a100;font-size:inherit}
+  .pv .panel{padding:14px;margin:12px 0}
+  .pv .panel h2{font-size:19px;align-items:baseline;gap:8px}
+  .pv .panel h2 small{font-family:-apple-system,BlinkMacSystemFont,sans-serif;font-size:13px;color:var(--muted);font-weight:400;margin-left:auto}
+  .pv .ing li{padding:6px 0;font-size:15px;cursor:default}
+  .pv .ing li::before{content:"•";color:var(--accent);font-weight:700}
+  .pv .steps li{padding:6px 0;font-size:15px;cursor:default}
+  .pv .steps li::before{width:24px;height:24px;font-size:13px}
+  .pv .rest{color:var(--muted);font-size:13.5px;margin-top:4px}
+  .pv .orig{display:inline-flex;align-items:center;min-height:44px;font-size:14.5px;overflow-wrap:anywhere}
+  .avis{font-size:14px;color:var(--muted);border-left:3px solid var(--accent-soft);padding:2px 0 2px 10px;margin:8px 0}
+  @media (min-width:900px){
+    .sheet{left:auto;top:0;bottom:0;width:440px;max-height:none;border-radius:20px 0 0 20px;transform:translateX(105%)}
+    .grab{display:none}
+    .sh-top{padding-top:14px}
+    .pv-hero{height:160px}
+  }
+  .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translate(-50%,calc(100% + 60px));visibility:hidden;background:#2b2420;color:#fff;
+    border-radius:14px;padding:8px 8px 8px 14px;display:flex;align-items:center;gap:6px;font-size:14.5px;z-index:30;
+    transition:transform .3s,visibility 0s .3s;box-shadow:0 8px 24px rgba(0,0,0,.25);width:max-content;max-width:calc(100% - 24px)}
+  .toast.on{transform:translate(-50%,0);visibility:visible;transition:transform .3s}
+  .toast span{flex:1;margin-right:6px}
+  .toast button{border:0;background:#f6e2d6;color:#b5532f;font-weight:700;border-radius:10px;padding:0 14px;min-height:44px;cursor:pointer;white-space:nowrap;flex:none}
+  .toast button.undo{background:none;color:#f6c9b2;padding:0 8px}
 </style>
 </head>
 <body>
 <div id="app"><div class="spin">Chargement…</div></div>
+<div class="veil" id="veil"></div>
+<aside class="sheet" id="sheet" aria-label="Aperçu de la recette" role="dialog" aria-modal="true"></aside>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 <script>
 /* smartphone : pas de zoom au pincement (Safari iOS ignore user-scalable, d'où ces événements) ni au double toucher (touch-action: manipulation en CSS) */
 ['gesturestart','gesturechange','gestureend'].forEach(function(n){document.addEventListener(n,function(ev){ev.preventDefault()})});
@@ -208,6 +298,14 @@ const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt
 const lines = t => String(t || '').split('\n').map(s => s.trim()).filter(Boolean);
 const mins = m => !m ? '' : m < 60 ? `${m} min` : `${Math.floor(m/60)} h${m%60 ? ' ' + String(m%60).padStart(2,'0') : ''}`;
 const safeUrl = u => /^https?:\/\//i.test(u || '') ? u : '';
+// adresse sûre dans un url('…') CSS (photos venues de sites extérieurs)
+const cssUrl = u => esc(safeUrl(u).replace(/['"()\\\s]/g, c => '%' + c.charCodeAt(0).toString(16).padStart(2, '0')));
+const SITES = { 'marmiton.org': 'Marmiton', '750g.com': '750g', 'cuisineaz.com': 'Cuisine AZ', 'journaldesfemmes.fr': 'Journal des Femmes Cuisine',
+  'ricardocuisine.com': 'Ricardo', 'cuisine-libre.org': 'Cuisine libre' };
+const hote = u => { try { return new URL(u).hostname.replace(/^www\./, ''); } catch { return ''; } };
+const siteNom = u => { const h = hote(u); const d = Object.keys(SITES).find(d => h === d || h.endsWith('.' + d)); return d ? SITES[d] : h; };
+// même recette ? (on ignore http/https, www, paramètres et / final)
+const urlKey = u => String(u || '').toLowerCase().replace(/^https?:\/\/(www\.)?/, '').replace(/[?#].*$/, '').replace(/\/+$/, '');
 const fmtCode = c => c ? c.slice(0, 3) + '-' + c.slice(3) : '';
 const store = {
   get(k) { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } },
@@ -332,13 +430,16 @@ function subscribe() {
 function rerender(id) {
   if (editing) return;
   const h = location.hash.slice(1) || '/';
-  if (h === '/') { if (document.getElementById('res')) drawResults(); }
+  if (h === '/') { if (document.getElementById('res')) { drawResults(); drawWeb(); } }
   else if (h === '/r/' + id) { const r = find(id); r ? renderDetail(r, true) : go('/'); }
   else if (h === '/famille' && !id) renderFamille();
 }
 
+let listY = null;                         // position dans la liste, retrouvée au retour d'une fiche
 async function route(msg = '') {
   releaseWake(); editing = false;
+  if (document.getElementById('res')) listY = window.scrollY;
+  closeSheet(); hideToast(); document.body.classList.remove('cherche');
   if (!AUTH) return renderLogin(msg);
   if (!loaded) {
     app.innerHTML = '<div class="spin">Chargement des recettes…</div>';
@@ -475,24 +576,33 @@ function renderList() {
       <a class="icon-btn" href="#/famille" title="Famille et invitations">👥</a>
       <a class="icon-btn" href="#/compte" title="Mon compte">👤</a>
     </div>
-    <input type="search" id="q" placeholder="Chercher une recette, un ingrédient…" value="${esc(filt.q)}">
+    <div class="search-row">
+      <input type="search" id="q" placeholder="Chercher dans le carnet… ou sur le web" value="${esc(filt.q)}" enterkeyhint="search" autocomplete="off" aria-label="Chercher une recette, dans le carnet et sur le web">
+      <button type="button" class="clear" id="clr" aria-label="Effacer la recherche" ${filt.q ? '' : 'hidden'}><span>✕</span></button>
+    </div>
     <div class="chips" id="chips">
       <button class="chip ${!filt.cat && !filt.fav ? 'on' : ''}" data-c="">Toutes</button>
       <button class="chip ${filt.fav ? 'on' : ''}" data-f="1">★ Favorites</button>
       ${used.map(([c, e]) => `<button class="chip ${filt.cat === c ? 'on' : ''}" data-c="${esc(c)}">${e} ${esc(c)}</button>`).join('')}
     </div>
     <div id="res"></div>
+    <div id="web"></div>
   </div>
   <a class="fab2" href="#/import" title="Importer depuis un lien">🔗</a>
   <a class="fab" href="#/new" title="Nouvelle recette">+</a>`;
-  const qi = document.getElementById('q');
-  qi.oninput = () => { filt.q = qi.value; drawResults(); };
+  const qi = document.getElementById('q'), clr = document.getElementById('clr');
+  // en recherche, les boutons flottants laissent la place aux « + » des résultats
+  const etat = () => { clr.hidden = !filt.q; document.body.classList.toggle('cherche', !!filt.q.trim()); };
+  qi.oninput = () => { filt.q = qi.value; etat(); drawResults(); askWeb(); };
+  qi.onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); qi.blur(); askWeb(true); } };
+  clr.onclick = () => { filt.q = ''; qi.value = ''; etat(); askWeb(); drawResults(); qi.focus(); };
   document.getElementById('chips').onclick = e => {
     const b = e.target.closest('.chip'); if (!b) return;
     if (b.dataset.f) { filt.fav = !filt.fav; filt.cat = ''; } else { filt.cat = b.dataset.c; filt.fav = false; }
-    renderList();
+    const y = window.scrollY; renderList(); window.scrollTo(0, y);
   };
-  drawResults();
+  etat(); drawResults(); askWeb(); drawWeb();
+  if (listY != null) { window.scrollTo(0, listY); listY = null; }
 }
 
 const norm = s => String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
@@ -506,7 +616,11 @@ function drawResults() {
     return words.every(w => hay.includes(w));
   });
   const res = document.getElementById('res');
-  if (!recipes.length) {
+  if (!res) return;
+  const qq = filt.q.trim();
+  const jump = qq && W.etat === 'ok' && W.liste.length
+    ? ` · <button type="button" class="jump" id="jump">${W.liste.length} sur le web ↓</button>` : '';
+  if (!recipes.length && !qq) {
     res.innerHTML = `<div class="empty"><div class="big">📖</div><p>Le carnet est vide pour l’instant.</p>
       <div style="display:flex;flex-direction:column;gap:10px;max-width:300px;margin:0 auto">
       <a class="btn" href="#/import">🔗 Importer depuis un lien</a>
@@ -520,17 +634,252 @@ function drawResults() {
     };
     return;
   }
-  if (!list.length) { res.innerHTML = `<div class="empty"><div class="big">🤷</div><p>Aucune recette ne correspond.</p></div>`; return; }
-  res.innerHTML = `<div class="count">${list.length} recette${list.length > 1 ? 's' : ''}</div>
+  if (!list.length) {
+    res.innerHTML = qq ? `<div class="count">Rien dans le carnet pour « ${esc(qq)} »${jump}</div>`
+      : `<div class="empty"><div class="big">🤷</div><p>Aucune recette ne correspond.</p></div>`;
+  } else res.innerHTML = `<div class="count">${qq ? '<b style="color:var(--ink)">Dans mon carnet</b> · ' : ''}${list.length} recette${list.length > 1 ? 's' : ''}${jump}</div>
   <div class="grid">${list.map(r => {
     const t = (r.temps_prep || 0) + (r.temps_cuisson || 0);
-    const ph = safeUrl(r.photo);
-    return `<a class="card" href="#/r/${r.id}">
-      <div class="ph" ${ph ? `style="background-image:url('${esc(ph)}')"` : ''}>${ph ? '' : emoji(r.categorie)}</div>
+    const ph = safeUrl(r.photo), src = safeUrl(r.source);
+    return `<a class="card ${flashId === r.id ? 'flash' : ''}" href="#/r/${r.id}">
+      <div class="ph" ${ph ? `style="background-image:url('${cssUrl(ph)}')"` : ''}>${ph ? '' : emoji(r.categorie)}</div>
       <div class="bd"><h3>${r.favori ? '<span class="star">★</span> ' : ''}${esc(r.titre)}</h3>
-      <div class="meta">${r.categorie ? `<span>${esc(r.categorie)}</span>` : ''}${t ? `<span>⏱ ${mins(t)}</span>` : ''}</div></div>
+      <div class="meta">${r.categorie ? `<span>${esc(r.categorie)}</span>` : ''}${t ? `<span>⏱ ${mins(t)}</span>` : ''}</div>
+      ${src ? `<div class="src">↗ via ${esc(siteNom(src))}</div>` : ''}</div>
     </a>`;
   }).join('')}</div>`;
+  const j = document.getElementById('jump');
+  if (j) j.onclick = () => document.getElementById('web')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+/* ---------- recherche sur le web (Edge Function « recherche-recettes », API Brave Search) ----------
+   Le carnet répond à chaque touche ; le web seulement après une pause de frappe (600 ms) et 3 lettres,
+   ou tout de suite à la validation. Les réponses sont gardées en mémoire pendant la visite. */
+const W = { cle: '', etat: 'idle', liste: [], err: '', suite: false, page: 0, plus: false, tri: 'fiable', seq: 0, timer: null, attente: false, cache: new Map() };
+const WEB_MIN = 3, WEB_PAUSE = 1000;
+let flashId = null;
+function askWeb(maintenant = false) {
+  const qq = filt.q.trim().replace(/\s+/g, ' '), cle = norm(qq);
+  if (qq.length < WEB_MIN) {
+    clearTimeout(W.timer); W.attente = false;
+    if (W.etat !== 'idle') { W.seq++; W.etat = 'idle'; W.cle = ''; drawWeb(); drawResults(); } else drawWeb();
+    return;
+  }
+  if (cle === W.cle && W.etat !== 'err') {             // même recherche : rien à refaire (sauf validation pendant la pause)
+    if (maintenant && W.attente) { clearTimeout(W.timer); W.attente = false; chercherWeb(qq, 0, W.seq); }
+    return;
+  }
+  clearTimeout(W.timer); const seq = ++W.seq; W.cle = cle;
+  const c = W.cache.get(cle);
+  if (c) { Object.assign(W, c, { etat: 'ok', plus: false, attente: false }); drawWeb(); drawResults(); return; }
+  W.etat = 'wait'; W.attente = true; drawWeb(); drawResults();
+  W.timer = setTimeout(() => { W.attente = false; chercherWeb(qq, 0, seq); }, maintenant ? 0 : WEB_PAUSE);
+}
+async function chercherWeb(qq, page, seq) {
+  if (page) { W.plus = true; drawWeb(); }
+  let data;
+  try {
+    await token();
+    const r = await sb.functions.invoke('recherche-recettes', { body: { q: qq, page } });
+    if (r.error) {
+      const st = r.error.context?.status || 0;
+      throw new Error(st === 404 || /not found/i.test(r.error.message + (await r.error.context?.text?.().catch(() => '') || ''))
+        ? 'La recherche sur le web n’est pas encore installée (fonction « recherche-recettes » à créer dans Supabase).'
+        : st === 401 ? 'Session expirée, reconnecte-toi.' : 'Le service de recherche ne répond pas. Réessaie plus tard.');
+    }
+    data = r.data;
+    if (!data || data.error || !Array.isArray(data.recettes)) throw new Error(data?.error || 'Le service de recherche ne répond pas. Réessaie plus tard.');
+  } catch (e) {
+    if (seq !== W.seq) return;
+    if (page) { W.plus = false; toast(e.message || String(e)); drawWeb(); return; }
+    W.etat = 'err'; W.err = /non connecté/.test(e.message) ? 'Session expirée, reconnecte-toi.' : (e.message || String(e));
+    drawWeb(); drawResults(); return;
+  }
+  if (seq !== W.seq) return;                            // une recherche plus récente a pris le relais
+  const vus = new Set(page ? W.liste.map(w => urlKey(w.url)) : []);
+  const neuves = data.recettes.filter(w => w && safeUrl(w.url) && w.titre && !vus.has(urlKey(w.url)) && vus.add(urlKey(w.url)));
+  Object.assign(W, { etat: 'ok', liste: page ? W.liste.concat(neuves) : neuves, suite: !!data.suite, page, plus: false });
+  W.cache.set(W.cle, { liste: W.liste, suite: W.suite, page: W.page });
+  drawWeb(); drawResults();
+}
+// fiabilité : note pondérée par le nombre d'avis (moyenne bayésienne : peu d'avis => on se rapproche de 4/5)
+const fiab = w => w.note ? (w.note * (w.nb_avis || 0) + 4 * 30) / ((w.nb_avis || 0) + 30) : 3.5;
+const webTries = () => [...W.liste].sort(W.tri === 'rapide'
+  ? (a, b) => (a.temps || 1e9) - (b.temps || 1e9)
+  : (a, b) => fiab(b) - fiab(a));
+const dansCarnet = w => recipes.find(r => r.source && urlKey(r.source) === urlKey(w.url));
+const catDe = w => CATS.some(c => c[0] === w.categorie) ? w.categorie : 'Autre';
+const nbFr = n => Number(n).toLocaleString('fr-FR');
+const noteFr = n => Number(n).toLocaleString('fr-FR', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+const vignette = (w, cls) => {
+  const ph = safeUrl(w.photo);
+  return `<div class="vg ${cls}" ${ph ? `style="background-image:url('${cssUrl(ph)}')"` : ''}>${ph ? '' : emoji(catDe(w))}</div>`;
+};
+const enCours = new Set();                              // ajouts en cours (évite les doubles touchers)
+
+function drawWeb() {
+  const el = document.getElementById('web'); if (!el) return;
+  const qq = filt.q.trim();
+  if (!qq || W.etat === 'idle') {
+    el.innerHTML = qq && qq.length < WEB_MIN ? '<p class="sites" style="margin-top:14px">Encore une lettre ou deux pour chercher aussi sur le web.</p>' : '';
+    return;
+  }
+  const head = `<div class="sec-h"><h2>🌐 Sur le web</h2><span class="muted">sites de recettes</span></div>`;
+  if (W.etat === 'wait') { el.innerHTML = head + '<p class="muted"><span class="loader"></span>Recherche sur Marmiton, 750g, Cuisine AZ…</p>'; return; }
+  if (W.etat === 'err') {
+    const fini = /quota/i.test(W.err);                    // quota du mois épuisé : réessayer ne sert à rien
+    el.innerHTML = head + `<div class="msg err">${esc(W.err)}</div>` + (fini ? '' : `<button type="button" class="btn ghost" id="wretry">Réessayer</button>`);
+    if (!fini) document.getElementById('wretry').onclick = () => { W.etat = 'idle'; W.cle = ''; askWeb(true); };
+    return;
+  }
+  const list = webTries();
+  if (!list.length) { el.innerHTML = head + `<p class="muted">Rien trouvé sur les sites de recettes pour « ${esc(qq)} ».</p>`; return; }
+  el.innerHTML = head + `
+    <div class="sorts" role="group" aria-label="Trier les résultats du web">
+      <button type="button" class="chip ${W.tri === 'fiable' ? 'on' : ''}" data-s="fiable" aria-pressed="${W.tri === 'fiable'}">★ Les plus fiables</button>
+      <button type="button" class="chip ${W.tri === 'rapide' ? 'on' : ''}" data-s="rapide" aria-pressed="${W.tri === 'rapide'}">⏱ Les plus rapides</button>
+    </div>
+    <div class="sites">${W.tri === 'fiable' ? 'Triées par note et par nombre d’avis : une 4,9 avec 12 avis passe après une 4,8 avec 3 400 avis.' : 'Triées par temps total.'}</div>
+    <div class="wlist">${list.map((w, i) => {
+      const r = dansCarnet(w), busy = enCours.has(urlKey(w.url));
+      return `<div class="wcard" data-u="${esc(w.url)}" role="button" tabindex="0" aria-label="Aperçu : ${esc(w.titre)}, ${esc(w.site)}">
+        ${vignette(w, '')}
+        <div class="bd">
+          ${r ? '<span class="badge ok">✓ Déjà dans le carnet</span>' : i === 0 && W.tri === 'fiable' && w.note ? '<span class="badge">La plus fiable</span>' : ''}
+          <h3>${esc(w.titre)}</h3>
+          <div class="site">${esc(w.site || siteNom(w.url))}</div>
+          <div class="meta">${w.note ? `<span><span class="star">★</span> ${noteFr(w.note)}${w.nb_avis ? ` (${nbFr(w.nb_avis)} avis)` : ''}</span>` : '<span class="noavis">pas encore d’avis</span>'}${w.temps ? `<span>⏱ ${mins(w.temps)}</span>` : ''}</div>
+        </div>
+        <button type="button" class="add ${r ? 'ok' : ''}" ${busy ? 'disabled' : ''} aria-label="${r ? 'Déjà dans le carnet : ouvrir' : 'Ajouter au carnet'}">${r ? '✓' : busy ? '…' : '+'}</button>
+      </div>`; }).join('')}</div>
+    ${W.suite ? `<button type="button" class="btn ghost more" id="wmore" ${W.plus ? 'disabled' : ''}>${W.plus ? '<span class="loader"></span>Recherche…' : 'Plus de résultats'}</button>` : ''}`;
+  el.querySelector('.sorts').onclick = e => { const b = e.target.closest('.chip'); if (!b) return; W.tri = b.dataset.s; drawWeb(); };
+  const ouvrir = (c, e) => {
+    const w = W.liste.find(x => x.url === c.dataset.u); if (!w) return;
+    if (e.target.closest('.add')) { const r = dansCarnet(w); r ? go('/r/' + r.id) : ajouterWeb(w, catDe(w), false); return; }
+    openSheet(w);
+  };
+  el.querySelectorAll('.wcard').forEach(c => {
+    c.onclick = e => ouvrir(c, e);
+    c.onkeydown = e => { if ((e.key === 'Enter' || e.key === ' ') && e.target === c) { e.preventDefault(); openSheet(W.liste.find(x => x.url === c.dataset.u)); } };
+  });
+  const more = document.getElementById('wmore');
+  if (more) more.onclick = () => chercherWeb(filt.q.trim().replace(/\s+/g, ' '), W.page + 1, W.seq);
+}
+
+/* aperçu d'une recette du web */
+const sheetEl = document.getElementById('sheet'), veilEl = document.getElementById('veil');
+let current = null, catChoisie = 'Autre';
+function openSheet(w) {
+  if (!w) return;
+  current = w; catChoisie = catDe(w);
+  const ings = lines(w.ingredients), steps = lines(w.etapes).filter(s => !/^—.*—$/.test(s)).map(s => s.replace(/^\d+[.)-]\s*/, ''));
+  const montre = steps.slice(0, 3), reste = steps.length - montre.length, s = reste > 1 ? 's' : '';
+  const src = safeUrl(w.url);
+  sheetEl.innerHTML = `
+    <button type="button" class="grab" id="grab" aria-label="Fermer l’aperçu"><i></i></button>
+    <div class="sh-top"><span class="muted">Aperçu</span><span class="sp"></span>
+      <button type="button" class="icon-btn" id="shx" title="Fermer" aria-label="Fermer l’aperçu">✕</button></div>
+    <div class="sh-body pv">
+      ${vignette(w, 'pv-hero')}
+      <div class="site">${esc(w.site || siteNom(w.url))}</div>
+      <h1>${esc(w.titre)}</h1>
+      <div class="trust">
+        <div><b>${w.note ? `<span class="star">★</span> ${noteFr(w.note)}` : '—'}</b><span>${w.note ? (w.nb_avis ? nbFr(w.nb_avis) + ' avis' : 'note du site') : 'pas d’avis'}</span></div>
+        ${w.temps ? `<div><b>${mins(w.temps)}</b><span>${[w.temps_prep && mins(w.temps_prep) + ' prépa', w.temps_cuisson && mins(w.temps_cuisson) + ' cuisson'].filter(Boolean).join(' · ') || 'temps total'}</span></div>` : ''}
+        ${w.portions ? `<div><b>${w.portions} pers.</b><span>portions</span></div>` : ''}
+      </div>
+      ${w.avis ? `<div class="avis">« ${esc(w.avis)} »</div>` : ''}
+      ${ings.length ? `<div class="panel"><h2>Ingrédients <small>${ings.length} ingrédient${ings.length > 1 ? 's' : ''}</small></h2>
+        <ul class="ing">${ings.map(i => `<li><span>${esc(i)}</span></li>`).join('')}</ul></div>` : ''}
+      ${steps.length ? `<div class="panel"><h2>Préparation <small>${steps.length} étape${steps.length > 1 ? 's' : ''}</small></h2>
+        <ol class="steps">${montre.map(x => `<li>${esc(x)}</li>`).join('')}</ol>
+        ${reste > 0 ? `<div class="rest">… et ${reste} autre${s} étape${s}, ajoutée${s} au carnet avec le reste.</div>` : ''}</div>` : ''}
+      ${src ? `<a class="orig" href="${esc(src)}" target="_blank" rel="noopener">Voir la recette complète sur ${esc(hote(src))} ↗</a>` : ''}
+    </div>
+    <div class="sh-foot" id="foot"></div>`;
+  drawFoot();
+  document.getElementById('shx').onclick = closeSheet;
+  document.getElementById('grab').onclick = closeSheet;
+  sheetEl.querySelector('.sh-body').scrollTop = 0;
+  sheetEl.classList.add('on'); veilEl.classList.add('on');
+  setTimeout(() => document.getElementById('shx')?.focus({ preventScroll: true }), 50);
+}
+function drawFoot() {
+  const w = current, f = document.getElementById('foot'); if (!w || !f) return;
+  const r = dansCarnet(w), busy = enCours.has(urlKey(w.url));
+  f.innerHTML = r
+    ? `<button type="button" class="btn done" id="go">✓ Dans le carnet · Ouvrir</button>`
+    : `<label class="rangee"><span class="muted" style="font-size:14.5px;white-space:nowrap">Ranger dans</span>
+        <select id="cat" aria-label="Catégorie">${CATS.map(([c, e]) => `<option value="${esc(c)}" ${c === catChoisie ? 'selected' : ''}>${e} ${esc(c)}</option>`).join('')}</select></label>
+       <button type="button" class="btn" id="addb" ${busy ? 'disabled' : ''}>${busy ? '<span class="loader"></span>Ajout…' : '＋ Ajouter au carnet'}</button>`;
+  const a = document.getElementById('addb'); if (a) a.onclick = () => ajouterWeb(w, catChoisie, true);
+  const sc = document.getElementById('cat'); if (sc) sc.onchange = () => { catChoisie = sc.value; };
+  const g = document.getElementById('go'); if (g) g.onclick = () => go('/r/' + r.id);
+}
+function closeSheet() {
+  if (!sheetEl.classList.contains('on')) return;
+  sheetEl.classList.remove('on'); veilEl.classList.remove('on'); current = null;
+}
+veilEl.onclick = closeSheet;
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSheet(); });
+// glisser vers le bas pour fermer (téléphone)
+let y0 = null;
+sheetEl.addEventListener('touchstart', e => { y0 = e.target.closest('.grab,.sh-top') ? e.touches[0].clientY : null; }, { passive: true });
+sheetEl.addEventListener('touchend', e => { if (y0 != null && e.changedTouches[0].clientY - y0 > 60) closeSheet(); y0 = null; });
+
+// ajout au carnet : même fiche qu'un import par lien (source = page d'origine)
+async function ajouterWeb(w, categorie, depuisApercu) {
+  const k = urlKey(w.url);
+  if (enCours.has(k) || dansCarnet(w)) return;
+  enCours.add(k); drawWeb(); if (depuisApercu) drawFoot();
+  try {
+    const rec = await insertRecipe({
+      titre: String(w.titre).slice(0, 200), categorie, portions: w.portions || 4,
+      temps_prep: w.temps_prep ?? null, temps_cuisson: w.temps_cuisson ?? null,
+      ingredients: w.ingredients || '', etapes: w.etapes || '', notes: '', tags: Array.isArray(w.tags) ? w.tags.slice(0, 20) : [],
+      source: safeUrl(w.url) || null, photo: safeUrl(w.photo) || null, favori: false,
+    });
+    enCours.delete(k);
+    flashId = rec.id; setTimeout(() => { flashId = null; }, 1700);
+    redessinerSansSaut();
+    if (depuisApercu && current === w) drawFoot();
+    else toast(`Ajoutée au carnet · ${categorie}`, [
+      ['Annuler', 'undo', async () => {
+        try { await q(sb.from('recettes').delete().eq('id', rec.id)); recipes = recipes.filter(x => x.id !== rec.id); redessinerSansSaut(); }
+        catch (err) { toast(dbErr(err)); }
+      }],
+      ['Ouvrir', '', () => go('/r/' + rec.id)],
+    ]);
+  } catch (err) {
+    enCours.delete(k); drawWeb(); if (current === w) drawFoot();
+    toast(dbErr(err));
+  }
+}
+
+/* redessine sans faire sauter la section « Sur le web » (une recette ajoutée apparaît aussi dans le carnet, au-dessus) */
+function redessinerSansSaut() {
+  const w = document.getElementById('web'), avant = w ? w.getBoundingClientRect().top : null;
+  drawResults(); drawWeb();
+  const w2 = document.getElementById('web');
+  if (avant != null && w2) window.scrollBy(0, w2.getBoundingClientRect().top - avant);
+}
+
+/* message en bas d'écran, avec actions éventuelles */
+let toastT;
+function toast(msg, actions = []) {
+  const t = document.getElementById('toast');
+  t.innerHTML = `<span>${actions.length ? '✓ ' : ''}${esc(msg)}</span>` + actions.map(([l, c], i) => `<button type="button" class="${c}" data-i="${i}">${esc(l)}</button>`).join('');
+  t.querySelectorAll('button').forEach(b => b.onclick = () => { hideToast(); actions[+b.dataset.i][2](); });
+  t.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(hideToast, actions.length ? 6000 : 4500);
+}
+function hideToast() { document.getElementById('toast')?.classList.remove('on'); }
+
+async function insertRecipe(row) {
+  const rec = await q(sb.from('recettes').insert({ ...row, famille_id: fam.id }).select().single());
+  if (!find(rec.id)) recipes.push(rec);
+  recipes.sort((a, b) => a.titre.localeCompare(b.titre, 'fr'));
+  return rec;
 }
 
 /* ---------- fiche recette ---------- */
@@ -566,7 +915,7 @@ function renderDetail(r, keep = false) {
       <button class="icon-btn" id="fav" title="Favori">${r.favori ? '★' : '☆'}</button>
       <a class="icon-btn" href="#/edit/${r.id}" title="Modifier">✎</a>
     </div>
-    ${ph ? `<div class="hero" style="background-image:url('${esc(ph)}')"></div>` : ''}
+    ${ph ? `<div class="hero" style="background-image:url('${cssUrl(ph)}')"></div>` : ''}
     <div class="meta">${emoji(r.categorie)} ${esc(r.categorie || '')}</div>
     <h1>${esc(r.titre)}</h1>
     <div class="meta">
@@ -574,10 +923,10 @@ function renderDetail(r, keep = false) {
       ${r.temps_cuisson ? `<span>🔥 Cuisson ${mins(r.temps_cuisson)}</span>` : ''}
     </div>
     ${(r.tags || []).length ? `<div class="tags">${r.tags.map(t => `<span class="tag">${esc(t)}</span>`).join('')}</div>` : ''}
-    <div class="row-actions">
-      ${src ? `<a href="${esc(src)}" target="_blank" rel="noopener">Recette d’origine ↗</a>` : ''}
-      ${'wakeLock' in navigator ? `<label class="toggle"><input type="checkbox" id="wake"> Garder l’écran allumé</label>` : ''}
-    </div>
+    ${src ? `<div class="panel src-panel"><span style="font-size:22px" aria-hidden="true">🌐</span>
+      <div style="flex:1;min-width:0"><b>D’après ${esc(siteNom(src))}</b></div>
+      <a href="${esc(src)}" target="_blank" rel="noopener">Recette d’origine ↗</a></div>` : ''}
+    ${'wakeLock' in navigator ? `<div class="row-actions"><label class="toggle"><input type="checkbox" id="wake"> Garder l’écran allumé</label></div>` : ''}
     ${ings.length ? `<div class="panel">
       <h2>Ingrédients
         <span class="portions"><button id="minus" aria-label="Moins">−</button>
@@ -650,9 +999,7 @@ function renderImport(preset = '') {
       if (error) throw new Error(/not found|404/i.test(error.message + (error.context?.status || ''))
         ? 'L’import n’est pas encore installé (fonction « import-recette » à créer dans Supabase).' : 'Le service d’import ne répond pas. Réessaie plus tard.');
       if (!data?.recette) { const er = new Error(data?.error || 'Import impossible.'); er.partiel = data?.partiel; throw er; }
-      const rec = await q(sb.from('recettes').insert({ ...data.recette, famille_id: fam.id }).select().single());
-      if (!find(rec.id)) recipes.push(rec);
-      recipes.sort((a, b) => a.titre.localeCompare(b.titre, 'fr'));
+      const rec = await insertRecipe(data.recette);
       go('/r/' + rec.id);
     } catch (err) {
       b.disabled = false;
