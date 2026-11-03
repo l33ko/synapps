@@ -69,7 +69,7 @@ Règles de sécurité (prioritaires) :
 - Sinon, dessine une création originale.
 
 Format du dessin :
-- Une grille rectangulaire de 14 à 22 colonnes et 14 à 22 lignes, toutes les lignes de même longueur.
+- Une grille rectangulaire de 14 à 26 colonnes et 14 à 24 lignes, toutes les lignes de même longueur (un sujet de profil peut être plus large que haut).
 - Chaque caractère est une case : "." = case vide, ou une lettre de couleur parmi : ${Object.entries(PALETTE).map(([k, v]) => `${k}=${v}`).join(', ')}.
 - Contour noir (K) autour du sujet, formes lisibles et pleines, sujet centré, pas de fond (cases vides autour).
 - Pas de texte ni de lettres dessinées.
@@ -188,7 +188,7 @@ function nettoyer(g: unknown) {
 async function demander(mot: string, angle: string) {
   const r = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
-    signal: AbortSignal.timeout(90000),
+    signal: AbortSignal.timeout(60000),
     headers: {
       'x-api-key': env('ANTHROPIC_API_KEY'),
       'anthropic-version': '2023-06-01',
@@ -212,6 +212,22 @@ async function demander(mot: string, angle: string) {
   return json;
 }
 
+// Un dessin : demande + vérification de la grille ; une seconde chance s'il est raté et qu'il reste du temps
+async function dessiner(mot: string, angle: string) {
+  const t0 = Date.now();
+  for (let essai = 0; essai < 2; essai++) {
+    try {
+      const r = await demander(mot, angle);
+      if (r && r.refus) return r;
+      const grille = r && nettoyer(r.grille);
+      if (grille) return { titre: String(r.titre || mot).slice(0, 40), grille };
+      console.log('dessin rejeté', angle.slice(0, 30), r ? JSON.stringify(r).slice(0, 200) : 'vide');
+    } catch (e) { console.log('appel en échec', angle.slice(0, 30), String(e)); }
+    if (Date.now() - t0 > 50000) break;                   // pas le temps d'une seconde chance
+  }
+  return null;
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS });
   if (req.method !== 'POST') return reply({ erreur: 'service', message: 'Méthode non permise' }, 405);
@@ -231,7 +247,7 @@ Deno.serve(async (req) => {
   if (ok !== true) return reply({ erreur: 'service', message: 'Le service n’est pas prêt.' });
 
   // Un appel par idée, en parallèle : plus rapide et plus varié qu'un seul long appel
-  const resultats = await Promise.allSettled(ANGLES.slice(0, NB_IDEES).map(a => demander(mot, a)));
+  const resultats = await Promise.allSettled(ANGLES.slice(0, NB_IDEES).map(a => dessiner(mot, a)));
   const reponses = resultats.filter(r => r.status === 'fulfilled' && r.value).map((r: any) => r.value);
   if (!reponses.length) return reply({ erreur: 'service', message: 'Le dessinateur ne répond pas. Réessaie dans un moment.' });
 
@@ -244,9 +260,7 @@ Deno.serve(async (req) => {
     });
   }
 
-  const idees = reponses
-    .map(r => ({ titre: String(r.titre || mot).slice(0, 40), grille: nettoyer(r.grille) }))
-    .filter(i => i.grille);
+  const idees = reponses.filter(r => r.grille);
   if (!idees.length) return reply({ erreur: 'service', message: 'Je n’ai pas réussi à dessiner ça. Essaie un autre mot.' });
   return reply({ idees });
 });
