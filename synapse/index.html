@@ -1476,10 +1476,10 @@ function trialAnswer(good,v){
 function trialRender(){
  stopRun();
  var T=TR,e=T.e,k=T.k,th=themeOf(e.id),idx=plan().indexOf(e),run=T.ph!=='end';
- var h='<div class="bk"><button class="lnk" data-act="home">Quitter</button><span class="ex">'+(SESS&&!SESS.single&&idx>-1?'Exercice '+(idx+1)+' sur '+NEED:'Entraînement libre')+'</span>'+
-  (run?'<button class="lnk strong" data-act="tskip">Passer l’essai</button>':'<span style="width:44px"></span>')+'</div>'+
+ var h='<div class="bk"><button class="lnk" data-act="home">Quitter</button><span class="ex">'+(SESS&&!SESS.single&&idx>-1?'Exercice '+(idx+1)+' sur '+NEED:'')+'</span>'+
+  (run?'<button class="lnk strong" data-act="tskip">Lancer l’exercice</button>':'<span style="width:44px"></span>')+'</div>'+
   '<div class="ttl t-'+th.id+(run?' tpl':'')+'"><h1>'+e.jeu+'</h1><div class="row"><span class="sub">'+e.nom+' · '+(T.known?'niveau '+fr(S.lv[e.id],1):'nouveau jeu')+'</span>'+
-  (run?'<span class="pill"><i></i>'+(T.known?'Entraînement':'Premier essai')+' · rien n’est compté</span>':'')+'</div></div>'+trialSteps(T);
+  (run?'<span class="pill"><i></i>Explications</span>':'')+'</div></div>'+trialSteps(T);
  if(!run){countdown(T,false);return}
  var tuto=T.ph==='tuto',b=tuto?k.tuto[T.step]:null,it=tuto?k.demo:k.items[T.qi];
  app.innerHTML=h+'<div class="stage">'+(k.top?'<div id="ttop">'+k.top+'</div>':'')+(tuto&&b.tg==='top'?trialBubble(T,b):'')+'<div class="screen" id="stim"></div>'+
@@ -1505,7 +1505,7 @@ function trialRender(){
  }else if(k.play){
   T.busy=true;stim.classList.add('lock');ctl.classList.add('lock');calm.textContent='Regarde…';
   k.play(it,stim,ctl,function(){T.busy=false;stim.classList.remove('lock');ctl.classList.remove('lock');calm.textContent=k.go||'À toi.'})
- }else calm.textContent='Pas de chrono.';
+ }else calm.textContent='À toi de jouer !';
  if(!T.res)trialFit();
  CUR={handle:function(a,v){if(TR===T&&!T.res&&!T.busy)k.handle(a,v,it,trialAnswer)},key:function(x){if(TR===T&&!T.res&&!T.busy&&k.key)k.key(x,it,trialAnswer)}}}
 /* sur petit écran : faire entrer les boutons de réponse dans la vue, sans faire sortir la bulle par le haut */
@@ -1517,9 +1517,9 @@ function trialFit(){
 function countdown(T,skipped){
  stopRun();
  var e=T.e,idx=plan().indexOf(e),th=themeOf(e.id),n=3;
- app.innerHTML='<div class="bk"><button class="lnk" data-act="home">Quitter</button><span class="ex">'+(SESS&&!SESS.single&&idx>-1?'Exercice '+(idx+1)+' sur '+NEED:'Entraînement libre')+'</span><span style="width:44px"></span></div>'+
+ app.innerHTML='<div class="bk"><button class="lnk" data-act="home">Quitter</button><span class="ex">'+(SESS&&!SESS.single&&idx>-1?'Exercice '+(idx+1)+' sur '+NEED:'')+'</span><span style="width:44px"></span></div>'+
   '<div class="ttl t-'+th.id+'"><h1>'+e.jeu+'</h1><div class="row"><span class="sub">'+e.nom+'</span></div></div>'+
-  '<div class="card tight go-card" role="status"><p class="go-pre">'+(skipped?'Essai passé.':'Essai terminé, bravo !')+'</p><h2>L’exercice commence</h2>'+
+  '<div class="card tight go-card" role="status">'+(skipped?'':'<p class="go-pre">Essai terminé, bravo !</p>')+'<h2>L’exercice commence</h2>'+
   '<div class="go-num" id="goNum" aria-hidden="true">3</div><p>'+(e.span?'<b>5 essais</b>, de plus en plus longs.':'<b>45 secondes</b>, chronométré.')+'</p>'+'</div>';
  markSeen(e.id);
  (function tick(){later(1000,function(){n--;var el=document.getElementById('goNum');
