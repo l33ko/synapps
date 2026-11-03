@@ -1,0 +1,486 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Piste A · Recherche intégrée au carnet — Nos recettes</title>
+<style>
+  :root{
+    --bg:#fbf6ef; --card:#fff; --ink:#2b2420; --muted:#8a7d72; --line:#eadfd2;
+    --accent:#b5532f; --accent-soft:#f6e2d6; --ok:#4f7a4a; --danger:#b23a3a;
+    --radius:16px; --shadow:0 1px 2px rgba(60,40,20,.06),0 4px 14px rgba(60,40,20,.06);
+  }
+  @media (prefers-color-scheme:dark){
+    :root{ --bg:#1c1816; --card:#27211e; --ink:#f3ebe3; --muted:#a8998c; --line:#3a312b;
+      --accent:#e07a50; --accent-soft:#3d2a20; --shadow:none; }
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%;touch-action:manipulation}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+  h1,h2,h3{font-family:ui-serif,Georgia,"Times New Roman",serif;font-weight:600;line-height:1.2;margin:0}
+  a{color:var(--accent)}
+  button,input,select,textarea{font:inherit;color:inherit}
+  .wrap{max-width:760px;margin:0 auto;padding:16px 16px 96px}
+  .top{display:flex;align-items:center;gap:10px;margin:6px 0 14px}
+  .icon-btn{border:0;background:var(--card);box-shadow:var(--shadow);width:42px;height:42px;border-radius:12px;
+    display:grid;place-items:center;cursor:pointer;font-size:19px;flex:none;text-decoration:none;color:var(--ink)}
+  .btn{border:0;border-radius:12px;padding:11px 16px;font-weight:600;cursor:pointer;background:var(--accent);color:#fff}
+  .btn.ghost{background:var(--card);color:var(--ink);box-shadow:var(--shadow)}
+  .btn.done{background:var(--ok)}
+  input[type=search],select{width:100%;border:1px solid var(--line);background:var(--card);border-radius:12px;padding:11px 13px;outline:none}
+  input:focus,select:focus{border-color:var(--accent)}
+  .chips{display:flex;gap:8px;overflow-x:auto;padding:12px 0 4px;scrollbar-width:none;margin:0 -16px;padding-left:16px;padding-right:16px}
+  .chips::-webkit-scrollbar{display:none}
+  .chip{flex:none;border:1px solid var(--line);background:var(--card);border-radius:999px;padding:6px 13px;cursor:pointer;font-size:14px;white-space:nowrap}
+  .chip.on{background:var(--accent);border-color:var(--accent);color:#fff}
+  .count{color:var(--muted);font-size:14px;margin:10px 2px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+  .card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;text-decoration:none;color:inherit;display:flex;flex-direction:column;cursor:pointer}
+  .card .ph{aspect-ratio:16/9;background:var(--accent-soft);display:grid;place-items:center;font-size:40px}
+  .card .bd{padding:11px 13px 13px}
+  .card h3{font-size:18px;margin-bottom:4px}
+  .meta{color:var(--muted);font-size:13.5px;display:flex;gap:10px;flex-wrap:wrap}
+  .star{color:#e0a100}
+  .muted{color:var(--muted);font-size:14px}
+  .empty{text-align:center;color:var(--muted);padding:40px 10px}
+  .fab2{position:fixed;bottom:calc(max(18px,env(safe-area-inset-bottom)) + 70px);
+    width:48px;height:48px;border-radius:50%;background:var(--card);color:var(--ink);font-size:21px;box-shadow:var(--shadow),0 4px 14px rgba(60,40,20,.15);
+    text-decoration:none;display:grid;place-items:center;right:calc(max(18px,env(safe-area-inset-right)) + 5px)}
+  .fab{position:fixed;right:max(18px,env(safe-area-inset-right));bottom:max(18px,env(safe-area-inset-bottom));
+    width:58px;height:58px;border-radius:50%;border:0;background:var(--accent);color:#fff;font-size:30px;
+    box-shadow:0 6px 18px rgba(181,83,47,.4);cursor:pointer;text-decoration:none;display:grid;place-items:center}
+  .loader{display:inline-block;width:18px;height:18px;border:3px solid var(--accent-soft);border-top-color:var(--accent);border-radius:50%;animation:sp 1s linear infinite;vertical-align:-4px;margin-right:8px}
+  @keyframes sp{to{transform:rotate(360deg)}}
+  .fam-title{flex:1;min-width:0;text-decoration:none;color:inherit}
+  .fam-title span{display:block;font-family:ui-serif,Georgia,serif;font-weight:600;font-size:28px;line-height:1.15}
+  .tags{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+  .tag{background:var(--accent-soft);color:var(--accent);border-radius:999px;padding:2px 10px;font-size:13px}
+  .panel{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;margin:14px 0}
+  .panel h2{font-size:21px;margin-bottom:10px}
+  .ing{list-style:none;margin:0;padding:0}
+  .ing li{display:flex;gap:11px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--line)}
+  .ing li:last-child{border-bottom:0}
+  .ing input{width:20px;height:20px;margin:2px 0 0;accent-color:var(--ok);flex:none}
+  .steps{margin:0;padding:0;list-style:none;counter-reset:s}
+  .steps li{counter-increment:s;display:flex;gap:12px;padding:9px 0}
+  .steps li::before{content:counter(s);flex:none;width:28px;height:28px;border-radius:50%;background:var(--accent);color:#fff;
+    display:grid;place-items:center;font-weight:700;font-size:14px;margin-top:1px}
+  .detail h1{font-size:30px;margin:4px 0 8px}
+  .hero{border-radius:var(--radius);aspect-ratio:16/9;max-height:240px;width:100%;margin-bottom:14px;display:grid;place-items:center;font-size:70px}
+  @media (max-width:480px){ .grid{grid-template-columns:1fr 1fr;gap:10px} .card h3{font-size:16px} .card .ph{font-size:32px} }
+
+  /* ---- bandeau maquette ---- */
+  .mq{background:#2b2420;color:#f3ebe3;font-size:13px;line-height:1.4;padding:10px 14px;position:relative}
+  .mq b.t{font-size:14px}
+  .mq .cols{display:flex;gap:18px;flex-wrap:wrap;margin-top:6px}
+  .mq .cols div{flex:1 1 280px}
+  .mq ul{margin:2px 0 0;padding-left:18px}
+  .mq summary{cursor:pointer;color:#f6c9b2;margin-top:4px}
+  .mq .x{position:absolute;right:8px;top:6px;border:0;background:none;color:#cbb;font-size:18px;cursor:pointer}
+  @media (max-width:480px){ .mq ul{font-size:12.5px} }
+
+  /* ---- recherche web (nouveau) ---- */
+  .search-row{position:relative}
+  .search-row input{padding-right:40px}
+  .search-row input::-webkit-search-cancel-button{-webkit-appearance:none;display:none}
+  .clear{position:absolute;right:0;top:50%;transform:translateY(-50%);border:0;background:none;width:44px;height:44px;cursor:pointer;display:grid;place-items:center;padding:0}
+  .clear span{width:26px;height:26px;border-radius:50%;background:var(--line);display:grid;place-items:center;font-size:13px;color:var(--muted)}
+  .search-row input{min-height:46px}
+  .sec-h{display:flex;align-items:baseline;gap:8px;margin:22px 2px 4px}
+  .sec-h h2{font-size:21px}
+  .sec-h .muted{font-size:13.5px}
+  .jump{color:var(--accent);text-decoration:none;font-weight:600;display:inline-flex;align-items:center;min-height:44px;padding:0 6px;margin:-12px 0}
+  .count{min-height:22px}
+  .sorts{display:flex;gap:8px;margin:6px 0 10px;flex-wrap:wrap;align-items:center}
+  .sorts .chip{padding:0 14px;font-size:14px;min-height:44px}
+  .sites{color:var(--muted);font-size:12.5px;margin:0 2px 10px}
+  .wlist{display:flex;flex-direction:column;gap:10px}
+  .wcard{display:flex;gap:12px;background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:10px;cursor:pointer;align-items:center;text-align:left;border:0;width:100%;position:relative}
+  .wcard .vg{width:84px;height:84px;border-radius:12px;flex:none;display:grid;place-items:center;font-size:36px}
+  .wcard .bd{flex:1;min-width:0}
+  .wcard h3{font-size:17px;margin-bottom:3px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+  .wcard .site{font-size:13px;color:var(--ink);font-weight:600;margin-bottom:2px}
+  .wcard .meta{font-size:13px;gap:8px}
+  .wcard .add{flex:none;width:48px;height:48px;border-radius:50%;border:0;background:var(--accent-soft);color:var(--accent);font-size:22px;font-weight:600;cursor:pointer;display:grid;place-items:center}
+  .wcard .add.ok{background:var(--ok);color:#fff;font-size:17px}
+  .badge{display:inline-block;background:var(--accent-soft);color:var(--accent);border-radius:999px;padding:1px 8px;font-size:12px;font-weight:600;margin-bottom:3px}
+  .badge.ok{background:#e3eedf;color:var(--ok)}
+  @media (prefers-color-scheme:dark){ .badge.ok{background:#25331f;color:#9fcf8f} }
+  .noavis{font-style:italic}
+  .more{display:block;margin:14px auto 0;text-align:center}
+  .card .src{font-size:12.5px;color:var(--ok);font-weight:600}
+
+  /* ---- aperçu : feuille glissante / panneau latéral ---- */
+  .veil{position:fixed;inset:0;background:rgba(30,20,12,.42);opacity:0;pointer-events:none;transition:opacity .25s;z-index:20}
+  .veil.on{opacity:1;pointer-events:auto}
+  .sheet{position:fixed;left:0;right:0;bottom:0;max-height:90vh;max-height:90dvh;background:var(--bg);border-radius:20px 20px 0 0;
+    transform:translateY(105%);transition:transform .3s cubic-bezier(.2,.8,.2,1);z-index:21;display:flex;flex-direction:column;
+    box-shadow:0 -8px 30px rgba(40,25,10,.2)}
+  .sheet.on{transform:none}
+  .grab{padding:8px 0 2px;display:grid;place-items:center;cursor:pointer;flex:none}
+  .grab i{width:40px;height:5px;border-radius:3px;background:var(--line);display:block}
+  .sh-top{display:flex;align-items:center;gap:8px;padding:2px 14px 6px;flex:none}
+  .sh-top .sp{flex:1}
+  .sh-body{overflow-y:auto;padding:0 16px 16px;-webkit-overflow-scrolling:touch;flex:1}
+  .sh-foot{flex:none;padding:10px 16px calc(12px + env(safe-area-inset-bottom));border-top:1px solid var(--line);background:var(--bg);display:flex;flex-direction:column;gap:8px}
+  .sh-foot .btn{width:100%;padding:14px 16px;font-size:16.5px}
+  .rangee{display:flex;align-items:center;gap:10px;font-size:14.5px}
+  .rangee select{width:auto;flex:1;padding:0 10px;min-height:44px}
+  .pv-hero{height:130px;border-radius:var(--radius);display:grid;place-items:center;font-size:60px;margin:2px 0 12px}
+  .pv h1{font-size:25px;margin:0 0 6px}
+  .pv .site{font-weight:600;font-size:14.5px}
+  .trust{display:flex;gap:14px;flex-wrap:wrap;background:var(--card);border-radius:12px;box-shadow:var(--shadow);padding:10px 12px;margin:10px 0 4px;font-size:14px}
+  .trust div{display:flex;flex-direction:column}
+  .trust b{font-size:16px}
+  .trust span{color:var(--muted);font-size:12.5px}
+  .pv .panel{padding:14px;margin:12px 0}
+  .pv .panel h2{font-size:19px;display:flex;align-items:baseline;gap:8px}
+  .pv .panel h2 small{font-family:-apple-system,BlinkMacSystemFont,sans-serif;font-size:13px;color:var(--muted);font-weight:400;margin-left:auto}
+  .pv .ing li{padding:6px 0;font-size:15px}
+  .pv .ing li::before{content:"•";color:var(--accent);font-weight:700}
+  .pv .steps li{padding:6px 0;font-size:15px}
+  .pv .steps li::before{width:24px;height:24px;font-size:13px}
+  .pv .rest{color:var(--muted);font-size:13.5px;margin-top:4px}
+  .pv .orig{display:inline-block;margin-top:4px;font-size:14.5px}
+  .avis{font-size:14px;color:var(--muted);border-left:3px solid var(--accent-soft);padding:2px 0 2px 10px;margin:8px 0}
+  @media (min-width:900px){
+    .sheet{left:auto;top:0;bottom:0;width:440px;max-height:none;border-radius:20px 0 0 20px;transform:translateX(105%)}
+    .sheet.on{transform:none}
+    .grab{display:none}
+    .sh-top{padding-top:14px}
+    .pv-hero{height:160px}
+  }
+
+  /* toast */
+  .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translate(-50%,calc(100% + 60px));visibility:hidden;background:#2b2420;color:#fff;
+    border-radius:14px;padding:10px 10px 10px 14px;display:flex;align-items:center;gap:12px;font-size:14.5px;z-index:30;
+    transition:transform .3s;box-shadow:0 8px 24px rgba(0,0,0,.25);width:max-content;max-width:calc(100% - 24px)}
+  .toast.on{transform:translate(-50%,0);visibility:visible}
+  .toast button{border:0;background:#f6e2d6;color:#b5532f;font-weight:700;border-radius:10px;padding:0 14px;min-height:44px;cursor:pointer;white-space:nowrap;flex:none}
+  .toast button.undo{background:none;color:#f6c9b2;padding:0 8px}
+  .toast{gap:6px}
+  .toast span{flex:1;margin-right:6px}
+  .flash{animation:fl 1.6s ease-out}
+  @keyframes fl{0%,40%{box-shadow:0 0 0 3px var(--ok)}100%{box-shadow:var(--shadow)}}
+</style>
+</head>
+<body>
+
+<div class="mq" id="mq">
+  <button class="x" onclick="document.getElementById('mq').remove()" aria-label="Masquer">×</button>
+  <b class="t">Piste A · La recherche intégrée au carnet</b> — on tape dans le champ habituel : le carnet répond d’abord, le web (sites de recettes choisis) juste en dessous.
+  <details id="mqd"><summary>Points forts et limites</summary>
+  <div class="cols">
+    <div><b>Points forts</b><ul>
+      <li>Rien de nouveau à apprendre : un seul champ, le même qu’aujourd’hui.</li>
+      <li>On voit qu’on a déjà la recette avant d’en chercher une autre.</li>
+      <li>Ajout en un geste (« + » sur la carte) ou après aperçu.</li></ul></div>
+    <div><b>Limites</b><ul>
+      <li>Chaque frappe peut déclencher une recherche web (coût de l’API, à temporiser).</li>
+      <li>Sur iPhone, si le carnet a beaucoup de résultats, le web est plus bas (lien « ↓ »).</li>
+      <li>Peu de place pour filtrer (site, temps max…).</li></ul></div>
+  </div></details>
+  <div style="margin-top:6px;color:#cbb">Essayez : tapez « gratin », touchez une carte, puis « Ajouter au carnet ».</div>
+</div>
+
+<div id="app"></div>
+
+<div class="veil" id="veil"></div>
+<aside class="sheet" id="sheet" aria-label="Aperçu de la recette"></aside>
+<div class="toast" id="toast"></div>
+
+<script>
+const CATS = [['Apéro','🫒'],['Entrée','🥗'],['Plat','🍲'],['Accompagnement','🥔'],['Dessert','🍰'],['Petit-déj','🥐'],['Pain & pâte','🥖'],['Sauce','🫙'],['Boisson','🍹'],['Autre','🍽️']];
+const emoji = c => (CATS.find(x => x[0] === c) || [, '🍽️'])[1];
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const mins = m => m < 60 ? `${m} min` : `${Math.floor(m/60)} h${m%60 ? ' ' + String(m%60).padStart(2,'0') : ''}`;
+const norm = s => String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+const nb = n => n.toLocaleString('fr-FR');
+const note = r => r.toLocaleString('fr-FR', {minimumFractionDigits:1});
+
+/* ---- carnet fictif de la famille ---- */
+let recipes = [
+  {id:1, titre:'Gratin dauphinois de Mamie', categorie:'Accompagnement', t:95, fav:true, ing:'pommes de terre crème lait ail muscade'},
+  {id:2, titre:'Poulet basquaise', categorie:'Plat', t:70, ing:'poulet poivrons tomates oignons piment d’espelette'},
+  {id:3, titre:'Gratin de courgettes', categorie:'Accompagnement', t:50, ing:'courgettes gruyère œufs crème'},
+  {id:4, titre:'Tarte aux pommes fine', categorie:'Dessert', t:45, fav:true, ing:'pâte feuilletée pommes beurre sucre'},
+  {id:5, titre:'Velouté de potimarron', categorie:'Entrée', t:40, ing:'potimarron oignon bouillon crème'},
+  {id:6, titre:'Pâte à crêpes', categorie:'Petit-déj', t:15, ing:'farine œufs lait beurre'},
+  {id:7, titre:'Gratin dauphinois', categorie:'Accompagnement', t:75, src:'Ricardo', srcUrl:'ricardocuisine.com', ing:'pommes de terre crème lait ail'},
+  {id:8, titre:'Tapenade noire', categorie:'Apéro', t:10, ing:'olives noires câpres anchois huile'},
+  {id:9, titre:'Moelleux au chocolat', categorie:'Dessert', t:30, ing:'chocolat beurre œufs sucre farine'},
+];
+
+/* ---- résultats web fictifs pour « gratin dauphinois » ---- */
+const G = (a,b) => `linear-gradient(135deg,${a},${b})`;
+const WEB = [
+  {id:'w1', titre:'Gratin dauphinois (le vrai)', site:'Marmiton', url:'marmiton.org', note:4.8, avis:3412, t:85, prep:20, cuis:65, por:6, vg:G('#f6dfa8','#d99a4e'), e:'🥔',
+   ing:['1,5 kg de pommes de terre à chair ferme','50 cl de crème fraîche liquide','50 cl de lait entier','2 gousses d’ail','30 g de beurre','Noix de muscade, sel, poivre'],
+   steps:['Éplucher les pommes de terre et les couper en fines rondelles de 3 mm, sans les laver.','Les faire cuire 10 min dans le lait et la crème avec l’ail écrasé et la muscade.','Verser dans un plat beurré frotté à l’ail, puis enfourner 1 h à 160 °C.','Laisser reposer 10 min avant de servir.'],
+   avis1:'« Cuire d’abord dans le lait change tout, ultra fondant. » — 2 sem.'},
+  {id:'w2', titre:'Gratin dauphinois crémeux', site:'750g', url:'750g.com', note:4.6, avis:1208, t:90, prep:25, cuis:65, por:6, vg:G('#f3e3c3','#c98b52'), e:'🧀',
+   avis1:'« Parfait avec un rôti, j’ai mis un peu moins de crème. »'},
+  {id:'w3', titre:'Gratin dauphinois traditionnel', site:'Journal des Femmes Cuisine', url:'cuisine.journaldesfemmes.fr', note:4.7, avis:402, t:100, prep:20, cuis:80, por:6, vg:G('#fbe7c2','#e0a35f'), e:'🥔',
+   avis1:'« Recette de grand-mère, aucune surprise : ça marche. »'},
+  {id:'w4', titre:'Gratin dauphinois facile', site:'Cuisine AZ', url:'cuisineaz.com', note:4.5, avis:865, t:80, prep:15, cuis:65, por:4, vg:G('#efd9b0','#b97c45'), e:'🍽️',
+   avis1:'« Simple et rapide à préparer. »'},
+  {id:'w5', titre:'Gratin dauphinois', site:'Ricardo', url:'ricardocuisine.com', note:4.6, avis:198, t:75, prep:20, cuis:55, por:6, vg:G('#f5e0b5','#cf9150'), e:'🥘', have:7,
+   avis1:'« Toujours un succès au souper du dimanche. »'},
+  {id:'w6', titre:'Gratin dauphinois de Joël Robuchon', site:'Cuisine AZ', url:'cuisineaz.com', note:4.9, avis:12, t:110, prep:25, cuis:85, por:6, vg:G('#f8e8cf','#d6a26a'), e:'👨‍🍳',
+   avis1:'« Long mais divin. »'},
+  {id:'w7', titre:'Gratin dauphinois rapide au micro-ondes', site:'Marmiton', url:'marmiton.org', note:4.1, avis:56, t:35, prep:15, cuis:20, por:4, vg:G('#f1e6d2','#bb8f63'), e:'⚡',
+   avis1:'« Dépanne, mais moins doré qu’au four. »'},
+  {id:'w8', titre:'Gratin dauphinois sans crème', site:'750g', url:'750g.com', note:null, avis:0, t:70, prep:20, cuis:50, por:4, vg:G('#eee4d4','#a98a6a'), e:'🥛'},
+];
+const BASE_ING = ['1 kg de pommes de terre','40 cl de crème liquide','40 cl de lait','1 gousse d’ail','Beurre pour le plat','Muscade, sel, poivre'];
+const BASE_STEPS = ['Éplucher et trancher finement les pommes de terre.','Frotter le plat avec l’ail et le beurrer.','Disposer les rondelles, saler, poivrer, râper la muscade.','Couvrir de lait et de crème.','Cuire 1 h au four à 170 °C jusqu’à ce que le dessus soit doré.'];
+WEB.forEach(w => { w.ing ||= BASE_ING; w.steps ||= BASE_STEPS; });
+
+/* fiabilité : note pondérée par le nombre d'avis (peu d'avis => on se rapproche de 4/5) */
+const score = w => w.note ? (w.note * w.avis + 4 * 30) / (w.avis + 30) : 3.5;
+
+let filt = {q:'', cat:'', fav:false}, sort = 'fiable', webState = 'idle', timer = null, added = new Set(), current = null, flashId = null;
+const app = document.getElementById('app');
+
+function renderList() {
+  const used = CATS.filter(([c]) => recipes.some(r => r.categorie === c));
+  app.innerHTML = `
+  <div class="wrap">
+    <div class="top">
+      <a class="fam-title" href="#" onclick="return false"><span>Famille Roux ▾</span></a>
+      <a class="icon-btn" href="#" onclick="return false" title="Famille et invitations">👥</a>
+      <a class="icon-btn" href="#" onclick="return false" title="Mon compte">👤</a>
+    </div>
+    <div class="search-row">
+      <input type="search" id="q" placeholder="Chercher dans le carnet… ou sur le web" value="${esc(filt.q)}" enterkeyhint="search" autocomplete="off">
+      ${filt.q ? '<button class="clear" id="clr" aria-label="Effacer"><span>✕</span></button>' : ''}
+    </div>
+    <div class="chips" id="chips">
+      <button class="chip ${!filt.cat && !filt.fav ? 'on' : ''}" data-c="">Toutes</button>
+      <button class="chip ${filt.fav ? 'on' : ''}" data-f="1">★ Favorites</button>
+      ${used.map(([c, e]) => `<button class="chip ${filt.cat === c ? 'on' : ''}" data-c="${esc(c)}">${e} ${esc(c)}</button>`).join('')}
+    </div>
+    <div id="res"></div>
+    <div id="web"></div>
+  </div>
+  ${filt.q ? '' : `<a class="fab2" href="#" onclick="return false" title="Importer depuis un lien">🔗</a>
+  <a class="fab" href="#" onclick="return false" title="Nouvelle recette">+</a>`}`;
+  const qi = document.getElementById('q');
+  qi.oninput = () => {
+    const had = !!filt.q; filt.q = qi.value;
+    if (!!filt.q !== had) { renderList(); const n = document.getElementById('q'); n.focus(); n.setSelectionRange(n.value.length, n.value.length); askWeb(); return; }
+    drawResults(); askWeb();
+  };
+  qi.onkeydown = e => { if (e.key === 'Enter') { qi.blur(); clearTimeout(timer); webState = 'ok'; drawWeb(); } };
+  const clr = document.getElementById('clr');
+  if (clr) clr.onclick = () => { filt.q = ''; webState = 'idle'; renderList(); };
+  document.getElementById('chips').onclick = e => {
+    const b = e.target.closest('.chip'); if (!b) return;
+    if (b.dataset.f) { filt.fav = !filt.fav; filt.cat = ''; } else { filt.cat = b.dataset.c; filt.fav = false; }
+    renderList();
+  };
+  drawResults(); drawWeb();
+}
+
+function localMatches() {
+  const words = norm(filt.q).split(/\s+/).filter(Boolean);
+  return recipes.filter(r => {
+    if (filt.fav && !r.fav) return false;
+    if (filt.cat && r.categorie !== filt.cat) return false;
+    if (!words.length) return true;
+    return words.every(w => norm([r.titre, r.categorie, r.ing].join(' ')).includes(w));
+  });
+}
+
+function drawResults() {
+  const list = localMatches(), res = document.getElementById('res');
+  const q = filt.q.trim();
+  if (!list.length) {
+    res.innerHTML = q ? `<div class="count">Rien dans le carnet pour « ${esc(q)} ».</div>` : `<div class="empty">Aucune recette ne correspond.</div>`;
+    return;
+  }
+  res.innerHTML = `<div class="count">${q ? `<b style="color:var(--ink)">Dans mon carnet</b> · ` : ''}${list.length} recette${list.length > 1 ? 's' : ''}
+    ${q && webState !== 'idle' ? ` · <a class="jump" href="#web" onclick="document.getElementById('web').scrollIntoView({behavior:'smooth'});return false">${webState === 'ok' ? webResults().length + ' ' : ''}sur le web ↓</a>` : ''}</div>
+  <div class="grid">${list.map(r => `<a class="card ${flashId === r.id ? 'flash' : ''}" data-id="${r.id}">
+      <div class="ph">${emoji(r.categorie)}</div>
+      <div class="bd"><h3>${r.fav ? '<span class="star">★</span> ' : ''}${esc(r.titre)}</h3>
+      <div class="meta"><span>${esc(r.categorie)}</span><span>⏱ ${mins(r.t)}</span></div>
+      ${r.src ? `<div class="src">↗ via ${esc(r.src)}</div>` : ''}</div>
+    </a>`).join('')}</div>`;
+  res.querySelectorAll('.card').forEach(c => c.onclick = () => renderDetail(recipes.find(r => r.id == c.dataset.id)));
+}
+
+function askWeb() {
+  clearTimeout(timer);
+  if (filt.q.trim().length < 3) { webState = 'idle'; drawWeb(); return; }
+  webState = 'wait'; drawWeb(); drawResults();
+  timer = setTimeout(() => { webState = 'ok'; drawWeb(); drawResults(); }, 700);
+}
+
+function webResults() {
+  if (!/gratin|dauphin|pomme|patate/.test(norm(filt.q))) return [];
+  const l = [...WEB];
+  if (sort === 'fiable') l.sort((a, b) => score(b) - score(a));
+  else l.sort((a, b) => a.t - b.t);
+  return l;
+}
+
+function drawWeb() {
+  const el = document.getElementById('web'); if (!el) return;
+  const q = filt.q.trim();
+  if (!q || webState === 'idle') { el.innerHTML = q && q.length < 3 ? '' : ''; return; }
+  const head = `<div class="sec-h"><h2>🌐 Sur le web</h2><span class="muted">sites de recettes</span></div>`;
+  if (webState === 'wait') { el.innerHTML = head + `<p class="muted"><span class="loader"></span>Recherche sur Marmiton, 750g, Cuisine AZ…</p>`; return; }
+  const list = webResults();
+  if (!list.length) { el.innerHTML = head + `<p class="muted">Rien trouvé sur les sites de recettes pour « ${esc(q)} ».<br><i>(Maquette : essayez « gratin dauphinois ».)</i></p>`; return; }
+  el.innerHTML = head + `
+    <div class="sorts">
+      <button class="chip ${sort === 'fiable' ? 'on' : ''}" data-s="fiable">★ Les plus fiables</button>
+      <button class="chip ${sort === 'rapide' ? 'on' : ''}" data-s="rapide">⏱ Les plus rapides</button>
+    </div>
+    <div class="sites">${sort === 'fiable' ? 'Triées par note et par nombre d’avis : une 4,9 avec 12 avis passe après une 4,8 avec 3 400 avis.' : 'Triées par temps total.'}</div>
+    <div class="wlist">${list.map((w, i) => {
+      const inBook = w.have || added.has(w.id);
+      return `<div class="wcard" data-w="${w.id}" role="button" tabindex="0">
+        <div class="vg" style="background:${w.vg}">${w.e}</div>
+        <div class="bd">
+          ${inBook ? '<span class="badge ok">✓ Déjà dans le carnet</span>' : i === 0 && sort === 'fiable' ? '<span class="badge">La plus fiable</span>' : ''}
+          <h3>${esc(w.titre)}</h3>
+          <div class="site">${esc(w.site)}</div>
+          <div class="meta">${w.note ? `<span><span class="star">★</span> ${note(w.note)} <span>(${nb(w.avis)} avis)</span></span>` : '<span class="noavis">pas encore d’avis</span>'}<span>⏱ ${mins(w.t)}</span></div>
+        </div>
+        <button class="add ${inBook ? 'ok' : ''}" data-add="${w.id}" aria-label="${inBook ? 'Déjà dans le carnet' : 'Ajouter au carnet'}">${inBook ? '✓' : '+'}</button>
+      </div>`; }).join('')}</div>
+    <button class="btn ghost more">Plus de résultats</button>`;
+  el.querySelector('.sorts').onclick = e => { const b = e.target.closest('.chip'); if (!b) return; sort = b.dataset.s; drawWeb(); };
+  el.querySelectorAll('.wcard').forEach(c => c.onclick = e => {
+    const id = c.dataset.w, w = WEB.find(x => x.id === id);
+    if (e.target.closest('.add')) { if (!(w.have || added.has(id))) addRecipe(w); else openInBook(w); return; }
+    openSheet(w);
+  });
+}
+
+/* ---- aperçu ---- */
+const sheet = document.getElementById('sheet'), veil = document.getElementById('veil');
+function openSheet(w) {
+  current = w; cat = 'Accompagnement';
+  const inBook = w.have || added.has(w.id);
+  const shownSteps = w.steps.slice(0, 3);
+  sheet.innerHTML = `
+    <div class="grab" id="grab"><i></i></div>
+    <div class="sh-top"><span class="muted">Aperçu</span><span class="sp"></span>
+      <button class="icon-btn" id="shx" title="Fermer" style="width:44px;height:44px;font-size:17px" aria-label="Fermer l’aperçu">✕</button></div>
+    <div class="sh-body pv">
+      <div class="pv-hero" style="background:${w.vg}">${w.e}</div>
+      <div class="site">${esc(w.site)}</div>
+      <h1>${esc(w.titre)}</h1>
+      <div class="trust">
+        <div><b>${w.note ? `<span style="color:#e0a100">★</span> ${note(w.note)}` : '—'}</b><span>${w.note ? nb(w.avis) + ' avis' : 'pas d’avis'}</span></div>
+        <div><b>${mins(w.t)}</b><span>${w.prep} min prépa · ${mins(w.cuis)} cuisson</span></div>
+        <div><b>${w.por} pers.</b><span>portions</span></div>
+      </div>
+      ${w.avis1 ? `<div class="avis">${esc(w.avis1)}</div>` : ''}
+      <div class="panel"><h2>Ingrédients <small>${w.ing.length} ingrédients</small></h2>
+        <ul class="ing">${w.ing.map(i => `<li><span>${esc(i)}</span></li>`).join('')}</ul></div>
+      <div class="panel"><h2>Préparation <small>${w.steps.length} étapes</small></h2>
+        <ol class="steps">${shownSteps.map(s => `<li>${esc(s)}</li>`).join('')}</ol>
+        ${w.steps.length > 3 ? `<div class="rest">… et ${w.steps.length - 3} autre${w.steps.length - 3 > 1 ? 's' : ''} étape${w.steps.length - 3 > 1 ? 's' : ''}, ajoutée${w.steps.length - 3 > 1 ? 's' : ''} au carnet avec le reste.</div>` : ''}
+      </div>
+      <a class="orig" href="#" onclick="return false">Voir la recette complète sur ${esc(w.url)} ↗</a>
+    </div>
+    <div class="sh-foot" id="foot"></div>`;
+  drawFoot();
+  document.getElementById('shx').onclick = closeSheet;
+  document.getElementById('grab').onclick = closeSheet;
+  sheet.querySelector('.sh-body').scrollTop = 0;
+  sheet.classList.add('on'); veil.classList.add('on');
+}
+let cat = 'Accompagnement';
+function drawFoot() {
+  const w = current, inBook = w.have || added.has(w.id), f = document.getElementById('foot');
+  f.innerHTML = inBook
+    ? `<button class="btn done" id="go">✓ Dans le carnet · Ouvrir</button>`
+    : `<label class="rangee"><span class="muted" style="font-size:14.5px;white-space:nowrap">Ranger dans</span>
+        <select id="cat" aria-label="Catégorie">${CATS.map(([c, e]) => `<option value="${c}" ${c === cat ? 'selected' : ''}>${e} ${c}</option>`).join('')}</select></label>
+       <button class="btn" id="addb">＋ Ajouter au carnet</button>`;
+  const a = document.getElementById('addb'); if (a) a.onclick = () => addRecipe(w);
+  const sc = document.getElementById('cat'); if (sc) sc.onchange = () => { cat = sc.value; };
+  const g = document.getElementById('go'); if (g) g.onclick = () => { closeSheet(); openInBook(w); };
+}
+function closeSheet() { sheet.classList.remove('on'); veil.classList.remove('on'); }
+veil.onclick = closeSheet;
+/* glisser vers le bas pour fermer (iPhone) */
+let y0 = null;
+sheet.addEventListener('touchstart', e => { if (e.target.closest('.grab,.sh-top')) y0 = e.touches[0].clientY; }, {passive:true});
+sheet.addEventListener('touchend', e => { if (y0 != null && e.changedTouches[0].clientY - y0 > 60) closeSheet(); y0 = null; });
+
+function addRecipe(w) {
+  added.add(w.id);
+  const id = 100 + recipes.length;
+  w.have = id;
+  recipes.unshift({id, titre:w.titre, categorie:cat, t:w.t, src:w.site, srcUrl:w.url, ing:w.ing.join(' '), web:w, by:'Claire'});
+  flashId = id;
+  drawResults(); drawWeb();
+  if (sheet.classList.contains('on')) drawFoot();
+  else toast(`Ajoutée au carnet · ${cat}`, () => { closeSheet(); openInBook(w); }, () => removeRecipe(w));
+  setTimeout(() => { flashId = null; }, 1700);
+}
+function removeRecipe(w) {
+  recipes = recipes.filter(r => r.id !== w.have);
+  added.delete(w.id); delete w.have;
+  drawResults(); drawWeb();
+}
+function openInBook(w) { renderDetail(recipes.find(r => r.id === w.have)); }
+
+let tt;
+function toast(msg, act, undo) {
+  const t = document.getElementById('toast');
+  t.innerHTML = `<span>✓ ${esc(msg)}</span><button class="undo">Annuler</button><button class="open">Ouvrir</button>`;
+  t.querySelector('.open').onclick = () => { t.classList.remove('on'); act(); };
+  t.querySelector('.undo').onclick = () => { t.classList.remove('on'); undo(); };
+  t.classList.add('on'); clearTimeout(tt); tt = setTimeout(() => t.classList.remove('on'), 6000);
+}
+
+/* ---- fiche recette (après ajout) ---- */
+let listY = 0;
+function renderDetail(r) {
+  if (document.getElementById('res')) listY = scrollY;
+  document.getElementById('toast').classList.remove('on');
+  const w = r.web || WEB.find(x => x.have === r.id);
+  const ing = w ? w.ing : r.ing.split(' ');
+  const steps = w ? w.steps : ['Recette saisie à la main par la famille.'];
+  app.innerHTML = `
+  <div class="wrap detail">
+    <div class="top">
+      <button class="icon-btn" id="back" title="Retour">←</button>
+      <span style="flex:1"></span>
+      <button class="icon-btn" title="Favori">${r.fav ? '★' : '☆'}</button>
+      <button class="icon-btn" title="Modifier">✎</button>
+    </div>
+    <div class="hero" style="background:${w ? w.vg : 'var(--accent-soft)'}">${w ? w.e : emoji(r.categorie)}</div>
+    <div class="meta">${emoji(r.categorie)} ${esc(r.categorie)}</div>
+    <h1>${esc(r.titre)}</h1>
+    <div class="meta">${w ? `<span>🔪 Préparation ${w.prep} min</span><span>🔥 Cuisson ${mins(w.cuis)}</span>` : `<span>⏱ ${mins(r.t)}</span>`}</div>
+    ${r.src ? `<div class="panel" style="padding:11px 14px;display:flex;gap:10px;align-items:center;margin-bottom:0">
+        <span style="font-size:22px">🌐</span>
+        <div style="flex:1;min-width:0"><b>D’après ${esc(r.src)}</b><div class="muted" style="font-size:13px">${w && w.note ? `★ ${note(w.note)} · ${nb(w.avis)} avis · ` : ''}trouvée avec la recherche</div></div>
+        <a href="#" onclick="return false" style="white-space:nowrap">Recette d’origine ↗</a></div>` : ''}
+    <div class="panel"><h2>Ingrédients</h2>
+      <ul class="ing">${ing.map(i => `<li><input type="checkbox"><span>${esc(i)}</span></li>`).join('')}</ul></div>
+    <div class="panel"><h2>Préparation</h2><ol class="steps">${steps.map(s => `<li>${esc(s)}</li>`).join('')}</ol></div>
+    <p class="muted">${r.by ? `Ajoutée par ${esc(r.by)} · à l’instant` : 'Ajoutée par Marc'}</p>
+  </div>`;
+  document.getElementById('back').onclick = () => { renderList(); window.scrollTo(0, listY); };
+  window.scrollTo(0, 0);
+}
+
+if (matchMedia('(min-width:700px)').matches) document.getElementById('mqd').open = true;
+renderList();
+/* démo : ?q=gratin%20dauphinois pré-remplit la recherche */
+const pre = new URLSearchParams(location.search).get('q');
+if (pre) { filt.q = pre; webState = 'ok'; renderList(); }
+</script>
+</body>
+</html>

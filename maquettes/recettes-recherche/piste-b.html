@@ -1,0 +1,511 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Piste B · Trouver une recette · Mes recettes</title>
+<meta name="theme-color" content="#b5532f">
+<style>
+  :root{
+    --bg:#fbf6ef; --card:#fff; --ink:#2b2420; --muted:#8a7d72; --line:#eadfd2;
+    --accent:#b5532f; --accent-soft:#f6e2d6; --ok:#4f7a4a; --ok-soft:#e3eedf; --danger:#b23a3a;
+    --gold:#e0a100; --gold-soft:#fbf0cf;
+    --radius:16px; --shadow:0 1px 2px rgba(60,40,20,.06),0 4px 14px rgba(60,40,20,.06);
+  }
+  @media (prefers-color-scheme:dark){
+    :root{ --bg:#1c1816; --card:#27211e; --ink:#f3ebe3; --muted:#a8998c; --line:#3a312b;
+      --accent:#e07a50; --accent-soft:#3d2a20; --ok-soft:#24301f; --gold-soft:#3a3018; --shadow:none; }
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%;touch-action:manipulation}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+  h1,h2,h3{font-family:ui-serif,Georgia,"Times New Roman",serif;font-weight:600;line-height:1.2;margin:0}
+  a{color:var(--accent)}
+  button,input,select{font:inherit;color:inherit}
+
+  /* --- bandeau de la piste --- */
+  .piste{background:#2b2420;color:#f3ebe3;font-size:13.5px;line-height:1.45}
+  .piste .in{max-width:1080px;margin:0 auto;padding:10px 16px;display:grid;gap:4px 24px;grid-template-columns:1fr}
+  .piste b{color:#ffcfb6}
+  .piste .lbl{display:inline-block;background:#b5532f;color:#fff;border-radius:6px;padding:0 7px;font-weight:700;margin-right:6px;font-size:12.5px}
+  .piste ul{margin:2px 0 0;padding-left:18px}
+  .piste details summary{cursor:pointer;color:#e8d8c9}
+  @media (min-width:900px){ .piste .in{grid-template-columns:1fr 1.6fr} .piste details summary{display:none} .piste .pl{display:grid;grid-template-columns:1fr 1fr;gap:16px} }
+
+  .wrap{max-width:760px;margin:0 auto;padding:16px 16px 110px}
+  .wrap.wide{max-width:1080px}
+  .top{display:flex;align-items:center;gap:10px;margin:6px 0 14px}
+  .top h1{font-size:24px;flex:1}
+  .icon-btn{border:0;background:var(--card);box-shadow:var(--shadow);width:42px;height:42px;border-radius:12px;
+    display:grid;place-items:center;cursor:pointer;font-size:19px;flex:none;text-decoration:none;color:var(--ink)}
+  .btn{border:0;border-radius:12px;padding:11px 16px;font-weight:600;cursor:pointer;background:var(--accent);color:#fff;text-decoration:none;display:inline-block;text-align:center}
+  .btn.ghost{background:var(--card);color:var(--ink);box-shadow:var(--shadow)}
+  .btn.ok{background:var(--ok)}
+  .btn.big{width:100%;padding:14px 16px;font-size:17px}
+  input[type=search]{width:100%;border:1px solid var(--line);background:var(--card);border-radius:12px;padding:11px 13px;outline:none}
+  input:focus{border-color:var(--accent)}
+  .chips{display:flex;gap:8px;overflow-x:auto;padding:10px 0 4px;scrollbar-width:none;margin:0 -16px;padding-left:16px;padding-right:16px}
+  .chips::-webkit-scrollbar{display:none}
+  .chip{flex:none;border:1px solid var(--line);background:var(--card);border-radius:999px;padding:6px 15px;min-height:44px;display:inline-flex;align-items:center;cursor:pointer;font-size:15px;white-space:nowrap}
+  .chip.on{background:var(--accent);border-color:var(--accent);color:#fff}
+  .muted{color:var(--muted);font-size:14px}
+  .meta{color:var(--muted);font-size:13.5px;display:flex;gap:4px 10px;flex-wrap:wrap}
+  .star{color:var(--gold)}
+  .fam-title{flex:1;min-width:0}
+  .fam-title span{display:block;font-family:ui-serif,Georgia,serif;font-weight:600;font-size:28px;line-height:1.15}
+  .loader{display:inline-block;width:18px;height:18px;border:3px solid var(--accent-soft);border-top-color:var(--accent);border-radius:50%;animation:sp 1s linear infinite;vertical-align:-4px;margin-right:8px}
+  @keyframes sp{to{transform:rotate(360deg)}}
+
+  /* onglets carnet / trouver */
+  .tabs{display:flex;background:var(--card);box-shadow:var(--shadow);border-radius:14px;padding:4px;gap:4px;margin:0 0 14px}
+  .tabs button{flex:1;border:0;background:none;border-radius:10px;padding:9px 6px;font-weight:600;cursor:pointer;font-size:15px;color:var(--muted)}
+  .tabs button.on{background:var(--accent);color:#fff}
+
+  /* carnet */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+  .card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;color:inherit;display:flex;flex-direction:column;text-decoration:none;cursor:pointer}
+  .card .ph{aspect-ratio:16/9;display:grid;place-items:center;font-size:40px}
+  .card .bd{padding:11px 13px 13px}
+  .card h3{font-size:17px;margin-bottom:4px}
+  .promo{display:flex;gap:14px;align-items:center;background:linear-gradient(135deg,#b5532f,#d9824f);color:#fff;border-radius:var(--radius);padding:14px 16px;cursor:pointer;margin:12px 0 4px;box-shadow:0 6px 18px rgba(181,83,47,.25)}
+  .promo .e{font-size:34px}
+  .promo b{font-family:ui-serif,Georgia,serif;font-size:19px;display:block}
+  .promo span{font-size:13.5px;opacity:.92}
+  .count{color:var(--muted);font-size:14px;margin:12px 2px 8px}
+
+  /* recherche */
+  .searchbox{display:flex;gap:8px}
+  .searchbox input{flex:1;min-width:0;font-size:17px;padding:13px 14px}
+  .filters{background:var(--card);box-shadow:var(--shadow);border-radius:var(--radius);padding:12px 14px;margin:12px 0}
+  .frow{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:6px 0}
+  .frow+.frow{border-top:1px solid var(--line)}
+  .frow .k{font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;width:92px;flex:none}
+  .frow .opts{display:flex;gap:6px;flex-wrap:wrap}
+  .frow .chip{padding:6px 14px}
+  .sites{font-size:13px;color:var(--muted);margin:2px 2px 0}
+  .sugg h3{font-size:18px;margin:20px 0 6px}
+  .sugg .chips{flex-wrap:wrap;overflow:visible;margin:0;padding:4px 0}
+
+  /* résultats */
+  .best{background:var(--card);border-radius:20px;box-shadow:0 0 0 2px var(--gold) inset,var(--shadow);overflow:hidden;margin:6px 0 18px;position:relative}
+  .best .ribbon{position:absolute;top:12px;left:12px;background:var(--gold);color:#2b2420;font-weight:800;font-size:13px;border-radius:999px;padding:4px 11px;letter-spacing:.02em;z-index:1}
+  .best .ph{height:150px;display:grid;place-items:center;font-size:64px}
+  .best .bd{padding:14px 16px 16px}
+  .best h2{font-size:24px;margin:0 0 3px}
+  .why{background:var(--gold-soft);border-radius:12px;padding:10px 12px;margin:12px 0;font-size:14.5px}
+  .why>b{display:block;margin-bottom:3px}
+  .why ul{margin:0;padding-left:0;list-style:none}
+  .why li{padding:1px 0}
+  .best .acts{display:flex;gap:8px;flex-wrap:wrap}
+  .best .quickadd{position:absolute;top:10px;right:10px;z-index:1;border-radius:999px;min-height:44px;padding:9px 16px;box-shadow:0 4px 14px rgba(60,30,10,.25)}
+  .best .quickadd.ok{background:var(--ok)}
+  .deja{display:flex;align-items:center;gap:10px;background:var(--ok-soft);color:var(--ink);border-radius:12px;padding:6px 6px 6px 12px;margin:0 0 12px;font-size:14.5px}
+  .deja span{flex:1;min-width:0}
+  .deja button{border:0;background:var(--card);color:var(--ok);font-weight:700;border-radius:10px;min-height:44px;padding:0 14px;cursor:pointer;flex:none}
+  .inbook-tag{display:inline-block;background:var(--ok-soft);color:var(--ok);border-radius:999px;padding:3px 11px;font-size:13.5px;font-weight:600;margin-bottom:6px}
+  @media (max-width:759px){ .best .ph{height:112px;font-size:54px} .best .bd{padding:12px 14px 14px} .best h2{font-size:21px} .why{margin:10px 0} }
+  .best .acts .btn{flex:1;min-width:140px}
+  @media (min-width:760px){
+    .best{display:grid;grid-template-columns:300px 1fr}
+    .best .ph{height:auto;min-height:100%;font-size:84px}
+  }
+  .sec-t{display:flex;align-items:baseline;gap:10px;margin:6px 2px 8px}
+  .sec-t h3{font-size:19px;flex:1}
+  .alts{display:flex;flex-direction:column;gap:10px}
+  .alt{display:flex;gap:12px;background:var(--card);border-radius:14px;box-shadow:var(--shadow);padding:10px;align-items:center;cursor:pointer;position:relative}
+  .alt .th{width:78px;height:78px;border-radius:11px;display:grid;place-items:center;font-size:34px;flex:none}
+  .alt .tx{flex:1;min-width:0}
+  .alt h4{margin:0 0 2px;font-family:ui-serif,Georgia,serif;font-size:16.5px;font-weight:600;line-height:1.25}
+  .alt .site{font-size:13px;color:var(--ink);opacity:.75}
+  .alt .note{font-size:12.5px;color:var(--muted);font-style:italic;margin-top:2px}
+  .alt .go{color:var(--muted);font-size:20px;flex:none;padding:0 4px}
+  .cmp{display:none;align-items:center;gap:6px;font-size:13.5px;color:var(--muted);flex:none;border:1px solid var(--line);border-radius:999px;padding:4px 12px;min-height:40px;cursor:pointer;background:var(--bg)}
+  .cmp input{accent-color:var(--accent);margin:0}
+  .cmp.on{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+  .in-book{display:inline-block;background:var(--ok-soft);color:var(--ok);border-radius:999px;padding:1px 9px;font-size:12.5px;font-weight:600}
+  @media (min-width:900px){
+    .cmp{display:inline-flex}
+    .alts{display:grid;grid-template-columns:1fr 1fr}
+    .best .cmp{position:absolute;top:12px;right:12px}
+    .best .quickadd{display:none}
+    .mob-only{display:none}
+  }
+  @media (max-width:899px){ .desk-only{display:none !important} }
+  .cmpbar{position:fixed;left:50%;transform:translateX(-50%);bottom:22px;background:#2b2420;color:#fff;border-radius:999px;padding:8px 8px 8px 18px;display:flex;align-items:center;gap:12px;box-shadow:0 8px 26px rgba(0,0,0,.28);font-size:15px;z-index:20}
+  .cmpbar .btn{border-radius:999px;padding:8px 16px}
+  .empty{text-align:center;color:var(--muted);padding:34px 10px}
+  .empty .big{font-size:46px}
+
+  /* aperçu */
+  .hero{border-radius:var(--radius);height:170px;display:grid;place-items:center;font-size:72px;margin-bottom:14px;position:relative}
+  .hero .ribbon{position:absolute;top:12px;left:12px;background:var(--gold);color:#2b2420;font-weight:800;font-size:13px;border-radius:999px;padding:4px 11px}
+  .detail h1{font-size:28px;margin:2px 0 6px}
+  .facts{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0}
+  .fact{background:var(--card);box-shadow:var(--shadow);border-radius:12px;padding:8px 6px;text-align:center}
+  .fact b{display:block;font-size:16px}
+  .fact span{font-size:12px;color:var(--muted)}
+  .panel{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;margin:14px 0}
+  .panel h2{font-size:20px;margin-bottom:8px}
+  .ing{list-style:none;margin:0;padding:0}
+  .ing li{padding:7px 0;border-bottom:1px solid var(--line)}
+  .ing li:last-child{border-bottom:0}
+  .steps{margin:0;padding:0;list-style:none;counter-reset:s}
+  .steps li{counter-increment:s;display:flex;gap:12px;padding:7px 0}
+  .steps li::before{content:counter(s);flex:none;width:26px;height:26px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-weight:700;font-size:13px;margin-top:1px}
+  .src{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;font-size:14px;color:var(--muted)}
+  .stick{position:fixed;left:0;right:0;bottom:0;background:linear-gradient(transparent,var(--bg) 30%);padding:22px 16px calc(14px + env(safe-area-inset-bottom));z-index:10}
+  .stick .in{max-width:760px;margin:0 auto;display:flex;gap:8px}
+  .stick .btn{flex:1}
+  @media (min-width:900px){ .cols-d{display:grid;grid-template-columns:1fr 1.25fr;gap:16px} .cols-d .panel{margin:0} }
+
+  /* feuille catégorie */
+  .veil{position:fixed;inset:0;background:rgba(30,20,10,.45);z-index:30;display:flex;align-items:flex-end;justify-content:center}
+  .sheet{background:var(--bg);width:100%;max-width:520px;border-radius:22px 22px 0 0;padding:10px 18px calc(18px + env(safe-area-inset-bottom));animation:up .22s ease-out}
+  @media (min-width:700px){ .veil{align-items:center} .sheet{border-radius:22px;padding-bottom:20px} }
+  @keyframes up{from{transform:translateY(40px);opacity:.3}}
+  .grab{width:40px;height:5px;border-radius:9px;background:var(--line);margin:0 auto 12px}
+  .sheet h2{font-size:22px;margin-bottom:2px}
+  .catgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0}
+  .catb{border:1px solid var(--line);background:var(--card);border-radius:12px;padding:10px 4px;cursor:pointer;font-size:14px;text-align:center;position:relative}
+  .catb .e{display:block;font-size:24px}
+  .catb.on{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset;background:var(--accent-soft)}
+  .catb small{position:absolute;top:-8px;right:-4px;background:var(--gold);color:#2b2420;border-radius:999px;font-size:10.5px;font-weight:700;padding:0 6px}
+  .famsel{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--muted);margin:0 0 4px}
+  .famsel b{color:var(--ink)}
+
+  .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom));background:#25321e;color:#fff;border-radius:16px;padding:12px 14px 12px 16px;display:flex;align-items:center;gap:12px;z-index:40;box-shadow:0 8px 26px rgba(0,0,0,.28);width:max-content;max-width:calc(100% - 24px);font-size:15px}
+  .toast button{border:0;border-radius:999px;padding:7px 15px;min-height:44px;background:#8fd16a;color:#18240f;font-weight:600;cursor:pointer;white-space:nowrap}
+
+  /* comparaison */
+  .cmpgrid{display:grid;grid-template-columns:150px 1fr 1fr;background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+  .cmpgrid>div{padding:11px 14px;border-top:1px solid var(--line)}
+  .cmpgrid .h{border-top:0}
+  .cmpgrid .k{color:var(--muted);font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;background:var(--bg)}
+  .cmpgrid .hd{display:flex;gap:12px;align-items:center}
+  .cmpgrid .hd .th{width:64px;height:64px;border-radius:12px;display:grid;place-items:center;font-size:30px;flex:none}
+  .cmpgrid h3{font-size:18px}
+  .win{color:var(--ok);font-weight:700}
+  .cmpgrid ul{margin:0;padding:0;list-style:none;font-size:14.5px}
+  .cmpgrid li{padding:2px 0}
+  .cmpgrid li.only{background:var(--gold-soft);border-radius:6px;padding:2px 6px;margin:0 -6px}
+  .legend{font-size:13px;color:var(--muted);margin:10px 2px}
+  .legend span{background:var(--gold-soft);border-radius:6px;padding:1px 6px;color:var(--ink)}
+</style>
+</head>
+<body>
+
+<div class="piste">
+  <div class="in">
+    <div><span class="lbl">Piste B</span><b>« Trouver une recette » qui choisit pour moi.</b> Un espace dédié avec quelques filtres ; l’app met en avant <b>une meilleure recette</b> en expliquant pourquoi, avec 5 autres en dessous. Sur ordinateur, on peut en comparer deux côte à côte.</div>
+    <details id="pd">
+      <summary>Points forts et limites</summary>
+      <div class="pl"><div><b>Points forts</b><ul><li>Une seule réponse claire : idéal en cuisine ou au supermarché, sans hésiter longtemps.</li><li>Le choix est expliqué (note, nombre d’avis, temps), pour qu’on lui fasse confiance.</li><li>Ajout en 2 gestes, catégorie déjà proposée.</li></ul></div>
+      <div><b>Limites</b><ul><li>Un écran de plus : on quitte le carnet pour chercher.</li><li>La comparaison côte à côte n’existe que sur ordinateur.</li><li>Le classement dépend des notes des sites, parfois peu fiables ou absentes.</li></ul></div></div>
+    </details>
+  </div>
+</div>
+
+<div id="app"></div>
+
+<script>
+/* Maquette : aucune vraie recherche, aucune donnée enregistrée. */
+if(matchMedia('(min-width:900px)').matches)document.getElementById('pd').open=true;
+const CATS=[['Apéro','🫒'],['Entrée','🥗'],['Plat','🍲'],['Accompagnement','🥔'],['Dessert','🍰'],['Petit-déj','🥐'],['Pain & pâte','🥖'],['Sauce','🫙'],['Boisson','🍹'],['Autre','🍽️']];
+const G={a:'linear-gradient(135deg,#f6d9a8,#e9a86a)',b:'linear-gradient(135deg,#f3e1c4,#d8b07c)',c:'linear-gradient(135deg,#fde7c8,#f0b37e)',d:'linear-gradient(135deg,#efe3cf,#c9a37a)',e:'linear-gradient(135deg,#f9e3b5,#dfa14f)',f:'linear-gradient(135deg,#e8dcc9,#bfa588)'};
+
+const MAMIE={t:'Gratin dauphinois de Mamie',c:'Accompagnement',e:'🥔',m:'1 h 30',g:'linear-gradient(135deg,#f6dfb6,#d7a35f)',
+  by:'Ajoutée par Mamie Jeanne · il y a 2 ans',p:6,
+  ing:['1,5 kg de pommes de terre (Charlotte)','1 L de lait entier','20 cl de crème crue','2 gousses d’ail','Une noix de beurre','Muscade, sel, poivre'],
+  st:['Couper les pommes de terre en rondelles fines, ne pas les rincer.','Les faire frémir 15 min dans le lait avec l’ail.','Tout verser dans le plat en terre beurré, ajouter la crème.','1 h 15 à 150 °C. Le secret : ne pas monter le four !']};
+const CARNET=[
+  {...MAMIE,fiche:'mamie'},
+  {t:'Blanquette de mamie',c:'Plat',e:'🍲',m:'2 h 30',g:'linear-gradient(135deg,#f3e6d0,#d9b98c)'},
+  {t:'Tarte aux pommes fine',c:'Dessert',e:'🍰',m:'50 min',g:'linear-gradient(135deg,#fbe2c0,#e8a76a)'},
+  {t:'Taboulé libanais',c:'Entrée',e:'🥗',m:'25 min',g:'linear-gradient(135deg,#e2efd2,#a9c98a)'},
+  {t:'Pancakes du dimanche',c:'Petit-déj',e:'🥞',m:'20 min',g:'linear-gradient(135deg,#fbe8c3,#e6b765)'},
+  {t:'Sauce vierge',c:'Sauce',e:'🫙',m:'10 min',g:'linear-gradient(135deg,#f6d6cf,#d8806b)'},
+  {t:'Poulet basquaise',c:'Plat',e:'🍗',m:'1 h 15',g:'linear-gradient(135deg,#f7d9b8,#d98a4c)'},
+];
+
+const R=[
+ {id:1,t:'Gratin dauphinois traditionnel',s:'Marmiton',d:'marmiton.org',n:4.8,a:2312,min:80,prep:20,cuis:60,diff:'Facile',p:6,e:'🥔',g:G.a,
+  ing:['1,5 kg de pommes de terre à chair ferme','50 cl de lait entier','30 cl de crème fraîche épaisse','2 gousses d’ail','40 g de beurre','1 pincée de noix de muscade','Sel, poivre'],
+  st:['Éplucher les pommes de terre et les couper en fines rondelles (3 mm), sans les laver.','Les faire cuire 10 min dans le lait avec l’ail écrasé, la muscade, sel et poivre.','Frotter un plat à gratin avec l’ail et le beurrer.','Verser les pommes de terre et le lait, napper de crème.','Enfourner 1 h à 160 °C, jusqu’à ce que le dessus soit bien doré.']},
+ {id:2,t:'Le vrai gratin dauphinois (sans fromage)',s:'Journal des Femmes Cuisine',d:'cuisine.journaldesfemmes.fr',n:4.7,a:864,min:95,prep:20,cuis:75,diff:'Facile',p:6,e:'🧄',g:G.b,
+  ing:['1,2 kg de pommes de terre','75 cl de lait','25 cl de crème liquide entière','1 gousse d’ail','30 g de beurre','Noix de muscade','Sel, poivre'],
+  st:['Couper les pommes de terre en rondelles fines.','Les cuire 15 min dans le lait et la crème avec l’ail.','Verser dans un plat beurré.','Cuire 1 h à 150 °C.']},
+ {id:3,t:'Gratin dauphinois bien crémeux',s:'750g',d:'750g.com',n:4.6,a:1105,min:70,prep:15,cuis:55,diff:'Facile',p:4,e:'🧈',g:G.c,
+  ing:['1 kg de pommes de terre','40 cl de crème fraîche entière','20 cl de lait','1 gousse d’ail','Beurre','Muscade, sel, poivre'],
+  st:['Trancher les pommes de terre finement.','Mélanger crème, lait, ail, muscade.','Alterner pommes de terre et crème dans le plat.','Cuire 55 min à 180 °C.']},
+ {id:4,t:'Gratin dauphinois de Ricardo',s:'Ricardo',d:'ricardocuisine.com',n:4.9,a:96,min:90,prep:25,cuis:65,diff:'Moyen',p:8,e:'🥘',g:G.d,
+  note:'Mieux notée, mais trop peu d’avis pour être sûre',
+  ing:['1,8 kg de pommes de terre Yukon Gold','50 cl de crème 35 %','25 cl de lait','2 gousses d’ail','Thym frais','Sel, poivre'],
+  st:['Chauffer crème, lait, ail et thym.','Ajouter les pommes de terre tranchées, mijoter 10 min.','Transférer dans un plat.','Cuire 65 min à 175 °C.']},
+ {id:5,t:'Gratin dauphinois express',s:'Cuisine AZ',d:'cuisineaz.com',n:4.3,a:412,min:45,prep:15,cuis:30,diff:'Très facile',p:4,e:'⏱️',g:G.e,
+  ing:['800 g de pommes de terre','40 cl de crème liquide','10 cl de lait','1 gousse d’ail','Muscade, sel, poivre'],
+  st:['Couper les pommes de terre en rondelles fines.','Les précuire 8 min au micro-ondes dans la crème et le lait.','Verser dans un plat frotté à l’ail.','Cuire 30 min à 200 °C.']},
+ {id:6,t:'Gratin dauphinois au Thermomix',s:'Cuisine AZ',d:'cuisineaz.com',n:null,a:0,min:55,prep:10,cuis:45,diff:'Facile',p:4,e:'🥄',g:G.f,
+  ing:['900 g de pommes de terre','30 cl de crème','30 cl de lait','1 gousse d’ail','Sel, poivre, muscade'],
+  st:['Trancher les pommes de terre au robot.','Cuire 15 min dans le lait et la crème (100 °C, vitesse mijotage).','Verser dans un plat.','Gratiner 30 min à 200 °C.']},
+];
+
+const S={view:'carnet',q:'gratin dauphinois',temps:'',diff:'',vege:false,cur:null,cmp:[],fiche:null,ficheBack:'carnet',toastId:null,added:{},cat:null,toast:null,searched:false};
+const app=document.getElementById('app');
+const fmt=m=>m<60?m+' min':Math.floor(m/60)+' h'+(m%60?' '+String(m%60).padStart(2,'0'):'');
+const nb=n=>n.toLocaleString('fr-FR');
+const note=r=>r.n?`<span><span class="star">★</span> ${String(r.n).replace('.',',')}/5 · ${nb(r.a)} avis</span>`:'<span>Pas encore de note</span>';
+const byId=id=>R.find(r=>r.id===id);
+const DIFF={'Très facile':0,'Facile':1,'Moyen':2};
+
+function results(){
+  return R.filter(r=>{
+    if(S.temps==='30'&&r.min>30)return false;
+    if(S.temps==='60'&&r.min>60)return false;
+    if(S.diff==='facile'&&DIFF[r.diff]>1)return false;
+    return true; // toutes végétariennes ici
+  }).sort((a,b)=>score(b)-score(a));
+}
+function score(r){ if(!r.n) return 0; return r.n*Math.min(1,Math.log10(r.a)/3.2); }
+
+function go(v,extra){Object.assign(S,{view:v},extra||{});S.toast=null;render();scrollTo(0,0);}
+
+function render(){
+  if(S.view==='carnet') app.innerHTML=vCarnet();
+  if(S.view==='trouver') app.innerHTML=vTrouver();
+  if(S.view==='attente') app.innerHTML=vAttente();
+  if(S.view==='resultats') app.innerHTML=vResultats();
+  if(S.view==='apercu') app.innerHTML=vApercu();
+  if(S.view==='comparer') app.innerHTML=vComparer();
+  if(S.view==='fiche') app.innerHTML=vFiche();
+  if(S.cat!==null) app.insertAdjacentHTML('beforeend',vSheet());
+  if(S.toast) app.insertAdjacentHTML('beforeend',`<div class="toast">✓ ${S.toast}<button data-a="voir">Voir la fiche</button></div>`);
+}
+
+function tabs(on){return `<div class="tabs"><button class="${on==='carnet'?'on':''}" data-a="carnet">📖 Notre carnet</button><button class="${on!=='carnet'?'on':''}" data-a="trouver">🔎 Trouver une recette</button></div>`;}
+function header(){return `<div class="top"><div class="fam-title"><span>Famille Martin</span></div><span class="icon-btn" title="Famille">👥</span><span class="icon-btn" title="Mon compte">👤</span></div>`;}
+
+function vCarnet(){
+  const extra=Object.keys(S.added).map(id=>{const r=byId(+id);return {t:r.t,c:S.added[id],e:r.e,m:fmt(r.min),g:r.g,isNew:1,fiche:r.id};});
+  const all=[...extra,...CARNET];
+  return `<div class="wrap">${header()}${tabs('carnet')}
+  <input type="search" placeholder="Chercher dans le carnet…">
+  <div class="promo" data-a="trouver"><div class="e">✨</div><div><b>Pas d’idée ? Trouvez une recette sur le web</b><span>On cherche sur Marmiton, 750g, Cuisine AZ… et on vous dit laquelle choisir.</span></div></div>
+  <div class="count">${all.length} recettes</div>
+  <div class="grid">${all.map(r=>`<div class="card" ${r.fiche?`data-fiche="${r.fiche}"`:''}><div class="ph" style="background:${r.g}">${r.e}</div><div class="bd"><h3>${r.t}</h3><div class="meta"><span>${r.c}</span><span>⏱ ${r.m}</span>${r.isNew?'<span class="in-book">Nouveau</span>':''}</div></div></div>`).join('')}</div>
+  </div>`;
+}
+
+function filtersHTML(){
+  const c=(k,v,l)=>`<button class="chip ${S[k]===v?'on':''}" data-f="${k}" data-v="${v}">${l}</button>`;
+  return `<div class="filters">
+    <div class="frow"><span class="k">Temps</span><div class="opts">${c('temps','','Peu importe')}${c('temps','30','⏱ < 30 min')}${c('temps','60','⏱ < 1 h')}</div></div>
+    <div class="frow"><span class="k">Difficulté</span><div class="opts">${c('diff','','Peu importe')}${c('diff','facile','👌 Facile')}</div></div>
+    <div class="frow"><span class="k">Régime</span><div class="opts"><button class="chip ${S.vege?'on':''}" data-f="vege">🌱 Végétarien</button></div></div>
+  </div>`;
+}
+
+function vTrouver(){
+  return `<div class="wrap">${header()}${tabs('trouver')}
+  <form class="searchbox" id="sf"><input type="search" id="qi" value="${S.q}" placeholder="Un plat, un ingrédient… (ex. gratin dauphinois)" autocomplete="off"><button class="btn">Chercher</button></form>
+  <p class="sites">On cherche uniquement sur : Marmiton · 750g · Cuisine AZ · Journal des Femmes Cuisine · Ricardo</p>
+  ${filtersHTML()}
+  <div class="sugg"><h3>Recherches récentes</h3><div class="chips">
+    <button class="chip" data-s="gratin dauphinois">🕘 gratin dauphinois</button><button class="chip" data-s="gratin dauphinois">🕘 pâte à crêpes</button><button class="chip" data-s="gratin dauphinois">🕘 lasagnes végétariennes</button></div>
+  <h3>Idées de saison</h3><div class="chips">
+    <button class="chip" data-s="gratin dauphinois">🎃 velouté de potimarron</button><button class="chip" data-s="gratin dauphinois">🥔 gratin dauphinois</button><button class="chip" data-s="gratin dauphinois">🍲 pot-au-feu</button><button class="chip" data-s="gratin dauphinois">🍎 crumble aux pommes</button></div>
+  <p class="muted" style="margin-top:14px">Maquette : toutes les recherches affichent les résultats fictifs « gratin dauphinois ».</p></div>
+  </div>`;
+}
+
+function vAttente(){
+  return `<div class="wrap">${header()}${tabs('trouver')}
+   <div class="empty"><div class="big">🧑‍🍳</div><p><span class="loader"></span>On compare <b>38 recettes</b> sur 5 sites…</p><p class="muted">Note, nombre d’avis, temps, fiche complète</p></div></div>`;
+}
+
+function cmpBox(id){const on=S.cmp.includes(id);return `<label class="cmp ${on?'on':''}" data-cmp="${id}"><input type="checkbox" ${on?'checked':''} tabindex="-1"> Comparer</label>`;}
+
+function vResultats(){
+  const list=results();
+  const fil=[S.temps==='30'?'< 30 min':S.temps==='60'?'< 1 h':'',S.diff?'Facile':'',S.vege?'Végétarien':''].filter(Boolean);
+  let body;
+  if(!list.length){
+    body=`<div class="empty"><div class="big">🤷</div><p>Aucun gratin dauphinois en moins de 30 min sur ces sites.</p><button class="btn" data-f="temps" data-v="60">Élargir à moins d’1 h</button></div>`;
+  } else {
+    const b=list[0], rest=list.slice(1);
+    const why=b.id===1?['★ <b>4,8/5</b> sur <b>2 312 avis</b> : la mieux notée parmi les recettes très testées','⏱ <b>1 h 20</b> dont 20 min de préparation','✓ Fiche complète : ingrédients et étapes récupérés']
+      :b.id===5?['⏱ <b>45 min</b> : la plus rapide qui ait de bons avis','★ <b>4,3/5</b> sur <b>412 avis</b>','✓ Fiche complète : ingrédients et étapes récupérés']
+      :[`★ ${b.n}/5 sur ${b.a} avis`,`⏱ ${fmt(b.min)}`];
+    body=`
+    <div class="best">
+      <span class="ribbon">🏆 Notre choix</span>
+      ${S.added[b.id]?`<span class="btn quickadd ok">✓ Ajoutée</span>`:`<button class="btn quickadd" data-add="${b.id}">＋ Ajouter</button>`}
+      <div class="ph" style="background:${b.g}">${b.e}</div>
+      <div class="bd">
+        ${cmpBox(b.id)}
+        <div class="muted">${b.s}</div>
+        <h2>${b.t}</h2>
+        <div class="meta">${note(b)}<span>⏱ ${fmt(b.min)}</span><span>👌 ${b.diff}</span><span>🍽 ${b.p} pers.</span></div>
+        <div class="why"><b>Pourquoi celle-ci ?</b><ul>${why.map(w=>`<li>${w}</li>`).join('')}</ul></div>
+        <div class="acts">
+          ${S.added[b.id]?`<span class="btn ok" style="cursor:default">✓ Dans le carnet</span>`:`<button class="btn" data-add="${b.id}">＋ Ajouter au carnet</button>`}
+          <button class="btn ghost" data-open="${b.id}">Voir l’aperçu</button>
+        </div>
+      </div>
+    </div>
+    <div class="sec-t"><h3>Les autres bonnes options</h3><span class="muted">${rest.length} recette${rest.length>1?'s':''}</span></div>
+    <div class="alts">${rest.map(r=>`
+      <div class="alt" data-open="${r.id}">
+        <div class="th" style="background:${r.g}">${r.e}</div>
+        <div class="tx"><div class="site">${r.s}</div><h4>${r.t}</h4>
+          <div class="meta">${note(r)}<span>⏱ ${fmt(r.min)}</span>${S.added[r.id]?'<span class="in-book">✓ Dans le carnet</span>':''}</div>
+          ${r.note?`<div class="note">${r.note}</div>`:''}</div>
+        ${cmpBox(r.id)}<span class="go mob-only">›</span>
+      </div>`).join('')}</div>
+    <p class="muted desk-only" style="margin-top:14px">Cochez « Comparer » sur deux recettes pour les voir côte à côte.</p>`;
+  }
+  return `<div class="wrap wide">
+    <div class="top"><button class="icon-btn" data-a="trouver" title="Modifier la recherche">←</button>
+      <form id="sf" class="searchbox" style="flex:1"><input type="search" id="qi" value="${S.q}"></form></div>
+    <div class="chips" style="padding-top:0">
+      <button class="chip ${!S.temps?'on':''}" data-f="temps" data-v="">Tous les temps</button>
+      <button class="chip ${S.temps==='30'?'on':''}" data-f="temps" data-v="30">⏱ < 30 min</button>
+      <button class="chip ${S.temps==='60'?'on':''}" data-f="temps" data-v="60">⏱ < 1 h</button>
+      <button class="chip ${S.diff?'on':''}" data-f="diff" data-v="${S.diff?'':'facile'}">👌 Facile</button>
+      <button class="chip ${S.vege?'on':''}" data-f="vege">🌱 Végétarien</button>
+    </div>
+    <div class="deja"><span>📖 Vous avez déjà « <b>Gratin dauphinois de Mamie</b> » dans le carnet</span><button data-fiche="mamie" data-back="resultats">Ouvrir</button></div>
+    <p class="muted" style="margin:6px 2px 10px">${list.length} recettes retenues sur 38 trouvées${fil.length?' · filtres : '+fil.join(', '):''}</p>
+    ${body}
+  </div>
+  ${S.cmp.length===2?`<div class="cmpbar desk-only">2 recettes sélectionnées <button class="btn" data-a="comparer">Comparer côte à côte</button></div>`:''}`;
+}
+
+function vApercu(){
+  const r=byId(S.cur), best=results()[0]?.id===r.id;
+  return `<div class="wrap wide detail">
+    <div class="top"><button class="icon-btn" data-a="resultats" title="Retour aux résultats">←</button><h1 style="font-size:19px;font-family:-apple-system,sans-serif;color:var(--muted);font-weight:500">Aperçu</h1></div>
+    <div class="hero" style="background:${r.g}">${best?'<span class="ribbon">🏆 Notre choix</span>':''}${r.e}</div>
+    <div class="muted">${r.s}</div>
+    <h1>${r.t}</h1>
+    <div class="meta">${note(r)}</div>
+    <div class="facts">
+      <div class="fact"><b>${fmt(r.min)}</b><span>au total</span></div>
+      <div class="fact"><b>${r.prep} min</b><span>préparation</span></div>
+      <div class="fact"><b>${r.diff}</b><span>difficulté</span></div>
+      <div class="fact"><b>${r.p}</b><span>personnes</span></div>
+    </div>
+    <div class="cols-d">
+      <div class="panel"><h2>Ingrédients</h2><ul class="ing">${r.ing.map(i=>`<li>${i}</li>`).join('')}</ul></div>
+      <div class="panel"><h2>Étapes en bref</h2><ol class="steps">${r.st.map(i=>`<li>${i}</li>`).join('')}</ol>
+        <p class="muted" style="margin:8px 0 0">La recette complète sera copiée dans le carnet : vous pourrez la modifier ensuite.</p></div>
+    </div>
+    <div class="src"><span>Source : ${r.s} (${r.d})</span><a href="https://www.${r.d.replace(/^www\./,'')}" target="_blank" rel="noopener">Voir la page d’origine ↗</a></div>
+  </div>
+  <div class="stick"><div class="in">
+    ${S.added[r.id]?`<span class="btn ok big" style="cursor:default">✓ Ajoutée dans «&nbsp;${S.added[r.id]}&nbsp;»</span>`:`<button class="btn big" data-add="${r.id}">＋ Ajouter au carnet</button>`}
+  </div></div>`;
+}
+
+function vFiche(){
+  let r,cat,src;
+  if(S.fiche==='mamie'){r=MAMIE;cat=MAMIE.c;src=MAMIE.by;}
+  else{r=byId(+S.fiche);cat=S.added[r.id]||'Accompagnement';src=`Ajoutée à l’instant · source : ${r.s} (${r.d})`;}
+  const back=S.ficheBack==='resultats'?'Retour aux résultats':'Retour au carnet';
+  return `<div class="wrap wide detail">
+    <div class="top"><button class="icon-btn" data-a="${S.ficheBack}" title="${back}">←</button><h1 style="font-size:19px;font-family:-apple-system,sans-serif;color:var(--muted);font-weight:500">${back}</h1><span class="icon-btn" title="Modifier">✏️</span></div>
+    <div class="hero" style="background:${r.g}">${r.e}</div>
+    <span class="inbook-tag">📖 Notre carnet · ${cat}</span>
+    <h1>${r.t}</h1>
+    <div class="muted">${src}</div>
+    <div class="facts">
+      <div class="fact"><b>${r.min?fmt(r.min):r.m}</b><span>au total</span></div>
+      <div class="fact"><b>${r.prep?r.prep+' min':'20 min'}</b><span>préparation</span></div>
+      <div class="fact"><b>${r.diff||'Facile'}</b><span>difficulté</span></div>
+      <div class="fact"><b>${r.p}</b><span>personnes</span></div>
+    </div>
+    <div class="cols-d">
+      <div class="panel"><h2>Ingrédients</h2><ul class="ing">${r.ing.map(i=>`<li>${i}</li>`).join('')}</ul></div>
+      <div class="panel"><h2>Étapes</h2><ol class="steps">${r.st.map(i=>`<li>${i}</li>`).join('')}</ol></div>
+    </div>
+  </div>`;
+}
+
+function vSheet(){
+  const r=byId(S.cat.id);
+  return `<div class="veil" data-a="fermer"><div class="sheet" role="dialog" aria-label="Choisir la catégorie">
+    <div class="grab"></div>
+    <h2>Ranger dans quelle catégorie ?</h2>
+    <p class="muted" style="margin:2px 0 10px">${r.t}</p>
+    <div class="famsel">📖 Carnet : <b>Famille Martin</b></div>
+    <div class="catgrid">${CATS.map(([c,e])=>`<button class="catb ${S.cat.c===c?'on':''}" data-c="${c}">${c==='Accompagnement'?'<small>suggéré</small>':''}<span class="e">${e}</span>${c==='Accompagnement'?'Accompagn.':c}</button>`).join('')}</div>
+    <button class="btn big" data-a="valider">Ajouter dans «&nbsp;${S.cat.c}&nbsp;»</button>
+    <button class="btn ghost big" style="margin-top:8px;box-shadow:none;background:none" data-a="fermer">Annuler</button>
+  </div></div>`;
+}
+
+function vComparer(){
+  const [a,b]=S.cmp.map(byId);
+  const ingWords=r=>r.ing.map(i=>i.toLowerCase());
+  const KW=/pommes de terre|lait|crème|ail|beurre|muscade|sel|poivre|thym/g;
+  const keys=i=>i.toLowerCase().match(KW)||[i.toLowerCase()];
+  const ka=new Set(a.ing.flatMap(keys)), kb=new Set(b.ing.flatMap(keys));
+  const ul=(r,other)=>`<ul>${r.ing.map(i=>`<li class="${keys(i).some(k=>other.has(k))?'':'only'}">${i}</li>`).join('')}</ul>`;
+  const w=(x,y,better)=>better?`<span class="win">${x} ✓</span>`:x;
+  const row=(k,x,y)=>`<div class="k">${k}</div><div>${x}</div><div>${y}</div>`;
+  const nA=a.n||0,nB=b.n||0;
+  return `<div class="wrap wide">
+    <div class="top"><button class="icon-btn" data-a="resultats" title="Retour">←</button><h1>Comparer deux recettes</h1></div>
+    <div class="cmpgrid">
+      <div class="k h"></div>
+      ${[a,b].map(r=>`<div class="h hd"><div class="th" style="background:${r.g}">${r.e}</div><div><div class="muted">${r.s}</div><h3>${r.t}</h3></div></div>`).join('')}
+      ${row('Note',w(note(a),0,nA*Math.log10(a.a+1)>nB*Math.log10(b.a+1)),w(note(b),0,nB*Math.log10(b.a+1)>nA*Math.log10(a.a+1)))}
+      ${row('Temps total',w(fmt(a.min),0,a.min<b.min),w(fmt(b.min),0,b.min<a.min))}
+      ${row('Préparation',a.prep+' min',b.prep+' min')}
+      ${row('Cuisson',a.cuis+' min',b.cuis+' min')}
+      ${row('Difficulté',a.diff,b.diff)}
+      ${row('Pour',a.p+' personnes',b.p+' personnes')}
+      ${row('Ingrédients',ul(a,kb),ul(b,ka))}
+      ${row('Étapes',a.st.length+' étapes',b.st.length+' étapes')}
+      <div class="k"></div>
+      ${[a,b].map(r=>`<div>${S.added[r.id]?`<span class="btn ok" style="width:100%;cursor:default">✓ Dans le carnet</span>`:`<button class="btn" style="width:100%" data-add="${r.id}">＋ Ajouter celle-ci</button>`}<button class="btn ghost" style="width:100%;margin-top:8px" data-open="${r.id}">Voir l’aperçu</button></div>`).join('')}
+    </div>
+    <p class="legend"><span>Surligné</span> : ingrédient présent dans une seule des deux recettes. ✓ : la meilleure des deux.</p>
+  </div>`;
+}
+
+function search(){S.q=document.getElementById('qi')?.value||S.q;go('attente');setTimeout(()=>{if(S.view==='attente')go('resultats');},900);}
+
+app.addEventListener('submit',e=>{e.preventDefault();search();});
+app.addEventListener('click',e=>{
+  const t=e.target;
+  const cmp=t.closest('[data-cmp]');
+  if(cmp){e.preventDefault();e.stopPropagation();const id=+cmp.dataset.cmp;
+    S.cmp=S.cmp.includes(id)?S.cmp.filter(x=>x!==id):[...S.cmp,id].slice(-2);render();return;}
+  const add=t.closest('[data-add]');
+  if(add){const r=byId(+add.dataset.add);S.cat={id:r.id,c:'Accompagnement'};render();return;}
+  const c=t.closest('[data-c]');
+  if(c&&S.cat){S.cat.c=c.dataset.c;render();return;}
+  const f=t.closest('[data-f]');
+  if(f){const k=f.dataset.f;if(k==='vege')S.vege=!S.vege;else S[k]=f.dataset.v;render();return;}
+  const s=t.closest('[data-s]');
+  if(s){S.q=s.dataset.s;search();return;}
+  const fi=t.closest('[data-fiche]');
+  if(fi){go('fiche',{fiche:fi.dataset.fiche,ficheBack:fi.dataset.back||'carnet'});return;}
+  const o=t.closest('[data-open]');
+  if(o){go('apercu',{cur:+o.dataset.open});return;}
+  const a=t.closest('[data-a]');
+  if(!a)return;
+  const act=a.dataset.a;
+  if(act==='fermer'){if(t===a||t.tagName==='BUTTON'){S.cat=null;render();}return;}
+  if(act==='valider'){S.added[S.cat.id]=S.cat.c;S.toastId=S.cat.id;const cat=S.cat.c;S.cat=null;S.toast=`Ajoutée au carnet, dans «&nbsp;${cat}&nbsp;»`;render();clearTimeout(window._tt);window._tt=setTimeout(()=>{S.toast=null;render();},5000);return;}
+  if(act==='voir'){S.toast=null;clearTimeout(window._tt);go('fiche',{fiche:String(S.toastId),ficheBack:'carnet'});return;}
+  if(act==='trouver'){go('trouver');return;}
+  go(act);
+});
+
+render();
+</script>
+</body>
+</html>
