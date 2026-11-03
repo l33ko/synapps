@@ -117,6 +117,134 @@ input[type=range]{accent-color:var(--accent)}
 .export img{max-width:100%;border:2px solid var(--line);border-radius:12px;image-rendering:auto}
 .export p{color:var(--soft);font-size:13px;margin:6px 0 0}
 .empty{color:var(--soft);text-align:center;padding:30px 10px}
+/* ---------- « Invente un modèle » (issue #73) ---------- */
+.magic{border-color:#ffc9c2;background:linear-gradient(180deg,#fff 0,#fff 60%,#fff4f2 100%);padding:16px}
+.magic h3{font-size:21px;display:flex;align-items:center;gap:8px;margin-bottom:2px}
+.magic .sub{color:var(--soft);font-size:14px;margin:0 0 10px}
+.search{display:flex;align-items:center;gap:6px;background:#fff;border:3px solid var(--ink);border-radius:18px;padding:5px 5px 5px 14px;box-shadow:0 3px 0 var(--ink)}
+.search:focus-within{border-color:var(--accent);box-shadow:0 3px 0 var(--accent)}
+.search .ic{font-size:20px}
+.search input{flex:1;min-width:0;border:0;outline:0;font:inherit;font-size:20px;font-weight:700;color:var(--ink);background:none;padding:4px 0}
+.search input::placeholder{color:#b9aec9;font-weight:600}
+.search .go{border:0;background:var(--accent);color:#fff;font-weight:800;font-size:17px;border-radius:13px;padding:8px 16px;cursor:pointer;white-space:nowrap}
+.search .clear{border:0;background:#f3e9da;color:var(--soft);width:30px;height:30px;border-radius:50%;font-size:16px;cursor:pointer;display:none}
+.search.has .clear{display:block}
+.pills{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 0}
+.pill{flex:none;min-height:44px;border:2px solid var(--line);background:#fff;border-radius:999px;padding:4px 14px 4px 10px;font-weight:700;font-size:16px;color:var(--ink);cursor:pointer;display:flex;align-items:center;gap:6px}
+/* iPhone : 2 lignes seulement (dé + 5 mots), le reste sur ordinateur */
+@media (max-width:760px){.pills .pill.xtra{display:none}.pills{gap:7px}.pill{padding:4px 11px 4px 8px;font-size:15px}}
+.pill .e{font-size:19px;line-height:1}
+.pill:hover{border-color:#d8c8b0}
+.pill.dice{background:#fff3c4;border-color:#f3d97a}
+
+/* lecture à voix haute */
+.say{flex:none;min-width:44px;min-height:44px;border:2px solid var(--line);background:#fff;border-radius:14px;font-size:20px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:4px;padding:0 8px;color:var(--ink);font-weight:800}
+.say.big{font-size:15px;padding:0 12px}
+.say.talk{background:#fff3c4;border-color:#f3d97a;animation:wob .5s infinite alternate}
+@keyframes wob{to{transform:scale(1.08)}}
+.magic .h-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.magic .h-row div{flex:1;min-width:0}
+.msg-row{display:flex;align-items:center;gap:8px;justify-content:center}
+.oops .msg-row{margin-top:6px}
+
+/* résultats */
+.res{margin-top:14px}
+@media (min-width:761px){.res{max-width:780px;margin-left:auto;margin-right:auto}}
+.res-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.res-head h4{margin:0;font-size:18px}
+.res-head h4 em{font-style:normal;color:var(--accent)}
+.res-head .btn{margin-left:auto}
+.props{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+@media (min-width:761px){.props{grid-template-columns:repeat(3,1fr);gap:14px}}
+.prop{position:relative;background:#fff;border:2px solid var(--line);border-radius:18px;padding:10px 8px 6px;cursor:pointer;text-align:center;transition:transform .12s,border-color .12s;animation:pop .35s both}
+.prop:hover{transform:translateY(-3px);border-color:#d8c8b0}
+.prop:active{transform:scale(.97)}
+.prop .cv{aspect-ratio:1;background:var(--peg);border-radius:12px;display:flex;align-items:center;justify-content:center;padding:8px}
+.prop canvas{width:100%;height:100%;image-rendering:pixelated;display:block}
+.prop b{display:block;font-size:15px;margin-top:5px;line-height:1.15}
+.prop small{display:block;color:#4f4766;font-size:14px;font-weight:600;line-height:1.2}
+.prop .heart{position:absolute;top:6px;right:6px;width:32px;height:32px;border-radius:50%;background:#fffd;border:2px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:15px;pointer-events:none}
+.prop.added{border-color:var(--accent2)}
+.prop.added .heart{background:var(--accent2);border-color:var(--accent2);color:#fff}
+@keyframes pop{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:none}}
+.props .prop:nth-child(2){animation-delay:.06s}.props .prop:nth-child(3){animation-delay:.12s}
+.props .prop:nth-child(4){animation-delay:.18s}.props .prop:nth-child(5){animation-delay:.24s}.props .prop:nth-child(6){animation-delay:.3s}
+.again{display:flex;justify-content:center;margin-top:12px}
+.again .btn{font-size:16px;padding:9px 18px}
+.hint{color:#4f4766;font-size:15px;font-weight:600;text-align:center;margin:0}
+
+/* chargement */
+.load .prop{cursor:default;animation:none}
+.load .prop:hover{transform:none;border-color:var(--line)}
+.load canvas{opacity:.95}
+.ld-msg{display:flex;align-items:center;gap:10px;background:#fff;border:2px dashed #ffc9c2;border-radius:14px;padding:8px 12px;margin-bottom:10px}
+.ld-msg .bead{width:22px;height:22px;border-radius:50%;background:var(--accent);position:relative;flex:none;animation:hop .7s infinite alternate ease-in}
+.ld-msg .bead:after{content:"";position:absolute;inset:7px;border-radius:50%;background:#fff}
+@keyframes hop{to{transform:translateY(-6px)}}
+.ld-msg b{font-size:16px}
+.ld-bar{height:8px;background:#f3e9da;border-radius:8px;overflow:hidden;margin-top:4px}
+.ld-bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),#f9a23b);border-radius:8px;transition:width .3s linear}
+.ld-txt{flex:1}
+.ld-txt small{color:#4f4766;font-size:14px}
+
+/* refusé / rien trouvé */
+.oops{background:#fff;border:2px solid var(--line);border-radius:18px;padding:16px;text-align:center}
+.oops canvas{width:72px;height:72px;image-rendering:pixelated}
+.oops h4{margin:4px 0 2px;font-size:19px}
+.oops p{margin:0 0 10px;color:var(--soft);font-size:15px}
+.oops .pills{justify-content:center;flex-wrap:wrap;overflow:visible;margin:0;padding:0}
+
+/* autres panneaux, repliés */
+.fold{display:flex;align-items:center;gap:10px;cursor:pointer}
+.fold h3{margin:0;font-size:17px}
+.fold small{color:var(--soft);font-size:13px;display:block;line-height:1.2}
+.fold .chev{margin-left:auto;color:var(--soft);font-weight:800;transition:transform .2s}
+.panel.open .chev{transform:rotate(90deg)}
+.fold-body{display:none;margin-top:12px}
+.panel.open .fold-body{display:block}
+.side-grid{display:grid;grid-template-columns:1fr;gap:0}
+@media (min-width:761px){.side-grid{grid-template-columns:1fr 1fr;gap:14px}}
+
+/* zoom : feuille du bas sur iPhone, fenêtre au centre sur ordinateur */
+.veil{position:fixed;inset:0;background:#2b234066;display:none;z-index:50;align-items:flex-end;justify-content:center}
+.veil.on{display:flex}
+.sheet{background:var(--bg);width:100%;max-height:92vh;overflow:auto;border-radius:24px 24px 0 0;padding:10px 16px calc(16px + env(safe-area-inset-bottom));animation:up .25s ease-out}
+.sheet .grab{width:44px;height:5px;border-radius:5px;background:#d9cdbb;margin:0 auto 8px}
+@keyframes up{from{transform:translateY(40px);opacity:.4}to{transform:none;opacity:1}}
+.z-top{display:flex;align-items:center;gap:8px}
+.z-top h3{margin:0;font-size:23px;flex:1;line-height:1.1}
+.z-x{border:0;background:#f3e9da;width:36px;height:36px;border-radius:50%;font-size:18px;cursor:pointer;color:var(--ink)}
+.z-body{display:grid;grid-template-columns:1fr;gap:12px;margin-top:8px}
+.z-art{background:#fff;border:2px solid var(--line);border-radius:18px;padding:10px;position:relative}
+.z-art canvas{display:block;max-width:100%;max-height:330px;width:auto;height:auto;margin:0 auto}
+.z-seg{display:flex;margin:10px auto 0;max-width:320px}
+.z-seg button{flex:1;min-height:44px;padding:6px 12px;font-size:16px}
+.facts{display:flex;gap:8px}
+.fact{flex:1;background:#fff;border:2px solid var(--line);border-radius:14px;padding:6px 8px;text-align:center}
+.fact b{display:block;font-size:22px;line-height:1.1}
+.fact small{color:#4f4766;font-size:14px;font-weight:600}
+.cols{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.colc{display:flex;align-items:center;gap:5px;background:#fff;border:2px solid var(--line);border-radius:999px;padding:2px 9px 2px 3px;font-size:13px;font-weight:700}
+.colc i{width:20px;height:20px;border-radius:50%;border:2px solid #0003;display:block;position:relative}
+.colc i:after{content:"";position:absolute;inset:5px;border-radius:50%;background:#fffd}
+.colc span{color:var(--soft);font-weight:600}
+.z-acts{display:flex;flex-direction:column;gap:8px;margin-top:12px;position:sticky;bottom:calc(-16px - env(safe-area-inset-bottom));background:var(--bg);padding:8px 0 calc(12px + env(safe-area-inset-bottom));z-index:2}
+@media (max-width:760px){.z-art canvas{max-height:250px}.cols{margin-top:8px}.fact b{font-size:19px}}
+.z-acts .btn{font-size:18px;padding:11px 14px;border-radius:16px}
+.z-acts .nav{display:flex;gap:8px}
+.z-acts .nav .btn{flex:1;font-size:15px;padding:8px}
+@media (min-width:761px){
+  .veil{align-items:center}
+  .sheet{width:760px;border-radius:24px;padding:18px 20px 20px;max-height:90vh}
+  .sheet .grab{display:none}
+  .z-body{grid-template-columns:1.1fr 1fr;gap:18px}
+}
+
+.toast{position:fixed;left:50%;top:14px;transform:translate(-50%,-80px);background:var(--accent2);color:#fff;font-weight:800;border-radius:999px;padding:8px 18px;z-index:60;box-shadow:0 6px 20px #0003;transition:transform .3s;white-space:nowrap;font-size:15px}
+.toast.on{transform:translate(-50%,0)}
+
+.prop .warn{display:block;color:var(--soft);font-size:13px}
+.oops .btn{margin-top:8px}
 </style>
 </head>
 <body>
@@ -161,8 +289,25 @@ input[type=range]{accent-color:var(--accent)}
 
   <!-- Créer -->
   <section id="creer" class="view">
-    <div class="panel">
-      <h3>📷 À partir d'une image</h3>
+    <div class="panel magic">
+      <div class="h-row"><div>
+        <h3>✨ Invente un modèle</h3>
+        <p class="sub" id="consigne" style="margin:0">✍️ Écris ce que tu veux dessiner, je te propose 6 idées.</p>
+      </div><button class="say big" data-say="#consigne" aria-label="Écouter la consigne">🔊 Écouter</button></div>
+      <form class="search" id="sform" autocomplete="off">
+        <span class="ic">🔍</span>
+        <input id="q" type="search" placeholder="Un dragon, un tracteur…" enterkeyhint="go" maxlength="40" aria-label="Ce que tu veux dessiner">
+        <button type="button" class="clear" id="clear" aria-label="Effacer">✕</button>
+        <button class="go" type="submit">Créer ✨</button>
+      </form>
+      <div class="pills" id="pills"></div>
+      <div class="res" id="res"></div>
+    </div>
+
+    <div class="side-grid">
+      <div class="panel" id="pImg">
+        <div class="fold"><span style="font-size:24px">📷</span><div><h3>À partir d'une image</h3><small>Transforme ton dessin ou une photo</small></div><span class="chev">›</span></div>
+        <div class="fold-body">
       <div class="row">
         <span class="file"><label class="btn" for="imgIn">Choisir une image</label><input type="file" id="imgIn" accept="image/*"></span>
         <label>Taille <b id="sizeLbl">24</b> cases</label>
@@ -173,8 +318,10 @@ input[type=range]{accent-color:var(--accent)}
       </div>
       <p class="tip">Choisis un dessin simple sur fond clair : ça marche beaucoup mieux qu'une photo. Les couleurs sont arrondies aux couleurs de perles les plus courantes.</p>
     </div>
-    <div class="panel">
-      <h3>🖌️ Dessiner</h3>
+      </div>
+      <div class="panel" id="pDraw">
+        <div class="fold"><span style="font-size:24px">🖌️</span><div><h3>Dessiner</h3><small>Case par case, sur une feuille vide</small></div><span class="chev">›</span></div>
+        <div class="fold-body">
       <div class="row">
         <label>Largeur</label><input type="number" id="wIn" min="4" max="48" value="16" style="width:60px;font:inherit">
         <label>Hauteur</label><input type="number" id="hIn" min="4" max="48" value="16" style="width:60px;font:inherit">
@@ -189,8 +336,43 @@ input[type=range]{accent-color:var(--accent)}
       </div>
       <p class="tip" id="saveTip">Tes créations s'ajoutent au catalogue dans « Mes modèles » (sur cet appareil uniquement).</p>
     </div>
+      </div>
+    </div>
   </section>
 </main>
+<!-- Zoom sur une proposition « Invente un modèle » -->
+<div class="veil" id="veil">
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="zTitle">
+    <div class="grab"></div>
+    <div class="z-top">
+      <h3 id="zTitle"></h3>
+      <button class="z-x" id="zClose" aria-label="Fermer">✕</button>
+    </div>
+    <div class="z-body">
+      <div class="z-art">
+        <canvas id="zCv"></canvas>
+        <div class="seg z-seg" id="zSeg"><button class="on" data-m="papier">✏️ Papier</button><button data-m="perles">⚪ Perles</button></div>
+      </div>
+      <div>
+        <div class="facts">
+          <div class="fact"><b id="zSize"></b><small>cases</small></div>
+          <div class="fact"><b id="zBeads"></b><small>perles</small></div>
+          <div class="fact"><b id="zCols"></b><small>couleurs</small></div>
+        </div>
+        <div class="cols" id="zColList"></div>
+        <div class="z-acts">
+          <button class="btn" id="zAdd">⭐ Ajouter à Mes modèles</button>
+          <div class="nav">
+            <button class="btn ghost" id="zPrev">‹ Précédente</button>
+            <button class="btn ghost" id="zNext">Suivante ›</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
 
 <script>
 /* ---------- Couleurs (proches des perles Hama / Perler) ---------- */
@@ -724,7 +906,7 @@ const $=s=>document.querySelector(s);
 function show(id){document.querySelectorAll(".view").forEach(v=>v.classList.toggle("on",v.id===id));
   document.querySelectorAll(".tabs button").forEach(b=>b.classList.toggle("on",b.dataset.tab===(id==="detail"?"catalogue":id)));
   window.scrollTo(0,0);}
-document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{show(b.dataset.tab);if(b.dataset.tab==="creer")drawEditor();});
+document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{from="catalogue";show(b.dataset.tab);if(b.dataset.tab==="creer")drawEditor();});
 
 /* ---------- Catalogue ---------- */
 let filter="Tous";
@@ -739,7 +921,7 @@ function renderCatalogue(){
     const cv=document.createElement("canvas");drawThumb(cv,it.grid);d.appendChild(cv);
     const cnt=it.grid.flat().filter(k=>k!==".").length;
     d.insertAdjacentHTML("beforeend",`<b>${esc(it.t)}</b><small>${it.grid[0].length}×${it.grid.length} · ${cnt} perles${it.lvl?` <span class="lvl">${"★".repeat(it.lvl)}</span>`:""}</small>`);
-    d.onclick=()=>openDetail(it);
+    d.onclick=()=>{from="catalogue";openDetail(it)};
     $("#tiles").appendChild(d);
   });
 }
@@ -747,8 +929,8 @@ function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;","
 
 /* ---------- Détail ---------- */
 let cur=null,mode="papier";
-function openDetail(it){cur=it;$("#dTitle").textContent=it.t;$("#exportBox").innerHTML="";renderBoard();show("detail");}
-$("#back").onclick=()=>show("catalogue");
+function openDetail(it){cur=it;$("#dTitle").textContent=it.t;$("#back").textContent=from==="creer"?"← Mes idées":"← Retour";$("#exportBox").innerHTML="";renderBoard();show("detail");}
+$("#back").onclick=()=>{if(from==="creer"){show("creer");from="catalogue"}else show("catalogue")};
 $("#modeSeg").querySelectorAll("button").forEach(b=>b.onclick=()=>{mode=b.dataset.mode;$("#modeSeg").querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===b));$("#exportBox").innerHTML="";renderBoard()});
 ["#optNum","#optCoord","#optBlank"].forEach(s=>$(s).onchange=()=>{$("#exportBox").innerHTML="";renderBoard()});
 
@@ -825,7 +1007,7 @@ $("#exportBtn").onclick=()=>{
   $("#exportBox").innerHTML=`<img alt="${esc(cur.t)}" src="${out.toDataURL("image/png")}"><p>Sur iPhone : appui long sur l'image → « Enregistrer dans Photos », puis imprime-la depuis Photos.</p>`;
   $("#exportBox").scrollIntoView({behavior:"smooth"});
 };
-$("#toEdit").onclick=()=>{loadEditor(cur.grid,cur.t);show("creer");drawEditor()};
+$("#toEdit").onclick=()=>{loadEditor(cur.grid,cur.t);from="catalogue";show("creer");openFold("#pDraw");$("#pDraw").scrollIntoView({behavior:"smooth"})};
 
 /* ---------- Éditeur ---------- */
 let eg=[],brush="K",hist=[];
@@ -867,7 +1049,7 @@ $("#useBtn").onclick=()=>{
   const t=$("#nameIn").value.trim()||"Mon dessin";
   const item={id:"m"+Date.now(),t,grid:g,cat:"Mes modèles",lvl:0};
   store.mine=[{id:item.id,t,grid:g},...(store.mine||[])].slice(0,40);saveStore();
-  renderCatalogue();openDetail(item);
+  renderCatalogue();from="catalogue";openDetail(item);
 };
 
 /* ---------- Image → pixel art ---------- */
@@ -892,8 +1074,163 @@ function convert(){
   const keep=new Set(Object.entries(count).sort((a,b)=>b[1]-a[1]).slice(0,maxC).map(e=>e[0]));
   for(let j=0;j<h;j++)for(let i=0;i<w;i++){if(g[j][i]!=="."&&!keep.has(g[j][i])){const p=(j*w+i)*4;g[j][i]=nearest(d[p],d[p+1],d[p+2],keep)}}
   hist.push(eg);eg=g;$("#wIn").value=w;$("#hIn").value=h;if(!$("#nameIn").value)$("#nameIn").value="Mon image";drawEditor();
-  ed.scrollIntoView({behavior:"smooth",block:"center"});
+  openFold("#pDraw");ed.scrollIntoView({behavior:"smooth",block:"center"});
 }
+
+/* ---------- Invente un modèle (issue #73) ----------
+   Le mot part vers l'Edge Function Supabase « genere-pixel » (pixel-arts/genere-pixel.ts),
+   qui demande 6 dessins à Claude et renvoie des grilles aux couleurs de perles de l'app. */
+const SB = (/^(app\.synapsium\.com|synapps-bhl\.pages\.dev|l33ko\.github\.io)$/.test(location.hostname) ? {url:'https://qxwypwcxdhhtgmzaskzs.supabase.co',key:'sb_publishable_BZ9SxprfxkC-dUQZori4zA_txbvmngw'} : {url:'https://zlfgcfexvawijldgiqbu.supabase.co',key:'sb_publishable_aLCilH09KKWb4IfJC4Sx1g_df2_RUrC'});
+const SUGG=[["🐉","dragon"],["🚜","tracteur"],["🍣","sushi"],["🦄","licorne"],["🚀","fusée"],["🐙","pieuvre"],["🦖","dinosaure"],["🌵","cactus"],["🧁","cupcake"]];
+const MSGS=["🔎 Je cherche des idées de {w}…","🎨 Je trie les perles par couleur…","🧩 Je pose les perles une par une…","⏳ Encore quelques perles…"];
+let props=[],word="",added=new Set(),genId=0,anim=null,from="catalogue";
+function count(grid){return grid.flat().filter(k=>k!==".").length}
+function pillsHTML(list,cut){return list.map(([e,w],i)=>`<button type="button" class="pill${cut!=null&&i>=cut?" xtra":""}" data-w="${esc(w)}"><span class="e">${e}</span>${esc(w)}</button>`).join("")}
+function drawPix(cv,grid,size){
+  const h=grid.length,w=grid[0].length,n=Math.max(w,h),s=Math.max(1,Math.floor(size/n));
+  cv.width=n*s;cv.height=n*s;const x=cv.getContext("2d");x.clearRect(0,0,cv.width,cv.height);
+  const ox=Math.floor((n-w)/2)*s,oy=Math.floor((n-h)/2)*s;
+  grid.forEach((r,j)=>r.forEach((k,i)=>{if(k!=="."){x.fillStyle=PAL[k].c;x.fillRect(ox+i*s,oy+j*s,s,s)}}));
+}
+function drawZoom(cv,grid,size,m){
+  const h=grid.length,w=grid[0].length,s=Math.max(4,Math.floor(size/Math.max(w,h)));
+  cv.width=w*s+2;cv.height=h*s+2;const x=cv.getContext("2d");
+  x.fillStyle="#fff";x.fillRect(0,0,cv.width,cv.height);
+  for(let j=0;j<h;j++)for(let i=0;i<w;i++){
+    const k=grid[j][i],px=1+i*s,py=1+j*s;
+    if(m==="perles"){
+      if(k==="."){x.fillStyle="#e2d8c8";x.beginPath();x.arc(px+s/2,py+s/2,s*.14,0,7);x.fill()}
+      else{x.fillStyle=PAL[k].c;x.beginPath();x.arc(px+s/2,py+s/2,s*.46,0,7);x.fill();x.strokeStyle="rgba(0,0,0,.25)";x.stroke();
+        x.fillStyle="#fffe";x.beginPath();x.arc(px+s/2,py+s/2,s*.15,0,7);x.fill()}
+    }else if(k!=="."){x.fillStyle=PAL[k].c;x.fillRect(px,py,s,s)}
+  }
+  if(m==="papier"){
+    for(let i=0;i<=w;i++){x.strokeStyle=i%5===0?"#8a8099":"#d6cfe0";x.lineWidth=i%5===0?2:1;x.beginPath();x.moveTo(1+i*s+.5,1);x.lineTo(1+i*s+.5,1+h*s);x.stroke()}
+    for(let j=0;j<=h;j++){x.strokeStyle=j%5===0?"#8a8099":"#d6cfe0";x.lineWidth=j%5===0?2:1;x.beginPath();x.moveTo(1,1+j*s+.5);x.lineTo(1+w*s,1+j*s+.5);x.stroke()}
+  }
+}
+$("#pills").innerHTML=`<button type="button" class="pill dice" data-w="?"><span class="e">🎲</span>Au hasard</button>`+pillsHTML(SUGG,5);
+$("#creer").addEventListener("click",e=>{
+  const p=e.target.closest(".pill");if(!p)return;
+  let w=p.dataset.w;if(w==="?")w=SUGG[Math.floor(Math.random()*SUGG.length)][1];
+  $("#q").value=w;$("#sform").classList.add("has");go(w);
+});
+$("#q").oninput=()=>$("#sform").classList.toggle("has",!!$("#q").value);
+$("#clear").onclick=()=>{$("#q").value="";$("#sform").classList.remove("has");genId++;cancelAnimationFrame(anim);$("#res").innerHTML="";$("#q").focus()};
+$("#sform").onsubmit=e=>{e.preventDefault();const w=$("#q").value.trim();if(w){$("#q").blur();go(w)}};
+
+function loading(){
+  const res=$("#res");
+  res.innerHTML=`<div class="load">
+    <div class="ld-msg"><span class="bead"></span><div class="ld-txt"><b id="ldT"></b><div class="ld-bar"><i id="ldB"></i></div><small>⏱️ Ça prend quelques secondes</small></div><button type="button" class="say" data-say="#ldT" aria-label="Écouter">🔊</button></div>
+    <div class="props">${Array.from({length:6},()=>`<div class="prop"><div class="cv"><canvas width="16" height="16"></canvas></div><b style="color:#c9bfd8">· · ·</b><small>&nbsp;</small></div>`).join("")}</div></div>`;
+  const cvs=[...res.querySelectorAll("canvas")],fills=cvs.map(()=>new Array(256).fill(null));
+  const pals=cvs.map(()=>{const k=KEYS.filter(k=>k!=="K"&&k!=="W");return[k[Math.random()*k.length|0],k[Math.random()*k.length|0],"K"]});
+  const t0=performance.now();
+  function frame(t){
+    if(!$("#ldB"))return;
+    const p=1-Math.exp(-(t-t0)/6000);                     // avance vite puis ralentit, sans jamais finir seule
+    $("#ldB").style.width=(p*100)+"%";
+    $("#ldT").textContent=MSGS[Math.min(MSGS.length-1,Math.floor(p*MSGS.length))].replace("{w}",word);
+    cvs.forEach((cv,i)=>{const x=cv.getContext("2d");
+      while(fills[i].filter(Boolean).length<p*150){const c=Math.random()*256|0;if(!fills[i][c])fills[i][c]=pals[i][Math.random()*3|0];}
+      x.fillStyle="#efe6d8";x.fillRect(0,0,16,16);
+      fills[i].forEach((k,c)=>{if(k){x.fillStyle=PAL[k].c;x.fillRect(c%16,c/16|0,1,1)}});});
+    anim=requestAnimationFrame(frame);
+  }
+  anim=requestAnimationFrame(frame);
+}
+function oops(titre,texte,mots){
+  cancelAnimationFrame(anim);
+  $("#res").innerHTML=`<div class="oops"><h4>${titre}</h4><p id="oopsP">${texte}</p>
+    ${mots&&mots.length?`<div class="pills">${pillsHTML(mots)}</div>`:""}
+    <div class="msg-row"><button type="button" class="say big" data-say=".oops h4,#oopsP" aria-label="Écouter">🔊 Écouter</button></div></div>`;
+}
+async function go(w){
+  const id=++genId;word=w.toLowerCase();loading();
+  let data=null,status=0;
+  try{
+    const r=await fetch(SB.url+"/functions/v1/genere-pixel",{method:"POST",
+      headers:{apikey:SB.key,"Content-Type":"application/json"},body:JSON.stringify({mot:w})});
+    status=r.status;data=await r.json().catch(()=>null);
+  }catch(e){data=null}
+  if(id!==genId)return;                                    // une autre recherche a été lancée entre-temps
+  if(!data){
+    oops("📡 Le dessinateur ne répond pas",status===404?"🔧 Cette fonction n'est pas encore installée.":"🔌 Vérifie la connexion, puis réessaie.");return}
+  if(data.refus==="personnage"){
+    const m=(data.suggestions||[]).map(s=>["✨",s]);
+    oops("🙈 Je ne dessine pas les personnages connus",`🎬 « ${esc(w)} » appartient à un dessin animé ou un jeu.<br>👉 J'invente plutôt quelque chose d'approchant :`,m.length?m:SUGG.slice(0,4));return}
+  if(data.refus){
+    oops("🙈 Je ne dessine pas ça",`🚫 « ${esc(w)} » n'est pas un mot pour Pixel arts.<br>👉 Essaie plutôt :`,[["🐉","dragon"],["🐱","chat"],["🏰","château"],["🚒","camion de pompiers"]]);return}
+  if(data.erreur==="quota"){oops("🌙 C'est tout pour aujourd'hui",`⏰ ${esc(data.message||"Reviens demain pour inventer d'autres modèles.")}<br>💡 En attendant, le catalogue a plein de modèles !`);return}
+  if(data.erreur||!Array.isArray(data.idees)||!data.idees.length){
+    oops("🤔 Je n'ai pas réussi",`❓ ${esc(data.message||"Essaie un autre mot.")}<br>🙋 Vérifie l'orthographe ou demande de l'aide à un grand.`,SUGG.slice(0,4));return}
+  cancelAnimationFrame(anim);
+  props=data.idees.slice(0,6).map((d,i)=>({id:"g"+Date.now()+"-"+i,t:String(d.titre||w),grid:parseArt(d.grille.join("\n"))}));
+  showResult();
+}
+function showResult(){
+  const res=$("#res");
+  res.innerHTML=`<div class="res-head"><h4>${props.length} idée${props.length>1?"s":""} de <em>${esc(word)}</em></h4></div>
+    <div class="props">${props.map((p,i)=>`<div class="prop${added.has(p.id)?" added":""}" data-i="${i}" role="button" tabindex="0" aria-label="Voir ${esc(p.t)} en grand"><span class="heart" aria-hidden="true">${added.has(p.id)?"✓":"🔍"}</span><div class="cv"><canvas></canvas></div><b>${esc(p.t)}</b><small>${p.grid[0].length} × ${p.grid.length} · ${count(p.grid)} perles</small></div>`).join("")}</div>
+    <div class="msg-row" style="margin-top:8px"><p class="hint" id="hint">👆 Touche une idée pour la voir en grand.</p><button type="button" class="say" data-say="#hint" aria-label="Écouter">🔊</button></div>
+    <div class="again"><button type="button" class="btn ghost" id="againBtn">🔄 6 autres idées</button></div>`;
+  res.querySelectorAll(".prop").forEach(el=>{drawPix(el.querySelector("canvas"),props[+el.dataset.i].grid,96);
+    el.onclick=()=>openZoom(+el.dataset.i);el.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();openZoom(+el.dataset.i)}}});
+  $("#againBtn").onclick=()=>go(word);
+}
+
+/* zoom : feuille du bas sur iPhone, fenêtre au centre sur ordinateur */
+let zi=0,zm="papier";
+function openZoom(i){zi=i;renderZoom();$("#veil").classList.add("on");document.body.style.overflow="hidden";$("#zAdd").focus()}
+function closeZoom(){$("#veil").classList.remove("on");document.body.style.overflow=""}
+function renderZoom(){
+  const p=props[zi],g=p.grid,u=colorsUsed(g);
+  $("#zTitle").textContent=p.t;
+  drawZoom($("#zCv"),g,600,zm);
+  $("#zSize").textContent=g[0].length+"×"+g.length;
+  $("#zBeads").textContent=count(g);
+  $("#zCols").textContent=u.length;
+  $("#zColList").innerHTML=u.map(([k,n])=>`<span class="colc"><i style="background:${PAL[k].c}"></i>${PAL[k].n}<span>× ${n}</span></span>`).join("");
+  const a=added.has(p.id);
+  $("#zAdd").textContent=a?"✓ Déjà dans Mes modèles : l'ouvrir":"⭐ Ajouter à Mes modèles";
+  $("#zAdd").className="btn"+(a?" alt":"");
+  $("#zPrev").parentElement.style.display=props.length>1?"":"none";
+}
+$("#zSeg").querySelectorAll("button").forEach(b=>b.onclick=()=>{zm=b.dataset.m;$("#zSeg").querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===b));renderZoom()});
+$("#zClose").onclick=closeZoom;
+$("#veil").onclick=e=>{if(e.target.id==="veil")closeZoom()};
+$("#zPrev").onclick=()=>{zi=(zi+props.length-1)%props.length;renderZoom()};
+$("#zNext").onclick=()=>{zi=(zi+1)%props.length;renderZoom()};
+$("#zAdd").onclick=()=>{
+  const p=props[zi];
+  if(!added.has(p.id)){
+    added.add(p.id);
+    store.mine=[{id:p.id,t:p.t,grid:p.grid},...(store.mine||[])].slice(0,40);saveStore();renderCatalogue();
+    toast("⭐ Ajouté à Mes modèles !");speak("Ajouté à Mes modèles !");
+  }
+  const el=document.querySelector(`.prop[data-i="${zi}"]`);if(el){el.classList.add("added");el.querySelector(".heart").textContent="✓"}
+  closeZoom();from="creer";openDetail({...p,cat:"Mes modèles",lvl:0});
+};
+document.addEventListener("keydown",e=>{if(!$("#veil").classList.contains("on"))return;if(e.key==="Escape")closeZoom();if(e.key==="ArrowRight")$("#zNext").click();if(e.key==="ArrowLeft")$("#zPrev").click()});
+function toast(t){const el=$("#toast");el.textContent=t;el.classList.add("on");clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.remove("on"),2200)}
+
+/* lecture à voix haute, avec la voix du navigateur (sans lire les emojis) */
+function speak(txt,btn){
+  const S=window.speechSynthesis;document.querySelectorAll(".say.talk").forEach(b=>b.classList.remove("talk"));
+  if(!S){toast("🔇 Pas de voix sur cet appareil");return}
+  S.cancel();
+  const u=new SpeechSynthesisUtterance(txt.replace(/[\p{Extended_Pictographic}\u{FE0F}\u{20E3}]/gu,"").replace(/\s+/g," ").trim());
+  u.lang="fr-FR";u.rate=.9;const v=S.getVoices().find(v=>v.lang&&v.lang.startsWith("fr"));if(v)u.voice=v;
+  if(btn){btn.classList.add("talk");u.onend=u.onerror=()=>btn.classList.remove("talk")}
+  S.speak(u);
+}
+document.addEventListener("click",e=>{const b=e.target.closest("[data-say]");if(!b)return;e.stopPropagation();
+  speak([...document.querySelectorAll(b.dataset.say)].map(n=>n.innerText).join(". "),b)},true);
+
+/* panneaux « À partir d'une image » et « Dessiner », repliés par défaut */
+function openFold(id){const p=$(id);if(!p.classList.contains("open")){p.classList.add("open")}if(id==="#pDraw")drawEditor()}
+document.querySelectorAll(".fold").forEach(f=>f.onclick=()=>{const p=f.parentElement;p.classList.toggle("open");if(p.id==="pDraw"&&p.classList.contains("open"))drawEditor()});
 
 /* ---------- Démarrage ---------- */
 buildPal();renderCatalogue();window.addEventListener("resize",()=>{if($("#creer").classList.contains("on"))drawEditor()});

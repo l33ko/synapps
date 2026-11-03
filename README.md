@@ -92,6 +92,7 @@ Des modèles de pixel art pour les enfants, à recopier sur papier quadrillé ou
 - **Mode papier** : grille avec repères (chiffres et lettres) et un trait plus marqué tous les 5 carreaux ; option « Numéros » + « Grille vide » pour un coloriage magique.
 - **Mode perles** : le modèle sur une plaque à picots, avec la liste des perles à préparer par couleur et le total.
 - **Image à garder** : une image du modèle avec sa légende, à enregistrer ou imprimer.
+- **Invente un modèle** (onglet Créer) : on tape un mot (« dragon », « tracteur »…) ou on touche une suggestion, et l'app propose 6 pixel arts originaux dessinés par Claude, aux couleurs des perles ; on agrandit une idée (taille, perles par couleur, papier / perles) puis on l'ajoute à « Mes modèles ». Les mots inadaptés aux enfants et les personnages protégés sont refusés, avec des idées de remplacement ; un bouton 🔊 lit les consignes. Fonctionne avec l'Edge Function [`pixel-arts/genere-pixel.ts`](pixel-arts/genere-pixel.ts) (clé API Claude dans les secrets Supabase) et la table de [`pixel-arts/supabase.sql`](pixel-arts/supabase.sql), qui plafonne le nombre de recherches par jour.
 - **Créer** : transformer une image en pixel art (taille et nombre de couleurs réglables, couleurs de perles courantes) ou dessiner case par case. Les créations s'ajoutent au catalogue dans « Mes modèles », enregistrées dans le navigateur de l'appareil.
 
 ## Rétro Console
