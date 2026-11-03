@@ -17,7 +17,10 @@
 //    { idees: [{ titre, grille: ["..KK..", ...] }, ...] }   jusqu'à 6 idées
 //    { refus: "personnage" | "inadapte", message, suggestions: [..] }
 //    { erreur: "quota" | "mot" | "service", message }
-//  Rien n'est enregistré à part le compteur (appareil anonymisé, effacé après 2 jours).
+//  Seul le compteur des recherches est enregistré (empreinte de l'appareil et mot tapé),
+//  effacé au bout de 2 jours. Chaque recherche est réservée AVANT d'appeler Claude
+//  (fonction SQL pixel_reserver), pour que les plafonds tiennent même avec des requêtes simultanées.
+//  Conseil : donner à la clé Claude une limite de dépense mensuelle (Console Claude > Limits).
 // =============================================================
 
 const CORS = {
@@ -30,8 +33,9 @@ const reply = (data: unknown, status = 200) =>
 
 const env = (k: string, d = '') => Deno.env.get(k) || d;
 const MODELE = env('ANTHROPIC_MODEL', 'claude-haiku-5-5');
-const LIM_APPAREIL = +env('LIMITE_JOUR_APPAREIL', '20');
-const LIM_TOTAL = +env('LIMITE_JOUR_TOTAL', '300');
+const nombre = (k: string, d: number) => { const n = parseInt(env(k), 10); return Number.isFinite(n) && n > 0 ? n : d; };
+const LIM_APPAREIL = nombre('LIMITE_JOUR_APPAREIL', 20);
+const LIM_TOTAL = nombre('LIMITE_JOUR_TOTAL', 300);   // plafonné à 1000 côté SQL quoi qu'il arrive
 const SB_URL = env('SUPABASE_URL');
 const SB_KEY = env('SUPABASE_SERVICE_ROLE_KEY');
 
@@ -69,29 +73,27 @@ Format du dessin :
 Réponds uniquement avec un objet JSON, sans texte autour :
 {"titre":"2 à 4 mots en français","grille":["....KKKK....", "..."]}`;
 
+// Empreinte de l'appareil : hachage de l'adresse IP avec un sel secret (dérivé de la clé
+// service_role, jamais publiée) qui change chaque jour : impossible de remonter à l'adresse.
 async function hacher(t: string) {
-  const d = await crypto.subtle.digest('SHA-256', new TextEncoder().encode('synapps-pixel|' + t));
+  const jour = new Date().toISOString().slice(0, 10);
+  const d = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(`${SB_KEY}|${jour}|${t}`));
   return [...new Uint8Array(d)].slice(0, 12).map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
-async function compter(filtre: string) {
-  const r = await fetch(`${SB_URL}/rest/v1/pixel_generations?select=id&${filtre}`, {
-    headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`, Prefer: 'count=exact', Range: '0-0' },
-  });
-  const n = +(r.headers.get('content-range') || '').split('/')[1];
-  return Number.isFinite(n) ? n : 0;
-}
-
-async function noter(appareil: string, mot: string) {
-  await fetch(`${SB_URL}/rest/v1/pixel_generations`, {
-    method: 'POST',
-    headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
-    body: JSON.stringify({ appareil, mot: mot.slice(0, 40) }),
-  }).catch(() => {});
-  // ménage : rien n'est gardé plus de 2 jours
-  fetch(`${SB_URL}/rest/v1/pixel_generations?created_at=lt.${new Date(Date.now() - 2 * 864e5).toISOString()}`, {
-    method: 'DELETE', headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}` },
-  }).catch(() => {});
+// Réserve une recherche (comptage + ajout dans la même transaction, verrouillée).
+// Renvoie true si c'est autorisé, false si un plafond est atteint, null si le comptage a échoué.
+async function reserver(appareil: string, mot: string) {
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/rpc/pixel_reserver`, {
+      method: 'POST',
+      headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ p_appareil: appareil, p_mot: mot.slice(0, 40), p_lim_appareil: LIM_APPAREIL, p_lim_total: LIM_TOTAL }),
+    });
+    if (!r.ok) return null;
+    const v = await r.json();
+    return v === true ? true : v === false ? false : null;
+  } catch { return null; }
 }
 
 function lireJSON(t: string) {
@@ -145,18 +147,13 @@ Deno.serve(async (req) => {
   if (!mot || mot.length > 40 || !/^[\p{L}\p{N}' -]+$/u.test(mot))
     return reply({ erreur: 'mot', message: 'Écris un mot simple, sans signes bizarres.' });
 
-  // Plafonds : par appareil (adresse anonymisée) et pour tout le monde
-  const ip = (req.headers.get('x-forwarded-for') || '').split(',')[0].trim() || req.headers.get('cf-connecting-ip') || 'inconnu';
-  const appareil = await hacher(ip);
-  const depuis = new Date(Date.now() - 864e5).toISOString();
-  if (SB_URL && SB_KEY) {
-    const [moi, tous] = await Promise.all([
-      compter(`appareil=eq.${appareil}&created_at=gte.${depuis}`),
-      compter(`created_at=gte.${depuis}`),
-    ]);
-    if (moi >= LIM_APPAREIL || tous >= LIM_TOTAL)
-      return reply({ erreur: 'quota', message: 'Assez de dessins inventés pour aujourd’hui ! Reviens demain.' });
-  }
+  // Plafonds : par appareil et pour tout le monde. Sans comptage possible, on n'appelle pas Claude.
+  const ip = req.headers.get('cf-connecting-ip') || req.headers.get('x-real-ip')
+    || (req.headers.get('x-forwarded-for') || '').split(',')[0].trim() || 'inconnu';
+  if (!SB_URL || !SB_KEY) return reply({ erreur: 'service', message: 'Le service n’est pas prêt.' });
+  const ok = await reserver(await hacher(ip), mot);
+  if (ok === false) return reply({ erreur: 'quota', message: 'Assez de dessins inventés pour aujourd’hui ! Reviens demain.' });
+  if (ok !== true) return reply({ erreur: 'service', message: 'Le service n’est pas prêt.' });
 
   // 6 appels en parallèle (un par angle) : plus rapide et plus varié qu'un seul long appel
   const resultats = await Promise.allSettled(ANGLES.map(a => demander(mot, a)));
@@ -166,7 +163,6 @@ Deno.serve(async (req) => {
   // Un seul refus suffit (prudence : public d'enfants)
   const refus = reponses.find(r => r.refus);
   if (refus) {
-    if (SB_URL && SB_KEY) await noter(appareil, mot);
     return reply({
       refus: refus.refus === 'personnage' ? 'personnage' : 'inadapte',
       suggestions: Array.isArray(refus.suggestions) ? refus.suggestions.slice(0, 3).map(String) : [],
@@ -176,7 +172,6 @@ Deno.serve(async (req) => {
   const idees = reponses
     .map(r => ({ titre: String(r.titre || mot).slice(0, 40), grille: nettoyer(r.grille) }))
     .filter(i => i.grille);
-  if (SB_URL && SB_KEY) await noter(appareil, mot);
   if (!idees.length) return reply({ erreur: 'service', message: 'Je n’ai pas réussi à dessiner ça. Essaie un autre mot.' });
   return reply({ idees });
 });

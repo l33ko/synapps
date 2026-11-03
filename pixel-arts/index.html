@@ -243,6 +243,7 @@ input[type=range]{accent-color:var(--accent)}
 .toast{position:fixed;left:50%;top:14px;transform:translate(-50%,-80px);background:var(--accent2);color:#fff;font-weight:800;border-radius:999px;padding:8px 18px;z-index:60;box-shadow:0 6px 20px #0003;transition:transform .3s;white-space:nowrap;font-size:15px}
 .toast.on{transform:translate(-50%,0)}
 
+#creer.busy .pill,.search .go:disabled{opacity:.55;cursor:wait}
 .prop .warn{display:block;color:var(--soft);font-size:13px}
 .oops .btn{margin-top:8px}
 </style>
@@ -1112,14 +1113,16 @@ function drawZoom(cv,grid,size,m){
 $("#pills").innerHTML=`<button type="button" class="pill dice" data-w="?"><span class="e">🎲</span>Au hasard</button>`+pillsHTML(SUGG,5);
 $("#creer").addEventListener("click",e=>{
   const p=e.target.closest(".pill");if(!p)return;
-  let w=p.dataset.w;if(w==="?")w=SUGG[Math.floor(Math.random()*SUGG.length)][1];
+  if(p.disabled)return;let w=p.dataset.w;if(w==="?")w=SUGG[Math.floor(Math.random()*SUGG.length)][1];
   $("#q").value=w;$("#sform").classList.add("has");go(w);
 });
 $("#q").oninput=()=>$("#sform").classList.toggle("has",!!$("#q").value);
-$("#clear").onclick=()=>{$("#q").value="";$("#sform").classList.remove("has");genId++;cancelAnimationFrame(anim);$("#res").innerHTML="";$("#q").focus()};
-$("#sform").onsubmit=e=>{e.preventDefault();const w=$("#q").value.trim();if(w){$("#q").blur();go(w)}};
+$("#clear").onclick=()=>{$("#q").value="";$("#sform").classList.remove("has");genId++;cancelAnimationFrame(anim);busy(false);$("#res").innerHTML="";$("#q").focus()};
+$("#sform").onsubmit=e=>{e.preventDefault();const w=$("#q").value.trim();if(w&&!$("#sform .go").disabled){$("#q").blur();go(w)}};
 
+function busy(on){$("#sform .go").disabled=on;document.querySelectorAll("#creer .pill").forEach(b=>b.disabled=on);$("#creer").classList.toggle("busy",on)}
 function loading(){
+  cancelAnimationFrame(anim);busy(true);
   const res=$("#res");
   res.innerHTML=`<div class="load">
     <div class="ld-msg"><span class="bead"></span><div class="ld-txt"><b id="ldT"></b><div class="ld-bar"><i id="ldB"></i></div><small>⏱️ Ça prend quelques secondes</small></div><button type="button" class="say" data-say="#ldT" aria-label="Écouter">🔊</button></div>
@@ -1155,6 +1158,8 @@ async function go(w){
     status=r.status;data=await r.json().catch(()=>null);
   }catch(e){data=null}
   if(id!==genId)return;                                    // une autre recherche a été lancée entre-temps
+  busy(false);
+  if(data&&!data.idees&&!data.refus&&!data.erreur)data=null;    // réponse de Supabase (fonction absente…), pas de la nôtre
   if(!data){
     oops("📡 Le dessinateur ne répond pas",status===404?"🔧 Cette fonction n'est pas encore installée.":"🔌 Vérifie la connexion, puis réessaie.");return}
   if(data.refus==="personnage"){
