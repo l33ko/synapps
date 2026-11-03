@@ -656,7 +656,7 @@ function drawResults() {
    Le carnet répond à chaque touche ; le web seulement après une pause de frappe (600 ms) et 3 lettres,
    ou tout de suite à la validation. Les réponses sont gardées en mémoire pendant la visite. */
 const W = { cle: '', etat: 'idle', liste: [], err: '', suite: false, page: 0, plus: false, tri: 'fiable', seq: 0, timer: null, attente: false, cache: new Map() };
-const WEB_MIN = 3, WEB_PAUSE = 600;
+const WEB_MIN = 3, WEB_PAUSE = 1000;
 let flashId = null;
 function askWeb(maintenant = false) {
   const qq = filt.q.trim().replace(/\s+/g, ' '), cle = norm(qq);

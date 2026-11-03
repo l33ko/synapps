@@ -38,7 +38,8 @@ const MAX_PAGES = 10;
 function siteDe(u: string) {
   try {
     const url = new URL(u), h = url.hostname.replace(/^www\./, '');
-    const s = SITES.find(([d]) => h === d || h.endsWith('.' + d));
+    if (url.protocol !== 'https:' || url.port) return null;           // https sur le port standard uniquement
+    const s = SITES.find(([d]) => h === d);
     if (!s || !(s[2] as RegExp).test(url.pathname) || PAS_FICHE.test(url.pathname + url.search)) return null;
     return s[1] as string;
   } catch { return null; }
@@ -47,7 +48,7 @@ function siteDe(u: string) {
 async function lirePage(url: string) {
   try {
     const r = await fetch(url, {
-      redirect: 'follow',
+      redirect: 'manual',                       // pas de redirection vers un autre site
       signal: AbortSignal.timeout(6000),
       headers: {
         'user-agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1',
@@ -55,9 +56,17 @@ async function lirePage(url: string) {
         'accept-language': 'fr-FR,fr;q=0.9,en;q=0.7',
       },
     });
-    if (!r.ok) return null;
-    // On lit la page jusqu'à la fiche « Recipe » (elle est le plus souvent dans l'en-tête), 4 Mo au plus
-    return (await r.text()).slice(0, 4_000_000);
+    if (!r.ok || !r.body) return null;
+    // On lit la page par morceaux, 1,5 Mo au plus (la fiche « Recipe » est le plus souvent dans l'en-tête)
+    const lecteur = r.body.getReader(), dec = new TextDecoder();
+    let html = '';
+    while (html.length < 1_500_000) {
+      const { done, value } = await lecteur.read();
+      if (done) break;
+      html += dec.decode(value, { stream: true });
+    }
+    lecteur.cancel().catch(() => {});
+    return html;
   } catch { return null; }
 }
 
@@ -87,6 +96,14 @@ function noteDe(html: string) {
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS });
+  // Réservé aux personnes connectées : « Verify JWT » vérifie la signature, on vérifie ici le rôle
+  // (une ancienne clé « anon », publique, serait sinon acceptée).
+  {
+    const jwt = (req.headers.get('authorization') || '').replace(/^Bearer /i, '');
+    let role = '';
+    try { role = JSON.parse(atob(jwt.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'))).role; } catch { /* jeton illisible */ }
+    if (role !== 'authenticated') return new Response(JSON.stringify({ error: 'Connexion requise', code: 'requete' }), { status: 401, headers: { ...CORS, 'Content-Type': 'application/json; charset=utf-8' } });
+  }
   if (req.method !== 'POST') return reply({ error: 'Méthode non permise', code: 'requete' });
 
   let q = '', page = 0;
@@ -95,7 +112,7 @@ Deno.serve(async (req) => {
     q = String(b.q || '').replace(/\s+/g, ' ').trim().slice(0, 100);
     page = Math.max(0, Math.min(9, parseInt(b.page, 10) || 0));
   } catch {}
-  if (q.length < 2) return reply({ error: 'Tape au moins 3 lettres pour chercher sur le web.', code: 'requete' });
+  if (q.length < 3) return reply({ error: 'Tape au moins 3 lettres pour chercher sur le web.', code: 'requete' });
 
   const KEY = Deno.env.get('BRAVE_API_KEY');
   if (!KEY) return reply({ error: 'La recherche sur le web n’est pas encore configurée (clé BRAVE_API_KEY à ajouter dans Supabase).', code: 'cle' });
