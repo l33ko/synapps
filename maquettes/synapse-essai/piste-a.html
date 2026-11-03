@@ -1,0 +1,400 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Synapse · essai guidé · piste A (maquette)</title>
+<meta name="theme-color" content="#1b46d1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,200..800&display=swap">
+<style>
+/* Maquette — piste A : l'essai guidé vit dans l'écran d'introduction, en tutoriel pas à pas.
+   Styles repris de synapse/index.html (papier millimétré, cartes plates, écran de jeu sombre). */
+:root{
+  --paper:#f3f6f7;--rule:#dbe4e8;--card:#ffffff;--ink:#13212b;--ink2:#566874;--edge:#b9c7ce;
+  --accent:#1b46d1;--accent-ink:#ffffff;--ok:#0f7a4d;--bad:#b3261e;--screen:#16202a;--screen-ink:#eef3f6;
+  --lit:#ffd23f;--on-tc:#ffffff;--c-att:#d1334a;--soft:#fff7db;--soft-edge:#e7c662;
+  --f:"Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root{--paper:#0d1620;--rule:#18242f;--card:#131f2a;--ink:#e6edf2;--ink2:#93a5b2;--edge:#2b3b48;
+    --accent:#86a0ff;--accent-ink:#0d1620;--ok:#5fd39a;--bad:#ff8a80;--screen:#0a1118;--on-tc:#0d1620;--c-att:#ff7f90;
+    --soft:#2a2410;--soft-edge:#6b5a1f;color-scheme:dark}
+}
+.t-att{--tc:var(--c-att)}
+*{box-sizing:border-box}
+html{touch-action:manipulation;-webkit-text-size-adjust:100%}
+body{
+  margin:0;background-color:var(--paper);
+  background-image:linear-gradient(var(--rule) 1px,transparent 1px),linear-gradient(90deg,var(--rule) 1px,transparent 1px);
+  background-size:22px 22px;color:var(--ink);font-family:var(--f);font-size:16px;line-height:1.45;
+  padding-block:0 48px;
+}
+.wrap{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+#app{max-width:34rem;margin:20px auto 0;display:flex;flex-direction:column;gap:16px}
+h1{font-size:clamp(1.9rem,7vw,2.4rem);line-height:1.05;font-weight:800;font-stretch:80%;letter-spacing:-.02em;margin:0;text-wrap:balance}
+h2{font-size:1.15rem;font-weight:700;margin:0}
+p{margin:0}
+.sub,.note{color:var(--ink2)}
+.note{font-size:.92rem}
+.card{background:var(--card);border:1px solid var(--edge);border-radius:4px;padding:16px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.bk{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.ex{color:var(--ink2);font-size:.9rem;text-align:center;min-width:0}
+button{font:inherit;color:inherit}
+button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.btn{font-weight:700;font-size:1.05rem;background:var(--accent);color:var(--accent-ink);border:1px solid var(--accent);border-radius:4px;min-height:52px;padding:12px 18px;cursor:pointer;width:100%;display:flex;align-items:center;justify-content:center;text-decoration:none}
+.btn.s{background:transparent;color:var(--accent)}
+.lnk{background:none;border:0;color:var(--accent);padding:10px 0;min-height:44px;cursor:pointer;text-decoration:underline;text-underline-offset:3px;white-space:nowrap}
+.lnk.strong{font-weight:700}
+.fin{color:var(--ok);font-weight:600}
+.tb{height:6px;border:1px solid var(--ink);border-radius:3px;overflow:hidden;background:var(--card)}
+.tb i{display:block;height:100%;width:100%;background:var(--accent);transition:width .1s linear}
+.hud{display:flex;justify-content:space-between;gap:12px;font-variant-numeric:tabular-nums}
+.screen{background:var(--screen);color:var(--screen-ink);border-radius:4px;min-height:160px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:18px;text-align:center;transition:opacity .25s,box-shadow .25s}
+.screen.sm{min-height:0;padding:14px}
+.screen.good{outline:3px solid var(--ok);outline-offset:-3px}
+.wd{font-size:clamp(2.4rem,12vw,3.4rem);font-weight:800;font-stretch:85%;letter-spacing:.02em;transition:opacity .25s}
+.opts{display:grid;gap:10px;grid-template-columns:repeat(var(--cols,2),1fr);transition:opacity .25s}
+.op{font-weight:600;font-size:1.1rem;background:var(--card);color:var(--ink);border:1.5px solid var(--ink);border-radius:4px;min-height:56px;padding:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;position:relative}
+@media (hover:hover){.op:hover{background:var(--rule)}}
+.op svg{width:44px;height:44px;display:block}
+.arrows{display:flex;gap:8px;align-items:center;justify-content:center}
+.aw{width:clamp(34px,11vw,48px);height:clamp(34px,11vw,48px);display:block;transition:opacity .25s}
+.aw.fl{transform:scaleX(-1)}
+
+/* ---------- Nouveautés de la piste A ---------- */
+.pill{display:inline-flex;align-items:center;gap:6px;border:1.5px solid var(--tc);color:var(--ink);border-radius:999px;padding:2px 10px;font-size:.85rem;font-weight:600;background:var(--card)}
+.pill i{width:8px;height:8px;border-radius:2px;background:var(--tc);display:block}
+.ttl{display:flex;flex-direction:column;gap:6px}
+.ttl .row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+/* frise : Consigne · Essai 1 · Essai 2 · Essai 3 */
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;list-style:none;margin:0;padding:0}
+.steps li{display:flex;flex-direction:column;gap:5px;font-size:.78rem;color:var(--ink2);text-align:center}
+.steps li b{display:block;height:6px;border-radius:3px;background:var(--rule);border:1px solid var(--edge)}
+.steps li.dn b{background:var(--accent);border-color:var(--accent)}
+.steps li.on{color:var(--ink);font-weight:700}
+.steps li.on b{background:linear-gradient(90deg,var(--accent) 50%,var(--rule) 50%);border-color:var(--accent)}
+/* zone de jeu en ralenti */
+.stage{display:flex;flex-direction:column;gap:12px}
+.dim{opacity:.28}
+.hl{box-shadow:0 0 0 3px var(--lit),0 0 0 7px rgba(255,210,63,.28);border-radius:6px}
+.screen.hl{box-shadow:0 0 0 3px var(--lit),0 0 0 8px rgba(255,210,63,.28)}
+.aw.mid{color:var(--lit)}
+.ink-hl{text-decoration:underline wavy var(--lit) 3px;text-underline-offset:10px}
+/* bulle de consigne */
+.bub{position:relative;background:var(--accent);color:var(--accent-ink);border-radius:8px;padding:14px 16px;font-size:1.12rem;line-height:1.35;font-weight:600;display:flex;flex-direction:column;gap:10px;animation:pop .25s ease-out}
+.bub::before{content:"";position:absolute;left:var(--px,50%);margin-left:-10px;border:10px solid transparent}
+.bub.up::before{top:-19px;border-bottom-color:var(--accent)}
+.bub.down::before{bottom:-19px;border-top-color:var(--accent)}
+.bub .cnt{font-size:.8rem;font-weight:500;opacity:.85}
+.bub .bf{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.bub .bn{background:var(--accent-ink);color:var(--accent);border:0;border-radius:4px;min-height:44px;padding:8px 18px;font-weight:700;cursor:pointer}
+.bub .bp{background:none;border:0;color:var(--accent-ink);min-height:44px;padding:8px 4px;cursor:pointer;text-decoration:underline;text-underline-offset:3px;font-weight:500}
+.sw{display:inline-block;width:.9em;height:.9em;border-radius:3px;vertical-align:-.08em;border:2px solid var(--accent-ink);margin-right:2px}
+.kbd{display:inline-block;border:1.5px solid currentColor;border-radius:4px;padding:0 6px;font-size:.9em;line-height:1.3}
+/* retours pendant l'essai */
+.fb{border-radius:8px;padding:14px 16px;display:flex;flex-direction:column;gap:10px;animation:pop .25s ease-out;position:relative}
+.fb b{font-size:1.12rem}
+.fb.good{background:var(--card);border:2px solid var(--ok)}
+.fb.good b{color:var(--ok)}
+.fb.soft{background:var(--soft);border:2px solid var(--soft-edge)}
+.fb.hint{background:var(--soft);border:2px dashed var(--soft-edge)}
+.calm{display:flex;justify-content:space-between;align-items:center;gap:10px;min-height:44px;padding:0 4px}
+.calm .note{font-size:.95rem}
+/* zone d'aide : place réservée d'avance. Tous les messages possibles sont empilés dans la même case
+   (invisibles sauf un) : la case prend la hauteur du plus long, les boutons ne bougent jamais. */
+.slot{display:grid}
+.slot>*{grid-area:1/1;visibility:hidden}
+.slot>.on{visibility:visible}
+.slot .fb{animation:none}
+.slot>.on.fb{animation:pop .25s ease-out}
+.fb .lnk{align-self:flex-start;padding:0;min-height:44px;font-weight:700}
+.after{min-height:52px}
+.slot>.calm{align-self:center}
+.op.glow{box-shadow:0 0 0 3px var(--lit),0 0 0 8px rgba(255,210,63,.35);animation:glow 1.3s ease-in-out infinite;z-index:1}
+.op.tried{opacity:.45;border-style:dashed}
+.op.right{background:var(--ok);border-color:var(--ok);color:#fff}
+.op.right svg{color:#fff}
+@keyframes glow{50%{box-shadow:0 0 0 3px var(--lit),0 0 0 12px rgba(255,210,63,.12)}}
+@keyframes pop{from{transform:translateY(6px);opacity:0}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){.bub,.fb,.op.glow{animation:none}}
+.recap{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.92rem;color:var(--ink2)}
+.recap span{display:inline-flex;align-items:center;gap:4px}
+.recap svg{color:var(--ok);flex:none}
+.card.tight{gap:8px;padding:14px 16px}
+.rule{background:var(--screen);color:var(--screen-ink);border-radius:4px;padding:14px 16px;font-size:1.1rem;font-weight:600;text-align:center}
+.rule em{font-style:normal;color:var(--lit)}
+.toast{background:var(--card);border:1px solid var(--edge);border-left:4px solid var(--accent);border-radius:4px;padding:10px 12px;font-size:.92rem}
+.kv{display:grid;grid-template-columns:1fr auto;gap:8px 12px;margin:0}
+.kv dt{color:var(--ink2)}
+.kv dd{margin:0;font-weight:600;text-align:right;font-variant-numeric:tabular-nums}
+.alt{display:flex;flex-direction:column;gap:4px}
+.alt .note{text-align:center}
+
+/* ---------- Bandeau de la maquette (hors app) ---------- */
+.meta{background:var(--card);border-bottom:2px dashed var(--edge);padding-top:14px;padding-bottom:12px}
+.meta-in{max-width:62rem;margin:0 auto;display:flex;flex-direction:column;gap:8px}
+.meta .tt{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.meta .tt b{font-size:1.05rem}
+.meta .tag{background:var(--accent);color:var(--accent-ink);border-radius:999px;padding:1px 10px;font-size:.78rem;font-weight:700}
+.meta p{font-size:.92rem}
+.pc{display:grid;grid-template-columns:1fr 1fr;gap:6px 18px;font-size:.84rem;color:var(--ink2)}
+.pc ul{margin:2px 0 0;padding-left:18px}
+.pc h3{margin:0;font-size:.8rem;text-transform:uppercase;letter-spacing:.05em;color:var(--ink)}
+.scn{display:flex;flex-wrap:wrap;gap:6px;padding:2px 0}
+.scn button{flex:none;border:1.5px solid var(--edge);background:var(--card);border-radius:999px;min-height:36px;padding:0 12px;cursor:pointer;font-size:.85rem;white-space:nowrap}
+.scn button[aria-pressed="true"]{border:2px solid var(--accent);color:var(--accent);font-weight:700;padding:0 11px}
+.meta summary{cursor:pointer;font-size:.85rem;color:var(--accent);list-style:none;display:flex;align-items:center;gap:10px;min-height:36px}
+.meta summary::-webkit-details-marker{display:none}
+.meta summary u{text-underline-offset:3px}
+.meta .dt{display:flex;flex-direction:column;gap:8px}
+@media (min-width:641px){.meta summary{display:none}}
+/* sur iPhone : bandeau replié en une ligne + la rangée des écrans (défilable), pour laisser l'app visible */
+@media (max-width:640px){
+  .meta{padding-top:4px;padding-bottom:6px}
+  .meta-in{gap:2px}
+  .pc{grid-template-columns:1fr}
+  .meta details:not([open]) .dt{display:none}
+  .meta details[open] .dt{padding-top:6px}
+  .scn{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-right:calc(-1 * max(16px,env(safe-area-inset-right,0px)));padding-right:16px}
+  .scn::-webkit-scrollbar{display:none}
+  .scn button{min-height:34px}
+  #app{margin-top:8px;gap:12px}
+  /* écran d'essai sur iPhone : tout doit tenir au-dessus du pli, boutons de réponse compris */
+  .ttl.pl .sub{display:none}
+  .stage .screen{min-height:120px}
+  .slot .fb{padding:10px 14px;gap:4px}
+  .slot .fb b{font-size:1.05rem}
+}
+/* grand écran : le bandeau passe en colonne à gauche, l'app garde toute la hauteur */
+@media (min-width:1000px){
+  .meta{position:fixed;top:0;left:0;bottom:0;width:300px;overflow-y:auto;border-bottom:0;border-right:2px dashed var(--edge);padding:18px 18px 24px}
+  .meta-in{gap:12px}
+  .pc{grid-template-columns:1fr;gap:12px}
+  .scn{flex-direction:column;align-items:stretch}
+  .scn button{text-align:left}
+  body>div.wrap{margin-left:300px}
+}
+.mq{border:1.5px dashed var(--edge);border-radius:4px;padding:10px 12px;font-size:.88rem;color:var(--ink2);display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+</style>
+</head>
+<body>
+<header class="meta wrap">
+  <div class="meta-in">
+    <details open id="pcd">
+      <summary><span class="tag">Piste A</span><u>L’idée, points forts et limites</u></summary>
+      <div class="dt">
+      <div class="tt"><span class="tag">Piste A</span><b>L’essai dans l’écran d’introduction, en tutoriel pas à pas</b></div>
+      <p>La consigne est découpée en 3 bulles qui montrent le jeu, puis 3 questions sans chrono avec indice, au même endroit, avant de lancer le vrai exercice.</p>
+      <div class="pc">
+        <div><h3>Points forts</h3><ul><li>On apprend sur le vrai jeu, au vrai endroit : rien de nouveau à comprendre ensuite.</li><li>Plus de pavé de texte : une idée par bulle, montrée du doigt.</li><li>« Passer l’essai » reste visible à chaque étape.</li></ul></div>
+        <div><h3>Limites</h3><ul><li>Il faut écrire 3 bulles et 3 questions pour chacun des 20 jeux.</li><li>Pour les jeux de mémoire (Séquence, Chiffres), le « ralenti » demande un traitement à part.</li><li>Un habitué qui veut juste relire la consigne doit repasser par les bulles.</li></ul></div>
+      </div>
+      </div>
+    </details>
+    <div class="scn" role="group" aria-label="Choisir l’écran à voir">
+      <button data-scn="att" aria-pressed="true">1. Couleurs, première fois</button>
+      <button data-scn="fle" aria-pressed="false">2. Flèches, première fois</button>
+      <button data-scn="known" aria-pressed="false">3. Couleurs, déjà connu</button>
+    </div>
+  </div>
+</header>
+<div class="wrap"><main id="app"></main></div>
+
+<script>
+(function(){
+'use strict';
+var HEX={rouge:'#ff5a52',bleu:'#4d8dff',vert:'#3fd16f'};
+var CHECK='<svg viewBox="0 0 20 20" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5l4 4 8-9"/></svg>';
+function arrow(dir,cls){return '<svg class="aw'+(dir==='g'?' fl':'')+(cls?' '+cls:'')+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h17M14 5l7 7-7 7"/></svg>'}
+function sw(c){return '<span class="sw" style="background:'+HEX[c]+'"></span>'}
+if(window.innerWidth<=640){var pcd=document.getElementById('pcd');if(pcd)pcd.open=false}
+var KB=window.matchMedia&&matchMedia('(hover:hover) and (pointer:fine)').matches;
+
+/* ---------- Contenu des essais (données fictives) ---------- */
+var GAMES={
+ att:{jeu:'Couleurs',nom:'Attention',
+  demo:{w:'ROUGE',ink:'bleu'},
+  tuto:[
+   {tg:'word',dir:'up',t:'Un mot de couleur s’affiche ici.'},
+   {tg:'ink',dir:'up',t:'Regarde la couleur de ses lettres : ici, l’encre est '+sw('bleu')+' bleue.'},
+   {tg:'btns',dir:'down',t:'On touche la couleur de l’encre, pas celle que le mot dit. À toi&nbsp;: touche le bouton «&nbsp;bleu&nbsp;» qui brille.'}],
+  qs:[
+   {w:'VERT',ink:'rouge',ans:'rouge',hint:'Ne lis pas le mot : regarde la couleur des lettres.',why:'Le mot dit « vert », mais l’encre est rouge.'},
+   {w:'BLEU',ink:'bleu',ans:'bleu',hint:'Ici, le mot et l’encre disent la même chose.',why:'Le mot et l’encre sont tous les deux bleus.'},
+   {w:'ROUGE',ink:'vert',ans:'vert',hint:'Le mot essaie de te piéger : quelle est la couleur des lettres ?',why:'Le mot dit « rouge », mais l’encre est verte.'}],
+  rule:'Touche la couleur de <em>l’encre</em>, pas le mot.',
+  real:{w:'BLEU',ink:'rouge'}},
+ fle:{jeu:'Flèches',nom:'Attention',
+  demo:{dir:'d',flank:'g'},
+  tuto:[
+   {tg:'row',dir:'up',t:'Cinq flèches s’affichent ici.'},
+   {tg:'mid',dir:'up',t:'Seule la flèche du milieu compte. Les autres sont là pour te distraire.'},
+   {tg:'btns',dir:'down',t:'On touche sa direction. Ici, elle pointe à droite. À toi&nbsp;: touche la flèche qui brille.'+(KB?' Au clavier : <span class="kbd">←</span> <span class="kbd">→</span>.':'')}],
+  qs:[
+   {dir:'g',flank:'g',ans:'g',hint:'Regarde seulement la flèche du milieu.',why:'Toutes les flèches vont à gauche : facile pour commencer.'},
+   {dir:'d',flank:'g',ans:'d',hint:'Les flèches autour vont à gauche… et celle du milieu ?',why:'Les autres vont à gauche, mais celle du milieu va à droite.'},
+   {dir:'g',flank:'d',ans:'g',hint:'Cache les autres du regard : celle du milieu pointe où ?',why:'Celle du milieu va à gauche, malgré les autres.'}],
+  rule:'Seule compte <em>la flèche du milieu</em>.',
+  real:{dir:'d',flank:'d'}}
+};
+var DIRN={g:'gauche',d:'droite'};
+
+/* ---------- État de la maquette ---------- */
+var app=document.getElementById('app');
+var M={scn:'att',g:'att',ph:'tuto',step:0,qi:0,hint:0,wrong:null,done:false,first:[],fromKnown:false,skipped:false};
+var tk=0,timers=[];
+function later(ms,fn){var t=tk;timers.push(setTimeout(function(){if(t===tk)fn()},ms))}
+function clr(){tk++;while(timers.length)clearTimeout(timers.pop())}
+function set(o){for(var k in o)M[k]=o[k];render()}
+function reset(scn){
+ clr();
+ M={scn:scn,g:scn==='fle'?'fle':'att',ph:scn==='known'?'known':'tuto',step:0,qi:0,hint:0,wrong:null,done:false,first:[],fromKnown:false,skipped:false};
+ var bs=document.querySelectorAll('.scn button');for(var i=0;i<bs.length;i++)bs[i].setAttribute('aria-pressed',String(bs[i].getAttribute('data-scn')===scn));
+ render();window.scrollTo(0,0)}
+
+/* ---------- Morceaux d'écran ---------- */
+function topRow(skip){
+ var lbl=M.scn==='fle'?'Exercice 4 sur 5':'Exercice 2 sur 5';
+ if(M.fromKnown)lbl='Entraînement';
+ return '<div class="bk"><button class="lnk" data-act="quit">Quitter</button><span class="ex">'+lbl+'</span>'+
+  (skip?'<button class="lnk strong" data-act="skip">Passer l’essai</button>':'<span style="width:60px"></span>')+'</div>'}
+function title(g,pill){
+ return '<div class="ttl t-att'+(pill?' pl':'')+'"><h1>'+g.jeu+'</h1><div class="row"><span class="sub">'+g.nom+(M.fromKnown?' · niveau 7,4':' · nouveau jeu')+'</span>'+(pill?'<span class="pill"><i></i>'+pill+'</span>':'')+'</div></div>'}
+function steps(){
+ var lab=['Consigne','Essai 1','Essai 2','Essai 3'],cur=M.ph==='tuto'?0:M.ph==='q'?M.qi+1:4;
+ return '<ol class="steps" aria-label="Avancement de l’essai">'+lab.map(function(l,i){
+  var c=i<cur||(i===cur&&M.ph==='q'&&M.done)?'dn':i===cur?'on':'';
+  return '<li class="'+c+'"'+(i===cur?' aria-current="step"':'')+'><b></b>'+l+'</li>'}).join('')+'</ol>'}
+
+function attStim(it,mode){
+ // mode : '' | 'word' | 'ink'
+ var cls=mode==='ink'?' ink-hl':'';
+ return '<div class="screen'+(mode?' hl':'')+(M.done?' good':'')+'" aria-label="Mot affiché : '+it.w+', écrit en '+it.ink+'"><span class="wd'+cls+'" style="color:'+HEX[it.ink]+'">'+it.w+'</span></div>'}
+function attBtns(it,o){
+ o=o||{};
+ return '<div class="opts'+(o.dim?' dim':'')+(o.hl?' hl':'')+'" style="--cols:3">'+['rouge','bleu','vert'].map(function(c){
+  var k='op';if(o.glow===c)k+=' glow';if(o.tried===c)k+=' tried';if(o.right===c)k+=' right';if(o.only&&o.only!==c)k+=' dim';
+  return '<button class="'+k+'" data-act="'+(o.act||'ans')+'" data-v="'+c+'">'+c+'</button>'}).join('')+'</div>'}
+function fleStim(it,mode){
+ var s='',i;
+ for(i=0;i<2;i++)s+=arrow(it.flank,mode==='mid'?'dim':'');
+ s+=arrow(it.dir,mode==='mid'?'mid':'');
+ for(i=0;i<2;i++)s+=arrow(it.flank,mode==='mid'?'dim':'');
+ return '<div class="screen'+(mode?' hl':'')+(M.done?' good':'')+'"><div class="arrows" aria-label="Flèches à observer">'+s+'</div></div>'}
+function fleBtns(it,o){
+ o=o||{};
+ return '<div class="opts'+(o.dim?' dim':'')+(o.hl?' hl':'')+'" style="--cols:2">'+['g','d'].map(function(d){
+  var k='op';if(o.glow===d)k+=' glow';if(o.tried===d)k+=' tried';if(o.right===d)k+=' right';if(o.only&&o.only!==d)k+=' dim';
+  return '<button class="'+k+'" data-act="'+(o.act||'ans')+'" data-v="'+d+'" aria-label="'+(d==='g'?'Gauche':'Droite')+'">'+arrow(d)+'</button>'}).join('')+'</div>'}
+function bubble(dir,html,i,n,px){
+ return '<div class="bub '+dir+'" style="--px:'+(px||'50%')+'" role="status"><span class="cnt">'+(i+1)+' sur '+n+'</span><span>'+html+'</span><div class="bf">'+
+  (i>0?'<button class="bp" data-act="prev">Retour</button>':'<span></span>')+
+  // dernière bulle : pas de bouton dans la bulle, la seule action est de toucher le bouton qui brille
+  (i<n-1?'<button class="bn" data-act="next">Suivant</button>':'')+'</div></div>'}
+
+/* ---------- Écrans ---------- */
+function viewTuto(){
+ var g=GAMES[M.g],s=g.tuto[M.step],n=g.tuto.length,stage;
+ if(M.g==='att'){
+  var it=g.demo;
+  if(s.tg==='btns')stage=attStim(it,'')+bubble('down',s.t,M.step,n,'50%')+attBtns(it,{glow:'bleu',only:'bleu',act:'demo'});
+  else stage=attStim(it,s.tg)+bubble('up',s.t,M.step,n)+attBtns(it,{dim:1,act:'demo'});
+ }else{
+  var f=g.demo;
+  if(s.tg==='btns')stage=fleStim(f,'')+bubble('down',s.t,M.step,n,'75%')+fleBtns(f,{glow:'d',only:'d',act:'demo'});
+  else stage=fleStim(f,s.tg==='mid'?'mid':'row')+bubble('up',s.t,M.step,n)+fleBtns(f,{dim:1,act:'demo'});
+ }
+ return topRow(true)+title(g,M.fromKnown?'Entraînement · rien n’est compté':'Premier essai · rien n’est compté')+steps()+'<div class="stage">'+stage+'</div>'}
+
+function viewQ(){
+ var g=GAMES[M.g],q=g.qs[M.qi],last=M.qi===g.qs.length-1,stim,btns,info;
+ // indice niveau 1 = rappel de la règle (rien ne s'allume) ; niveau 2 ou erreur = le bon bouton s'allume
+ var show=(M.hint>=2||M.wrong)&&!M.done;
+ var o={glow:show?q.ans:null,tried:M.wrong,right:M.done?q.ans:null};
+ if(M.g==='att'){stim=attStim(q,show?'ink':'');btns=attBtns(q,o)}
+ else{stim=fleStim(q,show?'mid':'');btns=fleBtns(q,o)}
+ var ans=M.g==='att'?'«&nbsp;'+q.ans+'&nbsp;»':'«&nbsp;'+DIRN[q.ans]+'&nbsp;»';
+ var cur=M.done?'done':M.wrong?'wrong':M.hint>=2?'h2':M.hint===1?'h1':'calm';
+ // l'aide se place entre l'écran et les boutons, au plus près du regard.
+ // Tous les messages sont posés d'avance dans la même case : elle a toujours la même hauteur.
+ function v(id,html){var on=id===cur;return html.replace('<div class="','<div '+(on?'role="status" ':'aria-hidden="true" ')+'class="'+(on?'on ':'')).replace(/<button /g,on?'<button ':'<button tabindex="-1" ')}
+ info='<div class="slot">'+
+  v('calm','<div class="calm"><span class="note">Prends ton temps : pas de chrono.</span><button class="lnk" data-act="hint">Un indice ?</button></div>')+
+  v('h1','<div class="fb hint"><b>Rappel de la règle</b><span>'+g.rule.replace(/<\/?em>/g,'')+'</span><button class="lnk" data-act="hint2">Un indice de plus ?</button></div>')+
+  v('h2','<div class="fb hint"><b>Un indice de plus</b><span>'+q.hint+' Le bon bouton s’allume en jaune.</span></div>')+
+  v('wrong','<div class="fb soft"><b>Pas tout à fait, ce n’est pas grave.</b><span>'+q.why+' Touche '+ans+', il s’allume en jaune.</span></div>')+
+  v('done','<div class="fb good"><b>'+(M.wrong?'Voilà, c’est ça !':pick(['Bravo !','Exactement !','Parfait !'],M.qi))+'</b><span>'+q.why+'</span></div>')+
+  '</div>';
+ // le bouton pour continuer arrive SOUS les réponses : il ne pousse rien vers le bas
+ var after='<div class="after">'+(M.done?'<button class="btn" data-act="nextq">'+(last?'Voir la suite':'Question suivante')+'</button>':'')+'</div>';
+ return topRow(true)+title(g,M.fromKnown?'Entraînement · rien n’est compté':'Premier essai · rien n’est compté')+steps()+'<div class="stage">'+stim+info+btns+after+'</div>'}
+function pick(a,i){return a[i%a.length]}
+
+function viewEnd(){
+ var g=GAMES[M.g],n=g.qs.length,ok=M.first.filter(Boolean).length;
+ var rec=g.qs.map(function(q,i){return '<span>'+CHECK+'Essai '+(i+1)+(M.first[i]?'':' (avec indice)')+'</span>'}).join('');
+ // ordre pensé pour l'iPhone : la règle et le bouton d'abord, le détail de l'essai ensuite
+ return topRow(false)+title(g,null)+
+ '<div class="card tight"><h2>Tu as compris le principe'+(ok===n?', bravo.':'.')+'</h2><div class="rule">'+g.rule+'</div>'+
+ '<p>Maintenant, le vrai exercice : <b>45 secondes</b>, sans indice.</p></div>'+
+ '<div class="alt"><button class="btn" data-act="go">J’ai compris, c’est parti !</button><button class="lnk" data-act="again" style="align-self:center">Refaire l’essai</button></div>'+
+ '<div class="recap" aria-label="Ton essai">'+rec+'</div>'+
+ '<p class="note">Rien n’a été compté'+(ok<n?', tes hésitations non plus':'')+'.</p>'}
+
+function viewKnown(){
+ var g=GAMES.att;
+ return '<div class="bk"><button class="lnk" data-act="quit">Quitter</button><span class="ex">Exercice 2 sur 5</span><span style="width:60px"></span></div>'+
+ '<div><h1>Couleurs</h1><p class="sub">Attention · niveau 7,4 · déjà joué 12 fois</p></div>'+
+ '<div class="card tight"><p>Touche la couleur de l’encre, pas celle que le mot désigne. 45 secondes.</p>'+
+ '<div class="screen sm"><span class="wd" style="color:'+HEX.bleu+'">ROUGE</span></div><p class="note">Ici, la bonne réponse est « bleu ». Record : 24 bonnes réponses.</p></div>'+
+ '<div class="alt"><button class="btn" data-act="go">Commencer</button></div>'+
+ '<div class="alt"><button class="btn s" data-act="train">S’entraîner</button><p class="note">3 questions sans chrono, avec indices. Rien n’est compté.</p></div>'}
+
+function viewReal(){
+ var g=GAMES[M.g],r=g.real,stim,btns;
+ if(M.g==='att'){stim='<div class="screen" id="stim"><span class="wd" style="color:'+HEX[r.ink]+'">'+r.w+'</span></div>';btns=attBtns(r,{act:'none'})}
+ else{stim=fleStim(r,'');btns=fleBtns(r,{act:'none'})}
+ return '<div class="bk"><button class="lnk" data-act="quit">Quitter</button><span class="ex">'+g.nom+' · '+g.jeu+'</span><button class="lnk">Son : oui</button></div>'+
+ (M.skipped?'<p class="toast" role="status">Essai passé. Tu pourras le refaire avec « S’entraîner » sur l’écran d’introduction.</p>':'')+
+ '<div class="tb"><i id="tb"></i></div><p class="hud"><span><b>0</b> juste</span><span id="tl">45 s</span></p>'+stim+btns+
+ '<div class="mq"><span>Maquette : ici commence le vrai exercice, chronométré, comme aujourd’hui.</span><button class="lnk" data-act="restart">Revoir depuis le début</button></div>'}
+
+function render(){
+ clr();
+ app.innerHTML=M.ph==='tuto'?viewTuto():M.ph==='q'?viewQ():M.ph==='end'?viewEnd():M.ph==='known'?viewKnown():viewReal();
+ // hésitation : après 15 secondes sans réponse, un simple rappel de la règle (ne donne pas la réponse)
+ if(M.ph==='q'&&!M.hint&&!M.wrong&&!M.done)later(15000,function(){set({hint:1})});
+ if(M.ph==='real'){var end=Date.now()+45000;(function tick(){var l=end-Date.now(),b=document.getElementById('tb'),t=document.getElementById('tl');if(!b)return;b.style.width=(l/450).toFixed(1)+'%';t.textContent=Math.ceil(l/1000)+' s';if(l>0)later(200,tick)})()}
+}
+
+/* ---------- Actions ---------- */
+function answer(v){
+ var q=GAMES[M.g].qs[M.qi];if(M.done)return;
+ if(v===q.ans){M.first[M.qi]=!M.wrong&&!M.hint;set({done:true})}
+ else set({wrong:v})}
+document.addEventListener('click',function(ev){
+ var b=ev.target.closest('[data-act],[data-scn]');if(!b)return;
+ if(b.hasAttribute('data-scn')){reset(b.getAttribute('data-scn'));return}
+ var a=b.getAttribute('data-act'),v=b.getAttribute('data-v'),g=GAMES[M.g];
+ if(a==='next'){if(M.step<g.tuto.length-1)set({step:M.step+1});else set({ph:'q',qi:0,hint:0,wrong:null,done:false,first:[]})}
+ else if(a==='prev')set({step:Math.max(0,M.step-1)});
+ else if(a==='demo'){if(M.step===g.tuto.length-1&&v===(M.g==='att'?g.demo.ink:g.demo.dir))set({ph:'q',qi:0,hint:0,wrong:null,done:false,first:[]})}
+ else if(a==='ans')answer(v);
+ else if(a==='hint')set({hint:1});
+ else if(a==='hint2')set({hint:2});
+ else if(a==='nextq'){if(M.qi<g.qs.length-1)set({qi:M.qi+1,hint:0,wrong:null,done:false});else set({ph:'end'});window.scrollTo(0,0)}
+ else if(a==='skip')set({ph:'real',skipped:true});
+ else if(a==='go'){set({ph:'real',skipped:false});window.scrollTo(0,0)}
+ else if(a==='again')set({ph:'tuto',step:0,qi:0,hint:0,wrong:null,done:false,first:[]});
+ else if(a==='train'){set({ph:'tuto',step:0,fromKnown:true});window.scrollTo(0,0)}
+ else if(a==='quit'||a==='restart')reset(M.scn);
+});
+document.addEventListener('keydown',function(e){
+ if(M.g!=='fle'||M.ph!=='q')return;
+ if(e.key==='ArrowLeft')answer('g');else if(e.key==='ArrowRight')answer('d')});
+render();
+})();
+</script>
+</body>
+</html>

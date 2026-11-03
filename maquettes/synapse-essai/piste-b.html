@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Synapse · Essai avant l’exercice · Piste B</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,200..800&display=swap">
+<style>
+/* Reprise du style de Synapse : papier millimétré, cartes plates, encre bleue, écran de jeu sombre. */
+:root{
+  --paper:#f3f6f7;--rule:#dbe4e8;--card:#ffffff;--ink:#13212b;--ink2:#566874;--edge:#b9c7ce;
+  --accent:#1b46d1;--accent-ink:#ffffff;--ok:#0f7a4d;--bad:#b3261e;--screen:#16202a;--screen-ink:#eef3f6;
+  --lit:#ffd23f;--on-tc:#ffffff;--c-att:#d1334a;
+  --soft:#fff5e6;--soft-edge:#e9a54a;--soft-ink:#8a4b08;
+  --f:"Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+.t-att{--tc:var(--c-att)}
+*{box-sizing:border-box}
+html{touch-action:manipulation;-webkit-text-size-adjust:100%}
+body{
+  margin:0;background-color:var(--paper);
+  background-image:linear-gradient(var(--rule) 1px,transparent 1px),linear-gradient(90deg,var(--rule) 1px,transparent 1px);
+  background-size:22px 22px;color:var(--ink);font-family:var(--f);font-size:16px;line-height:1.45;
+}
+.wrap{padding:16px max(16px,env(safe-area-inset-right,0px)) 104px max(16px,env(safe-area-inset-left,0px))}
+#app{max-width:34rem;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+h1{font-size:clamp(1.9rem,7vw,2.4rem);line-height:1.05;font-weight:800;font-stretch:80%;letter-spacing:-.02em;margin:0;text-wrap:balance}
+h2{font-size:1.15rem;font-weight:700;margin:0}
+p{margin:0}
+.sub,.date,.note{color:var(--ink2)}
+.date{font-size:.95rem;margin-top:4px}
+.note{font-size:.92rem}
+.card{background:var(--card);border:1px solid var(--edge);border-radius:4px;padding:16px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.bk{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.ex{color:var(--ink2);font-size:.95rem}
+.bk .ex{min-width:0;text-align:center;font-size:.9rem}
+.hd{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+button{font:inherit;color:inherit}
+button:focus-visible,a:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.btn{font-weight:700;font-size:1.05rem;background:var(--accent);color:var(--accent-ink);border:1px solid var(--accent);border-radius:4px;min-height:52px;padding:12px 18px;cursor:pointer;width:100%;display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none}
+.btn.s{background:transparent;color:var(--accent)}
+.btn.sm{width:auto;min-height:44px;padding:8px 14px;font-size:.95rem}
+.lnk{background:none;border:0;color:var(--accent);padding:10px 0;min-height:44px;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.tn{display:flex;align-items:center;gap:6px;font-weight:700}
+.tn i{width:10px;height:10px;border-radius:2px;background:var(--tc);display:block;flex:none}
+.gm{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:12px 0;border-top:1px solid var(--rule)}
+.gm:first-of-type{border-top:0}
+.pn{display:flex;flex-direction:column;min-width:0}
+.pg{color:var(--ink2);font-size:.9rem;font-variant-numeric:tabular-nums}
+.foot{color:var(--ink2);font-size:.85rem}
+.kv{display:grid;grid-template-columns:1fr auto;gap:8px 12px;margin:0}
+.kv dt{color:var(--ink2)}
+.kv dd{margin:0;font-weight:600;text-align:right}
+.tb{height:6px;border:1px solid var(--ink);border-radius:3px;overflow:hidden;background:var(--card)}
+.tb i{display:block;height:100%;width:72%;background:var(--accent)}
+.hud{display:flex;justify-content:space-between;gap:12px;font-variant-numeric:tabular-nums}
+.screen{background:var(--screen);color:var(--screen-ink);border-radius:4px;min-height:160px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:18px;text-align:center}
+.screen.sm{min-height:0;padding:14px}
+.screen.good{outline:3px solid var(--ok);outline-offset:-3px}
+.screen.bad{outline:3px solid #f0b45a;outline-offset:-3px}
+.wd{font-size:clamp(2.4rem,12vw,3.4rem);font-weight:800;font-stretch:85%;letter-spacing:.02em}
+.screen.sm .wd{font-size:2rem}
+.opts{display:grid;gap:10px;grid-template-columns:repeat(var(--cols,2),1fr)}
+.op{font-weight:600;font-size:1.1rem;background:var(--card);color:var(--ink);border:1.5px solid var(--ink);border-radius:4px;min-height:56px;padding:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px}
+.op:active{background:var(--accent);color:var(--accent-ink)}
+@media (hover:hover){.op:hover{background:var(--rule)}}
+.op svg{width:44px;height:44px;display:block}
+.arrows{display:flex;gap:8px;align-items:center;justify-content:center}
+.aw{width:clamp(34px,11vw,48px);height:clamp(34px,11vw,48px);display:block}
+.aw.fl{transform:scaleX(-1)}
+.screen.sm .aw{width:30px;height:30px}
+.aw.dim{opacity:.28}
+.aw.hi{color:var(--lit)}
+.nav{position:fixed;left:0;right:0;bottom:0;z-index:5;background:var(--card);border-top:1px solid var(--edge);display:flex;justify-content:center;padding:0 16px env(safe-area-inset-bottom,0px)}
+.nav[hidden]{display:none}
+.nav-in{display:flex;width:100%;max-width:34rem}
+.nav button{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:58px;background:none;border:0;cursor:pointer;color:var(--ink2);font-size:.8rem}
+.nav button svg{width:24px;height:24px;display:block}
+.nav button[aria-current="page"]{color:var(--accent);font-weight:700}
+
+/* ---------- Nouveautés de la piste B : le mode Essai ---------- */
+.ess{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;border:2px solid var(--ink);border-radius:4px;font-weight:800;
+  background:repeating-linear-gradient(-45deg,var(--lit) 0 14px,#ffe27a 14px 28px);color:#13212b}
+.ess span{font-weight:600;font-size:.92rem}
+.ess b{font-size:1.05rem;letter-spacing:.04em;text-transform:uppercase}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.steps i{height:6px;border-radius:3px;border:1px solid var(--ink);background:var(--card)}
+.steps i.on{background:var(--ink)}
+.steps i.ok{background:var(--ok);border-color:var(--ok)}
+.steps i.re{background:var(--soft-edge);border-color:var(--soft-edge)}
+.nochr{display:inline-flex;align-items:center;gap:6px;color:var(--ink2)}
+.nochr svg{width:18px;height:18px}
+.scr-e{min-height:130px}
+.hint{display:flex;gap:10px;align-items:flex-start;background:var(--card);border:1px dashed var(--ink2);border-radius:4px;padding:12px 14px}
+.hint svg{width:22px;height:22px;flex:none;color:#b7791f;margin-top:1px}
+.hint b{display:block;font-size:.8rem;text-transform:uppercase;letter-spacing:.06em;color:var(--ink2)}
+.corr{border-width:2px}
+.corr.good{border-color:var(--ok)}
+.corr.bad{border-color:var(--soft-edge);background:var(--soft)}
+.corr.bad .why{background:var(--card)}
+.ch{display:flex;align-items:center;gap:10px;font-size:1.3rem;font-weight:800;font-stretch:85%}
+.corr.good .ch{color:var(--ok)}
+.corr.bad .ch{color:var(--soft-ink)}
+.ch svg{width:28px;height:28px;flex:none}
+.why{display:grid;grid-template-columns:auto 1fr;gap:6px 12px;align-items:center;margin:0;padding:12px;background:var(--paper);border-radius:4px}
+.why dt{font-weight:700;font-size:.92rem}
+.why dd{margin:0;font-size:.95rem}
+.why .x{color:var(--ink2);font-style:italic}
+.sw{display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:-2px;margin-right:6px;border:1px solid rgba(0,0,0,.25)}
+.first{border:2px solid var(--accent);border-radius:4px;background:var(--card);padding:14px 16px;display:flex;gap:12px;align-items:flex-start}
+.first svg{width:26px;height:26px;flex:none;color:var(--accent);margin-top:2px}
+.first b{display:block}
+.got{display:flex;align-items:center;gap:10px;font-size:1.25rem;font-weight:800;font-stretch:85%;color:var(--ok)}
+.got svg{width:28px;height:28px;flex:none}
+/* Écran d'essai compact : tout tient sur un iPhone, avec une marge en bas */
+#app.ec{gap:10px}
+.ec .bk .lnk{padding:6px 0}
+.skip{font-weight:700;text-align:right}
+.ec .ess{padding:7px 12px}
+.prog{display:flex;flex-direction:column;gap:6px}
+.ec .scr-e{min-height:112px;padding:14px}
+.ec .hint{padding:9px 12px}
+.ec .hint p{font-size:.94rem;line-height:1.35}
+.ec .op{min-height:52px}
+.hint.again{border-style:solid;border-color:var(--soft-edge);background:var(--soft)}
+.rule{font-size:1.15rem;font-weight:700;line-height:1.3;text-wrap:balance}
+.kbd{display:inline-block;border:1px solid var(--edge);border-bottom-width:2px;border-radius:3px;padding:0 6px;font-size:.85rem;background:var(--card)}
+.desk{display:none}
+@media (hover:hover) and (pointer:fine){.desk{display:inline}}
+.tagn{display:inline-block;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--accent);border:1.5px solid var(--accent);border-radius:999px;padding:0 8px;margin-left:6px;vertical-align:2px}
+.flash{animation:fl .5s ease-out}
+@keyframes fl{from{background:var(--lit)}to{background:var(--card)}}
+
+/* ---------- Bandeau de la maquette (hors app) ---------- */
+.mq{background:#13212b;color:#eef3f6;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;font-size:.85rem;line-height:1.4;padding:10px 16px}
+.mq-in{max-width:64rem;margin:0 auto}
+.mq summary{cursor:pointer;font-weight:700;font-size:.95rem;list-style:none}
+.mq summary::-webkit-details-marker{display:none}
+.mq summary::before{content:"▸ ";color:#ffd23f}
+.mq details[open] summary::before{content:"▾ "}
+.mq .cols{display:grid;grid-template-columns:1fr 1fr;gap:6px 24px;margin-top:6px}
+.mq ul{margin:2px 0 0;padding-left:18px}
+.mq h3{margin:4px 0 0;font-size:.8rem;text-transform:uppercase;letter-spacing:.05em;color:#ffd23f}
+.mq .sc{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;align-items:center}
+.mq .sc button{background:#26394a;color:#eef3f6;border:1px solid #3d5466;border-radius:999px;padding:5px 12px;cursor:pointer;font-size:.82rem}
+.mq .sc button[aria-pressed="true"]{background:#ffd23f;color:#13212b;border-color:#ffd23f;font-weight:700}
+@media (max-width:640px){.mq .cols{grid-template-columns:1fr}.mq{padding:8px 12px}.mq .sc{gap:4px;margin-top:6px}.mq .sc button{padding:3px 9px;font-size:.78rem}}
+</style>
+</head>
+<body>
+<div class="mq"><div class="mq-in">
+  <details id="mqd">
+    <summary>Piste B · Un vrai mode « Essai », distinct du jeu</summary>
+    <p style="margin-top:4px">La première fois, « Commencer » lance 3 questions sur l’écran de jeu habituel, marqué « Essai — ne compte pas », sans chrono, avec un indice. Après chaque réponse, une carte de correction explique pourquoi ; après une erreur, on refait le bon geste. « Quitter » reste en haut à gauche, « Passer » en haut à droite. À la fin, un écran « Prêt ? » propose de lancer l’exercice ou de refaire un essai.</p>
+    <div class="cols">
+      <div><h3>Points forts</h3><ul>
+        <li>On s’entraîne sur le vrai écran, avec les vrais boutons : rien de nouveau à découvrir au moment de jouer.</li>
+        <li>La correction explique chaque réponse, sur un ton doux, puis laisse refaire le bon geste : on finit toujours l’essai en ayant compris.</li>
+        <li>« Prêt ? » laisse décider : lancer l’exercice ou refaire un essai.</li></ul></div>
+      <div><h3>Limites</h3><ul>
+        <li>Un écran de plus à chaque question : l’essai prend environ 30 secondes, même pour qui a vite compris.</li>
+        <li>Les explications sont écrites à la main pour les 20 exercices (3 questions chacun, plusieurs cas : juste, piège, erreur simple).</li>
+        <li>Le bandeau jaune doit rester très visible : sinon, on risque de confondre l’essai avec l’exercice qui compte.</li></ul></div>
+    </div>
+  </details>
+  <div class="sc" role="group" aria-label="Scénarios de la maquette">
+    <span style="opacity:.75">Scénario :</span>
+    <button data-scen="c-new">Couleurs, 1re fois</button>
+    <button data-scen="f-new">Flèches, 1re fois</button>
+    <button data-scen="c-known">Couleurs, déjà joué</button>
+    <button data-scen="jeux">Liste des jeux</button>
+  </div>
+</div></div>
+
+<div class="wrap"><main id="app"></main></div>
+<nav class="nav" id="nav" aria-label="Navigation" hidden>
+  <div class="nav-in">
+    <button data-act="noop"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Accueil</button>
+    <button data-act="jeux" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7.5" height="7.5" rx="1"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="1"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="1"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1"/></svg>Jeux</button>
+    <button data-act="noop"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19V5M4 19h16M8 15l4-5 3 3 5-7"/></svg>Performance</button>
+    <button data-act="noop"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>Compte</button>
+  </div>
+</nav>
+
+<script>
+(function(){
+'use strict';
+/* Maquette : aucune logique réelle, rien n'est enregistré. */
+var COL={rouge:'#ff5a52',bleu:'#4d8dff',vert:'#3fd16f',jaune:'#ffd23f'};
+var CHECK='<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5l4 4 8-9"/></svg>';
+var CROSS='<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15"/></svg>';
+var BULB='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/></svg>';
+var NOCLOCK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M12 9v4M9 2h6M4 4l16 18"/></svg>';
+var HAND='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5v.5"/></svg>';
+var RETRY='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.5-5.8M4 4v4h4"/></svg>';
+function arrow(dir,cls){return '<svg class="aw'+(dir==='g'?' fl':'')+(cls?' '+cls:'')+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h17M14 5l7 7-7 7"/></svg>'}
+function arrows(it,mark){var s='',i;for(i=0;i<2;i++)s+=arrow(it.fl,mark?'dim':'');s+=arrow(it.dir,mark?'hi':'');for(i=0;i<2;i++)s+=arrow(it.fl,mark?'dim':'');return '<div class="arrows">'+s+'</div>'}
+function dirTxt(d){return d==='g'?'gauche':'droite'}
+
+/* Données des deux exercices montrés */
+var EX={
+ couleurs:{jeu:'Couleurs',nom:'Attention',lv:'3,0',rec:'21 bonnes réponses',
+  t:'Un mot s’affiche en couleur. Touche la couleur de l’encre, pas celle que le mot désigne. 45 secondes.',
+  rule:'Ne lis pas le mot : regarde la couleur des lettres.',
+  demo:'<div class="screen sm"><span class="wd" style="color:'+COL.bleu+'">ROUGE</span></div><p class="note">Ici, la bonne réponse est « bleu ».</p>',
+  opts:['rouge','bleu','vert','jaune'],
+  items:[
+   {w:'BLEU',ink:'bleu',ans:'bleu',hint:'Regarde la couleur des lettres. Ici, c’est facile : le mot et l’encre sont d’accord.'},
+   {w:'ROUGE',ink:'vert',ans:'vert',hint:'Le mot dit « rouge »… mais de quelle couleur sont les lettres ?'},
+   {w:'JAUNE',ink:'bleu',ans:'bleu',hint:'Ne lis pas le mot. Regarde seulement l’encre.'}]},
+ fleches:{jeu:'Flèches',nom:'Attention',lv:'3,0',rec:'26 bonnes réponses',
+  t:'Cinq flèches s’affichent. Touche la direction de la flèche du milieu, sans te laisser distraire par les autres. 45 secondes.',
+  rule:'Seule la flèche du milieu compte. Les autres sont là pour te tromper.',
+  demo:'<div class="screen sm">'+arrows({dir:'d',fl:'g'})+'</div><p class="note">Ici, la bonne réponse est droite.</p>',
+  opts:['g','d'],
+  items:[
+   {dir:'d',fl:'d',ans:'d',hint:'Toutes les flèches vont dans le même sens : regarde celle du milieu.'},
+   {dir:'d',fl:'g',ans:'d',hint:'Attention, les flèches ne vont pas toutes dans le même sens. Seule celle du milieu compte.'},
+   {dir:'g',fl:'d',ans:'g',hint:'Cache les flèches des côtés avec tes yeux : que dit celle du milieu ?'}]}
+};
+
+var app=document.getElementById('app'),nav=document.getElementById('nav');
+var S={scen:'c-new',ex:'couleurs',known:{couleurs:false,fleches:false},v:'intro',q:0,res:[],last:null,retry:false,timed:{ok:4,i:0}};
+
+/* ---------- Écrans ---------- */
+function vJeux(){
+ function row(id,extra){var e=EX[id],k=S.known[id];
+  return '<div class="gm"><span class="pn"><b>'+e.jeu+(k?'':'<span class="tagn">Nouveau</span>')+'</b><span class="pg">45 s · niveau '+e.lv+' · '+(k?'record : '+e.rec:'pas encore joué')+'</span></span><button class="btn s sm" data-act="open" data-v="'+id+'">Jouer</button></div>'}
+ return '<header class="hd"><div><h1>Jeux</h1><p class="date">20 jeux pour t’entraîner librement</p></div></header>'+
+ '<section class="card t-att"><div class="tn"><i></i><h2>Attention</h2></div><div>'+row('couleurs')+row('fleches')+
+ '<div class="gm"><span class="pn"><b>Différence</b><span class="pg">45 s · niveau 4,2 · record : 18 bonnes réponses</span></span><button class="btn s sm" data-act="noop">Jouer</button></div>'+
+ '<div class="gm"><span class="pn"><b>Cible</b><span class="pg">45 s · niveau 3,6 · record : 30 bonnes réponses</span></span><button class="btn s sm" data-act="noop">Jouer</button></div></div></section>'+
+ '<p class="foot">Les jeux marqués « Nouveau » commencent par un essai de 3 questions, qui ne compte pas.</p>'}
+
+function vIntro(){
+ var e=EX[S.ex],k=S.known[S.ex];
+ var top='<div class="bk"><button class="lnk" data-act="jeux">Quitter</button><span class="ex">Entraînement libre</span></div>'+
+  '<div><h1>'+e.jeu+'</h1><p class="sub">'+e.nom+' · niveau '+e.lv+'</p></div>'+
+  '<div class="card"><p>'+e.t+'</p>'+e.demo+'</div>';
+ if(!k)return top+
+  '<div class="first">'+HAND+'<div><b>Première fois sur ce jeu</b><p class="note">On commence par 3 questions d’essai, sans chrono et avec un indice. Elles ne comptent pas : tu peux te tromper.</p></div></div>'+
+  '<button class="btn" data-act="essai">Commencer</button>'+
+  '<button class="lnk" data-act="real" style="align-self:center">J’ai compris, passer l’essai</button>';
+ return top+'<button class="btn" data-act="real">Commencer</button>'+
+  '<button class="btn s" data-act="essai">S’entraîner</button>'+
+  '<p class="note" style="text-align:center;margin-top:-6px">3 questions sans chrono, qui ne comptent pas.</p>'}
+
+function bandeau(){
+ return '<div class="bk"><button class="lnk" data-act="jeux">Quitter</button><button class="lnk skip" data-act="skip">Passer → lancer l’exercice</button></div>'+
+  '<div class="ess" role="status"><b>Essai</b><span>'+EX[S.ex].jeu+' · ne compte pas</span></div>'+
+  '<div class="prog"><div class="steps" aria-hidden="true">'+[0,1,2].map(function(i){var r=S.res[i];return '<i class="'+(r===true?'ok':r==='re'?'re':i===S.q?'on':'')+'"></i>'}).join('')+'</div>'+
+  '<p class="hud"><span><b>Question '+(S.q+1)+'</b> sur 3</span><span class="nochr">'+NOCLOCK+'Pas de chrono</span></p></div>'}
+
+function stim(e,it,mark){
+ if(S.ex==='couleurs')return '<span class="wd" style="color:'+COL[it.ink]+'">'+it.w+'</span>';
+ return arrows(it,mark)}
+
+function opts(e){
+ if(S.ex==='couleurs')return '<div class="opts" style="--cols:2">'+e.opts.map(function(c){return '<button class="op" data-act="ans" data-v="'+c+'">'+c+'</button>'}).join('')+'</div>';
+ return '<div class="opts" style="--cols:2"><button class="op" data-act="ans" data-v="g" aria-label="Gauche">'+arrow('g')+'</button><button class="op" data-act="ans" data-v="d" aria-label="Droite">'+arrow('d')+'</button></div>'+
+  '<p class="note desk" style="text-align:center">Au clavier : <span class="kbd">←</span> et <span class="kbd">→</span></p>'}
+
+function vEssai(){
+ var e=EX[S.ex],it=e.items[S.q];
+ return bandeau()+'<div class="screen scr-e">'+stim(e,it)+'</div>'+
+  (S.retry?'<div class="hint again">'+RETRY+'<p><b>À toi de refaire</b>'+e.rule+' Touche la bonne réponse.</p></div>'
+   :'<div class="hint">'+BULB+'<p><b>Indice</b>'+it.hint+'</p></div>')+opts(e)}
+
+function vCorr(){
+ var e=EX[S.ex],it=e.items[S.q],v=S.last,good=v===it.ans,last=S.q===2,why,msg;
+ if(S.ex==='couleurs'){
+  var same=it.w.toLowerCase()===it.ink;
+  why='<dl class="why"><dt>Le mot</dt><dd>'+it.w+(same?'':' <span class="x">: ne compte pas</span>')+'</dd><dt>L’encre</dt><dd><span class="sw" style="background:'+COL[it.ink]+'"></span><b>'+it.ink+'</b> : c’est la réponse</dd>'+(good?'':'<dt>Ton choix</dt><dd>'+v+'</dd>')+'</dl>';
+  msg=good?(S.retry?'C’est ça : tu as touché la couleur de l’encre. Tu as le bon réflexe.':same?'Le mot et l’encre disaient la même chose. La suite sera moins simple !':'Tu as bien regardé l’encre, sans te laisser piéger par le mot.')
+   :(!same&&v===it.w.toLowerCase()?'Tu as touché ce que dit le mot. C’est le piège de ce jeu, presque tout le monde s’y laisse prendre au début : seule la couleur des lettres compte.':'Les lettres sont écrites en '+it.ink+'. C’est cette couleur qu’il fallait toucher. Essaie à nouveau, tranquillement.');
+ }else{
+  var all=it.fl===it.dir;
+  why='<dl class="why"><dt>Le milieu</dt><dd>'+arrowInline(it.dir)+' <b>'+dirTxt(it.dir)+'</b> : c’est la réponse</dd><dt>Les côtés</dt><dd>'+arrowInline(it.fl)+' '+dirTxt(it.fl)+(all?' aussi':' <span class="x">: ne comptent pas</span>')+'</dd>'+(good?'':'<dt>Ton choix</dt><dd>'+arrowInline(v)+' '+dirTxt(v)+'</dd>')+'</dl>';
+  if(good)msg=S.retry?'C’est ça : tu as suivi la flèche du milieu. Tu as le bon réflexe.':all?'Toutes allaient à '+dirTxt(it.dir)+'. La suite sera moins simple !':'Tu as suivi la flèche du milieu, sans te laisser distraire par les autres.';
+  else if(all)msg='Ici, toutes les flèches allaient à '+dirTxt(it.dir)+', y compris celle du milieu (en jaune). Il fallait donc toucher '+dirTxt(it.dir)+'. Ça arrive, surtout au début.';
+  else if(v===it.fl)msg='Tu as suivi les flèches des côtés, qui vont à '+dirTxt(it.fl)+'. C’est le piège de ce jeu : seule celle du milieu, en jaune, compte. Elle va à '+dirTxt(it.dir)+'.';
+  else msg='La flèche du milieu, en jaune, va à '+dirTxt(it.dir)+'. C’est elle qu’il fallait suivre.';
+ }
+ var btn=good?'<button class="btn" data-act="next">'+(last?'Terminer l’essai':'Question suivante')+'</button>'
+  :'<button class="btn" data-act="retry">'+RETRY.replace('<svg','<svg width="22" height="22"')+'Refaire cette question</button>';
+ return bandeau()+'<div class="screen '+(good?'good':'bad')+'">'+stim(e,it,true)+'</div>'+
+  '<div class="card corr '+(good?'good':'bad')+'" role="status"><p class="ch">'+(good?CHECK+(S.retry?'Bien joué !':'Juste !'):BULB+'Presque ! Regarde bien')+'</p>'+why+'<p>'+msg+'</p></div>'+btn}
+
+function arrowInline(d){return '<svg viewBox="0 0 24 24" width="20" height="20" style="vertical-align:-4px'+(d==='g'?';transform:scaleX(-1)':'')+'" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h17M14 5l7 7-7 7"/></svg>'}
+
+function vPret(){
+ var e=EX[S.ex],first=S.res.every(function(r){return r===true});
+ var line=first?'Du premier coup, bravo.':'Les pièges du début, c’est fait pour ça : maintenant, tu sais les déjouer.';
+ return '<div class="bk"><button class="lnk" data-act="jeux">Quitter</button><span class="ex">'+e.nom+' · '+e.jeu+'</span><span style="width:52px"></span></div>'+
+  '<div><h1>Prêt ?</h1><p class="sub">Essai terminé</p></div>'+
+  '<div class="card"><p class="got">'+CHECK+'Tu as compris la règle.</p>'+
+  '<p>'+line+'</p><p class="rule">'+e.rule+'</p>'+e.demo+'</div>'+
+  '<p class="note">Le vrai exercice dure 45 secondes, avec un chrono, et sans indice. Il compte dans ton niveau.</p>'+
+  '<button class="btn" data-act="real">Lancer l’exercice</button>'+
+  '<button class="btn s" data-act="essai">Refaire un essai</button>'}
+
+function vReal(){
+ var e=EX[S.ex],it=e.items[S.timed.i%3];
+ var son='<button class="lnk" data-act="noop">Son : oui</button>';
+ return '<div class="bk"><button class="lnk" data-act="jeux">Quitter</button><span class="ex">'+e.nom+' · '+e.jeu+'</span>'+son+'</div>'+
+  '<div class="tb"><i></i></div><p class="hud"><span><b>'+S.timed.ok+'</b> juste</span><span>32 s</span></p>'+
+  '<div class="screen">'+stim(e,it)+'</div>'+opts(e)+
+  '<p class="foot" style="text-align:center">Maquette : l’exercice habituel, inchangé (chrono, score).</p>'}
+
+/* ---------- Navigation ---------- */
+function render(){
+ var v=S.v;
+ app.innerHTML=v==='jeux'?vJeux():v==='intro'?vIntro():v==='essai'?vEssai():v==='corr'?vCorr():v==='pret'?vPret():vReal();
+ nav.hidden=v!=='jeux';
+ app.className=(v==='essai'||v==='corr')?'ec':'';
+ var bs=document.querySelectorAll('[data-scen]');for(var i=0;i<bs.length;i++)bs[i].setAttribute('aria-pressed',String(bs[i].getAttribute('data-scen')===S.scen));
+ window.scrollTo(0,0)}
+
+function scen(s){
+ S.scen=s;S.q=0;S.res=[];S.retry=false;
+ if(s==='c-new'){S.ex='couleurs';S.known={couleurs:false,fleches:false};S.v='intro'}
+ if(s==='f-new'){S.ex='fleches';S.known={couleurs:true,fleches:false};S.v='intro'}
+ if(s==='c-known'){S.ex='couleurs';S.known={couleurs:true,fleches:false};S.v='intro'}
+ if(s==='jeux'){S.known={couleurs:true,fleches:false};S.v='jeux'}
+ render()}
+
+function answer(v){if(S.v!=='essai')return;var it=EX[S.ex].items[S.q],ok=v===it.ans;S.last=v;
+ if(ok)S.res[S.q]=S.retry?'re':true;S.v='corr';render()}
+
+document.addEventListener('click',function(ev){
+ var b=ev.target.closest('[data-act],[data-scen]');if(!b)return;
+ if(b.hasAttribute('data-scen')){scen(b.getAttribute('data-scen'));return}
+ var a=b.getAttribute('data-act'),v=b.getAttribute('data-v');
+ if(a==='jeux'){S.scen='jeux';S.v='jeux';render()}
+ else if(a==='open'){S.ex=v;S.v='intro';S.scen=v==='couleurs'?(S.known.couleurs?'c-known':'c-new'):'f-new';render()}
+ else if(a==='essai'){S.q=0;S.res=[];S.retry=false;S.v='essai';render()}
+ else if(a==='retry'){S.retry=true;S.v='essai';render()}
+ else if(a==='skip'||a==='real'){S.known[S.ex]=true;S.timed={ok:4,i:0};S.v='real';render()}
+ else if(a==='ans'){if(S.v==='essai')answer(v);else if(S.v==='real'){S.timed.ok++;S.timed.i++;render()}}
+ else if(a==='next'){S.retry=false;if(S.q<2){S.q++;S.v='essai'}else S.v='pret';render()}
+});
+document.addEventListener('keydown',function(ev){
+ if(S.ex!=='fleches'||(S.v!=='essai'&&S.v!=='real'))return;
+ if(ev.key==='ArrowLeft'||ev.key==='ArrowRight'){var d=ev.key==='ArrowLeft'?'g':'d';if(S.v==='essai')answer(d);else{S.timed.ok++;S.timed.i++;render()}}
+});
+if(window.matchMedia('(min-width:700px)').matches)document.getElementById('mqd').open=true;
+var hs=(location.hash||'').slice(1);
+scen(/^(c-new|f-new|c-known|jeux)$/.test(hs)?hs:'c-new');
+})();
+</script>
+</body>
+</html>
