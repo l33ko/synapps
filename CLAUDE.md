@@ -13,11 +13,11 @@ Une conversation peut durer plusieurs jours, et ces règles changent. **Au débu
 **Grosse fonctionnalité** = nouvelle app, nouveau module ou nouvel écran, refonte d'un écran existant, nouveau parcours (connexion, partage, famille…). Les corrections de bugs, retouches de textes et petits ajustements passent directement par la règle n°1. En cas de doute, demander.
 
 1. **Reformuler le besoin** en quelques lignes et poser les questions qui changent le design (pour qui, sur quel appareil, ce qui compte le plus). Ne pas écrire de code de l'app à ce stade.
-2. **Proposer 2 ou 3 pistes de maquettes vraiment différentes** (disposition, parcours, manière d'interagir — pas seulement des couleurs), chacune montrée **sur iPhone et sur ordinateur**, avec des données fictives réalistes, en français, dans le style propre à l'app concernée (chaque app garde volontairement le sien). Les principaux enchaînements d'écrans peuvent être cliquables, sans logique réelle derrière.
+2. **Proposer 2 pistes de maquettes vraiment différentes** (3 seulement si le propriétaire le demande) (disposition, parcours, manière d'interagir — pas seulement des couleurs), chacune montrée **sur iPhone et sur ordinateur**, avec des données fictives réalistes, en français, dans le style propre à l'app concernée (chaque app garde volontairement le sien). Les principaux enchaînements d'écrans peuvent être cliquables, sans logique réelle derrière.
    Chaque piste est dessinée par un agent **`maquettiste`** distinct, lancés **en parallèle**, chacun avec un angle différent (voir « Agents »). Chaque piste est un fichier `maquettes/<sujet>/piste-<lettre>.html`.
-   Puis, **avant de pousser**, faire parcourir les pistes par l'agent **`utilisateur-temoin`** (dans la peau du public de l'app ; il les ouvre en local), corriger ce qui bloque et garder ses remarques.
+   Puis, **seulement pour une nouvelle app ou un nouveau parcours** (pas pour un écran ou un module ajouté à une app existante), et **avant de pousser**, faire parcourir les pistes par l'agent **`utilisateur-temoin`** (dans la peau du public de l'app ; il les ouvre en local), corriger ce qui bloque et garder ses remarques.
 3. Les publier sur une **branche `maquettes-<sujet>`**, avec `maquettes/<sujet>/index.html` : une page qui présente toutes les pistes côte à côte (chacune dans un cadre iPhone et un cadre ordinateur, avec ses points forts et ses limites, et un lien pour l'ouvrir en grand). **Pas de pull request** : cette branche n'est jamais fusionnée.
-4. Donner au propriétaire le lien de la version test : `https://maquettes-<sujet>.synapps-bhl.pages.dev/maquettes/<sujet>/`, avec le résumé de l'utilisateur-témoin pour chaque piste.
+4. Donner au propriétaire le lien de la version test : `https://maquettes-<sujet>.synapps-bhl.pages.dev/maquettes/<sujet>/`, avec le résumé de l'utilisateur-témoin pour chaque piste s'il est passé.
 5. **Attendre son choix explicite** (« piste B », « A avec le menu de C », retouches…). Les retouches se font sur la même branche, la version test se met à jour.
 6. Une fois la maquette validée, coder sur une **nouvelle branche** selon la règle n°1, en respectant la maquette choisie. Rappeler le lien de la maquette dans la pull request et signaler tout écart qui s'est imposé en cours de route.
 
@@ -29,7 +29,7 @@ Une conversation peut durer plusieurs jours, et ces règles changent. **Au débu
 4. Donner au propriétaire :
    - le **lien de la version test** (voir ci-dessous) vers l'app concernée ;
    - un résumé simple de ce qui change et de ce qu'il faut tester ;
-   - les captures d'écran iPhone et ordinateur du `testeur-appareils` (si une page a changé) ;
+   - les captures d'écran iPhone et ordinateur du `testeur-appareils` (si l'affichage a changé) ;
    - le verdict des agents en une ligne (et ce qui a été corrigé suite à leur relecture).
 5. **Attendre une validation explicite** (« validé », « ok pour la prod »…) avant de fusionner (squash).
    Une demande de correction se fait sur la même branche : la version test se met à jour.
@@ -112,14 +112,21 @@ Des agents spécialisés sont définis dans `.claude/agents/`. Ce sont d'autres 
 | Agent | Rôle | Quand |
 |---|---|---|
 | `relecteur` | Relit la branche à froid : bugs, règles du dépôt, secrets. Rend un verdict, ne modifie rien. | Avant chaque demande de validation, sauf toute petite retouche (voir plus bas). |
-| `testeur-appareils` | Ouvre les pages modifiées dans un iPhone, un Android et un ordinateur simulés, relève les erreurs, fait les captures. | Dès qu'une page change. |
+| `testeur-appareils` | Ouvre les pages modifiées dans un iPhone, un Android et un ordinateur simulés, relève les erreurs, fait les captures. | Quand **l'affichage** change (écran, mise en page, style). Pour une modification de logique sans effet visible, le robot Contrôles suffit. |
 | `gardien-supabase` | Vérifie qu'un script SQL ou une Edge Function est sûr pour la production et prépare le script ponctuel. | Dès qu'un `.sql` ou une Edge Function change. |
 | `maquettiste` | Dessine **une** piste de maquette. | Règle n°0 : un par piste, en parallèle. |
-| `utilisateur-temoin` | Parcourt les pistes ou un écran dans la peau du vrai public de l'app, relève ce qui bloque ou gêne. Ne juge pas le style : chaque app a volontairement le sien. | Règle n°0, avant de montrer les pistes ; en option sur une grosse modification d'écran. |
+| `utilisateur-temoin` | Parcourt les pistes ou un écran dans la peau du vrai public de l'app, relève ce qui bloque ou gêne. Ne juge pas le style : chaque app a volontairement le sien. | Règle n°0, pour une nouvelle app ou un nouveau parcours seulement ; sur demande du propriétaire sinon. |
 
-- **Relecture indépendante** : lancer `relecteur` et `testeur-appareils` (et `gardien-supabase` si besoin) **en même temps**, une fois le travail terminé et poussé. Corriger les points bloquants sur la même branche, puis relancer l'agent concerné si la correction est importante.
+- **Relecture indépendante** : lancer `relecteur` (et `testeur-appareils` si l'affichage a changé, `gardien-supabase` si la base change) **en même temps**, **une seule fois**, quand le travail est terminé et poussé — pas après chaque retouche. Corriger les points bloquants sur la même branche ; ne relancer un agent que si la correction est une vraie réécriture, sinon le robot Contrôles suffit.
 - Les agents ne poussent, ne fusionnent et ne publient rien : la session principale reste seule responsable de la branche et de la pull request.
 - **Toute petite retouche** (un texte, une couleur, une icône) : le `testeur-appareils` seul suffit, sans `relecteur`.
+- **Économiser l'abonnement Claude** (les agents et les conversations consomment la même limite) :
+  - les agents tournent sur le modèle **Sonnet** (`model: sonnet` dans leur fiche), suffisant pour relire et tester ;
+  - leur donner une demande précise et complète (branche, but, fichiers et écrans concernés), pour qu'ils ne refassent pas l'exploration ;
+  - **ne jamais lire en entier un gros fichier** (plus de 500 lignes, comme les `index.html` des apps) : chercher avec `grep -n` puis lire seulement les lignes utiles (`sed -n '120,180p'`) ; vaut pour la session principale comme pour les agents ;
+  - limiter les captures d'écran regardées : celles des écrans modifiés, sur iPhone et ordinateur ;
+  - **mettre au point une fonction d'IA** (appel à l'API Claude) sur un seul résultat et avec le modèle le moins cher, et ne passer au lot complet ou à un modèle plus puissant qu'une fois la consigne au point ;
+  - grouper les retouches demandées par le propriétaire avant de relancer contrôles et agents.
 - **Audit sur demande** : le propriétaire peut demander un passage d'agents sur plusieurs apps à la fois (un agent par app, en parallèle), par exemple pour l'accessibilité ou l'affichage sur iPhone.
 
 ## Organisation du dépôt
