@@ -618,8 +618,8 @@ function drawResults() {
   const res = document.getElementById('res');
   if (!res) return;
   const qq = filt.q.trim();
-  const jump = qq && W.etat !== 'idle'
-    ? ` · <button type="button" class="jump" id="jump">${W.etat === 'ok' ? W.liste.length + ' ' : ''}sur le web ↓</button>` : '';
+  const jump = qq && W.etat === 'ok' && W.liste.length
+    ? ` · <button type="button" class="jump" id="jump">${W.liste.length} sur le web ↓</button>` : '';
   if (!recipes.length && !qq) {
     res.innerHTML = `<div class="empty"><div class="big">📖</div><p>Le carnet est vide pour l’instant.</p>
       <div style="display:flex;flex-direction:column;gap:10px;max-width:300px;margin:0 auto">
@@ -727,8 +727,9 @@ function drawWeb() {
   const head = `<div class="sec-h"><h2>🌐 Sur le web</h2><span class="muted">sites de recettes</span></div>`;
   if (W.etat === 'wait') { el.innerHTML = head + '<p class="muted"><span class="loader"></span>Recherche sur Marmiton, 750g, Cuisine AZ…</p>'; return; }
   if (W.etat === 'err') {
-    el.innerHTML = head + `<div class="msg err">${esc(W.err)}</div><button type="button" class="btn ghost" id="wretry">Réessayer</button>`;
-    document.getElementById('wretry').onclick = () => { W.etat = 'idle'; W.cle = ''; askWeb(true); };
+    const fini = /quota/i.test(W.err);                    // quota du mois épuisé : réessayer ne sert à rien
+    el.innerHTML = head + `<div class="msg err">${esc(W.err)}</div>` + (fini ? '' : `<button type="button" class="btn ghost" id="wretry">Réessayer</button>`);
+    if (!fini) document.getElementById('wretry').onclick = () => { W.etat = 'idle'; W.cle = ''; askWeb(true); };
     return;
   }
   const list = webTries();
@@ -841,11 +842,11 @@ async function ajouterWeb(w, categorie, depuisApercu) {
     });
     enCours.delete(k);
     flashId = rec.id; setTimeout(() => { flashId = null; }, 1700);
-    drawResults(); drawWeb();
+    redessinerSansSaut();
     if (depuisApercu && current === w) drawFoot();
     else toast(`Ajoutée au carnet · ${categorie}`, [
       ['Annuler', 'undo', async () => {
-        try { await q(sb.from('recettes').delete().eq('id', rec.id)); recipes = recipes.filter(x => x.id !== rec.id); drawResults(); drawWeb(); }
+        try { await q(sb.from('recettes').delete().eq('id', rec.id)); recipes = recipes.filter(x => x.id !== rec.id); redessinerSansSaut(); }
         catch (err) { toast(dbErr(err)); }
       }],
       ['Ouvrir', '', () => go('/r/' + rec.id)],
@@ -854,6 +855,14 @@ async function ajouterWeb(w, categorie, depuisApercu) {
     enCours.delete(k); drawWeb(); if (current === w) drawFoot();
     toast(dbErr(err));
   }
+}
+
+/* redessine sans faire sauter la section « Sur le web » (une recette ajoutée apparaît aussi dans le carnet, au-dessus) */
+function redessinerSansSaut() {
+  const w = document.getElementById('web'), avant = w ? w.getBoundingClientRect().top : null;
+  drawResults(); drawWeb();
+  const w2 = document.getElementById('web');
+  if (avant != null && w2) window.scrollBy(0, w2.getBoundingClientRect().top - avant);
 }
 
 /* message en bas d'écran, avec actions éventuelles */
