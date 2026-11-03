@@ -52,9 +52,10 @@ const AUTORISES = new Set([...Object.keys(PALETTE), '.']);
 
 // Angles différents, un par appel (les NB_IDEES premiers), pour que les idées ne se ressemblent pas
 const ANGLES = [
-  'vue de face, version mignonne avec de grands yeux',
-  'de profil, en mouvement',
+  'sous l’angle qui le fait reconnaître au premier coup d’œil (souvent de profil, en entier) : son détail distinctif (corne, trompe, queue, roues…) doit être bien visible',
+  'vue de face, version mignonne avec de grands yeux, sans perdre son détail distinctif',
   'très simple, peu de couleurs, idéal pour débuter (16 × 16 au plus)',
+  'de profil, en mouvement',
   'version bébé ou miniature, très ronde',
   'avec un petit accessoire ou un élément de décor simple',
   'avec des couleurs inattendues et joyeuses',
