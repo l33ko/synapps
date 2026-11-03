@@ -7,7 +7,8 @@
 //
 //  Secrets à créer (Edge Functions > Secrets) :
 //    ANTHROPIC_API_KEY      clé API Claude (platform.claude.com > API keys). Obligatoire.
-//    ANTHROPIC_MODEL        facultatif, modèle utilisé (par défaut claude-haiku-5-5).
+//    ANTHROPIC_MODEL        facultatif, modèle utilisé (par défaut claude-haiku-5-5 ; claude-sonnet-5-5 dessine mieux, environ 20 fois plus cher).
+//    ANTHROPIC_EFFORT       facultatif, réflexion avant de dessiner : low, medium (par défaut) ou high.
 //    LIMITE_JOUR_APPAREIL   facultatif, recherches par jour et par appareil (par défaut 20).
 //    LIMITE_JOUR_TOTAL      facultatif, recherches par jour pour tout le monde (par défaut 300).
 //  SUPABASE_URL et SUPABASE_SERVICE_ROLE_KEY sont fournis automatiquement par Supabase.
@@ -70,6 +71,72 @@ Format du dessin :
 - Contour noir (K) autour du sujet, formes lisibles et pleines, sujet centré, pas de fond (cases vides autour).
 - Pas de texte ni de lettres dessinées.
 
+Méthode : choisis d'abord la silhouette la plus reconnaissable du sujet (ce qui le distingue : oreilles pointues et queue touffue du renard, trompe de l'éléphant…), place-la sur la grille, ajoute 2 ou 3 détails expressifs (yeux, museau, ombre d'une teinte plus foncée), puis vérifie qu'un enfant reconnaîtrait le sujet sans lire son nom.
+
+Exemples de modèles réussis, dans le style attendu (lignes séparées par des retours à la ligne) :
+
+Licorne :\n..................KK....
+.................KYYK...
+................KYOK....
+.........KKKK..KYYK.....
+........KPPPPKKOYK......
+.......KPPPPWWWKKK......
+......KOOPPWWWWWWWK.....
+......KOOOKWWWWWWWWK....
+.....KYYYKWWWWWWWWWWK...
+.....KYYYKWWWbKWWWWWWK..
+.....KgggKWWWKKWWWWWWWK.
+.....KgggKWWWKKWWWWWWWWK
+.....KgggKbWWWWppWWWWKWK
+....KBBBBKbWWWWWWWWWWWWK
+....KBBBKKbbWWWWWWWWWWK.
+....KVVVKKKbbbWWWWWWKK..
+...KVVVKWWWWbbKKKKKK....
+.KKKVVKWWWWWWWWWWK......
+KPPKKKWWWWWWWWWWWWK.....
+KOOOKWWWWWWWWWWWWWK.....
+KYYKKbWWWWWWWWWWWbK.....
+KggKKbbWWWWWWWWWbbK.....
+.KBBKKbbbbbbbbbbbK......
+..KVK.KWWK...KWWK.......
+...K..KWbK...KWbK.......
+......KppK...KppK.......
+.......KK.....KK........
+
+Chat :\n.KK..........KK.
+.KOK........KOK.
+.KOOK......KOOK.
+.KOPOKKKKKKOPOK.
+.KOOOOOOOOOOOOK.
+KOOOOOOOOOOOOOOK
+KOOOKKOOOOKKOOOK
+KOOOKWOOOOKWOOOK
+KOOOOOOOOOOOOOOK
+KPPOOOOPPOOOOPPK
+KOOOOWWWWWWOOOOK
+.KOOOWKWWKWOOOK.
+..KOOOWWWWOOOK..
+...KKOOOOOOKK...
+.....KKKKKK.....
+
+Saint-Bernard :\n......KKKKKK......
+....KKNNWWNNKK....
+...KNNNNWWNNNNK...
+..KNNNNNWWNNNNNK..
+.KKKNNNNWWNNNNKKK.
+KNNKNNNNWWNNNNKNNK
+KNNKNWKNWWNWKNKNNK
+KNNKNKKNWWNKKNKNNK
+KNNKNNWWWWWWNNKNNK
+KNNKWWWWWWWWWWKNNK
+KNNKWWWKKKKWWWKNNK
+KNNKWWWWKKWWWWKNNK
+.KKKWWWWKKWWWWKKK.
+...KWWKKWWKKWWK...
+...KWWWKPPKWWWK...
+....KWWKPPKWWK....
+.....KKKKKKKK.....
+
 Réponds uniquement avec un objet JSON, sans texte autour :
 {"titre":"2 à 4 mots en français","grille":["....KKKK....", "..."]}`;
 
@@ -118,7 +185,7 @@ function nettoyer(g: unknown) {
 async function demander(mot: string, angle: string) {
   const r = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
-    signal: AbortSignal.timeout(45000),
+    signal: AbortSignal.timeout(90000),
     headers: {
       'x-api-key': env('ANTHROPIC_API_KEY'),
       'anthropic-version': '2023-06-01',
@@ -128,8 +195,8 @@ async function demander(mot: string, angle: string) {
       model: MODELE,
       // Les modèles 5.5 réfléchissent avant de répondre (réflexion adaptative), et cette réflexion
       // compte dans max_tokens : il faut donc de la marge, et un effort bas pour rester rapide.
-      max_tokens: 8000,
-      output_config: { effort: 'low' },
+      max_tokens: 16000,
+      output_config: { effort: env('ANTHROPIC_EFFORT', 'medium') },
       system: SYSTEME,
       messages: [{ role: 'user', content: `Sujet demandé par l'enfant : « ${mot} ».\nStyle de cette version : ${angle}.` }],
     }),
