@@ -766,6 +766,7 @@ function pushDb(){
  .then(function(){ACC.last=Date.now();ACC.err=''},function(e){ACC.err=syncErr(e)})
  .then(function(){pushing=false;if(pending){pending=false;pushDb()}else redraw()})}
 function pullMerge(remote){
+ PULLED=true;
  var merged=mergeRuns(S.runs,remote),changed=merged.length!==S.runs.length,needPush=merged.length!==remote.length||seenPush;
  if(changed){S=mk(merged);saveLocal()}
  ACC.state='on';ACC.last=Date.now();ACC.err='';
@@ -1265,7 +1266,8 @@ var SEEN_KEY='synapse-essais',SEEN={},seenPush=false;
 try{var sv0=JSON.parse(localStorage.getItem(SEEN_KEY));if(sv0&&typeof sv0==='object')EXIDS.forEach(function(id){if(sv0[id])SEEN[id]=1})}catch(e){}
 function saveSeen(){try{localStorage.setItem(SEEN_KEY,JSON.stringify(SEEN))}catch(e){}}
 function seenList(){return EXIDS.filter(function(id){return SEEN[id]})}
-function markSeen(id){if(SEEN[id])return;SEEN[id]=1;saveSeen();pushDb()}
+var PULLED=false;   // pas d'envoi tant que le profil en ligne n'a pas été lu une première fois (sinon on écraserait l'historique)
+function markSeen(id){if(SEEN[id])return;SEEN[id]=1;saveSeen();if(PULLED)pushDb()}
 function mergeSeen(list){
  var add=false;list.forEach(function(id){if(EXIDS.indexOf(id)>-1&&!SEEN[id]){SEEN[id]=1;add=true}});
  if(add)saveSeen();seenPush=seenList().some(function(id){return list.indexOf(id)<0})}
@@ -1519,7 +1521,7 @@ function trialAct(a){
  if(a==='tagain'){trialStart(T.e,T.known);return true}
  if(a==='tskip'){
   var first=!T.known;markSeen(T.e.id);startPlay(T.e);
-  if(first){var bk=app.querySelector('.bk');if(bk)bk.insertAdjacentHTML('afterend','<p class="toast" role="status">Essai passé. Tu pourras le refaire avec « S’entraîner », avant de jouer.</p>')}
+  if(first){var bk=app.querySelector('.bk');if(bk){bk.insertAdjacentHTML('afterend','<p class="toast" role="status">Essai passé. Tu pourras le refaire avec « S’entraîner », avant de jouer.</p>');var tm=bk.nextElementSibling;setTimeout(function(){if(tm&&tm.parentNode)tm.remove()},4000)}}
   return true}
  return false}
 
