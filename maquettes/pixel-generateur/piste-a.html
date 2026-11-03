@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pixel arts — Piste A : tout dans « Créer »</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#fff8ef; --ink:#2b2340; --soft:#6d6585; --card:#ffffff; --line:#eadfce;
+  --accent:#ff6b5b; --accent2:#3fb5a3; --peg:#efe6d8;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:"Baloo 2",system-ui,sans-serif}
+button{font-family:inherit}
+
+/* ---------- Bandeau de la maquette ---------- */
+.mq{background:#2b2340;color:#fff;padding:10px 18px 12px;font-size:14px;line-height:1.35}
+.mq-in{max-width:1100px;margin:0 auto}
+.mq-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.mq-tag{background:var(--accent);border-radius:8px;padding:1px 9px;font-weight:800}
+.mq b.t{font-size:16px}
+.mq p{margin:4px 0 0;color:#e6e0f2}
+.mq details{margin-top:4px}
+.mq summary{cursor:pointer;color:#ffd7d2;font-weight:700}
+.mq-cols{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:6px}
+.mq-cols h4{margin:0;font-size:14px}
+.mq-cols ul{margin:2px 0 0;padding-left:18px;color:#e6e0f2}
+@media (max-width:640px){.mq-cols{grid-template-columns:1fr}}
+
+/* ---------- App (repris de Pixel arts) ---------- */
+header{padding:18px 18px 6px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+h1{margin:0;font-size:30px;font-weight:800;letter-spacing:-.5px}
+h1 span{color:var(--accent)}
+.tabs{display:flex;gap:6px;margin-left:auto;background:#f3e9da;padding:4px;border-radius:14px}
+.tabs button{border:0;background:none;font:inherit;font-weight:700;font-size:15px;padding:6px 14px;border-radius:10px;color:var(--soft);cursor:pointer}
+.tabs button.on{background:var(--card);color:var(--ink);box-shadow:0 1px 3px #0002}
+main{padding:8px 18px 60px;max-width:1100px;margin:0 auto}
+.view{display:none}.view.on{display:block}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 14px}
+.chip{border:2px solid var(--line);background:var(--card);border-radius:20px;padding:3px 12px;font:inherit;font-weight:700;font-size:14px;color:var(--soft);cursor:pointer}
+.chip.on{border-color:var(--ink);color:var(--ink)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px}
+.tile{background:var(--card);border:2px solid var(--line);border-radius:18px;padding:12px 10px 8px;text-align:center;cursor:pointer;transition:transform .12s;position:relative}
+.tile:hover{transform:translateY(-3px);border-color:#d8c8b0}
+.tile canvas{width:84px;height:84px;image-rendering:pixelated;display:block;margin:0 auto 6px}
+.tile b{display:block;font-size:16px}
+.tile small{color:var(--soft);font-size:12px}
+.tile .new{position:absolute;top:6px;right:6px;background:var(--accent);color:#fff;font-size:11px;font-weight:800;border-radius:8px;padding:0 6px}
+.lvl{display:inline-block;margin-left:4px;color:#f4b400;letter-spacing:-1px}
+.detail-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.back{background:var(--card);border:2px solid var(--line);border-radius:12px;font:inherit;font-weight:700;padding:4px 12px;cursor:pointer;color:var(--ink)}
+.detail-top h2{margin:0;font-size:26px}
+.controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.seg{display:flex;background:#f3e9da;border-radius:12px;padding:3px}
+.seg button{border:0;background:none;font:inherit;font-weight:700;padding:5px 12px;border-radius:9px;color:var(--soft);cursor:pointer;font-size:14px}
+.seg button.on{background:var(--card);color:var(--ink);box-shadow:0 1px 3px #0002}
+label.tog{display:flex;align-items:center;gap:6px;font-weight:600;font-size:14px;color:var(--soft);background:var(--card);border:2px solid var(--line);border-radius:12px;padding:3px 10px;cursor:pointer}
+.btn{border:0;background:var(--accent);color:#fff;font:inherit;font-weight:800;border-radius:12px;padding:7px 14px;cursor:pointer;font-size:14px}
+.btn.alt{background:var(--accent2)}
+.btn.ghost{background:var(--card);color:var(--ink);border:2px solid var(--line)}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:16px;align-items:start}
+@media (max-width:760px){.layout{grid-template-columns:1fr}}
+.board{background:var(--card);border:2px solid var(--line);border-radius:18px;padding:12px;overflow:auto}
+.board canvas{display:block;margin:0 auto;max-width:100%;height:auto}
+.legend{background:var(--card);border:2px solid var(--line);border-radius:18px;padding:12px 14px}
+.legend h3{margin:0 0 6px;font-size:17px}
+.leg{display:flex;align-items:center;gap:10px;padding:4px 0;border-bottom:1px dashed var(--line);font-size:15px}
+.leg:last-child{border:0}
+.sw{width:26px;height:26px;border-radius:7px;border:2px solid #0003;flex:none;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px}
+.sw.round{border-radius:50%}
+.leg .n{margin-left:auto;font-weight:800}
+.total{margin-top:8px;font-weight:800;font-size:15px}
+.tip{color:var(--soft);font-size:13px;margin-top:8px;line-height:1.35}
+.panel{background:var(--card);border:2px solid var(--line);border-radius:18px;padding:14px;margin-bottom:14px}
+.panel h3{margin:0 0 8px}
+
+/* ---------- NOUVEAU : « Invente un modèle » ---------- */
+.magic{border-color:#ffc9c2;background:linear-gradient(180deg,#fff 0,#fff 60%,#fff4f2 100%);padding:16px}
+.magic h3{font-size:21px;display:flex;align-items:center;gap:8px;margin-bottom:2px}
+.magic .sub{color:var(--soft);font-size:14px;margin:0 0 10px}
+.search{display:flex;align-items:center;gap:6px;background:#fff;border:3px solid var(--ink);border-radius:18px;padding:5px 5px 5px 14px;box-shadow:0 3px 0 var(--ink)}
+.search:focus-within{border-color:var(--accent);box-shadow:0 3px 0 var(--accent)}
+.search .ic{font-size:20px}
+.search input{flex:1;min-width:0;border:0;outline:0;font:inherit;font-size:20px;font-weight:700;color:var(--ink);background:none;padding:4px 0}
+.search input::placeholder{color:#b9aec9;font-weight:600}
+.search .go{border:0;background:var(--accent);color:#fff;font-weight:800;font-size:17px;border-radius:13px;padding:8px 16px;cursor:pointer;white-space:nowrap}
+.search .clear{border:0;background:#f3e9da;color:var(--soft);width:30px;height:30px;border-radius:50%;font-size:16px;cursor:pointer;display:none}
+.search.has .clear{display:block}
+.pills{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 0}
+.pill{flex:none;min-height:44px;border:2px solid var(--line);background:#fff;border-radius:999px;padding:4px 14px 4px 10px;font-weight:700;font-size:16px;color:var(--ink);cursor:pointer;display:flex;align-items:center;gap:6px}
+/* iPhone : 2 lignes seulement (dé + 5 mots), le reste sur ordinateur */
+@media (max-width:760px){.pills .pill.xtra{display:none}.pills{gap:7px}.pill{padding:4px 11px 4px 8px;font-size:15px}}
+.pill .e{font-size:19px;line-height:1}
+.pill:hover{border-color:#d8c8b0}
+.pill.dice{background:#fff3c4;border-color:#f3d97a}
+
+/* lecture à voix haute */
+.say{flex:none;min-width:44px;min-height:44px;border:2px solid var(--line);background:#fff;border-radius:14px;font-size:20px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:4px;padding:0 8px;color:var(--ink);font-weight:800}
+.say.big{font-size:15px;padding:0 12px}
+.say.talk{background:#fff3c4;border-color:#f3d97a;animation:wob .5s infinite alternate}
+@keyframes wob{to{transform:scale(1.08)}}
+.magic .h-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.magic .h-row div{flex:1;min-width:0}
+.msg-row{display:flex;align-items:center;gap:8px;justify-content:center}
+.oops .msg-row{margin-top:6px}
+
+/* résultats */
+.res{margin-top:14px}
+@media (min-width:761px){.res{max-width:780px;margin-left:auto;margin-right:auto}}
+.res-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.res-head h4{margin:0;font-size:18px}
+.res-head h4 em{font-style:normal;color:var(--accent)}
+.res-head .btn{margin-left:auto}
+.props{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+@media (min-width:761px){.props{grid-template-columns:repeat(3,1fr);gap:14px}}
+.prop{position:relative;background:#fff;border:2px solid var(--line);border-radius:18px;padding:10px 8px 6px;cursor:pointer;text-align:center;transition:transform .12s,border-color .12s;animation:pop .35s both}
+.prop:hover{transform:translateY(-3px);border-color:#d8c8b0}
+.prop:active{transform:scale(.97)}
+.prop .cv{aspect-ratio:1;background:var(--peg);border-radius:12px;display:flex;align-items:center;justify-content:center;padding:8px}
+.prop canvas{width:100%;height:100%;image-rendering:pixelated;display:block}
+.prop b{display:block;font-size:15px;margin-top:5px;line-height:1.15}
+.prop small{display:block;color:#4f4766;font-size:14px;font-weight:600;line-height:1.2}
+.prop .heart{position:absolute;top:6px;right:6px;width:32px;height:32px;border-radius:50%;background:#fffd;border:2px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:15px;pointer-events:none}
+.prop.added{border-color:var(--accent2)}
+.prop.added .heart{background:var(--accent2);border-color:var(--accent2);color:#fff}
+@keyframes pop{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:none}}
+.props .prop:nth-child(2){animation-delay:.06s}.props .prop:nth-child(3){animation-delay:.12s}
+.props .prop:nth-child(4){animation-delay:.18s}.props .prop:nth-child(5){animation-delay:.24s}.props .prop:nth-child(6){animation-delay:.3s}
+.again{display:flex;justify-content:center;margin-top:12px}
+.again .btn{font-size:16px;padding:9px 18px}
+.hint{color:#4f4766;font-size:15px;font-weight:600;text-align:center;margin:0}
+
+/* chargement */
+.load .prop{cursor:default;animation:none}
+.load .prop:hover{transform:none;border-color:var(--line)}
+.load canvas{opacity:.95}
+.ld-msg{display:flex;align-items:center;gap:10px;background:#fff;border:2px dashed #ffc9c2;border-radius:14px;padding:8px 12px;margin-bottom:10px}
+.ld-msg .bead{width:22px;height:22px;border-radius:50%;background:var(--accent);position:relative;flex:none;animation:hop .7s infinite alternate ease-in}
+.ld-msg .bead:after{content:"";position:absolute;inset:7px;border-radius:50%;background:#fff}
+@keyframes hop{to{transform:translateY(-6px)}}
+.ld-msg b{font-size:16px}
+.ld-bar{height:8px;background:#f3e9da;border-radius:8px;overflow:hidden;margin-top:4px}
+.ld-bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),#f9a23b);border-radius:8px;transition:width .3s linear}
+.ld-txt{flex:1}
+.ld-txt small{color:#4f4766;font-size:14px}
+
+/* refusé / rien trouvé */
+.oops{background:#fff;border:2px solid var(--line);border-radius:18px;padding:16px;text-align:center}
+.oops canvas{width:72px;height:72px;image-rendering:pixelated}
+.oops h4{margin:4px 0 2px;font-size:19px}
+.oops p{margin:0 0 10px;color:var(--soft);font-size:15px}
+.oops .pills{justify-content:center;flex-wrap:wrap;overflow:visible;margin:0;padding:0}
+
+/* autres panneaux, repliés */
+.fold{display:flex;align-items:center;gap:10px;cursor:pointer}
+.fold h3{margin:0;font-size:17px}
+.fold small{color:var(--soft);font-size:13px;display:block;line-height:1.2}
+.fold .chev{margin-left:auto;color:var(--soft);font-weight:800;transition:transform .2s}
+.panel.open .chev{transform:rotate(90deg)}
+.fold-body{display:none;margin-top:12px}
+.panel.open .fold-body{display:block}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.row label{font-weight:600;font-size:14px;color:var(--soft)}
+.palette{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
+.palette span{width:28px;height:28px;border-radius:8px;border:3px solid #0002}
+.side-grid{display:grid;grid-template-columns:1fr;gap:0}
+@media (min-width:761px){.side-grid{grid-template-columns:1fr 1fr;gap:14px}}
+
+/* zoom : feuille du bas sur iPhone, fenêtre au centre sur ordinateur */
+.veil{position:fixed;inset:0;background:#2b234066;display:none;z-index:50;align-items:flex-end;justify-content:center}
+.veil.on{display:flex}
+.sheet{background:var(--bg);width:100%;max-height:92vh;overflow:auto;border-radius:24px 24px 0 0;padding:10px 16px calc(16px + env(safe-area-inset-bottom));animation:up .25s ease-out}
+.sheet .grab{width:44px;height:5px;border-radius:5px;background:#d9cdbb;margin:0 auto 8px}
+@keyframes up{from{transform:translateY(40px);opacity:.4}to{transform:none;opacity:1}}
+.z-top{display:flex;align-items:center;gap:8px}
+.z-top h3{margin:0;font-size:23px;flex:1;line-height:1.1}
+.z-x{border:0;background:#f3e9da;width:36px;height:36px;border-radius:50%;font-size:18px;cursor:pointer;color:var(--ink)}
+.z-body{display:grid;grid-template-columns:1fr;gap:12px;margin-top:8px}
+.z-art{background:#fff;border:2px solid var(--line);border-radius:18px;padding:10px;position:relative}
+.z-art canvas{display:block;max-width:100%;max-height:330px;width:auto;height:auto;margin:0 auto}
+.z-seg{display:flex;margin:10px auto 0;max-width:320px}
+.z-seg button{flex:1;min-height:44px;padding:6px 12px;font-size:16px}
+.facts{display:flex;gap:8px}
+.fact{flex:1;background:#fff;border:2px solid var(--line);border-radius:14px;padding:6px 8px;text-align:center}
+.fact b{display:block;font-size:22px;line-height:1.1}
+.fact small{color:#4f4766;font-size:14px;font-weight:600}
+.cols{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.colc{display:flex;align-items:center;gap:5px;background:#fff;border:2px solid var(--line);border-radius:999px;padding:2px 9px 2px 3px;font-size:13px;font-weight:700}
+.colc i{width:20px;height:20px;border-radius:50%;border:2px solid #0003;display:block;position:relative}
+.colc i:after{content:"";position:absolute;inset:5px;border-radius:50%;background:#fffd}
+.colc span{color:var(--soft);font-weight:600}
+.z-acts{display:flex;flex-direction:column;gap:8px;margin-top:12px;position:sticky;bottom:calc(-16px - env(safe-area-inset-bottom));background:var(--bg);padding:8px 0 calc(12px + env(safe-area-inset-bottom));z-index:2}
+@media (max-width:760px){.z-art canvas{max-height:250px}.cols{margin-top:8px}.fact b{font-size:19px}}
+.z-acts .btn{font-size:18px;padding:11px 14px;border-radius:16px}
+.z-acts .nav{display:flex;gap:8px}
+.z-acts .nav .btn{flex:1;font-size:15px;padding:8px}
+@media (min-width:761px){
+  .veil{align-items:center}
+  .sheet{width:760px;border-radius:24px;padding:18px 20px 20px;max-height:90vh}
+  .sheet .grab{display:none}
+  .z-body{grid-template-columns:1.1fr 1fr;gap:18px}
+}
+
+.toast{position:fixed;left:50%;top:14px;transform:translate(-50%,-80px);background:var(--accent2);color:#fff;font-weight:800;border-radius:999px;padding:8px 18px;z-index:60;box-shadow:0 6px 20px #0003;transition:transform .3s;white-space:nowrap;font-size:15px}
+.toast.on{transform:translate(-50%,0)}
+
+.demo{margin-top:22px;border:2px dashed #cfc3dd;border-radius:14px;padding:8px 12px;font-size:13px;color:var(--soft)}
+.demo b{color:var(--ink)}
+.demo button{border:0;background:#efe9f6;border-radius:8px;padding:2px 8px;font-weight:700;font-size:13px;color:var(--ink);cursor:pointer;margin:2px}
+</style>
+</head>
+<body>
+
+<div class="mq"><div class="mq-in">
+  <div class="mq-top"><span class="mq-tag">Piste A</span><b class="t">Tout dans l'onglet « Créer »</b></div>
+  <p>Un grand champ en haut de « Créer » : on tape un mot, 6 idées apparaissent juste en dessous, on en touche une pour la voir en grand et on l'ajoute à « Mes modèles ».</p>
+  <details><summary>Points forts et limites</summary>
+    <div class="mq-cols">
+      <div><h4>Points forts</h4><ul>
+        <li>Trois touchers seulement (mot, idée, « Ajouter ») et aucun écran de plus à comprendre.</li>
+        <li>Les 6 idées restent affichées : on revient comparer, on en ajoute plusieurs, on relance.</li>
+        <li>« À partir d'une image » et « Dessiner » restent sur la même page : rien ne disparaît.</li>
+        <li>Bouton 🔊 à côté de la consigne et de chaque message : l'enfant qui lit mal peut tout écouter.</li>
+      </ul></div>
+      <div><h4>Limites</h4><ul>
+        <li>Sur iPhone, la page « Créer » devient longue : les deux outils existants sont repliés plus bas.</li>
+        <li>Peu de mise en scène : pendant l'attente de 5 à 10 s, il n'y a qu'une animation simple.</li>
+        <li>Un enfant qui ne lit pas encore dépend des pastilles à images ou d'un adulte pour taper le mot (le 🔊 lit, mais n'écrit pas).</li>
+      </ul></div>
+    </div>
+  </details>
+</div></div>
+
+<header>
+  <h1>Pixel <span>arts</span></h1>
+  <nav class="tabs">
+    <button data-tab="catalogue">Catalogue</button>
+    <button data-tab="creer" class="on">Créer</button>
+  </nav>
+</header>
+
+<main>
+  <!-- Catalogue -->
+  <section id="catalogue" class="view">
+    <div class="filters" id="filters"></div>
+    <div class="grid" id="tiles"></div>
+  </section>
+
+  <!-- Détail -->
+  <section id="detail" class="view">
+    <div class="detail-top">
+      <button class="back" id="back">← Retour</button>
+      <h2 id="dTitle"></h2>
+    </div>
+    <div class="controls">
+      <div class="seg" id="modeSeg">
+        <button data-mode="papier" class="on">✏️ Papier</button>
+        <button data-mode="perles">⚪ Perles</button>
+      </div>
+      <label class="tog"><input type="checkbox" id="optNum"> Numéros</label>
+      <label class="tog"><input type="checkbox" id="optCoord" checked> Repères</label>
+      <button class="btn ghost">Modifier</button>
+      <button class="btn alt">Image à garder</button>
+    </div>
+    <div class="layout">
+      <div class="board"><canvas id="board"></canvas></div>
+      <aside class="legend" id="legend"></aside>
+    </div>
+  </section>
+
+  <!-- Créer -->
+  <section id="creer" class="view on">
+    <div class="panel magic">
+      <div class="h-row"><div>
+        <h3>✨ Invente un modèle</h3>
+        <p class="sub" id="consigne" style="margin:0">✍️ Écris ce que tu veux dessiner, je te propose 6 idées.</p>
+      </div><button class="say big" data-say="#consigne" aria-label="Écouter la consigne">🔊 Écouter</button></div>
+      <form class="search" id="sform" autocomplete="off">
+        <span class="ic">🔍</span>
+        <input id="q" type="search" placeholder="Un dragon, un tracteur…" enterkeyhint="go" maxlength="40">
+        <button type="button" class="clear" id="clear" aria-label="Effacer">✕</button>
+        <button class="go" type="submit">Créer ✨</button>
+      </form>
+      <div class="pills" id="pills"></div>
+      <div class="res" id="res"></div>
+    </div>
+
+    <div class="side-grid">
+      <div class="panel" id="pImg">
+        <div class="fold"><span style="font-size:24px">📷</span><div><h3>À partir d'une image</h3><small>Transforme ton dessin ou une photo</small></div><span class="chev">›</span></div>
+        <div class="fold-body">
+          <div class="row"><button class="btn">Choisir une image</button><label>Taille <b>24</b> cases</label><label>Couleurs <b>8</b></label></div>
+          <p class="tip">Choisis un dessin simple sur fond clair : ça marche beaucoup mieux qu'une photo.</p>
+        </div>
+      </div>
+      <div class="panel" id="pDraw">
+        <div class="fold"><span style="font-size:24px">🖌️</span><div><h3>Dessiner</h3><small>Case par case, sur une feuille vide</small></div><span class="chev">›</span></div>
+        <div class="fold-body">
+          <div class="row"><label>Largeur 16</label><label>Hauteur 16</label><button class="btn ghost">Nouvelle feuille</button></div>
+          <div class="palette" id="miniPal"></div>
+          <p class="tip">Tes créations s'ajoutent au catalogue dans « Mes modèles » (sur cet appareil uniquement).</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="demo">
+      <b>Pour la maquette :</b> seuls les dragons sont dessinés (tout autre mot affiche des dragons).
+      Voir aussi : <button data-demo="pistolet">mot refusé (« pistolet »)</button><button data-demo="blorptz">aucun résultat (« blorptz »)</button>
+    </div>
+  </section>
+</main>
+
+<!-- Zoom sur une proposition -->
+<div class="veil" id="veil">
+  <div class="sheet" role="dialog" aria-modal="true">
+    <div class="grab"></div>
+    <div class="z-top">
+      <h3 id="zTitle"></h3>
+      <button class="z-x" id="zClose" aria-label="Fermer">✕</button>
+    </div>
+    <div class="z-body">
+      <div class="z-art">
+        <canvas id="zCv"></canvas>
+        <div class="seg z-seg" id="zSeg"><button class="on" data-m="papier">✏️ Papier</button><button data-m="perles">⚪ Perles</button></div>
+      </div>
+      <div>
+        <div class="facts">
+          <div class="fact"><b id="zSize"></b><small>cases</small></div>
+          <div class="fact"><b id="zBeads"></b><small>perles</small></div>
+          <div class="fact"><b id="zCols"></b><small>couleurs</small></div>
+        </div>
+        <div class="cols" id="zColList"></div>
+        <div class="z-acts">
+          <button class="btn" id="zAdd">⭐ Ajouter à Mes modèles</button>
+          <div class="nav">
+            <button class="btn ghost" id="zPrev">‹ Précédente</button>
+            <button class="btn ghost" id="zNext">Suivante ›</button>
+          </div>
+        </div>
+        <div class="msg-row" style="justify-content:flex-start;margin-top:4px"><p class="tip" id="zTip" style="margin:0;flex:1">💡 Tu pourras le recopier sur papier ou en perles, et le modifier.</p><button class="say" data-say="#zTip" aria-label="Écouter">🔊</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ---------- Couleurs (les mêmes que Pixel arts) ---------- */
+const PAL = {
+  K:{n:"Noir",c:"#1f1b24"}, W:{n:"Blanc",c:"#fbfbf7"}, S:{n:"Gris",c:"#8d8f98"}, s:{n:"Gris clair",c:"#c9cbd1"},
+  R:{n:"Rouge",c:"#e0352f"}, O:{n:"Orange",c:"#f58a1f"}, Y:{n:"Jaune",c:"#fdd835"}, G:{n:"Vert",c:"#2fa84f"},
+  g:{n:"Vert clair",c:"#9bd770"}, B:{n:"Bleu",c:"#2766c9"}, b:{n:"Bleu ciel",c:"#7cc6f2"}, V:{n:"Violet",c:"#8a4fc4"},
+  P:{n:"Rose",c:"#f47fae"}, p:{n:"Rose pâle",c:"#f9c6d8"}, N:{n:"Marron",c:"#7a4a2a"}, n:{n:"Beige",c:"#e0b47c"},
+};
+const KEYS=Object.keys(PAL);
+
+function parseArt(a){
+  const rows=a.split("\n").filter(r=>r.trim().length);
+  const w=Math.max(...rows.map(r=>r.length));
+  return rows.map(r=>r.padEnd(w,".").split("").map(ch=>PAL[ch]?ch:"."));
+}
+// dessins symétriques : on écrit la moitié gauche
+function sym(a){return a.split("\n").filter(r=>r.trim().length).map(r=>r+r.split("").reverse().join("")).join("\n")}
+
+/* ---------- 6 dragons originaux (fictifs, dessinés pour la maquette) ---------- */
+const DRAGONS=[
+ {t:"Bébé dragon",a:sym(`
+..K.....
+.KnK....
+.KnnK.KK
+..KnKKGG
+...KGGGG
+..KGGGGG
+..KGKKGG
+..KGKWGG
+..KGGGGG
+..KGPGGK
+...KGGGG
+.KK.KKYY
+KggKGYYY
+KgggKYYY
+.KK.KYYY
+....KGGK
+....KKK.`)},
+ {t:"Dragon cracheur de feu",a:`
+...............K........
+..............KnK.......
+.............KRRRKK.....
+.....K......KRRRRRRRK...
+.....KK.....KRRRKKRRRK..
+.....KOK....KRRRKWRRRRKO
+.....KOOK...KRRRRRRRRRKY
+.....KOOOK..KRRRRRRKKKOY
+.....KOOOOK.KRRRRRRRRKYO
+.....KOOOOOKKRRRRRKKK...
+.....KOOOOKRRRRRRRK.....
+......KKKRRRRRRYYRK.....
+..K...KRRRRRRRYYYYRK....
+.KRK.KRRRRRRRYYYYRRK....
+.KRRKRRRRRRRRYYYYRRK....
+..KRRRRRRRRRRRYYRRK.....
+...KKKRRKKKKRRKKKK......
+......KKK...KKK.........`},
+ {t:"Dragon aux grandes ailes",a:sym(`
+K........K..
+KK......KnK.
+KPK....KVVVV
+KPPK..KVVVVV
+KPPPK.KVKKVV
+KPPPPKKVKWVV
+KPPPPPKVVVVV
+KPPPPPPKVVKV
+KPPPPPPKKVVV
+KPPPPPKVVVpp
+KPPPPKVVVppp
+KPPKKKVVVppp
+KPK...KVVppp
+KK....KVVVpp
+K......KVVKK
+........KK..`)},
+ {t:"Dragon qui sort de l'œuf",a:sym(`
+.K......
+.KYK....
+..KYK...
+...KYKKK
+..KOOOOO
+.KOOOOOO
+.KOKKOOO
+.KOWKOOO
+.KOPOOOK
+KKOOOKOO
+KWKOKWKO
+KWWKWWWK
+KWWWWWWW
+KWWbWWWW
+.KWWWWWb
+.KWWWWWW
+..KKWWWW
+....KKKK`)},
+ {t:"Dragon des mers",a:`
+.................K.K....
+................KnKnK...
+...............KBBBBBK..
+...............KBBKWBBK.
+...............KBBKKBBBK
+...............KBBBBBBBK
+........KKK....KBBBBKKK.
+.......KBBBK...KBBBK....
+......KBBBBBK..KBBBK....
+..K..KBBKKKBBK.KBBBK..b.
+bKBKbKBKbbbKBKbKBBBKbbbb
+bbbbbbWbbbbbbbbbbbWbbbbb
+BBBBBBBBBBBBBBBBBBBBBBBB`},
+ {t:"Dragon qui fait dodo",a:`
+................bbb.
+..................b.
+.................b..
+....K...K...K...bbb.
+...KGK.KGK.KGK......
+..KKKKKKKKKKKKK.....
+.KgggggggggggggK....
+.KgggggggggggggKK...
+KgggggggggggggKKKKK.
+.KgggggggggggKggggK.
+KggggggggggggKgKKggK
+KggggggggggggKggggnK
+KgggggggggggggKKKKK.
+KgggggggggggggggK...
+.KggggKKKKKKggggK...
+..KKKKggggggKKKK....
+......KKKKKK........`},
+];
+// « 6 autres idées » : mêmes formes, autres couleurs (pour la maquette)
+const SWAPS=[
+ {t:"Petit dragon des bois",m:{G:"N",g:"n",Y:"g",P:"O"}},
+ {t:"Dragon de glace",m:{R:"b",Y:"W",O:"b"},flip:1},
+ {t:"Dragon de la nuit",m:{V:"B",P:"b",p:"s"}},
+ {t:"Bébé dragon rose",m:{O:"P",b:"g"}},
+ {t:"Serpent de mer doré",m:{B:"O",K:"K"},flip:1},
+ {t:"Dragon violet endormi",m:{g:"V",Y:"P",n:"p"}},
+];
+function makeSet(k){
+  return DRAGONS.map((d,i)=>{
+    let g=parseArt(d.a);
+    if(k%2===1){const s=SWAPS[i];g=g.map(r=>(s.flip?[...r].reverse():r).map(c=>s.m[c]||c));return{t:s.t,grid:g}}
+    return{t:d.t,grid:g};
+  });
+}
+
+/* catalogue d'origine (extrait) */
+const CAT=[
+ {t:"Cœur",cat:"Formes",lvl:1,a:`
+..KK...KK..
+.KRRK.KRRK.
+KRWRRKRRRRK
+KRRRRRRRRRK
+KRRRRRRRRRK
+.KRRRRRRRK.
+..KRRRRRK..
+...KRRRK...
+....KRK....
+.....K.....`},
+ {t:"Fraise",cat:"Miam",lvl:1,a:`
+....GG.G...
+...GGGGG...
+..KRRGRRK..
+.KRRRRRRRK.
+.KRYRRRYRK.
+.KRRRRRRRK.
+.KRRRYRRRK.
+..KRRRRRK..
+..KRYRRRK..
+...KRRRK...
+....KKK....`},
+ {t:"Champignon",cat:"Nature",lvl:1,a:`
+....KKKKK....
+..KKRRRRRKK..
+.KRRWWRRRRRK.
+.KRWWWRRWWRK.
+KRRRWRRRWWWRK
+KRRRRRRRRWRRK
+KKKKKKKKKKKKK
+...KWWWWWK...
+...KWKWKWK...
+...KWWWWWK...
+....KKKKK....`},
+].map(c=>({...c,grid:parseArt(c.a)}));
+let mine=[];
+
+/* ---------- Dessin ---------- */
+function hexToRgb(h){h=h.replace("#","");return[0,2,4].map(i=>parseInt(h.substr(i,2),16))}
+function lum(h){const[r,g,b]=hexToRgb(h);return(0.299*r+0.587*g+0.114*b)}
+function drawPix(cv,grid,size){
+  const h=grid.length,w=grid[0].length,n=Math.max(w,h),s=Math.ceil(size/n);
+  cv.width=n*s;cv.height=n*s;const x=cv.getContext("2d");x.clearRect(0,0,cv.width,cv.height);
+  const ox=Math.floor((n-w)/2)*s,oy=Math.floor((n-h)/2)*s;
+  grid.forEach((r,j)=>r.forEach((k,i)=>{if(k!=="."){x.fillStyle=PAL[k].c;x.fillRect(ox+i*s,oy+j*s,s,s)}}));
+}
+function drawBeads(cv,grid,size,showGrid){
+  const h=grid.length,w=grid[0].length,n=Math.max(w,h),s=Math.floor(size/n);
+  cv.width=w*s+2;cv.height=h*s+2;const x=cv.getContext("2d");
+  const ox=1,oy=1;
+  x.fillStyle="#fff";x.fillRect(0,0,cv.width,cv.height);
+  for(let j=0;j<h;j++)for(let i=0;i<w;i++){
+    const k=grid[j][i],px=ox+i*s,py=oy+j*s;
+    if(showGrid==="perles"){
+      if(k==="."){x.fillStyle="#e2d8c8";x.beginPath();x.arc(px+s/2,py+s/2,s*.14,0,7);x.fill()}
+      else{x.fillStyle=PAL[k].c;x.beginPath();x.arc(px+s/2,py+s/2,s*.46,0,7);x.fill();x.strokeStyle="rgba(0,0,0,.25)";x.stroke();
+        x.fillStyle="#fffe";x.beginPath();x.arc(px+s/2,py+s/2,s*.15,0,7);x.fill()}
+    }else{
+      if(k!=="."){x.fillStyle=PAL[k].c;x.fillRect(px,py,s,s)}
+    }
+  }
+  if(showGrid==="papier"){
+    for(let i=0;i<=w;i++){x.strokeStyle=i%5===0?"#8a8099":"#d6cfe0";x.lineWidth=i%5===0?2:1;x.beginPath();x.moveTo(ox+i*s+.5,oy);x.lineTo(ox+i*s+.5,oy+h*s);x.stroke()}
+    for(let j=0;j<=h;j++){x.strokeStyle=j%5===0?"#8a8099":"#d6cfe0";x.lineWidth=j%5===0?2:1;x.beginPath();x.moveTo(ox,oy+j*s+.5);x.lineTo(ox+w*s,oy+j*s+.5);x.stroke()}
+  }
+}
+function colorsUsed(grid){const m={};grid.flat().forEach(k=>{if(k!==".")m[k]=(m[k]||0)+1});return Object.entries(m).sort((a,b)=>b[1]-a[1])}
+function count(grid){return grid.flat().filter(k=>k!==".").length}
+
+/* ---------- Navigation ---------- */
+const $=s=>document.querySelector(s);
+function show(id){
+  document.querySelectorAll(".view").forEach(v=>v.classList.toggle("on",v.id===id));
+  document.querySelectorAll(".tabs button").forEach(b=>b.classList.toggle("on",b.dataset.tab===(id==="detail"?from:id)));
+  window.scrollTo(0,0);
+}
+let from="creer";
+document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{if(b.dataset.tab==="catalogue")renderCatalogue();show(b.dataset.tab)});
+
+/* ---------- Pastilles ---------- */
+const SUGG=[["🐉","dragon"],["🚜","tracteur"],["🍣","sushi"],["🦄","licorne"],["🚀","fusée"],["🐙","pieuvre"],["🦖","dinosaure"],["🌵","cactus"],["🧁","cupcake"]];
+function pillsHTML(list,cut){return list.map(([e,w],i)=>`<button class="pill${cut!=null&&i>=cut?" xtra":""}" data-w="${w}"><span class="e">${e}</span>${w}</button>`).join("")}
+$("#pills").innerHTML=`<button class="pill dice" data-w="?"><span class="e">🎲</span>Au hasard</button>`+pillsHTML(SUGG,5);
+document.addEventListener("click",e=>{
+  const p=e.target.closest(".pill");if(p){let w=p.dataset.w;if(w==="?")w=SUGG[Math.floor(Math.random()*SUGG.length)][1];$("#q").value=w;$("#sform").classList.add("has");go(w);return}
+  const d=e.target.closest("[data-demo]");if(d){$("#q").value=d.dataset.demo;$("#sform").classList.add("has");go(d.dataset.demo);window.scrollTo({top:0,behavior:"smooth"})}
+});
+$("#q").oninput=()=>$("#sform").classList.toggle("has",!!$("#q").value);
+$("#clear").onclick=()=>{$("#q").value="";$("#sform").classList.remove("has");$("#res").innerHTML="";$("#q").focus()};
+$("#sform").onsubmit=e=>{e.preventDefault();const w=$("#q").value.trim();if(w){$("#q").blur();go(w)}};
+
+/* ---------- Recherche : chargement → résultats ---------- */
+const REFUS=["pistolet","arme","fusil","sang","mort","couteau","bombe","zombie"];
+const MSGS=["🔎 Je cherche des idées de {w}…","🎨 Je trie les perles par couleur…","🧩 Je pose les perles une par une…","⏳ Encore quelques perles…"];
+let timer=null,anim=null,setNo=0,props=[],word="",added=new Set();
+function go(w,again){
+  clearTimeout(timer);cancelAnimationFrame(anim);
+  word=w.toLowerCase();
+  if(!again)setNo=0;
+  const res=$("#res");
+  // état de chargement : 6 cartes qui se remplissent de perles au hasard
+  res.innerHTML=`<div class="load">
+    <div class="ld-msg"><span class="bead"></span><div class="ld-txt"><b id="ldT"></b><div class="ld-bar"><i id="ldB"></i></div><small>⏱️ Ça prend quelques secondes</small></div><button class="say" data-say="#ldT" aria-label="Écouter">🔊</button></div>
+    <div class="props">${Array.from({length:6},()=>`<div class="prop"><div class="cv"><canvas width="16" height="16"></canvas></div><b style="color:#c9bfd8">· · ·</b><small>&nbsp;</small></div>`).join("")}</div></div>`;
+  const cvs=[...res.querySelectorAll("canvas")];
+  const fills=cvs.map(()=>Array.from({length:256},()=>null));
+  const pals=cvs.map(()=>{const k=KEYS.filter(k=>k!=="K"&&k!=="W");return[k[Math.random()*k.length|0],k[Math.random()*k.length|0],"K"]});
+  const T=word.includes("pistolet")||REFUS.some(r=>word.includes(r))?1800:5200, t0=performance.now();
+  function frame(t){
+    const p=Math.max(0,Math.min(1,(t-t0)/T));
+    $("#ldB").style.width=(p*100)+"%";
+    $("#ldT").textContent=MSGS[Math.min(MSGS.length-1,Math.floor(p*MSGS.length))].replace("{w}",word.endsWith("s")?word:word+"s");
+    cvs.forEach((cv,i)=>{const x=cv.getContext("2d");
+      while(fills[i].filter(Boolean).length<p*150){const c=Math.random()*256|0;if(!fills[i][c])fills[i][c]=pals[i][Math.random()*3|0];}
+      x.fillStyle="#efe6d8";x.fillRect(0,0,16,16);
+      fills[i].forEach((k,c)=>{if(k){x.fillStyle=PAL[k].c;x.fillRect(c%16,c/16|0,1,1)}});});
+    if(p<1)anim=requestAnimationFrame(frame);
+  }
+  anim=requestAnimationFrame(frame);
+  timer=setTimeout(()=>{cancelAnimationFrame(anim);showResult()},T);
+}
+function showResult(){
+  const res=$("#res");
+  if(REFUS.some(r=>word.includes(r))){
+    res.innerHTML=`<div class="oops"><canvas id="oopsCv"></canvas><h4>🙈 Je ne dessine pas ça</h4>
+      <p id="oopsP">🚫 « ${esc(word)} » n'est pas un mot pour Pixel arts.<br>👉 Essaie plutôt :</p>
+      <div class="pills">${pillsHTML([["🐉","dragon"],["🐱","chat"],["🏰","château"],["🚒","camion de pompiers"]])}</div><div class="msg-row"><button class="say big" data-say=".oops h4,#oopsP" aria-label="Écouter">🔊 Écouter</button></div></div>`;
+    drawPix($("#oopsCv"),parseArt(sym(`
+..KKKKKK
+.KYYYYYY
+KYYYYYYY
+KYYKKYYY
+KYYKKYYY
+KYYYYYYY
+KYYYYYYY
+KYYYKKKK
+KYYKYYYY
+.KYYYYYY
+..KKKKKK`)),72);return;
+  }
+  if(!/[aeiouyéèêàâîôû]/.test(word)||/(.)\1\1/.test(word)||word==="blorptz"){
+    res.innerHTML=`<div class="oops"><canvas id="oopsCv"></canvas><h4>🤔 Je n'ai rien trouvé</h4>
+      <p id="oopsP">❓ Je ne connais pas « ${esc(word)} ».<br>🙋 Vérifie l'orthographe ou demande de l'aide à un grand.</p>
+      <div class="pills">${pillsHTML(SUGG.slice(0,4))}</div><div class="msg-row"><button class="say big" data-say=".oops h4,#oopsP" aria-label="Écouter">🔊 Écouter</button></div></div>`;
+    drawPix($("#oopsCv"),parseArt(sym(`
+..KKKKKK
+.KbbbbbW
+KbbbbbbW
+KbbKKbbb
+KbbKKbbb
+KbbbbbbW
+KbbbbbbW
+KbbbKKKK
+KbbKbbbb
+.KbbbbbW
+..KKKKKK`)),72);return;
+  }
+  props=makeSet(setNo);
+  res.innerHTML=`<div class="res-head"><h4>6 idées de <em>${esc(word)}</em></h4></div>
+    <div class="props">${props.map((p,i)=>`<div class="prop${added.has(p.t)?" added":""}" data-i="${i}"><span class="heart" aria-hidden="true">${added.has(p.t)?"✓":"🔍"}</span><div class="cv"><canvas></canvas></div><b>${p.t}</b><small>${p.grid[0].length} × ${p.grid.length} · ${count(p.grid)} perles</small></div>`).join("")}</div>
+    <div class="msg-row" style="margin-top:8px"><p class="hint" id="hint">👆 Touche une idée pour la voir en grand.</p><button class="say" data-say="#hint" aria-label="Écouter">🔊</button></div>
+    <div class="again"><button class="btn ghost" id="againBtn">🔄 6 autres idées</button></div>`;
+  res.querySelectorAll(".prop").forEach(el=>{drawPix(el.querySelector("canvas"),props[+el.dataset.i].grid,96);el.onclick=()=>openZoom(+el.dataset.i)});
+  $("#againBtn").onclick=()=>{setNo++;go(word,true)};
+}
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+
+/* ---------- Zoom ---------- */
+let zi=0,zm="papier";
+function openZoom(i){zi=i;renderZoom();$("#veil").classList.add("on");document.body.style.overflow="hidden"}
+function closeZoom(){$("#veil").classList.remove("on");document.body.style.overflow=""}
+function renderZoom(){
+  const p=props[zi],g=p.grid,u=colorsUsed(g);
+  $("#zTitle").textContent=p.t;
+  drawBeads($("#zCv"),g,600,zm);
+  $("#zSize").textContent=g[0].length+"×"+g.length;
+  $("#zBeads").textContent=count(g);
+  $("#zCols").textContent=u.length;
+  $("#zColList").innerHTML=u.map(([k,n])=>`<span class="colc"><i style="background:${PAL[k].c}"></i>${PAL[k].n}<span>× ${n}</span></span>`).join("");
+  const a=added.has(p.t);
+  $("#zAdd").textContent=a?"✓ Déjà dans Mes modèles : l'ouvrir":"⭐ Ajouter à Mes modèles";
+  $("#zAdd").className="btn"+(a?" alt":"");
+}
+$("#zSeg").querySelectorAll("button").forEach(b=>b.onclick=()=>{zm=b.dataset.m;$("#zSeg").querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===b));renderZoom()});
+$("#zClose").onclick=closeZoom;
+$("#veil").onclick=e=>{if(e.target.id==="veil")closeZoom()};
+$("#zPrev").onclick=()=>{zi=(zi+5)%6;renderZoom()};
+$("#zNext").onclick=()=>{zi=(zi+1)%6;renderZoom()};
+$("#zAdd").onclick=()=>{
+  const p=props[zi];
+  if(!added.has(p.t)){added.add(p.t);mine.unshift({t:p.t,grid:p.grid,cat:"Mes modèles",isNew:1});toast("⭐ Ajouté à Mes modèles !");speak("Ajouté à Mes modèles !")}
+  const el=document.querySelector(`.prop[data-i="${zi}"]`);if(el){el.classList.add("added");el.querySelector(".heart").textContent="✓"}
+  closeZoom();from="creer";openDetail(p);
+};
+document.addEventListener("keydown",e=>{if(!$("#veil").classList.contains("on"))return;if(e.key==="Escape")closeZoom();if(e.key==="ArrowRight")$("#zNext").click();if(e.key==="ArrowLeft")$("#zPrev").click()});
+function toast(t){const el=$("#toast");el.textContent=t;el.classList.add("on");setTimeout(()=>el.classList.remove("on"),2200)}
+
+/* ---------- Lecture à voix haute (simulée avec la voix du navigateur) ---------- */
+function speak(txt,btn){
+  const S=window.speechSynthesis;document.querySelectorAll(".say.talk").forEach(b=>b.classList.remove("talk"));
+  if(!S){toast("🔇 Pas de voix sur cet appareil");return}
+  S.cancel();
+  // on ne lit pas les emojis
+  const u=new SpeechSynthesisUtterance(txt.replace(/[\p{Extended_Pictographic}\u{FE0F}\u{20E3}]/gu,"").replace(/\s+/g," ").trim());
+  u.lang="fr-FR";u.rate=.9;const v=S.getVoices().find(v=>v.lang&&v.lang.startsWith("fr"));if(v)u.voice=v;
+  if(btn){btn.classList.add("talk");u.onend=u.onerror=()=>btn.classList.remove("talk")}
+  S.speak(u);
+}
+document.addEventListener("click",e=>{const b=e.target.closest("[data-say]");if(!b)return;e.stopPropagation();
+  speak([...document.querySelectorAll(b.dataset.say)].map(n=>n.innerText).join(". "),b)},true);
+
+/* ---------- Détail (comme dans l'app) ---------- */
+let cur=null,mode="papier";
+function openDetail(it){cur=it;$("#dTitle").textContent=it.t;renderBoard();show("detail");
+  $("#back").textContent=from==="creer"?"← Mes 6 idées":"← Retour"}
+$("#back").onclick=()=>show(from);
+$("#modeSeg").querySelectorAll("button").forEach(b=>b.onclick=()=>{mode=b.dataset.mode;$("#modeSeg").querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===b));renderBoard()});
+["#optNum","#optCoord"].forEach(s=>$(s).onchange=renderBoard);
+function renderBoard(){
+  const grid=cur.grid,h=grid.length,w=grid[0].length,used=colorsUsed(grid),numOf={};used.forEach(([k],i)=>numOf[k]=i+1);
+  const coord=$("#optCoord").checked,num=$("#optNum").checked;
+  const cs=Math.max(22,Math.min(40,Math.floor(720/Math.max(w,h)))),m=coord?cs:Math.round(cs*.4);
+  const cv=$("#board"),W=w*cs+m*2,H=h*cs+m*2;cv.width=W;cv.height=H;const x=cv.getContext("2d");
+  x.fillStyle="#fff";x.fillRect(0,0,W,H);
+  for(let j=0;j<h;j++)for(let i=0;i<w;i++){
+    const k=grid[j][i],px=m+i*cs,py=m+j*cs,cx=px+cs/2,cy=py+cs/2;
+    if(mode==="papier"){if(k!=="."){x.fillStyle=PAL[k].c;x.fillRect(px,py,cs,cs)}}
+    else{if(k==="."){x.fillStyle="#e2d8c8";x.beginPath();x.arc(cx,cy,cs*.14,0,7);x.fill()}
+      else{x.fillStyle=PAL[k].c;x.beginPath();x.arc(cx,cy,cs*.46,0,7);x.fill();x.strokeStyle="rgba(0,0,0,.25)";x.stroke();x.fillStyle="#fffe";x.beginPath();x.arc(cx,cy,cs*.15,0,7);x.fill()}}
+    if(k!=="."&&num){x.fillStyle=mode==="perles"?"#222":(lum(PAL[k].c)<130?"#fff":"#222");x.font=`700 ${Math.round(cs*.42)}px "Baloo 2",sans-serif`;x.textAlign="center";x.textBaseline="middle";x.fillText(numOf[k],cx,cy+1)}
+  }
+  if(mode==="papier"){
+    for(let i=0;i<=w;i++){x.strokeStyle=i%5===0?"#8a8099":"#d6cfe0";x.lineWidth=i%5===0?2:1;x.beginPath();x.moveTo(m+i*cs+.5,m);x.lineTo(m+i*cs+.5,m+h*cs);x.stroke()}
+    for(let j=0;j<=h;j++){x.strokeStyle=j%5===0?"#8a8099":"#d6cfe0";x.lineWidth=j%5===0?2:1;x.beginPath();x.moveTo(m,m+j*cs+.5);x.lineTo(m+w*cs,m+j*cs+.5);x.stroke()}
+  }
+  if(coord){x.fillStyle="#8a8099";x.font=`700 ${Math.round(cs*.42)}px "Baloo 2",sans-serif`;x.textAlign="center";x.textBaseline="middle";
+    for(let i=0;i<w;i++){x.fillText(i+1,m+i*cs+cs/2,m/2);x.fillText(i+1,m+i*cs+cs/2,H-m/2)}
+    const L="ABCDEFGHIJKLMNOPQRSTUVWXYZ";for(let j=0;j<h;j++){x.fillText(L[j],m/2,m+j*cs+cs/2);x.fillText(L[j],W-m/2,m+j*cs+cs/2)}}
+  const per=mode==="perles",tot=count(grid);
+  let hh=`<h3>${per?"Perles à préparer":"Crayons à préparer"}</h3>`;
+  used.forEach(([k,n],i)=>{const c=PAL[k].c;hh+=`<div class="leg"><span class="sw${per?" round":""}" style="background:${c};color:${lum(c)<130?"#fff":"#222"}">${i+1}</span>${PAL[k].n}<span class="n">${per?n:""}</span></div>`});
+  if(per)hh+=`<div class="total">Total : ${tot} perles</div>`;
+  hh+=`<div class="tip">${per?"Pose les perles rangée par rangée en suivant les lettres. Un adulte repasse avec du papier sulfurisé.":"Astuce : les traits plus foncés tous les 5 carreaux aident à ne pas se perdre."}</div>`;
+  $("#legend").innerHTML=hh;
+}
+
+/* ---------- Catalogue (pour voir « Mes modèles ») ---------- */
+let filter="Tous";
+function renderCatalogue(){
+  const items=[...mine,...CAT];
+  const cats=["Tous",...new Set(items.map(i=>i.cat))];
+  $("#filters").innerHTML=cats.map(c=>`<button class="chip${c===filter?" on":""}" data-c="${c}">${c}</button>`).join("");
+  $("#filters").querySelectorAll(".chip").forEach(b=>b.onclick=()=>{filter=b.dataset.c;renderCatalogue()});
+  $("#tiles").innerHTML="";
+  items.filter(i=>filter==="Tous"||i.cat===filter).forEach(it=>{
+    const d=document.createElement("div");d.className="tile";const cv=document.createElement("canvas");drawPix(cv,it.grid,168);d.appendChild(cv);
+    d.insertAdjacentHTML("beforeend",`${it.isNew?'<span class="new">Nouveau</span>':""}<b>${esc(it.t)}</b><small>${it.grid[0].length}×${it.grid.length} · ${count(it.grid)} perles${it.lvl?` <span class="lvl">${"★".repeat(it.lvl)}</span>`:""}</small>`);
+    d.onclick=()=>{from="catalogue";openDetail(it)};$("#tiles").appendChild(d);
+  });
+}
+
+/* panneaux repliés */
+document.querySelectorAll(".fold").forEach(f=>f.onclick=()=>f.parentElement.classList.toggle("open"));
+$("#miniPal").innerHTML=KEYS.map(k=>`<span style="background:${PAL[k].c}"></span>`).join("");
+
+/* démarrage : ?etat=resultats|chargement|zoom|refus pour les captures */
+const st=new URLSearchParams(location.search).get("etat");
+if(st==="resultats"||st==="zoom"){$("#q").value="dragon";$("#sform").classList.add("has");word="dragon";showResult();if(st==="zoom")openZoom(0)}
+if(st==="chargement"){$("#q").value="dragon";$("#sform").classList.add("has");go("dragon")}
+if(st==="refus"){$("#q").value="pistolet";$("#sform").classList.add("has");word="pistolet";showResult()}
+if(st==="detail"){word="dragon";showResult();openZoom(0);$("#zAdd").click()}
+</script>
+</body>
+</html>

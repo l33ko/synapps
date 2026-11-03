@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pixel arts — Inventer un modèle (piste B)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#fff8ef; --ink:#2b2340; --soft:#6d6585; --card:#ffffff; --line:#eadfce;
+  --accent:#ff6b5b; --accent2:#3fb5a3; --peg:#efe6d8;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:"Baloo 2",system-ui,sans-serif}
+button{font:inherit;-webkit-tap-highlight-color:transparent}
+
+/* ---- bandeau de la maquette ---- */
+.maq{background:#2b2340;color:#fff;padding:10px 16px 12px;font-size:13.5px;line-height:1.35}
+.maq b.t{font-size:16px;color:#ffd166}
+.maq .cols{display:grid;grid-template-columns:1fr 1fr;gap:4px 18px;margin-top:6px}
+.maq ul{margin:2px 0 0;padding-left:18px}
+.maq summary{cursor:pointer;font-weight:700;color:#ffd166;margin-top:4px}
+.maq .demo{margin-top:6px;color:#cfc8e6;font-size:12.5px}
+.maq .demo code{background:#ffffff22;border-radius:5px;padding:0 5px;color:#fff}
+@media (max-width:640px){.maq .cols{grid-template-columns:1fr}}
+
+/* ---- app (repris de pixel-arts) ---- */
+header{padding:18px 18px 6px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+h1{margin:0;font-size:30px;font-weight:800;letter-spacing:-.5px}
+h1 span{color:var(--accent)}
+.tabs{display:flex;gap:6px;margin-left:auto;background:#f3e9da;padding:4px;border-radius:14px}
+.tabs button{border:0;background:none;font-weight:700;font-size:15px;padding:6px 14px;border-radius:10px;color:var(--soft);cursor:pointer}
+.tabs button.on{background:var(--card);color:var(--ink);box-shadow:0 1px 3px #0002}
+main{padding:8px 18px 40px;max-width:1100px;margin:0 auto}
+.view{display:none}.view.on{display:block}
+.panel{background:var(--card);border:2px solid var(--line);border-radius:18px;padding:14px;margin-bottom:14px}
+.panel h3{margin:0 0 8px}
+.tip{color:var(--soft);font-size:13px;margin-top:8px;line-height:1.35}
+.btn{border:0;background:var(--accent);color:#fff;font-weight:800;border-radius:12px;padding:7px 14px;cursor:pointer;font-size:14px}
+.btn.alt{background:var(--accent2)}
+.btn.ghost{background:var(--card);color:var(--ink);border:2px solid var(--line)}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 14px}
+.chip{border:2px solid var(--line);background:var(--card);border-radius:20px;padding:3px 12px;font-weight:700;font-size:14px;color:var(--soft);cursor:pointer}
+.chip.on{border-color:var(--ink);color:var(--ink)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px}
+.tile{position:relative;background:var(--card);border:2px solid var(--line);border-radius:18px;padding:12px 10px 8px;text-align:center;cursor:pointer;transition:transform .12s}
+.tile:hover{transform:translateY(-3px);border-color:#d8c8b0}
+.tile canvas{width:84px;height:84px;image-rendering:pixelated;display:block;margin:0 auto 6px}
+.tile b{display:block;font-size:16px}
+.tile small{color:var(--soft);font-size:12px}
+.tile .new{position:absolute;top:-9px;right:-6px;background:var(--accent);color:#fff;font-weight:800;font-size:12px;border-radius:10px;padding:1px 8px;transform:rotate(6deg)}
+.tile.fresh{border-color:var(--accent);animation:wiggle 1s ease 2}
+
+/* gros bouton magique */
+.magic{display:flex;align-items:center;gap:16px;width:100%;text-align:left;border:0;cursor:pointer;
+  background:linear-gradient(135deg,#ff6b5b 0%,#ff8f6b 45%,#ffb347 100%);color:#fff;border-radius:24px;padding:18px 20px;margin-bottom:14px;
+  box-shadow:0 6px 0 #d9483a,0 10px 24px #ff6b5b44;transition:transform .1s}
+.magic:active{transform:translateY(4px);box-shadow:0 2px 0 #d9483a}
+.magic canvas{width:76px;height:76px;image-rendering:pixelated;background:#fff;border-radius:16px;padding:6px;flex:none;animation:bob 2.4s ease-in-out infinite}
+.magic .big{display:block;font-size:26px;font-weight:800;line-height:1.1}
+.magic .small{display:block;font-size:15px;opacity:.95;font-weight:600}
+.others summary{cursor:pointer;font-weight:700;color:var(--soft);padding:4px 2px;list-style:none}
+.others summary::-webkit-details-marker{display:none}
+.mini-editor{height:140px;border-radius:12px;background:repeating-linear-gradient(0deg,#eee5d6 0 1px,transparent 1px 18px),repeating-linear-gradient(90deg,#eee5d6 0 1px,#fff 1px 18px);border:2px solid var(--line)}
+
+/* ---- parcours plein écran ---- */
+.flow{position:fixed;inset:0;z-index:50;background:var(--bg);display:none;flex-direction:column;overflow:hidden}
+.flow.on{display:flex}
+.flow-top{display:flex;align-items:center;gap:10px;padding:calc(12px + env(safe-area-inset-top)) 14px 6px}
+.x{width:46px;height:46px;border-radius:50%;border:2px solid var(--line);background:var(--card);font-size:22px;font-weight:800;color:var(--soft);cursor:pointer;flex:none}
+.steps{display:flex;gap:6px;margin:0 auto;align-items:center}
+.steps i{display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:50%;background:#f3e9da;font-style:normal;font-size:19px;filter:grayscale(1);opacity:.55;transition:.3s}
+.steps i.on{background:#fff;border:3px solid var(--accent);filter:none;opacity:1;transform:scale(1.12)}
+.steps i.done{filter:none;opacity:1;background:#d6f2ec}
+.steps b{width:18px;height:4px;border-radius:2px;background:#eadfce}
+.spacer{width:46px;flex:none}
+.stage{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
+.step{display:none;min-height:100%;flex-direction:column;align-items:center;padding:6px 18px 24px;max-width:980px;margin:0 auto}
+.step.on{display:flex;animation:pop .35s ease}
+
+.q{display:flex;align-items:center;gap:10px;margin:10px 0 14px;text-align:center}
+.q h2{margin:0;font-size:30px;line-height:1.1;font-weight:800}
+.say{width:48px;height:48px;border-radius:50%;border:0;background:var(--accent2);color:#fff;font-size:22px;cursor:pointer;flex:none;box-shadow:0 3px 0 #2c8d7e}
+.field{display:flex;gap:8px;width:100%;max-width:560px;background:var(--card);border:3px solid var(--ink);border-radius:22px;padding:6px 6px 6px 16px;box-shadow:0 4px 0 #2b234022}
+.field input{flex:1;min-width:0;border:0;outline:0;font:inherit;font-size:26px;font-weight:700;color:var(--ink);background:none}
+.field input::placeholder{color:#c8bfd6}
+.mic{width:54px;height:54px;border-radius:16px;border:0;background:#f3e9da;font-size:24px;cursor:pointer;flex:none}
+.mic.listen{background:#ffe1dd;animation:pulse 1s infinite}
+.go{width:54px;height:54px;border-radius:16px;border:0;background:var(--accent);color:#fff;font-size:28px;font-weight:800;cursor:pointer;flex:none;box-shadow:0 3px 0 #d9483a}
+.go:disabled{background:#e9dfd0;box-shadow:none;color:#fff}
+.hint{color:var(--soft);font-weight:600;margin:18px 0 8px;font-size:16px}
+.sugg{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;width:100%;max-width:640px}
+@media (max-width:520px){.sugg{grid-template-columns:repeat(3,1fr);gap:10px}}
+.pill{background:var(--card);border:2px solid var(--line);border-radius:20px;padding:10px 4px 6px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;transition:transform .12s;box-shadow:0 3px 0 var(--line)}
+.pill:active{transform:translateY(3px);box-shadow:none}
+.pill:hover{border-color:#d8c8b0}
+.pill canvas{width:52px;height:52px;image-rendering:pixelated}
+.pill span{font-weight:800;font-size:15px}
+.pill.hasard{background:#fff4c9;border-color:#f3dc8a;box-shadow:0 3px 0 #f3dc8a}
+
+/* attente */
+.wait-title{font-size:28px;font-weight:800;margin:10px 0 2px;text-align:center}
+.wait-word{display:inline-block;background:var(--card);border:2px solid var(--line);border-radius:14px;padding:0 12px;color:var(--accent)}
+.pegboard{position:relative;margin:18px auto 10px;background:#f3ece0;border-radius:22px;padding:12px;box-shadow:inset 0 0 0 3px #eadfce}
+.pegboard .peg{position:absolute;width:8px;height:8px;border-radius:50%;background:#e2d8c8}
+.bead{position:absolute;border-radius:50%;box-shadow:inset 0 -2px 0 #0002;opacity:0;animation:drop .55s cubic-bezier(.3,1.5,.6,1) forwards}
+.bead::after{content:"";position:absolute;left:32%;top:32%;width:36%;height:36%;border-radius:50%;background:#fffffff0}
+.msg{font-size:19px;font-weight:700;color:var(--soft);min-height:30px;text-align:center}
+.bar{width:220px;height:14px;border-radius:7px;background:#f3e9da;overflow:hidden;margin:10px auto}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),#ffb347);border-radius:7px;transition:width .3s linear}
+.skip{border:0;background:none;color:var(--soft);font-weight:700;text-decoration:underline;cursor:pointer;margin-top:4px}
+
+/* propositions */
+.res-head{text-align:center;margin:4px 0 4px}
+.res-head h2{margin:0;font-size:27px;line-height:1.1}
+.res-head p{margin:2px 0 0;color:var(--soft);font-weight:600;font-size:16px}
+.deck{width:100%;display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin:12px 0 6px;perspective:1200px}
+.cardw{perspective:1000px}
+.card3{position:relative;transform-style:preserve-3d;transition:transform .6s cubic-bezier(.3,1.3,.5,1);transform:rotateY(180deg)}
+.card3.up{transform:rotateY(0)}
+.face{backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:24px}
+.front{background:var(--card);border:3px solid var(--line);padding:12px 12px 10px;display:flex;flex-direction:column;align-items:center;transition:border-color .2s,transform .2s,opacity .3s}
+.front canvas{width:100%;max-width:230px;aspect-ratio:1;image-rendering:pixelated;display:block;border-radius:12px;background:
+  radial-gradient(circle,#ece2d2 1.6px,transparent 2px) 0 0/ calc(100%/20) calc(100%/20)}
+.front .nm{font-weight:800;font-size:16px;margin-top:4px;color:var(--soft)}
+.front .meta{font-size:14px;font-weight:600;color:#8f87a3;line-height:1.1}
+.front canvas{cursor:zoom-in}
+.zoomhint{position:absolute;top:18px;right:18px;background:#ffffffe6;border-radius:10px;padding:0 7px;font-size:14px;pointer-events:none}
+.cardw.kept .front{border-color:#f47fae}
+.kept-tag{display:none;background:#ffe8ee;color:#c02a5c;font-weight:800;font-size:14px;border-radius:10px;padding:0 10px;margin-top:2px}
+.cardw.kept .kept-tag{display:inline-block}
+/* vignettes iPhone */
+.thumbs{display:none}
+/* agrandissement */
+.zoom{position:fixed;inset:0;z-index:58;display:none;align-items:center;justify-content:center;background:#2b2340cc;padding:14px}
+.zoom.on{display:flex}
+.zoom .zb{background:var(--bg);border-radius:28px;padding:16px 18px 18px;width:min(94vw,440px);max-height:94vh;overflow:auto;text-align:center;animation:pop .3s ease;position:relative}
+.zoom canvas{width:min(78vw,280px);aspect-ratio:1;image-rendering:pixelated;display:block;margin:4px auto 6px;border-radius:14px;background:radial-gradient(circle,#ece2d2 1.6px,transparent 2px) 0 0/ calc(100%/20) calc(100%/20)}
+.zoom h3{margin:0;font-size:24px;line-height:1.1}
+.zoom .zmeta{color:var(--soft);font-weight:700;font-size:16px;margin:2px 0 8px}
+.zcols{display:flex;flex-wrap:wrap;gap:6px 8px;justify-content:center;margin-bottom:12px}
+.zcols span{display:inline-flex;align-items:center;gap:5px;background:#fff;border:2px solid var(--line);border-radius:12px;padding:2px 9px 2px 4px;font-size:14px;font-weight:700}
+.zcols i{width:18px;height:18px;border-radius:50%;border:1px solid #0003;display:block}
+.zoom .zact{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.zoom .zx{position:absolute;top:10px;right:10px}
+.verso{position:absolute;inset:0;transform:rotateY(180deg);background:
+  radial-gradient(circle at 50% 50%,#ffffff55 3px,transparent 4px) 0 0/22px 22px,
+  linear-gradient(135deg,#8a4fc4,#2766c9);border:3px solid #fff;display:flex;align-items:center;justify-content:center;font-size:56px;color:#fff;font-weight:800;box-shadow:0 4px 0 #1e4a96}
+.heart{margin-top:6px;width:64px;height:64px;border-radius:50%;border:3px solid var(--line);background:#fff;font-size:30px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#d6cbbb;transition:transform .15s}
+.heart:hover{transform:scale(1.08);border-color:#f9c6d8}
+.heart.on{background:#ffe8ee;border-color:#f47fae;color:#e0352f;animation:beat .5s ease 2}
+.cardw.chosen .front{border-color:#f47fae;transform:scale(1.04)}
+.deck.picked .cardw:not(.chosen) .front{opacity:.35}
+.nav{display:none}
+.dots{display:none}
+.res-actions{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:12px}
+.bigbtn{border:0;border-radius:18px;padding:12px 20px;font-weight:800;font-size:18px;cursor:pointer;display:flex;align-items:center;gap:8px}
+.bigbtn.y{background:#fdd835;color:var(--ink);box-shadow:0 4px 0 #d4b11c}
+.bigbtn.w{background:var(--card);color:var(--ink);border:2px solid var(--line);box-shadow:0 4px 0 var(--line)}
+.bigbtn.r{background:var(--accent);color:#fff;box-shadow:0 4px 0 #d9483a}
+.bigbtn:active{transform:translateY(3px);box-shadow:none}
+.note{color:var(--soft);font-size:12.5px;margin-top:8px;text-align:center}
+
+/* carrousel iPhone */
+@media (max-width:700px){
+  .deck{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:14px;padding:6px calc(50% - 135px) 10px;margin:6px -18px 0;width:calc(100% + 36px);scrollbar-width:none}
+  .deck::-webkit-scrollbar{display:none}
+  .cardw{flex:0 0 270px;scroll-snap-align:center}
+  .front canvas{max-width:none}
+  .carwrap{position:relative;width:100%}
+  .nav{display:flex;position:absolute;top:42%;width:44px;height:44px;border-radius:50%;border:2px solid var(--line);background:#fffffff0;font-size:24px;font-weight:800;align-items:center;justify-content:center;cursor:pointer;z-index:2;box-shadow:0 2px 6px #0002;color:var(--ink)}
+  .nav.l{left:-6px}.nav.r{right:-6px}
+  .thumbs{display:flex;gap:6px;justify-content:center;margin-top:6px}
+  .thumbs button{position:relative;width:48px;height:48px;padding:3px;border-radius:12px;border:2px solid var(--line);background:#fff;cursor:pointer;flex:none}
+  .thumbs button.on{border-color:var(--accent);box-shadow:0 0 0 2px #ff6b5b55}
+  .thumbs button.kept::after{content:"♥";position:absolute;top:-8px;right:-6px;color:#e0352f;font-size:15px;line-height:1}
+  .thumbs canvas{width:100%;height:100%;image-rendering:pixelated;display:block}
+  .q h2{font-size:26px}
+  .bigbtn{font-size:16px;padding:11px 16px}
+}
+@media (min-width:701px){.carwrap{width:100%;max-width:760px}.front canvas{max-width:170px}.heart{width:56px;height:56px;font-size:26px}.deck{gap:16px;margin-top:8px}}
+
+/* refus */
+.refus{max-width:460px;text-align:center}
+.refus #refusPic{width:150px;height:150px;image-rendering:pixelated;margin:14px auto 6px;display:block;animation:bob 2.4s ease-in-out infinite}
+.refus h2{font-size:28px;margin:4px 0;line-height:1.15}
+.refus p{color:var(--soft);font-weight:600;font-size:17px;margin:4px 0 14px}
+
+/* célébration */
+.party{position:fixed;inset:0;z-index:60;display:none;align-items:center;justify-content:center;background:#2b2340cc;overflow:hidden}
+.party.on{display:flex}
+.party .box{position:relative;z-index:2;background:var(--bg);border-radius:30px;padding:22px 22px 20px;text-align:center;width:min(92vw,420px);animation:boom .6s cubic-bezier(.3,1.6,.5,1)}
+.party canvas{width:180px;height:180px;image-rendering:pixelated;display:block;margin:6px auto 4px}
+.party h2{margin:0;font-size:30px;line-height:1.1}
+.party p{margin:4px 0 14px;color:var(--soft);font-weight:700;font-size:17px}
+.party .tag{display:inline-flex;align-items:center;gap:6px;background:#d6f2ec;color:#1f7d6f;font-weight:800;border-radius:14px;padding:3px 12px;margin-bottom:8px}
+.party .bigbtn{margin:0 auto;font-size:20px}
+.party .again{margin:12px auto 0;min-height:48px;font-size:17px;justify-content:center}
+.conf{position:absolute;top:-20px;border-radius:50%;animation:fall linear forwards;z-index:1}
+
+/* détail (repris de l'app) */
+.detail-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.back{background:var(--card);border:2px solid var(--line);border-radius:12px;font-weight:700;padding:4px 12px;cursor:pointer;min-height:44px;font-size:15px}
+.back.ideas{background:#fff4c9;border-color:#f3dc8a;color:var(--ink)}
+.detail-top h2{margin:0;font-size:26px}
+.badge-mine{background:#d6f2ec;color:#1f7d6f;border-radius:10px;padding:0 10px;font-weight:800;font-size:13px}
+.controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.seg{display:flex;background:#f3e9da;border-radius:12px;padding:3px}
+.seg button{border:0;background:none;font-weight:700;padding:5px 12px;border-radius:9px;color:var(--soft);cursor:pointer;font-size:14px}
+.seg button.on{background:var(--card);color:var(--ink);box-shadow:0 1px 3px #0002}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:16px;align-items:start}
+@media (max-width:760px){.layout{grid-template-columns:1fr}}
+.board{background:var(--card);border:2px solid var(--line);border-radius:18px;padding:12px;overflow:auto}
+.board canvas{display:block;margin:0 auto;max-width:100%;height:auto}
+.legend{background:var(--card);border:2px solid var(--line);border-radius:18px;padding:12px 14px}
+.legend h3{margin:0 0 6px;font-size:17px}
+.leg{display:flex;align-items:center;gap:10px;padding:4px 0;border-bottom:1px dashed var(--line);font-size:15px}
+.leg:last-child{border:0}
+.sw{width:26px;height:26px;border-radius:7px;border:2px solid #0003;flex:none;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px}
+.sw.round{border-radius:50%}
+.leg .n{margin-left:auto;font-weight:800}
+.total{margin-top:8px;font-weight:800;font-size:15px}
+
+@keyframes pop{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-6px) rotate(2deg)}}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 #ff6b5b66}50%{box-shadow:0 0 0 10px #ff6b5b00}}
+@keyframes drop{0%{opacity:0;transform:translateY(-260px) scale(.7)}60%{opacity:1}100%{opacity:1;transform:none}}
+@keyframes beat{0%,100%{transform:scale(1)}40%{transform:scale(1.3)}}
+@keyframes boom{from{transform:scale(.4) rotate(-8deg);opacity:0}to{transform:none;opacity:1}}
+@keyframes fall{to{transform:translateY(110vh) rotate(540deg)}}
+@keyframes wiggle{0%,100%{transform:rotate(0)}25%{transform:rotate(-3deg)}75%{transform:rotate(3deg)}}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01s!important;transition-duration:.01s!important}}
+</style>
+</head>
+<body>
+
+<div class="maq">
+  <b class="t">Piste B — « L'atelier magique »</b> · un parcours plein écran façon jeu, en 3 grandes étapes illustrées, pour un enfant qui lit peu.
+  <details id="maqDet"><summary>Points forts et limites</summary>
+  <div class="cols">
+    <div><b>Points forts</b><ul>
+      <li>Presque rien à lire : images, voix (🔊 lit la question, 🎤 dicte le mot) et gros boutons.</li>
+      <li>L'attente de 5 à 10 s devient un spectacle (les perles tombent sur la plaque).</li>
+      <li>Choisir est un moment de jeu : cartes qui se retournent, cœur, fête finale.</li>
+    </ul></div>
+    <div><b>Limites</b><ul>
+      <li>Plus de touchers et d'animations : un parent pressé ira moins vite que sur un seul écran.</li>
+      <li>Sur iPhone, une seule grande carte à la fois : les vignettes aident à comparer, mais en petit.</li>
+      <li>La dictée 🎤 dépend du navigateur (absente sur certains Android et Firefox).</li>
+    </ul></div>
+  </div>
+  </details>
+  <div class="demo">Maquette : quel que soit le mot, les propositions sont des dragons. Tape <code>pistolet</code> pour voir le « mot refusé ». Rien n'est enregistré.</div>
+</div>
+
+<header>
+  <h1>Pixel <span>arts</span></h1>
+  <nav class="tabs">
+    <button data-tab="catalogue">Catalogue</button>
+    <button data-tab="creer" class="on">Créer</button>
+  </nav>
+</header>
+
+<main>
+  <!-- Catalogue -->
+  <section id="catalogue" class="view">
+    <div class="filters" id="filters"></div>
+    <div class="grid" id="tiles"></div>
+  </section>
+
+  <!-- Détail -->
+  <section id="detail" class="view">
+    <div class="detail-top">
+      <button class="back ideas" id="backIdeas" hidden>← Mes 6 idées</button>
+      <button class="back" id="back">← Mes modèles</button>
+      <h2 id="dTitle">Bébé dragon</h2>
+      <span class="badge-mine">Mes modèles</span>
+    </div>
+    <div class="controls">
+      <div class="seg" id="modeSeg">
+        <button data-mode="papier" class="on">✏️ Papier</button>
+        <button data-mode="perles">⚪ Perles</button>
+      </div>
+      <button class="btn ghost">Modifier</button>
+      <button class="btn alt">Image à garder</button>
+    </div>
+    <div class="layout">
+      <div class="board"><canvas id="board"></canvas></div>
+      <aside class="legend" id="legend"></aside>
+    </div>
+  </section>
+
+  <!-- Créer -->
+  <section id="creer" class="view on">
+    <button class="magic" id="openFlow">
+      <canvas id="magicIcon"></canvas>
+      <span><span class="big">✨ Inventer un modèle</span><span class="small">Dis ce que tu veux, je te dessine 6 idées !</span></span>
+    </button>
+    <details class="others">
+      <summary>▸ Autres façons de créer (image, dessin à la main)</summary>
+      <div class="panel" style="margin-top:8px">
+        <h3>📷 À partir d'une image</h3>
+        <button class="btn">Choisir une image</button>
+        <p class="tip">Choisis un dessin simple sur fond clair : ça marche beaucoup mieux qu'une photo.</p>
+      </div>
+      <div class="panel">
+        <h3>🖌️ Dessiner</h3>
+        <div class="mini-editor"></div>
+      </div>
+    </details>
+  </section>
+</main>
+
+<!-- ======= Parcours plein écran ======= -->
+<div class="flow" id="flow" role="dialog" aria-label="Inventer un modèle">
+  <div class="flow-top">
+    <button class="x" id="closeFlow" aria-label="Fermer">✕</button>
+    <div class="steps" id="steps"><i data-s="1">✏️</i><b></b><i data-s="2">✨</i><b></b><i data-s="3">❤️</i></div>
+    <div class="spacer"></div>
+  </div>
+  <div class="stage" id="stage">
+
+    <!-- Étape 1 -->
+    <section class="step" id="s1">
+      <div class="q">
+        <h2>Qu'est-ce que tu veux dessiner ?</h2>
+        <button class="say" id="say" aria-label="Écouter la question">🔊</button>
+      </div>
+      <form class="field" id="form" autocomplete="off">
+        <input id="word" placeholder="un dragon…" maxlength="30" enterkeyhint="go" aria-label="Ton idée">
+        <button type="button" class="mic" id="mic" aria-label="Dire le mot">🎤</button>
+        <button type="submit" class="go" id="go" aria-label="C'est parti" disabled>➜</button>
+      </form>
+      <div class="hint">… ou touche une image :</div>
+      <div class="sugg" id="sugg"></div>
+    </section>
+
+    <!-- Étape 2 -->
+    <section class="step" id="s2">
+      <div class="wait-title">Je dessine <span class="wait-word" id="waitWord">dragon</span></div>
+      <div class="pegboard" id="pegboard"></div>
+      <div class="msg" id="msg">Je choisis les couleurs…</div>
+      <div class="bar"><i id="barFill"></i></div>
+      <button class="skip" id="skip">Passer l'attente (maquette)</button>
+    </section>
+
+    <!-- Étape 3 -->
+    <section class="step" id="s3">
+      <div class="res-head">
+        <h2 id="resTitle">6 dragons rien que pour toi !</h2>
+        <p>Touche un dessin pour le voir en grand, le ❤️ pour le garder</p>
+      </div>
+      <div class="carwrap">
+        <button class="nav l" id="prev" aria-label="Précédent">‹</button>
+        <div class="deck" id="deck"></div>
+        <button class="nav r" id="next" aria-label="Suivant">›</button>
+      </div>
+      <div class="thumbs" id="thumbs" aria-label="Les 6 idées"></div>
+      <div class="res-actions">
+        <button class="bigbtn y" id="more">🔄 6 autres idées</button>
+        <button class="bigbtn w" id="other">✏️ Un autre mot</button>
+      </div>
+    </section>
+
+    <!-- Refus -->
+    <section class="step" id="sRefus">
+      <div class="refus">
+        <canvas id="refusPic"></canvas>
+        <h2>Oups ! Ça, je ne sais pas le dessiner.</h2>
+        <p>Essaie plutôt une de ces idées :</p>
+        <div class="sugg" id="refusSugg" style="grid-template-columns:repeat(3,1fr);margin:0 auto 16px"></div>
+        <button class="bigbtn r" id="retry" style="margin:0 auto">✏️ Choisir un autre mot</button>
+      </div>
+    </section>
+  </div>
+</div>
+
+<!-- Agrandissement d'une carte -->
+<div class="zoom" id="zoom" role="dialog" aria-label="Voir en grand">
+  <div class="zb">
+    <button class="x zx" id="zClose" aria-label="Fermer">✕</button>
+    <canvas id="zPic"></canvas>
+    <h3 id="zName">Bébé dragon</h3>
+    <div class="zmeta" id="zMeta">16 × 16 · 180 perles</div>
+    <div class="zcols" id="zCols"></div>
+    <div class="zact">
+      <button class="bigbtn w" id="zBack">‹ Revenir aux idées</button>
+      <button class="bigbtn r" id="zPick">❤️ Je le garde</button>
+    </div>
+  </div>
+</div>
+
+<!-- Célébration -->
+<div class="party" id="party">
+  <div class="box">
+    <span class="tag">📒 Mes modèles</span>
+    <h2>Bravo, il est à toi !</h2>
+    <canvas id="partyPic"></canvas>
+    <p id="partyName">Bébé dragon est rangé dans Mes modèles.</p>
+    <button class="bigbtn r" id="openModel">Voir mon modèle ➜</button>
+    <button class="bigbtn w again" id="again">✨ Inventer un autre modèle</button>
+  </div>
+</div>
+
+<script>
+/* ---------- Couleurs (mêmes perles que l'app) ---------- */
+const PAL={K:{n:"Noir",c:"#1f1b24"},W:{n:"Blanc",c:"#fbfbf7"},S:{n:"Gris",c:"#8d8f98"},s:{n:"Gris clair",c:"#c9cbd1"},
+R:{n:"Rouge",c:"#e0352f"},O:{n:"Orange",c:"#f58a1f"},Y:{n:"Jaune",c:"#fdd835"},G:{n:"Vert",c:"#2fa84f"},g:{n:"Vert clair",c:"#9bd770"},
+B:{n:"Bleu",c:"#2766c9"},b:{n:"Bleu ciel",c:"#7cc6f2"},V:{n:"Violet",c:"#8a4fc4"},P:{n:"Rose",c:"#f47fae"},p:{n:"Rose pâle",c:"#f9c6d8"},
+N:{n:"Marron",c:"#7a4a2a"},n:{n:"Beige",c:"#e0b47c"}};
+const $=s=>document.querySelector(s);
+function parse(a){const r=a.split("\n").filter(x=>x.trim());const w=Math.max(...r.map(x=>x.length));return r.map(x=>x.padEnd(w,".").split("").map(c=>PAL[c]?c:"."))}
+function sym(a){return parse(a).map(r=>[...r,...r.slice().reverse()])}   // moitié gauche → dessin symétrique
+function flip(g){return g.map(r=>r.slice().reverse())}
+function recolor(g,m){return g.map(r=>r.map(k=>m[k]||k))}
+function lum(h){h=h.slice(1);const[r,g,b]=[0,2,4].map(i=>parseInt(h.substr(i,2),16));return .299*r+.587*g+.114*b}
+function draw(cv,grid,px){
+  const h=grid.length,w=grid[0].length,n=Math.max(w,h),s=px||Math.ceil(200/n);
+  cv.width=n*s;cv.height=n*s;const x=cv.getContext("2d");x.clearRect(0,0,cv.width,cv.height);
+  const ox=Math.floor((n-w)/2)*s,oy=Math.floor((n-h)/2)*s;
+  grid.forEach((r,j)=>r.forEach((k,i)=>{if(k!=="."){x.fillStyle=PAL[k].c;x.fillRect(ox+i*s,oy+j*s,s,s)}}));
+}
+
+/* ---------- 6 dragons fictifs (originaux) ---------- */
+const DRAGONS=[
+{t:"Bébé dragon",g:parse(`
+..K..........K..
+.KYK........KYK.
+.KYYKKKKKKKKYYK.
+..KGGGGGGGGGGK..
+.KGGGGGGGGGGGGK.
+.KGWWKGGGGWWKGK.
+.KGWKKGGGGWKKGK.
+.KGGGGGGGGGGGGK.
+.KGPGGGKKGGGPGK.
+KgKKKGGGGGGKKKgK
+KggKGYYYYYYGKggK
+KgggKYYYYYYKgggK
+.KgKGYYYYYYGKgK.
+..KKGYYYYYYGKK..
+...KGGKGGKGGK...
+...KKK.KK.KKK...`)},
+{t:"Dragon de feu",g:parse(`
+...........KK...........
+..........KRRK....KKK...
+..........KRRRK..KOOOK..
+.........KRWKRK.KOOOOOK.
+........KRRKKRRKOOOOOOOK
+...YY..KRRRRRRRKKOOOOOK.
+.YOOYKKRRRRRRRRRRKOOOK..
+YOROORRRRRRRRRRRRRKKK...
+.YOOYKKnnRRRRRRRRRRK....
+...YY..KnnnRRRRRRRRRK...
+........KnnnRRRRRRRRRK..
+.........KnnnRRKKRRRRRK.
+..........KKRRK..KRRRRK.
+..........KRRK....KKRRK.
+..........KKKK......KRRK
+.....................KK.`)},
+{t:"Dragon des nuages",g:sym(`
+.......K...
+......KYK..
+......KYKKK
+K....KBBBBB
+KK...KBWKBB
+KbK..KBKKBB
+KbbK.KBBBBB
+KbbbKKBbbbb
+KbbbbKKbbKb
+KbbbbbKKbbb
+.KbbbbbKKKK
+.KbbbbKBBBB
+..KbbbKBBYY
+...KKKKBBYY
+......KBBYY
+......KBBBB
+.....KBBKKB
+.....KKK..K`)},
+{t:"Dragon dans l'œuf",g:sym(`
+.........
+....K....
+...KYK..K
+...KYKKKO
+....KOOOO
+...KOOOOO
+...KOWKOO
+...KOKKOO
+...KOOOOO
+...KOPOOO
+..KVKOOKK
+.KVVVKKVV
+.KVVVVVVV
+KVVpVVVVV
+KVppVVVVV
+KVVVVVVpV
+KVVVVVppV
+KVVVVVVVV
+.KVVVpVVV
+..KVVVVVV
+...KKKKKK`)},
+{t:"Dragon serpent",g:parse(`
+..KK....................
+.KRRK...................
+KRWKRK..........KKK.....
+KRRRRRK........KRRRK....
+KRRRRRRK......KRRRRRK...
+.KYYKRRRK....KRRYYRRRK..
+.KKK.KRRRK..KRRYKKYRRRK.
+......KRRRKKRRYK..KYRRRK
+.......KRRRRRYK....KYRRK
+........KRRRYK.....KYRRK
+.........KKKK......KRRK.
+..................KRRK..
+.................KRRKK..
+................KRRK.KK.
+................KKK..KYK
+.....................KK.`)},
+{t:"Tête de dragon",g:sym(`
+K.........
+KVK.......
+KVVK......
+.KVVK..KKK
+..KVVKKVVV
+...KVVVVVV
+..KVVVVVVV
+.KVVYYKVVV
+.KVVYKKVVV
+.KVVVVVVVV
+..KVVVVVpp
+..KVVVVpKp
+...KVVVppp
+...KVVVVVV
+....KWKVVV
+.....KKKKK`)}
+];
+// « 6 autres idées » : mêmes dessins, autres couleurs (en vrai : 6 nouvelles images du moteur)
+const MORE=[
+ {t:"Bébé dragon orange",g:recolor(DRAGONS[0].g,{G:"O",g:"Y",Y:"n"})},
+ {t:"Dragon des glaces",g:flip(recolor(DRAGONS[1].g,{R:"b",O:"W",Y:"b",n:"W"}))},
+ {t:"Dragon du soir",g:recolor(DRAGONS[2].g,{B:"V",b:"p",Y:"P"})},
+ {t:"Œuf de dragon vert",g:recolor(DRAGONS[3].g,{V:"G",p:"g",O:"R"})},
+ {t:"Dragon d'or",g:flip(recolor(DRAGONS[4].g,{R:"Y",Y:"O"}))},
+ {t:"Tête de dragon verte",g:recolor(DRAGONS[5].g,{V:"G",p:"g"})},
+];
+
+/* ---------- petites icônes des suggestions ---------- */
+const ICONS={
+ dragon:DRAGONS[0].g,
+ chat:null,
+ tracteur:parse(`
+....KKKK..
+....KbbK..
+GGGGKbbK..
+GGGGGGGGGG
+GGGGGGGGGG
+KKK...KKKK
+KSK..KSSSK
+KKK..KKKKK`),
+ sushi:parse(`
+.KKKKKK.
+KWWWWWWK
+KWWOOWWK
+KWOOOOWK
+KWWOOWWK
+KWWWWWWK
+.KKKKKK.`),
+ licorne:parse(`
+......Y.
+.....Y..
+...KKKK.
+..KWWWWK
+.KPWKWWK
+KPPWWWWK
+KPKWWWpK
+.K.KWWK.`),
+ fusee:parse(`
+...R...
+..RWR..
+..WbW..
+..WWW..
+..WWW..
+.RWWWR.
+R.YOY.R
+...Y...`),
+ dino:parse(`
+....KKKK
+...KGKGGK
+...KGGGGK
+K.KGGGK..
+KKGGGGK..
+.KGGGGK..
+..KGKGK..
+..KK.KK..`),
+ fleur:parse(`
+.P.P.
+PPYPP
+.PPP.
+..G..
+G.G.G
+.GGG.
+..G..`),
+ hasard:parse(`
+..YYY..
+.Y...Y.
+.....Y.
+....Y..
+...Y...
+.......
+...Y...`)
+};
+const SUGG=[["dragon","Dragon"],["chat","Chat"],["tracteur","Tracteur"],["sushi","Sushi"],["licorne","Licorne"],["fusee","Fusée"],["dino","Dino"],["hasard","Au hasard"]];
+
+if(innerWidth>700)$("#maqDet").open=true;
+/* ---------- Créer : bouton magique ---------- */
+draw($("#magicIcon"),ICONS.dragon,8);
+
+/* ---------- Parcours ---------- */
+const flow=$("#flow");let step=1,word="dragon",batch=0,timers=[];
+function clearT(){timers.forEach(clearTimeout);timers=[]}
+function goStep(id,keep){
+  clearT();
+  document.querySelectorAll(".step").forEach(s=>s.classList.toggle("on",s.id===id));
+  const n={s1:1,s2:2,s3:3,sRefus:1}[id];
+  document.querySelectorAll("#steps i").forEach(i=>{const k=+i.dataset.s;i.classList.toggle("on",k===n);i.classList.toggle("done",k<n)});
+  $("#stage").scrollTop=0;
+  if(id==="s2")startWait();
+  if(id==="s3"){if(keep)refreshKept();else deal()}
+}
+$("#openFlow").onclick=()=>{flow.classList.add("on");$("#word").value="";$("#go").disabled=true;goStep("s1")};
+$("#closeFlow").onclick=()=>{clearT();flow.classList.remove("on")};
+
+function pills(box,list){
+  box.innerHTML="";
+  list.forEach(([k,label])=>{const b=document.createElement("button");b.className="pill"+(k==="hasard"?" hasard":"");
+    const cv=document.createElement("canvas");if(ICONS[k])draw(cv,ICONS[k],8);b.appendChild(cv);
+    b.insertAdjacentHTML("beforeend",`<span>${label}</span>`);
+    b.onclick=()=>launch(k==="hasard"?"robot":label.toLowerCase());box.appendChild(b)});
+}
+pills($("#sugg"),SUGG);
+draw($("#refusPic"),parse(`
+....KKKK......
+..KKbbbbKK....
+.KbbbbbbbbKKK.
+KbbbbbbbbbbbbK
+KbbKKbbbbKKbbK
+KbbbbbbbbbbbbK
+KbbbbKKKKbbbbK
+KbbbKbbbbKbbbK
+.KbbbbbbbbbbK.
+..KKKKKKKKKK..
+....B...B.....
+...B...B...B..
+.....B...B....`),10);
+pills($("#refusSugg"),[["dragon","Dragon"],["fusee","Fusée"],["fleur","Fleur"]]);
+
+const REFUSES=/pistolet|fusil|arme|sang|bombe|couteau|tuer|mort|drogue|alcool|cigarette/i;
+function launch(w){
+  word=(w||"").trim();if(!word)return;
+  if(REFUSES.test(word)){goStep("sRefus");return}
+  batch=0;goStep("s2");
+}
+$("#word").addEventListener("input",e=>$("#go").disabled=!e.target.value.trim());
+$("#form").onsubmit=e=>{e.preventDefault();launch($("#word").value)};
+$("#say").onclick=()=>{try{const u=new SpeechSynthesisUtterance("Qu'est-ce que tu veux dessiner ? Dis-le, écris-le, ou touche une image.");u.lang="fr-FR";speechSynthesis.cancel();speechSynthesis.speak(u)}catch(e){}};
+$("#mic").onclick=()=>{const m=$("#mic");m.classList.add("listen");$("#word").placeholder="Je t'écoute…";
+  timers.push(setTimeout(()=>{m.classList.remove("listen");$("#word").value="dragon";$("#word").placeholder="un dragon…";$("#go").disabled=false},1600))};
+$("#retry").onclick=()=>{$("#word").value="";$("#go").disabled=true;goStep("s1");setTimeout(()=>$("#word").focus(),50)};
+$("#other").onclick=$("#retry").onclick;
+
+/* ---------- Étape 2 : les perles tombent ---------- */
+const MYST=parse(`
+....YYYY...
+...YYYYYY..
+..PP....OO.
+..PP....OO.
+........RR.
+.......RR..
+......VV...
+.....VV....
+.....BB....
+.....BB....
+...........
+.....GG....
+.....GG....`);   // un grand « ? » arc-en-ciel
+const WAIT_MSG=["Je choisis les couleurs…","Je pose les perles une à une…","Je dessine 6 idées différentes…","Presque fini !"];
+function startWait(){
+  $("#waitWord").textContent=word;
+  const pb=$("#pegboard");const cols=11,rows=13;
+  const cs=Math.min(28,Math.floor((Math.min(innerWidth,520)-80)/cols));
+  pb.style.width=(cols*cs+24)+"px";pb.style.height=(rows*cs+24)+"px";pb.innerHTML="";
+  const cells=[];
+  for(let j=0;j<rows;j++)for(let i=0;i<cols;i++){
+    const d=document.createElement("i");d.className="peg";d.style.left=(12+i*cs+cs/2-4)+"px";d.style.top=(12+j*cs+cs/2-4)+"px";pb.appendChild(d);
+    const k=MYST[j]&&MYST[j][i];if(k&&k!==".")cells.push([i,j,k]);
+  }
+  cells.sort(()=>Math.random()-.5);
+  const total=5200;   // maquette : ~6 s (moteur réel : 5 à 10 s)
+  cells.forEach(([i,j,k],n)=>{const b=document.createElement("span");b.className="bead";
+    const sz=cs*.86;b.style.cssText=`width:${sz}px;height:${sz}px;left:${12+i*cs+(cs-sz)/2}px;top:${12+j*cs+(cs-sz)/2}px;background:${PAL[k].c};animation-delay:${(n/cells.length)*total*.8}ms`;pb.appendChild(b)});
+  let t0=Date.now();$("#barFill").style.width="0";
+  WAIT_MSG.forEach((m,i)=>timers.push(setTimeout(()=>$("#msg").textContent=m,i*total/4)));
+  const tick=()=>{const p=Math.min(1,(Date.now()-t0)/total);$("#barFill").style.width=(p*100)+"%";if(p<1)timers.push(setTimeout(tick,120))};tick();
+  timers.push(setTimeout(()=>goStep("s3"),total+500));
+}
+$("#skip").onclick=()=>goStep("s3");
+
+/* ---------- Étape 3 : les cartes ---------- */
+let chosen=null,busy=false,kept=new Set(),curList=[];
+function infos(g){const cnt={};g.flat().forEach(k=>{if(k!==".")cnt[k]=(cnt[k]||0)+1});
+  const used=Object.entries(cnt).sort((a,b)=>b[1]-a[1]);return{w:g[0].length,h:g.length,n:used.reduce((s,u)=>s+u[1],0),used}}
+function deal(){
+  const list=batch?MORE:DRAGONS;chosen=null;busy=false;curList=list;
+  const plural=word.toLowerCase()==="dragon"?"dragons":"idées de « "+word+" »";
+  $("#resTitle").textContent=(batch?"6 nouveaux ":"6 ")+plural+" rien que pour toi !";
+  const deck=$("#deck");deck.className="deck";deck.innerHTML="";deck.scrollLeft=0;
+  const th=$("#thumbs");th.innerHTML="";
+  list.forEach((it,i)=>{
+    const w=document.createElement("div");w.className="cardw";
+    const f=infos(it.g);w.dataset.t=it.t;
+    w.innerHTML=`<div class="card3"><div class="face front" style="position:relative"><canvas role="button" aria-label="Voir ${it.t} en grand"></canvas><span class="zoomhint">🔍</span><div class="nm">${it.t}</div>
+      <div class="meta">${f.w} × ${f.h} · ${f.n} perles</div><span class="kept-tag">Gardé ✓</span>
+      <button class="heart" aria-label="Je garde ${it.t}">♥</button></div><div class="face verso">?</div></div>`;
+    draw(w.querySelector("canvas"),it.g);
+    w.querySelector(".heart").onclick=()=>pick(w,it);
+    w.querySelector(".front canvas").onclick=()=>openZoom(w,it);
+    deck.appendChild(w);
+    timers.push(setTimeout(()=>w.firstElementChild.classList.add("up"),250+i*260));
+    const b=document.createElement("button");b.setAttribute("aria-label",it.t);if(!i)b.className="on";
+    const c=document.createElement("canvas");draw(c,it.g,4);b.appendChild(c);
+    b.onclick=()=>$("#deck").scrollTo({left:i*cardStep(),behavior:"smooth"});th.appendChild(b);
+  });
+  refreshKept();
+}
+function refreshKept(){
+  const deck=$("#deck");deck.classList.remove("picked");busy=false;
+  deck.querySelectorAll(".cardw").forEach((w,i)=>{const k=kept.has(w.dataset.t);w.classList.remove("chosen");w.classList.toggle("kept",k);
+    w.querySelector(".heart").classList.toggle("on",k);w.firstElementChild.classList.add("up");
+    const t=$("#thumbs").children[i];if(t)t.classList.toggle("kept",k)});
+}
+let zoomed=null;
+function openZoom(w,it){
+  zoomed=[w,it];const f=infos(it.g);draw($("#zPic"),it.g);$("#zName").textContent=it.t;
+  $("#zMeta").textContent=`${f.w} × ${f.h} perles · ${f.n} perles en tout`;
+  $("#zCols").innerHTML=f.used.map(([k,n])=>`<span><i style="background:${PAL[k].c}"></i>${PAL[k].n} ${n}</span>`).join("");
+  const k=kept.has(it.t);$("#zPick").textContent=k?"Déjà gardé ✓":"❤️ Je le garde";$("#zPick").disabled=k;
+  $("#zoom").classList.add("on");
+}
+function closeZoom(){$("#zoom").classList.remove("on")}
+$("#zClose").onclick=closeZoom;$("#zBack").onclick=closeZoom;
+$("#zoom").onclick=e=>{if(e.target.id==="zoom")closeZoom()};
+$("#zPick").onclick=()=>{closeZoom();pick(...zoomed)};
+function cardStep(){const c=$("#deck .cardw");return c?c.offsetWidth+14:284}
+$("#deck").addEventListener("scroll",()=>{const i=Math.round($("#deck").scrollLeft/cardStep());[...$("#thumbs").children].forEach((d,k)=>d.classList.toggle("on",k===i))});
+$("#prev").onclick=()=>$("#deck").scrollBy({left:-cardStep(),behavior:"smooth"});
+$("#next").onclick=()=>$("#deck").scrollBy({left:cardStep(),behavior:"smooth"});
+$("#more").onclick=()=>{batch=1;goStep("s2")};
+
+function pick(w,it){
+  if(busy||kept.has(it.t))return;busy=true;chosen=it;
+  kept.add(it.t);mine.unshift({...it,fresh:true});   // rangé dans Mes modèles dès le cœur
+  w.classList.add("chosen","kept");$("#deck").classList.add("picked");w.querySelector(".heart").classList.add("on");
+  timers.push(setTimeout(()=>celebrate(it),900));
+}
+function celebrate(it){
+  const p=$("#party");p.querySelectorAll(".conf").forEach(c=>c.remove());
+  draw($("#partyPic"),it.g);$("#partyName").textContent=`« ${it.t} » est rangé dans Mes modèles.`;
+  const ks=Object.keys(PAL).filter(k=>!"KSsW".includes(k));
+  for(let i=0;i<60;i++){const c=document.createElement("span");c.className="conf";const s=8+Math.random()*12;
+    c.style.cssText=`left:${Math.random()*100}%;width:${s}px;height:${s}px;background:${PAL[ks[i%ks.length]].c};animation-duration:${1.8+Math.random()*2}s;animation-delay:${Math.random()*.8}s`;p.appendChild(c)}
+  p.classList.add("on");
+}
+$("#again").onclick=()=>{$("#party").classList.remove("on");$("#word").value="";$("#go").disabled=true;goStep("s1")};
+$("#openModel").onclick=()=>{$("#party").classList.remove("on");flow.classList.remove("on");clearT();
+  openDetail(chosen,true)};
+$("#backIdeas").onclick=()=>{show("creer");flow.classList.add("on");goStep("s3",true)};
+
+/* ---------- Catalogue et détail (simplifiés) ---------- */
+const CAT=[
+ {t:"Chat",cat:"Animaux",g:parse(`
+.KK..........KK.
+.KOK........KOK.
+.KOOK......KOOK.
+.KOPOKKKKKKOPOK.
+.KOOOOOOOOOOOOK.
+KOOOOOOOOOOOOOOK
+KOOOKKOOOOKKOOOK
+KOOOKWOOOOKWOOOK
+KOOOOOOOOOOOOOOK
+KPPOOOOPPOOOOPPK
+KOOOOWWWWWWOOOOK
+.KOOOWKWWKWOOOK.
+..KOOOWWWWOOOK..
+...KKOOOOOOKK...
+.....KKKKKK.....`)},
+ {t:"Fusée",cat:"Espace",g:ICONS.fusee},{t:"Fleur",cat:"Nature",g:ICONS.fleur},{t:"Sushi",cat:"Miam",g:ICONS.sushi}];
+ICONS.chat=CAT[0].g;pills($("#sugg"),SUGG);
+let mine=[{t:"Mon chat roux",g:CAT[0].g}],filter="Tous";
+function show(id){document.querySelectorAll(".view").forEach(v=>v.classList.toggle("on",v.id===id));
+  document.querySelectorAll(".tabs button").forEach(b=>b.classList.toggle("on",b.dataset.tab===(id==="detail"?"catalogue":id)));scrollTo(0,0)}
+document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{if(b.dataset.tab==="catalogue")renderCat();show(b.dataset.tab)});
+function renderCat(){
+  const items=[...mine.map(m=>({...m,cat:"Mes modèles"})),...CAT];
+  const cats=["Tous","Mes modèles","Animaux","Espace","Nature","Miam"];
+  $("#filters").innerHTML="";cats.forEach(c=>{const b=document.createElement("button");b.className="chip"+(c===filter?" on":"");b.textContent=c;b.onclick=()=>{filter=c;renderCat()};$("#filters").appendChild(b)});
+  $("#tiles").innerHTML="";
+  items.filter(i=>filter==="Tous"||i.cat===filter).forEach(it=>{const d=document.createElement("div");d.className="tile"+(it.fresh?" fresh":"");
+    const cv=document.createElement("canvas");draw(cv,it.g,6);d.appendChild(cv);
+    const cnt=it.g.flat().filter(k=>k!==".").length;
+    d.insertAdjacentHTML("beforeend",`<b>${it.t}</b><small>${it.g[0].length}×${it.g.length} · ${cnt} perles</small>${it.fresh?'<span class="new">Nouveau !</span>':""}`);
+    d.onclick=()=>openDetail(it);$("#tiles").appendChild(d)});
+}
+let cur=null,mode="papier";
+function openDetail(it,fromFlow){cur=it;$("#dTitle").textContent=it.t;$("#backIdeas").hidden=!fromFlow;renderBoard();show("detail")}
+$("#back").onclick=()=>{filter="Mes modèles";renderCat();show("catalogue")};
+$("#modeSeg").querySelectorAll("button").forEach(b=>b.onclick=()=>{mode=b.dataset.mode;$("#modeSeg").querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===b));renderBoard()});
+function renderBoard(){
+  const g=cur.g,h=g.length,w=g[0].length,cs=Math.max(22,Math.min(34,Math.floor(680/Math.max(w,h)))),m=cs;
+  const cv=$("#board"),W=w*cs+m*2,H=h*cs+m*2;cv.width=W;cv.height=H;const x=cv.getContext("2d");
+  x.fillStyle="#fff";x.fillRect(0,0,W,H);
+  if(mode==="papier"){
+    g.forEach((r,j)=>r.forEach((k,i)=>{if(k!=="."){x.fillStyle=PAL[k].c;x.fillRect(m+i*cs,m+j*cs,cs,cs)}}));
+    for(let i=0;i<=w;i++){x.strokeStyle=i%5?"#d6cfe0":"#8a8099";x.lineWidth=i%5?1:2;x.beginPath();x.moveTo(m+i*cs+.5,m);x.lineTo(m+i*cs+.5,m+h*cs);x.stroke()}
+    for(let j=0;j<=h;j++){x.strokeStyle=j%5?"#d6cfe0":"#8a8099";x.lineWidth=j%5?1:2;x.beginPath();x.moveTo(m,m+j*cs+.5);x.lineTo(m+w*cs,m+j*cs+.5);x.stroke()}
+  }else{
+    x.fillStyle="#f3ece0";x.fillRect(m-cs*.25,m-cs*.25,w*cs+cs*.5,h*cs+cs*.5);
+    g.forEach((r,j)=>r.forEach((k,i)=>{const cx=m+i*cs+cs/2,cy=m+j*cs+cs/2;
+      if(k==="."){x.fillStyle="#e2d8c8";x.beginPath();x.arc(cx,cy,cs*.14,0,7);x.fill();return}
+      x.fillStyle=PAL[k].c;x.beginPath();x.arc(cx,cy,cs*.46,0,7);x.fill();x.strokeStyle="rgba(0,0,0,.25)";x.stroke();
+      x.fillStyle="#fffffff2";x.beginPath();x.arc(cx,cy,cs*.15,0,7);x.fill()}));
+  }
+  x.fillStyle="#8a8099";x.font=`700 ${Math.round(cs*.42)}px "Baloo 2",sans-serif`;x.textAlign="center";x.textBaseline="middle";
+  for(let i=0;i<w;i++)x.fillText(i+1,m+i*cs+cs/2,m/2);
+  for(let j=0;j<h;j++)x.fillText("ABCDEFGHIJKLMNOPQRSTUVWXYZ"[j],m/2,m+j*cs+cs/2);
+  const cnt={};g.flat().forEach(k=>{if(k!==".")cnt[k]=(cnt[k]||0)+1});
+  const used=Object.entries(cnt).sort((a,b)=>b[1]-a[1]),per=mode==="perles";
+  let html=`<h3>${per?"Perles à préparer":"Crayons à préparer"}</h3>`;
+  used.forEach(([k,n],i)=>{const c=PAL[k].c;html+=`<div class="leg"><span class="sw${per?" round":""}" style="background:${c};color:${lum(c)<130?"#fff":"#222"}">${i+1}</span>${PAL[k].n}<span class="n">${per?n:""}</span></div>`});
+  if(per)html+=`<div class="total">Total : ${used.reduce((s,u)=>s+u[1],0)} perles</div>`;
+  $("#legend").innerHTML=html;
+}
+</script>
+</body>
+</html>
