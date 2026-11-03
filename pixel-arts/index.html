@@ -154,7 +154,8 @@ input[type=range]{accent-color:var(--accent)}
 .res-head h4{margin:0;font-size:18px}
 .res-head h4 em{font-style:normal;color:var(--accent)}
 .res-head .btn{margin-left:auto}
-.props{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.props{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+@media (max-width:760px){.prop{padding:7px 5px 5px}.prop .cv{padding:5px}.prop b{font-size:13px}.prop small{font-size:12px}.prop .heart{width:26px;height:26px;font-size:12px;top:4px;right:4px}}
 @media (min-width:761px){.props{grid-template-columns:repeat(3,1fr);gap:14px}}
 .prop{position:relative;background:#fff;border:2px solid var(--line);border-radius:18px;padding:10px 8px 6px;cursor:pointer;text-align:center;transition:transform .12s,border-color .12s;animation:pop .35s both}
 .prop:hover{transform:translateY(-3px);border-color:#d8c8b0}
@@ -293,7 +294,7 @@ input[type=range]{accent-color:var(--accent)}
     <div class="panel magic">
       <div class="h-row"><div>
         <h3>✨ Invente un modèle</h3>
-        <p class="sub" id="consigne" style="margin:0">✍️ Écris ce que tu veux dessiner, je te propose 6 idées.</p>
+        <p class="sub" id="consigne" style="margin:0">✍️ Écris ce que tu veux dessiner, je te propose 3 idées.</p>
       </div><button class="say big" data-say="#consigne" aria-label="Écouter la consigne">🔊 Écouter</button></div>
       <form class="search" id="sform" autocomplete="off">
         <span class="ic">🔍</span>
@@ -1126,7 +1127,7 @@ function loading(){
   const res=$("#res");
   res.innerHTML=`<div class="load">
     <div class="ld-msg"><span class="bead"></span><div class="ld-txt"><b id="ldT"></b><div class="ld-bar"><i id="ldB"></i></div><small>⏱️ Ça prend quelques secondes</small></div><button type="button" class="say" data-say="#ldT" aria-label="Écouter">🔊</button></div>
-    <div class="props">${Array.from({length:6},()=>`<div class="prop"><div class="cv"><canvas width="16" height="16"></canvas></div><b style="color:#c9bfd8">· · ·</b><small>&nbsp;</small></div>`).join("")}</div></div>`;
+    <div class="props">${Array.from({length:3},()=>`<div class="prop"><div class="cv"><canvas width="16" height="16"></canvas></div><b style="color:#c9bfd8">· · ·</b><small>&nbsp;</small></div>`).join("")}</div></div>`;
   const cvs=[...res.querySelectorAll("canvas")],fills=cvs.map(()=>new Array(256).fill(null));
   const pals=cvs.map(()=>{const k=KEYS.filter(k=>k!=="K"&&k!=="W");return[k[Math.random()*k.length|0],k[Math.random()*k.length|0],"K"]});
   const t0=performance.now();
@@ -1179,7 +1180,7 @@ function showResult(){
   res.innerHTML=`<div class="res-head"><h4>${props.length} idée${props.length>1?"s":""} de <em>${esc(word)}</em></h4></div>
     <div class="props">${props.map((p,i)=>`<div class="prop${added.has(p.id)?" added":""}" data-i="${i}" role="button" tabindex="0" aria-label="Voir ${esc(p.t)} en grand"><span class="heart" aria-hidden="true">${added.has(p.id)?"✓":"🔍"}</span><div class="cv"><canvas></canvas></div><b>${esc(p.t)}</b><small>${p.grid[0].length} × ${p.grid.length} · ${count(p.grid)} perles</small></div>`).join("")}</div>
     <div class="msg-row" style="margin-top:8px"><p class="hint" id="hint">👆 Touche une idée pour la voir en grand.</p><button type="button" class="say" data-say="#hint" aria-label="Écouter">🔊</button></div>
-    <div class="again"><button type="button" class="btn ghost" id="againBtn">🔄 6 autres idées</button></div>`;
+    <div class="again"><button type="button" class="btn ghost" id="againBtn">🔄 D'autres idées</button></div>`;
   res.querySelectorAll(".prop").forEach(el=>{drawPix(el.querySelector("canvas"),props[+el.dataset.i].grid,96);
     el.onclick=()=>openZoom(+el.dataset.i);el.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();openZoom(+el.dataset.i)}}});
   $("#againBtn").onclick=()=>go(word);

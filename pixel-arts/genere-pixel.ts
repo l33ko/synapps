@@ -7,15 +7,16 @@
 //
 //  Secrets à créer (Edge Functions > Secrets) :
 //    ANTHROPIC_API_KEY      clé API Claude (platform.claude.com > API keys). Obligatoire.
-//    ANTHROPIC_MODEL        facultatif, modèle utilisé (par défaut claude-haiku-5-5 ; claude-sonnet-5-5 dessine mieux, environ 20 fois plus cher).
+//    ANTHROPIC_MODEL        facultatif, modèle utilisé (par défaut claude-sonnet-5-5 ; claude-haiku-5-5 est environ 20 fois moins cher mais dessine moins bien).
+//    NB_IDEES               facultatif, nombre de dessins par recherche, de 1 à 6 (par défaut 3). Le coût est proportionnel.
 //    ANTHROPIC_EFFORT       facultatif, réflexion avant de dessiner : low, medium (par défaut) ou high.
 //    LIMITE_JOUR_APPAREIL   facultatif, recherches par jour et par appareil (par défaut 20).
-//    LIMITE_JOUR_TOTAL      facultatif, recherches par jour pour tout le monde (par défaut 300).
+//    LIMITE_JOUR_TOTAL      facultatif, recherches par jour pour tout le monde (par défaut 100).
 //  SUPABASE_URL et SUPABASE_SERVICE_ROLE_KEY sont fournis automatiquement par Supabase.
 //  Table nécessaire : pixel-arts/supabase.sql (compteur des recherches, pour les plafonds).
 //
 //  Reçoit { mot } et renvoie :
-//    { idees: [{ titre, grille: ["..KK..", ...] }, ...] }   jusqu'à 6 idées
+//    { idees: [{ titre, grille: ["..KK..", ...] }, ...] }   NB_IDEES idées au plus
 //    { refus: "personnage" | "inadapte", message, suggestions: [..] }
 //    { erreur: "quota" | "mot" | "service", message }
 //  Seul le compteur des recherches est enregistré (empreinte de l'appareil et mot tapé),
@@ -33,10 +34,11 @@ const reply = (data: unknown, status = 200) =>
   new Response(JSON.stringify(data), { status, headers: { ...CORS, 'Content-Type': 'application/json; charset=utf-8' } });
 
 const env = (k: string, d = '') => Deno.env.get(k) || d;
-const MODELE = env('ANTHROPIC_MODEL', 'claude-haiku-5-5');
+const MODELE = env('ANTHROPIC_MODEL', 'claude-sonnet-5-5');
 const nombre = (k: string, d: number) => { const n = parseInt(env(k), 10); return Number.isFinite(n) && n > 0 ? n : d; };
 const LIM_APPAREIL = nombre('LIMITE_JOUR_APPAREIL', 20);
-const LIM_TOTAL = nombre('LIMITE_JOUR_TOTAL', 300);   // plafonné à 1000 côté SQL quoi qu'il arrive
+const LIM_TOTAL = nombre('LIMITE_JOUR_TOTAL', 100);   // plafonné à 1000 côté SQL quoi qu'il arrive
+const NB_IDEES = Math.min(6, nombre('NB_IDEES', 3));
 const SB_URL = env('SUPABASE_URL');
 const SB_KEY = env('SUPABASE_SERVICE_ROLE_KEY');
 
@@ -48,13 +50,13 @@ const PALETTE = {
 };
 const AUTORISES = new Set([...Object.keys(PALETTE), '.']);
 
-// Six angles différents, un par appel, pour que les 6 idées ne se ressemblent pas
+// Angles différents, un par appel (les NB_IDEES premiers), pour que les idées ne se ressemblent pas
 const ANGLES = [
   'vue de face, version mignonne avec de grands yeux',
   'de profil, en mouvement',
+  'très simple, peu de couleurs, idéal pour débuter (16 × 16 au plus)',
   'version bébé ou miniature, très ronde',
   'avec un petit accessoire ou un élément de décor simple',
-  'très simple, peu de couleurs, idéal pour débuter (16 × 16 au plus)',
   'avec des couleurs inattendues et joyeuses',
 ];
 
@@ -227,8 +229,8 @@ Deno.serve(async (req) => {
   if (ok === false) return reply({ erreur: 'quota', message: 'Assez de dessins inventés pour aujourd’hui ! Reviens demain.' });
   if (ok !== true) return reply({ erreur: 'service', message: 'Le service n’est pas prêt.' });
 
-  // 6 appels en parallèle (un par angle) : plus rapide et plus varié qu'un seul long appel
-  const resultats = await Promise.allSettled(ANGLES.map(a => demander(mot, a)));
+  // Un appel par idée, en parallèle : plus rapide et plus varié qu'un seul long appel
+  const resultats = await Promise.allSettled(ANGLES.slice(0, NB_IDEES).map(a => demander(mot, a)));
   const reponses = resultats.filter(r => r.status === 'fulfilled' && r.value).map((r: any) => r.value);
   if (!reponses.length) return reply({ erreur: 'service', message: 'Le dessinateur ne répond pas. Réessaie dans un moment.' });
 
