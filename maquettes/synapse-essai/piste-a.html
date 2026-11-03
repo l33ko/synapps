@@ -13,13 +13,13 @@
 :root{
   --paper:#f3f6f7;--rule:#dbe4e8;--card:#ffffff;--ink:#13212b;--ink2:#566874;--edge:#b9c7ce;
   --accent:#1b46d1;--accent-ink:#ffffff;--ok:#0f7a4d;--bad:#b3261e;--screen:#16202a;--screen-ink:#eef3f6;
-  --lit:#ffd23f;--on-tc:#ffffff;--c-att:#d1334a;--soft:#fff7db;--soft-edge:#e7c662;
+  --lit:#ffd23f;--on-tc:#ffffff;--c-att:#d1334a;--soft:#fff7db;--soft-edge:#e7c662;--bad-bg:#fde8e6;
   --f:"Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",sans-serif;
 }
 @media (prefers-color-scheme:dark){
   :root{--paper:#0d1620;--rule:#18242f;--card:#131f2a;--ink:#e6edf2;--ink2:#93a5b2;--edge:#2b3b48;
     --accent:#86a0ff;--accent-ink:#0d1620;--ok:#5fd39a;--bad:#ff8a80;--screen:#0a1118;--on-tc:#0d1620;--c-att:#ff7f90;
-    --soft:#2a2410;--soft-edge:#6b5a1f;color-scheme:dark}
+    --soft:#2a2410;--soft-edge:#6b5a1f;--bad-bg:#3a1714;color-scheme:dark}
 }
 .t-att{--tc:var(--c-att)}
 *{box-sizing:border-box}
@@ -98,14 +98,18 @@ button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 .op .mk svg{width:18px;height:18px}
 .op.right{border-color:var(--ok);box-shadow:inset 0 0 0 1.5px var(--ok)}
 .op.right .mk{color:var(--ok)}
-.op.miss{border-color:var(--soft-edge);background:var(--soft)}
-.op.miss .mk{color:var(--ink2)}
+.op.miss{border:2px solid var(--bad);background:var(--bad-bg);color:var(--bad);animation:shake .35s ease-in-out}
+.op.miss .mk{color:var(--bad)}
+.op.miss .mk svg{width:28px;height:28px}
+@keyframes shake{20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
 .opts.lock{pointer-events:none}
-.calm{text-align:center;font-size:.9rem;color:var(--ink2);min-height:24px}
+/* place réservée sous les réponses : « Réessayer » y apparaît sans faire bouger les boutons */
+.calm{text-align:center;font-size:.9rem;color:var(--ink2);min-height:52px;display:flex;align-items:center;justify-content:center;margin:0}
+.calm .btn{width:auto;min-width:12rem}
 .op.glow{box-shadow:0 0 0 3px var(--lit),0 0 0 8px rgba(255,210,63,.35);animation:glow 1.3s ease-in-out infinite;z-index:1}
 @keyframes glow{50%{box-shadow:0 0 0 3px var(--lit),0 0 0 12px rgba(255,210,63,.12)}}
 @keyframes pop{from{transform:translateY(6px);opacity:0}to{transform:none;opacity:1}}
-@media (prefers-reduced-motion:reduce){.bub,.op .mk,.op.glow{animation:none}}
+@media (prefers-reduced-motion:reduce){.bub,.op .mk,.op.glow,.op.miss{animation:none}}
 .card.tight{gap:8px;padding:14px 16px}
 .toast{background:var(--card);border:1px solid var(--edge);border-left:4px solid var(--accent);border-radius:4px;padding:10px 12px;font-size:.92rem}
 .kv{display:grid;grid-template-columns:1fr auto;gap:8px 12px;margin:0}
@@ -166,10 +170,10 @@ button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
       <summary><span class="tag">Piste A</span><u>L’idée, points forts et limites</u></summary>
       <div class="dt">
       <div class="tt"><span class="tag">Piste A</span><b>L’essai dans l’écran d’introduction, en tutoriel pas à pas</b></div>
-      <p>La consigne est découpée en 3 bulles qui montrent le jeu, puis 3 questions d’essai toutes simples (juste ✓ ou ✗, sans chrono ni explication), au même endroit, avant de lancer le vrai exercice.</p>
+      <p>La consigne est découpée en 3 bulles qui montrent le jeu, puis 3 questions d’essai toutes simples (une coche verte, ou une croix rouge et «&nbsp;Réessayer&nbsp;», sans chrono ni explication), au même endroit, avant de lancer le vrai exercice.</p>
       <div class="pc">
-        <div><h3>Points forts</h3><ul><li>On apprend sur le vrai jeu, au vrai endroit : rien de nouveau à comprendre ensuite.</li><li>Plus de pavé de texte : une idée par bulle, montrée du doigt.</li><li>Essai court et sans bavardage : 3 réponses qui s’enchaînent toutes seules, puis « C’est parti ! ».</li><li>« Passer l’essai » reste visible à chaque étape.</li></ul></div>
-        <div><h3>Limites</h3><ul><li>Il faut écrire 3 bulles et 3 questions pour chacun des 20 jeux.</li><li>Aucune explication après une erreur : si la consigne n’est pas comprise, seul « Refaire l’essai » rattrape le coup.</li><li>Pour les jeux de mémoire (Séquence, Chiffres), le « ralenti » demande un traitement à part.</li></ul></div>
+        <div><h3>Points forts</h3><ul><li>On apprend sur le vrai jeu, au vrai endroit : rien de nouveau à comprendre ensuite.</li><li>Plus de pavé de texte : une idée par bulle, montrée du doigt.</li><li>Essai court et sans bavardage : une erreur se voit tout de suite en rouge et se rejoue sur la même question.</li><li>« Passer l’essai » reste visible à chaque étape.</li></ul></div>
+        <div><h3>Limites</h3><ul><li>Il faut écrire 3 bulles et 3 questions pour chacun des 20 jeux.</li><li>Aucune explication après une erreur : on peut réessayer jusqu’à tomber juste par hasard (surtout aux Flèches, avec 2 choix) sans avoir compris.</li><li>Pour les jeux de mémoire (Séquence, Chiffres), le « ralenti » demande un traitement à part.</li></ul></div>
       </div>
       </div>
     </details>
@@ -187,7 +191,7 @@ button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 'use strict';
 var HEX={rouge:'#ff5a52',bleu:'#4d8dff',vert:'#3fd16f'};
 var CHECK='<svg viewBox="0 0 20 20" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5l4 4 8-9"/></svg>';
-var CROSS='<svg viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M5.5 5.5l9 9M14.5 5.5l-9 9"/></svg>';
+var CROSS='<svg viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15"/></svg>';
 function arrow(dir,cls){return '<svg class="aw'+(dir==='g'?' fl':'')+(cls?' '+cls:'')+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h17M14 5l7 7-7 7"/></svg>'}
 function sw(c){return '<span class="sw" style="background:'+HEX[c]+'"></span>'}
 if(window.innerWidth<=640){var pcd=document.getElementById('pcd');if(pcd)pcd.open=false}
@@ -297,7 +301,7 @@ function viewQ(){
  var o={pick:M.pick,res:M.res};
  if(M.g==='att'){stim=attStim(q,'');btns=attBtns(q,o)}
  else{stim=fleStim(q,'');btns=fleBtns(q,o)}
- var live='<p class="calm" role="status">'+(M.res==='ok'?'<span class="sr">Juste</span>':M.res==='ko'?'<span class="sr">Pas cette fois</span>':'Pas de chrono.')+'</p>';
+ var live='<p class="calm" role="status">'+(M.res==='ok'?'<span class="sr">Juste</span>':M.res==='ko'?'<span class="sr">Pas cette fois.</span><button class="btn" data-act="retry">Réessayer</button>':'Pas de chrono.')+'</p>';
  return topRow(true)+title(g,M.fromKnown?'Entraînement · rien n’est compté':'Premier essai · rien n’est compté')+steps()+'<div class="stage">'+stim+btns+live+'</div>'}
 
 function viewEnd(){
@@ -333,9 +337,9 @@ function render(){
 /* ---------- Actions ---------- */
 function answer(v){
  var g=GAMES[M.g],q=g.qs[M.qi];if(M.ph!=='q'||M.res)return;
- set({pick:v,res:v===q.ans?'ok':'ko'});
- // on enchaîne tout seul après un court instant
- later(900,function(){if(M.qi<g.qs.length-1)set({qi:M.qi+1,res:null,pick:null});else set({ph:'end'})})}
+ var ok=v===q.ans;set({pick:v,res:ok?'ok':'ko'});
+ // bonne réponse : on enchaîne tout seul. Mauvaise réponse : on attend « Réessayer ».
+ if(ok)later(900,function(){if(M.qi<g.qs.length-1)set({qi:M.qi+1,res:null,pick:null});else set({ph:'end'})})}
 document.addEventListener('click',function(ev){
  var b=ev.target.closest('[data-act],[data-scn]');if(!b)return;
  if(b.hasAttribute('data-scn')){reset(b.getAttribute('data-scn'));return}
@@ -344,6 +348,7 @@ document.addEventListener('click',function(ev){
  else if(a==='prev')set({step:Math.max(0,M.step-1)});
  else if(a==='demo'){if(M.step===g.tuto.length-1&&v===(M.g==='att'?g.demo.ink:g.demo.dir))set({ph:'q',qi:0,res:null,pick:null})}
  else if(a==='ans')answer(v);
+ else if(a==='retry')set({res:null,pick:null});
  else if(a==='skip')set({ph:'real',skipped:true});
  else if(a==='go'){set({ph:'real',skipped:false});window.scrollTo(0,0)}
  else if(a==='again')set({ph:'tuto',step:0,qi:0,res:null,pick:null});
