@@ -126,15 +126,20 @@ async function demander(mot: string, angle: string) {
     },
     body: JSON.stringify({
       model: MODELE,
-      max_tokens: 1500,
+      // Les modèles 5.5 réfléchissent avant de répondre (réflexion adaptative), et cette réflexion
+      // compte dans max_tokens : il faut donc de la marge, et un effort bas pour rester rapide.
+      max_tokens: 8000,
+      output_config: { effort: 'low' },
       system: SYSTEME,
       messages: [{ role: 'user', content: `Sujet demandé par l'enfant : « ${mot} ».\nStyle de cette version : ${angle}.` }],
     }),
   });
-  if (!r.ok) throw new Error('anthropic ' + r.status);
+  if (!r.ok) { console.log('anthropic', r.status, (await r.text()).slice(0, 300)); throw new Error('anthropic ' + r.status); }
   const data = await r.json();
   const texte = (data.content || []).filter((c: any) => c.type === 'text').map((c: any) => c.text).join('');
-  return lireJSON(texte);
+  const json = lireJSON(texte);
+  if (!json) console.log('réponse illisible', data.stop_reason, texte.slice(0, 200));   // visible dans Logs de la fonction
+  return json;
 }
 
 Deno.serve(async (req) => {
