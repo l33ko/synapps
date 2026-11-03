@@ -92,38 +92,21 @@ button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 .bub .bp{background:none;border:0;color:var(--accent-ink);min-height:44px;padding:8px 4px;cursor:pointer;text-decoration:underline;text-underline-offset:3px;font-weight:500}
 .sw{display:inline-block;width:.9em;height:.9em;border-radius:3px;vertical-align:-.08em;border:2px solid var(--accent-ink);margin-right:2px}
 .kbd{display:inline-block;border:1.5px solid currentColor;border-radius:4px;padding:0 6px;font-size:.9em;line-height:1.3}
-/* retours pendant l'essai */
-.fb{border-radius:8px;padding:14px 16px;display:flex;flex-direction:column;gap:10px;animation:pop .25s ease-out;position:relative}
-.fb b{font-size:1.12rem}
-.fb.good{background:var(--card);border:2px solid var(--ok)}
-.fb.good b{color:var(--ok)}
-.fb.soft{background:var(--soft);border:2px solid var(--soft-edge)}
-.fb.hint{background:var(--soft);border:2px dashed var(--soft-edge)}
-.calm{display:flex;justify-content:space-between;align-items:center;gap:10px;min-height:44px;padding:0 4px}
-.calm .note{font-size:.95rem}
-/* zone d'aide : place réservée d'avance. Tous les messages possibles sont empilés dans la même case
-   (invisibles sauf un) : la case prend la hauteur du plus long, les boutons ne bougent jamais. */
-.slot{display:grid}
-.slot>*{grid-area:1/1;visibility:hidden}
-.slot>.on{visibility:visible}
-.slot .fb{animation:none}
-.slot>.on.fb{animation:pop .25s ease-out}
-.fb .lnk{align-self:flex-start;padding:0;min-height:44px;font-weight:700}
-.after{min-height:52px}
-.slot>.calm{align-self:center}
+/* retours pendant l'essai : une simple marque sur le bouton touché, pas de texte */
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.op .mk{display:flex;flex:none;animation:pop .2s ease-out}
+.op .mk svg{width:18px;height:18px}
+.op.right{border-color:var(--ok);box-shadow:inset 0 0 0 1.5px var(--ok)}
+.op.right .mk{color:var(--ok)}
+.op.miss{border-color:var(--soft-edge);background:var(--soft)}
+.op.miss .mk{color:var(--ink2)}
+.opts.lock{pointer-events:none}
+.calm{text-align:center;font-size:.9rem;color:var(--ink2);min-height:24px}
 .op.glow{box-shadow:0 0 0 3px var(--lit),0 0 0 8px rgba(255,210,63,.35);animation:glow 1.3s ease-in-out infinite;z-index:1}
-.op.tried{opacity:.45;border-style:dashed}
-.op.right{background:var(--ok);border-color:var(--ok);color:#fff}
-.op.right svg{color:#fff}
 @keyframes glow{50%{box-shadow:0 0 0 3px var(--lit),0 0 0 12px rgba(255,210,63,.12)}}
 @keyframes pop{from{transform:translateY(6px);opacity:0}to{transform:none;opacity:1}}
-@media (prefers-reduced-motion:reduce){.bub,.fb,.op.glow{animation:none}}
-.recap{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.92rem;color:var(--ink2)}
-.recap span{display:inline-flex;align-items:center;gap:4px}
-.recap svg{color:var(--ok);flex:none}
+@media (prefers-reduced-motion:reduce){.bub,.op .mk,.op.glow{animation:none}}
 .card.tight{gap:8px;padding:14px 16px}
-.rule{background:var(--screen);color:var(--screen-ink);border-radius:4px;padding:14px 16px;font-size:1.1rem;font-weight:600;text-align:center}
-.rule em{font-style:normal;color:var(--lit)}
 .toast{background:var(--card);border:1px solid var(--edge);border-left:4px solid var(--accent);border-radius:4px;padding:10px 12px;font-size:.92rem}
 .kv{display:grid;grid-template-columns:1fr auto;gap:8px 12px;margin:0}
 .kv dt{color:var(--ink2)}
@@ -163,8 +146,6 @@ button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
   /* écran d'essai sur iPhone : tout doit tenir au-dessus du pli, boutons de réponse compris */
   .ttl.pl .sub{display:none}
   .stage .screen{min-height:120px}
-  .slot .fb{padding:10px 14px;gap:4px}
-  .slot .fb b{font-size:1.05rem}
 }
 /* grand écran : le bandeau passe en colonne à gauche, l'app garde toute la hauteur */
 @media (min-width:1000px){
@@ -185,10 +166,10 @@ button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
       <summary><span class="tag">Piste A</span><u>L’idée, points forts et limites</u></summary>
       <div class="dt">
       <div class="tt"><span class="tag">Piste A</span><b>L’essai dans l’écran d’introduction, en tutoriel pas à pas</b></div>
-      <p>La consigne est découpée en 3 bulles qui montrent le jeu, puis 3 questions sans chrono avec indice, au même endroit, avant de lancer le vrai exercice.</p>
+      <p>La consigne est découpée en 3 bulles qui montrent le jeu, puis 3 questions d’essai toutes simples (juste ✓ ou ✗, sans chrono ni explication), au même endroit, avant de lancer le vrai exercice.</p>
       <div class="pc">
-        <div><h3>Points forts</h3><ul><li>On apprend sur le vrai jeu, au vrai endroit : rien de nouveau à comprendre ensuite.</li><li>Plus de pavé de texte : une idée par bulle, montrée du doigt.</li><li>« Passer l’essai » reste visible à chaque étape.</li></ul></div>
-        <div><h3>Limites</h3><ul><li>Il faut écrire 3 bulles et 3 questions pour chacun des 20 jeux.</li><li>Pour les jeux de mémoire (Séquence, Chiffres), le « ralenti » demande un traitement à part.</li><li>Un habitué qui veut juste relire la consigne doit repasser par les bulles.</li></ul></div>
+        <div><h3>Points forts</h3><ul><li>On apprend sur le vrai jeu, au vrai endroit : rien de nouveau à comprendre ensuite.</li><li>Plus de pavé de texte : une idée par bulle, montrée du doigt.</li><li>Essai court et sans bavardage : 3 réponses qui s’enchaînent toutes seules, puis « C’est parti ! ».</li><li>« Passer l’essai » reste visible à chaque étape.</li></ul></div>
+        <div><h3>Limites</h3><ul><li>Il faut écrire 3 bulles et 3 questions pour chacun des 20 jeux.</li><li>Aucune explication après une erreur : si la consigne n’est pas comprise, seul « Refaire l’essai » rattrape le coup.</li><li>Pour les jeux de mémoire (Séquence, Chiffres), le « ralenti » demande un traitement à part.</li></ul></div>
       </div>
       </div>
     </details>
@@ -206,6 +187,7 @@ button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 'use strict';
 var HEX={rouge:'#ff5a52',bleu:'#4d8dff',vert:'#3fd16f'};
 var CHECK='<svg viewBox="0 0 20 20" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5l4 4 8-9"/></svg>';
+var CROSS='<svg viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M5.5 5.5l9 9M14.5 5.5l-9 9"/></svg>';
 function arrow(dir,cls){return '<svg class="aw'+(dir==='g'?' fl':'')+(cls?' '+cls:'')+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h17M14 5l7 7-7 7"/></svg>'}
 function sw(c){return '<span class="sw" style="background:'+HEX[c]+'"></span>'}
 if(window.innerWidth<=640){var pcd=document.getElementById('pcd');if(pcd)pcd.open=false}
@@ -220,9 +202,9 @@ var GAMES={
    {tg:'ink',dir:'up',t:'Regarde la couleur de ses lettres : ici, l’encre est '+sw('bleu')+' bleue.'},
    {tg:'btns',dir:'down',t:'On touche la couleur de l’encre, pas celle que le mot dit. À toi&nbsp;: touche le bouton «&nbsp;bleu&nbsp;» qui brille.'}],
   qs:[
-   {w:'VERT',ink:'rouge',ans:'rouge',hint:'Ne lis pas le mot : regarde la couleur des lettres.',why:'Le mot dit « vert », mais l’encre est rouge.'},
-   {w:'BLEU',ink:'bleu',ans:'bleu',hint:'Ici, le mot et l’encre disent la même chose.',why:'Le mot et l’encre sont tous les deux bleus.'},
-   {w:'ROUGE',ink:'vert',ans:'vert',hint:'Le mot essaie de te piéger : quelle est la couleur des lettres ?',why:'Le mot dit « rouge », mais l’encre est verte.'}],
+   {w:'VERT',ink:'rouge',ans:'rouge'},
+   {w:'BLEU',ink:'bleu',ans:'bleu'},
+   {w:'ROUGE',ink:'vert',ans:'vert'}],
   rule:'Touche la couleur de <em>l’encre</em>, pas le mot.',
   real:{w:'BLEU',ink:'rouge'}},
  fle:{jeu:'Flèches',nom:'Attention',
@@ -232,9 +214,9 @@ var GAMES={
    {tg:'mid',dir:'up',t:'Seule la flèche du milieu compte. Les autres sont là pour te distraire.'},
    {tg:'btns',dir:'down',t:'On touche sa direction. Ici, elle pointe à droite. À toi&nbsp;: touche la flèche qui brille.'+(KB?' Au clavier : <span class="kbd">←</span> <span class="kbd">→</span>.':'')}],
   qs:[
-   {dir:'g',flank:'g',ans:'g',hint:'Regarde seulement la flèche du milieu.',why:'Toutes les flèches vont à gauche : facile pour commencer.'},
-   {dir:'d',flank:'g',ans:'d',hint:'Les flèches autour vont à gauche… et celle du milieu ?',why:'Les autres vont à gauche, mais celle du milieu va à droite.'},
-   {dir:'g',flank:'d',ans:'g',hint:'Cache les autres du regard : celle du milieu pointe où ?',why:'Celle du milieu va à gauche, malgré les autres.'}],
+   {dir:'g',flank:'g',ans:'g'},
+   {dir:'d',flank:'g',ans:'d'},
+   {dir:'g',flank:'d',ans:'g'}],
   rule:'Seule compte <em>la flèche du milieu</em>.',
   real:{dir:'d',flank:'d'}}
 };
@@ -242,14 +224,14 @@ var DIRN={g:'gauche',d:'droite'};
 
 /* ---------- État de la maquette ---------- */
 var app=document.getElementById('app');
-var M={scn:'att',g:'att',ph:'tuto',step:0,qi:0,hint:0,wrong:null,done:false,first:[],fromKnown:false,skipped:false};
+var M={scn:'att',g:'att',ph:'tuto',step:0,qi:0,res:null,pick:null,fromKnown:false,skipped:false};
 var tk=0,timers=[];
 function later(ms,fn){var t=tk;timers.push(setTimeout(function(){if(t===tk)fn()},ms))}
 function clr(){tk++;while(timers.length)clearTimeout(timers.pop())}
 function set(o){for(var k in o)M[k]=o[k];render()}
 function reset(scn){
  clr();
- M={scn:scn,g:scn==='fle'?'fle':'att',ph:scn==='known'?'known':'tuto',step:0,qi:0,hint:0,wrong:null,done:false,first:[],fromKnown:false,skipped:false};
+ M={scn:scn,g:scn==='fle'?'fle':'att',ph:scn==='known'?'known':'tuto',step:0,qi:0,res:null,pick:null,fromKnown:false,skipped:false};
  var bs=document.querySelectorAll('.scn button');for(var i=0;i<bs.length;i++)bs[i].setAttribute('aria-pressed',String(bs[i].getAttribute('data-scn')===scn));
  render();window.scrollTo(0,0)}
 
@@ -264,29 +246,31 @@ function title(g,pill){
 function steps(){
  var lab=['Consigne','Essai 1','Essai 2','Essai 3'],cur=M.ph==='tuto'?0:M.ph==='q'?M.qi+1:4;
  return '<ol class="steps" aria-label="Avancement de l’essai">'+lab.map(function(l,i){
-  var c=i<cur||(i===cur&&M.ph==='q'&&M.done)?'dn':i===cur?'on':'';
+  var c=i<cur||(i===cur&&M.ph==='q'&&M.res)?'dn':i===cur?'on':'';
   return '<li class="'+c+'"'+(i===cur?' aria-current="step"':'')+'><b></b>'+l+'</li>'}).join('')+'</ol>'}
 
 function attStim(it,mode){
  // mode : '' | 'word' | 'ink'
  var cls=mode==='ink'?' ink-hl':'';
- return '<div class="screen'+(mode?' hl':'')+(M.done?' good':'')+'" aria-label="Mot affiché : '+it.w+', écrit en '+it.ink+'"><span class="wd'+cls+'" style="color:'+HEX[it.ink]+'">'+it.w+'</span></div>'}
+ return '<div class="screen'+(mode?' hl':'')+(M.res==='ok'?' good':'')+'" aria-label="Mot affiché : '+it.w+', écrit en '+it.ink+'"><span class="wd'+cls+'" style="color:'+HEX[it.ink]+'">'+it.w+'</span></div>'}
 function attBtns(it,o){
  o=o||{};
- return '<div class="opts'+(o.dim?' dim':'')+(o.hl?' hl':'')+'" style="--cols:3">'+['rouge','bleu','vert'].map(function(c){
-  var k='op';if(o.glow===c)k+=' glow';if(o.tried===c)k+=' tried';if(o.right===c)k+=' right';if(o.only&&o.only!==c)k+=' dim';
-  return '<button class="'+k+'" data-act="'+(o.act||'ans')+'" data-v="'+c+'">'+c+'</button>'}).join('')+'</div>'}
+ return '<div class="opts'+(o.dim?' dim':'')+(o.hl?' hl':'')+(o.res?' lock':'')+'" style="--cols:3">'+['rouge','bleu','vert'].map(function(c){
+  var k='op',mk='';if(o.glow===c)k+=' glow';if(o.only&&o.only!==c)k+=' dim';
+  if(o.pick===c){k+=o.res==='ok'?' right':' miss';mk='<span class="mk">'+(o.res==='ok'?CHECK:CROSS)+'</span>'}
+  return '<button class="'+k+'" data-act="'+(o.act||'ans')+'" data-v="'+c+'">'+c+mk+'</button>'}).join('')+'</div>'}
 function fleStim(it,mode){
  var s='',i;
  for(i=0;i<2;i++)s+=arrow(it.flank,mode==='mid'?'dim':'');
  s+=arrow(it.dir,mode==='mid'?'mid':'');
  for(i=0;i<2;i++)s+=arrow(it.flank,mode==='mid'?'dim':'');
- return '<div class="screen'+(mode?' hl':'')+(M.done?' good':'')+'"><div class="arrows" aria-label="Flèches à observer">'+s+'</div></div>'}
+ return '<div class="screen'+(mode?' hl':'')+(M.res==='ok'?' good':'')+'"><div class="arrows" aria-label="Flèches à observer">'+s+'</div></div>'}
 function fleBtns(it,o){
  o=o||{};
- return '<div class="opts'+(o.dim?' dim':'')+(o.hl?' hl':'')+'" style="--cols:2">'+['g','d'].map(function(d){
-  var k='op';if(o.glow===d)k+=' glow';if(o.tried===d)k+=' tried';if(o.right===d)k+=' right';if(o.only&&o.only!==d)k+=' dim';
-  return '<button class="'+k+'" data-act="'+(o.act||'ans')+'" data-v="'+d+'" aria-label="'+(d==='g'?'Gauche':'Droite')+'">'+arrow(d)+'</button>'}).join('')+'</div>'}
+ return '<div class="opts'+(o.dim?' dim':'')+(o.hl?' hl':'')+(o.res?' lock':'')+'" style="--cols:2">'+['g','d'].map(function(d){
+  var k='op',mk='';if(o.glow===d)k+=' glow';if(o.only&&o.only!==d)k+=' dim';
+  if(o.pick===d){k+=o.res==='ok'?' right':' miss';mk='<span class="mk">'+(o.res==='ok'?CHECK:CROSS)+'</span>'}
+  return '<button class="'+k+'" data-act="'+(o.act||'ans')+'" data-v="'+d+'" aria-label="'+(d==='g'?'Gauche':'Droite')+'">'+arrow(d)+mk+'</button>'}).join('')+'</div>'}
 function bubble(dir,html,i,n,px){
  return '<div class="bub '+dir+'" style="--px:'+(px||'50%')+'" role="status"><span class="cnt">'+(i+1)+' sur '+n+'</span><span>'+html+'</span><div class="bf">'+
   (i>0?'<button class="bp" data-act="prev">Retour</button>':'<span></span>')+
@@ -308,39 +292,19 @@ function viewTuto(){
  return topRow(true)+title(g,M.fromKnown?'Entraînement · rien n’est compté':'Premier essai · rien n’est compté')+steps()+'<div class="stage">'+stage+'</div>'}
 
 function viewQ(){
- var g=GAMES[M.g],q=g.qs[M.qi],last=M.qi===g.qs.length-1,stim,btns,info;
- // indice niveau 1 = rappel de la règle (rien ne s'allume) ; niveau 2 ou erreur = le bon bouton s'allume
- var show=(M.hint>=2||M.wrong)&&!M.done;
- var o={glow:show?q.ans:null,tried:M.wrong,right:M.done?q.ans:null};
- if(M.g==='att'){stim=attStim(q,show?'ink':'');btns=attBtns(q,o)}
- else{stim=fleStim(q,show?'mid':'');btns=fleBtns(q,o)}
- var ans=M.g==='att'?'«&nbsp;'+q.ans+'&nbsp;»':'«&nbsp;'+DIRN[q.ans]+'&nbsp;»';
- var cur=M.done?'done':M.wrong?'wrong':M.hint>=2?'h2':M.hint===1?'h1':'calm';
- // l'aide se place entre l'écran et les boutons, au plus près du regard.
- // Tous les messages sont posés d'avance dans la même case : elle a toujours la même hauteur.
- function v(id,html){var on=id===cur;return html.replace('<div class="','<div '+(on?'role="status" ':'aria-hidden="true" ')+'class="'+(on?'on ':'')).replace(/<button /g,on?'<button ':'<button tabindex="-1" ')}
- info='<div class="slot">'+
-  v('calm','<div class="calm"><span class="note">Prends ton temps : pas de chrono.</span><button class="lnk" data-act="hint">Un indice ?</button></div>')+
-  v('h1','<div class="fb hint"><b>Rappel de la règle</b><span>'+g.rule.replace(/<\/?em>/g,'')+'</span><button class="lnk" data-act="hint2">Un indice de plus ?</button></div>')+
-  v('h2','<div class="fb hint"><b>Un indice de plus</b><span>'+q.hint+' Le bon bouton s’allume en jaune.</span></div>')+
-  v('wrong','<div class="fb soft"><b>Pas tout à fait, ce n’est pas grave.</b><span>'+q.why+' Touche '+ans+', il s’allume en jaune.</span></div>')+
-  v('done','<div class="fb good"><b>'+(M.wrong?'Voilà, c’est ça !':pick(['Bravo !','Exactement !','Parfait !'],M.qi))+'</b><span>'+q.why+'</span></div>')+
-  '</div>';
- // le bouton pour continuer arrive SOUS les réponses : il ne pousse rien vers le bas
- var after='<div class="after">'+(M.done?'<button class="btn" data-act="nextq">'+(last?'Voir la suite':'Question suivante')+'</button>':'')+'</div>';
- return topRow(true)+title(g,M.fromKnown?'Entraînement · rien n’est compté':'Premier essai · rien n’est compté')+steps()+'<div class="stage">'+stim+info+btns+after+'</div>'}
-function pick(a,i){return a[i%a.length]}
+ var g=GAMES[M.g],q=g.qs[M.qi],stim,btns;
+ // essai sans aide : pas d'indice, pas d'explication. Juste une marque sur le bouton touché.
+ var o={pick:M.pick,res:M.res};
+ if(M.g==='att'){stim=attStim(q,'');btns=attBtns(q,o)}
+ else{stim=fleStim(q,'');btns=fleBtns(q,o)}
+ var live='<p class="calm" role="status">'+(M.res==='ok'?'<span class="sr">Juste</span>':M.res==='ko'?'<span class="sr">Pas cette fois</span>':'Pas de chrono.')+'</p>';
+ return topRow(true)+title(g,M.fromKnown?'Entraînement · rien n’est compté':'Premier essai · rien n’est compté')+steps()+'<div class="stage">'+stim+btns+live+'</div>'}
 
 function viewEnd(){
- var g=GAMES[M.g],n=g.qs.length,ok=M.first.filter(Boolean).length;
- var rec=g.qs.map(function(q,i){return '<span>'+CHECK+'Essai '+(i+1)+(M.first[i]?'':' (avec indice)')+'</span>'}).join('');
- // ordre pensé pour l'iPhone : la règle et le bouton d'abord, le détail de l'essai ensuite
- return topRow(false)+title(g,null)+
- '<div class="card tight"><h2>Tu as compris le principe'+(ok===n?', bravo.':'.')+'</h2><div class="rule">'+g.rule+'</div>'+
- '<p>Maintenant, le vrai exercice : <b>45 secondes</b>, sans indice.</p></div>'+
- '<div class="alt"><button class="btn" data-act="go">J’ai compris, c’est parti !</button><button class="lnk" data-act="again" style="align-self:center">Refaire l’essai</button></div>'+
- '<div class="recap" aria-label="Ton essai">'+rec+'</div>'+
- '<p class="note">Rien n’a été compté'+(ok<n?', tes hésitations non plus':'')+'.</p>'}
+ var g=GAMES[M.g];
+ return topRow(false)+title(g,null)+steps()+
+ '<div class="card tight"><h2>Essai terminé.</h2><p>Maintenant, le vrai exercice : <b>45 secondes</b>.</p></div>'+
+ '<div class="alt"><button class="btn" data-act="go">C’est parti !</button><button class="lnk" data-act="again" style="align-self:center">Refaire l’essai</button></div>'}
 
 function viewKnown(){
  var g=GAMES.att;
@@ -349,7 +313,7 @@ function viewKnown(){
  '<div class="card tight"><p>Touche la couleur de l’encre, pas celle que le mot désigne. 45 secondes.</p>'+
  '<div class="screen sm"><span class="wd" style="color:'+HEX.bleu+'">ROUGE</span></div><p class="note">Ici, la bonne réponse est « bleu ». Record : 24 bonnes réponses.</p></div>'+
  '<div class="alt"><button class="btn" data-act="go">Commencer</button></div>'+
- '<div class="alt"><button class="btn s" data-act="train">S’entraîner</button><p class="note">3 questions sans chrono, avec indices. Rien n’est compté.</p></div>'}
+ '<div class="alt"><button class="btn s" data-act="train">S’entraîner</button><p class="note">3 questions sans chrono. Rien n’est compté.</p></div>'}
 
 function viewReal(){
  var g=GAMES[M.g],r=g.real,stim,btns;
@@ -363,30 +327,26 @@ function viewReal(){
 function render(){
  clr();
  app.innerHTML=M.ph==='tuto'?viewTuto():M.ph==='q'?viewQ():M.ph==='end'?viewEnd():M.ph==='known'?viewKnown():viewReal();
- // hésitation : après 15 secondes sans réponse, un simple rappel de la règle (ne donne pas la réponse)
- if(M.ph==='q'&&!M.hint&&!M.wrong&&!M.done)later(15000,function(){set({hint:1})});
  if(M.ph==='real'){var end=Date.now()+45000;(function tick(){var l=end-Date.now(),b=document.getElementById('tb'),t=document.getElementById('tl');if(!b)return;b.style.width=(l/450).toFixed(1)+'%';t.textContent=Math.ceil(l/1000)+' s';if(l>0)later(200,tick)})()}
 }
 
 /* ---------- Actions ---------- */
 function answer(v){
- var q=GAMES[M.g].qs[M.qi];if(M.done)return;
- if(v===q.ans){M.first[M.qi]=!M.wrong&&!M.hint;set({done:true})}
- else set({wrong:v})}
+ var g=GAMES[M.g],q=g.qs[M.qi];if(M.ph!=='q'||M.res)return;
+ set({pick:v,res:v===q.ans?'ok':'ko'});
+ // on enchaîne tout seul après un court instant
+ later(900,function(){if(M.qi<g.qs.length-1)set({qi:M.qi+1,res:null,pick:null});else set({ph:'end'})})}
 document.addEventListener('click',function(ev){
  var b=ev.target.closest('[data-act],[data-scn]');if(!b)return;
  if(b.hasAttribute('data-scn')){reset(b.getAttribute('data-scn'));return}
  var a=b.getAttribute('data-act'),v=b.getAttribute('data-v'),g=GAMES[M.g];
- if(a==='next'){if(M.step<g.tuto.length-1)set({step:M.step+1});else set({ph:'q',qi:0,hint:0,wrong:null,done:false,first:[]})}
+ if(a==='next'){if(M.step<g.tuto.length-1)set({step:M.step+1});else set({ph:'q',qi:0,res:null,pick:null})}
  else if(a==='prev')set({step:Math.max(0,M.step-1)});
- else if(a==='demo'){if(M.step===g.tuto.length-1&&v===(M.g==='att'?g.demo.ink:g.demo.dir))set({ph:'q',qi:0,hint:0,wrong:null,done:false,first:[]})}
+ else if(a==='demo'){if(M.step===g.tuto.length-1&&v===(M.g==='att'?g.demo.ink:g.demo.dir))set({ph:'q',qi:0,res:null,pick:null})}
  else if(a==='ans')answer(v);
- else if(a==='hint')set({hint:1});
- else if(a==='hint2')set({hint:2});
- else if(a==='nextq'){if(M.qi<g.qs.length-1)set({qi:M.qi+1,hint:0,wrong:null,done:false});else set({ph:'end'});window.scrollTo(0,0)}
  else if(a==='skip')set({ph:'real',skipped:true});
  else if(a==='go'){set({ph:'real',skipped:false});window.scrollTo(0,0)}
- else if(a==='again')set({ph:'tuto',step:0,qi:0,hint:0,wrong:null,done:false,first:[]});
+ else if(a==='again')set({ph:'tuto',step:0,qi:0,res:null,pick:null});
  else if(a==='train'){set({ph:'tuto',step:0,fromKnown:true});window.scrollTo(0,0)}
  else if(a==='quit'||a==='restart')reset(M.scn);
 });
