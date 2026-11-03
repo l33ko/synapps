@@ -22,6 +22,7 @@ Le carnet de recettes de la famille, partagé entre plusieurs personnes et appar
 - **Familles** : chaque compte commence avec « Mon carnet de recettes ». Un lien ou un code d'invitation (ex. `K7P-42Q`) permet d'y faire entrer d'autres personnes, qui voient et modifient les mêmes recettes. L'admin renomme la famille, retire des membres, change le code. On peut appartenir à plusieurs familles et passer de l'une à l'autre.
 - **Temps réel** : une recette ajoutée ou modifiée sur un téléphone apparaît aussitôt sur les autres.
 - **Import depuis un lien** (Marmiton, 750g, blogs…) : la recette est extraite et la fiche créée automatiquement.
+- **Recherche sur le web** : le champ de recherche cherche d’abord dans le carnet, puis, après une courte pause de frappe (3 lettres au moins), sur quelques sites de recettes (Marmiton, 750g, Cuisine AZ, Journal des Femmes, Ricardo, Cuisine libre) via l’API Brave Search. Résultats triés « les plus fiables » (note pondérée par le nombre d’avis) ou « les plus rapides », aperçu de la recette, ajout au carnet en un geste (avec « Annuler »).
 - **Fiche** : portions ajustables (quantités recalculées), ingrédients et étapes à cocher, écran maintenu allumé, « ajoutée par … ».
 - **Recettes d’exemple** : chaque nouveau carnet démarre avec 5 recettes (gougères, crackers aux graines, gaufres, gâteau au chocolat, tarte au citron meringuée), rédigées pour SynApps. Elles sont dans la table `recettes_exemples` ; un carnet existant peut les ajouter depuis l’écran vide.
 - **Mon compte** : export des recettes en `.json`, suppression du compte. Page [confidentialité](recettes/confidentialite.html).
@@ -30,8 +31,9 @@ Le carnet de recettes de la famille, partagé entre plusieurs personnes et appar
 
 1. **SQL Editor** : exécuter [`recettes/supabase.sql`](recettes/supabase.sql) (tables `familles`, `membres_famille`, `recettes`, règles d'accès, temps réel).
 2. **Edge Functions → Deploy a new function → Via Editor** : nom `import-recette`, coller [`recettes/import-recette.ts`](recettes/import-recette.ts), laisser « Verify JWT » activé.
-3. **Authentication → URL Configuration → Redirect URLs** : ajouter `https://app.synapsium.com/**` (et `https://l33ko.github.io/synapps/**` tant que l’ancienne adresse sert).
-4. Les e-mails de connexion partent par le SMTP configuré dans le projet (Brevo) ; les modèles « Magic Link » et « Confirm signup » doivent contenir le code `{{ .Token }}` (et peuvent garder le lien `{{ .ConfirmationURL }}`).
+3. **Edge Functions → Deploy a new function → Via Editor** : nom `recherche-recettes`, coller [`recettes/recherche-recettes.ts`](recettes/recherche-recettes.ts), laisser « Verify JWT » activé. Puis **Edge Functions → Secrets** : ajouter `BRAVE_API_KEY` (clé de l’API Brave Search, https://api-dashboard.search.brave.com).
+4. **Authentication → URL Configuration → Redirect URLs** : ajouter `https://app.synapsium.com/**` (et `https://l33ko.github.io/synapps/**` tant que l’ancienne adresse sert).
+5. Les e-mails de connexion partent par le SMTP configuré dans le projet (Brevo) ; les modèles « Magic Link » et « Confirm signup » doivent contenir le code `{{ .Token }}` (et peuvent garder le lien `{{ .ConfirmationURL }}`).
 
 ## Mises à jour
 
