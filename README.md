@@ -90,7 +90,7 @@ Si la constante `SB` est vide, le bouton ☁ n'apparaît pas et l'app fonctionne
 
 Des modèles de pixel art pour les enfants, à recopier sur papier quadrillé ou à reproduire en perles à repasser :
 
-- **Catalogue de 30 modèles originaux** (animaux, mer, nature, fruits, objets, fêtes), avec la taille, le nombre de perles et un niveau de difficulté.
+- **Catalogue de 43 modèles originaux** (animaux, mer, nature, fruits, objets, fêtes et Noël), avec la taille, le nombre de perles et un niveau de difficulté.
 - **Mode papier** : grille avec repères (chiffres et lettres) et un trait plus marqué tous les 5 carreaux ; option « Numéros » + « Grille vide » pour un coloriage magique.
 - **Mode perles** : le modèle sur une plaque à picots, avec la liste des perles à préparer par couleur et le total.
 - **Image à garder** : une image du modèle avec sa légende, à enregistrer ou imprimer.
