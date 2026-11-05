@@ -44,7 +44,7 @@
   });
 })();
 </script>
-<title>Notre bosquet fruitier</title>
+<title>Le bosquet fruitier des CP</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#2f3b28">
@@ -129,12 +129,11 @@ h2{font-size:58px;color:#25321e}
 
 /* ---------- 1. Titre ---------- */
 .titre{padding:0}
-.titre .fond{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.titre .voile{position:absolute;inset:0;background:linear-gradient(180deg,rgba(20,30,15,.55) 0,rgba(20,30,15,.1) 45%,rgba(251,246,234,.0) 70%,rgba(251,246,234,.9) 86%)}
-.titre-bloc{position:absolute;left:70px;top:70px;color:#fff;text-shadow:0 3px 18px rgba(0,0,0,.45)}
-.titre-bloc .sur{font:600 34px var(--titre);margin:0 0 8px;color:#ffe9a8}
-.titre h1{font-size:118px;font-weight:700}
-.titre .sous{font-size:58px;margin:18px 0 0;letter-spacing:12px}
+.titre .fond{position:absolute;inset:0}
+.titre .fond svg{width:100%;height:100%;display:block}
+.titre-bloc{position:absolute;left:70px;top:64px;color:#25321e;text-shadow:0 0 18px rgba(255,255,255,.9),0 0 4px #fff}
+.titre-bloc .sur{font:600 32px var(--titre);margin:0 0 10px;color:#b4502a}
+.titre h1{font-size:112px;font-weight:700}
 
 /* ---------- 2. Potager ---------- */
 .cadre-photo{position:absolute;border-radius:26px;overflow:hidden;box-shadow:0 14px 34px rgba(60,50,20,.25);background:#ddd}
@@ -167,7 +166,7 @@ h2{font-size:58px;color:#25321e}
 .ba.anime .apres{transition:clip-path 1.6s ease-in-out}
 .ba.anime .poignee{transition:left 1.6s ease-in-out}
 .cote{position:absolute;left:840px;top:0;width:700px;display:flex;flex-direction:column;gap:22px}
-.cote .carte h3{font-size:44px;margin-bottom:14px;color:#25321e}
+.cote .carte h3{font-size:38px;margin-bottom:14px;color:#25321e}
 .cote .ligne{display:flex;align-items:center;gap:18px;font-size:34px;line-height:1.25;margin:10px 0}
 .cote .ligne .emo{font-size:56px;width:70px;text-align:center;flex:none}
 
@@ -189,7 +188,7 @@ h2{font-size:58px;color:#25321e}
 .etape{width:330px;text-align:center}
 .etape .dessin{width:290px;height:290px;margin:0 auto;border-radius:50%;background:var(--vert-pale);display:flex;align-items:center;justify-content:center;position:relative}
 .etape .dessin svg{width:230px;height:230px}
-.etape h3{font-size:36px;margin-top:16px}
+.etape h3{font-size:33px;margin-top:16px;line-height:1.12}
 .etape .num{position:absolute;left:6px;top:6px;width:56px;height:56px;border-radius:50%;background:var(--tomate);color:#fff;font:700 32px var(--titre);display:flex;align-items:center;justify-content:center}
 .fleche{font-size:60px;color:#b9b19a}
 .bandeau{margin-top:30px;display:flex;align-items:center;justify-content:center;gap:22px;font-size:36px}
@@ -231,7 +230,6 @@ h2{font-size:58px;color:#25321e}
 .bete .ico{width:74px;height:74px}
 .bete:hover{transform:translate(-50%,-50%) scale(1.08)}
 .bete.vue{border-color:var(--jaune)}
-.mare-fond{position:absolute;inset:0;border-radius:28px;overflow:hidden;background:#cfe6c3}
 
 /* ---------- Ce qu'on va planter ---------- */
 .plan{position:absolute;left:0;top:0;width:790px;height:609px;border-radius:24px;overflow:hidden;box-shadow:0 14px 34px rgba(60,50,20,.25)}
@@ -243,6 +241,10 @@ h2{font-size:58px;color:#25321e}
 .fiche-plante .grand-ico{width:130px;height:130px;font-size:110px}
 .fiche-plante h3{font-size:50px;color:#25321e}
 .fiche-plante p{font-size:31px;line-height:1.3;margin:0}
+.strate{position:absolute;right:14px;top:14px;width:214px;background:#f6f2e6;border-radius:16px;padding:8px 10px 6px;text-align:center}
+.strate svg{width:194px;height:84px;display:block;margin:0 auto}
+.strate b{display:block;font:600 21px var(--titre);color:#2c5a28;margin-top:2px}
+.fiche-plante .carte{position:relative}
 .badges{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
 .badge{font:600 25px var(--titre);background:var(--vert-pale);color:#2c5a28;padding:6px 16px;border-radius:999px}
 .badge.hiver{background:#dceefa;color:#1f5b86}
@@ -252,6 +254,15 @@ h2{font-size:58px;color:#25321e}
 .liste-plantes button.choisi{background:var(--jaune)}
 
 /* ---------- Aménagements ---------- */
+.eco-liens{position:absolute;inset:0;width:100%;height:100%}
+.eco-liens line{stroke:#c9bd98;stroke-width:8;stroke-dasharray:4 16;stroke-linecap:round}
+.eco-centre{position:absolute;left:600px;top:126px;width:340px;height:360px;border-radius:50%;background:#fff;box-shadow:0 0 0 14px var(--vert-pale),0 14px 34px rgba(60,50,20,.18);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font:600 32px/1.1 var(--titre);color:#25321e;padding:10px 40px 30px}
+.eco-centre .ico{width:230px;height:230px}
+.eco-n{position:absolute;width:470px;height:130px;display:flex;align-items:center;gap:20px;padding:16px 24px}
+.eco-n .emo{font-size:68px;flex:none}
+.eco-n h3{font-size:36px;color:#25321e}
+.eco-n p{margin:4px 0 0;font-size:26px;line-height:1.2;color:var(--doux)}
 .amenag{display:grid;grid-template-columns:1fr 1fr;gap:30px}
 .amenag .carte{display:flex;gap:26px;align-items:center;padding:30px}
 .amenag .grand{width:220px;height:220px;flex:none;border-radius:24px}
@@ -279,7 +290,7 @@ h2{font-size:58px;color:#25321e}
 .regle .rond.non::after{content:"";position:absolute;inset:8px;border:9px solid #d9483b;border-radius:50%;background:linear-gradient(45deg,transparent 46%,#d9483b 46%,#d9483b 54%,transparent 54%)}
 .regle h3{font-size:34px;line-height:1.15}
 .fin{position:absolute;inset:0;z-index:10;background:radial-gradient(circle at 50% 40%,#fff8de,#f4e7bf);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;padding-bottom:150px}
-.fin h1{font-size:96px;color:#25321e;text-align:center}
+.fin h1{font-size:84px;color:#25321e;text-align:center}
 .fin .nom{display:flex;align-items:center;gap:18px;font-size:40px;font-family:var(--titre)}
 .fin input{font:600 48px var(--titre);border:0;border-bottom:6px dashed var(--vert);background:transparent;width:620px;text-align:center;color:var(--vert);outline:none;padding:4px}
 .fin .duo{display:flex;gap:30px;align-items:flex-end}
@@ -297,19 +308,17 @@ h2{font-size:58px;color:#25321e}
 
 <!-- ================= 1. Titre ================= -->
 <section class="ecran titre on" data-say="coco|Bonjour ! Moi, c’est <b>Coco la coccinelle</b>.">
-  <img class="fond" src="img/aujourdhui.jpg" alt="Le coin de la cour où sera créé le bosquet">
-  <div class="voile"></div>
+  <div class="fond" id="accueilIllu" role="img" aria-label="Dessin d’un bosquet fruitier"></div>
   <div class="titre-bloc">
-    <p class="sur">Un projet pour notre cour</p>
-    <h1>Notre bosquet<br>fruitier</h1>
-    <p class="sous">🌳🐝🍊🐞💧</p>
+    <p class="sur">Un coin de nature comestible dans la cour de l’école</p>
+    <h1>Le bosquet<br>fruitier des CP</h1>
   </div>
-  <i class="m" data-s="1" data-say="clovis|Et moi, <b>Clovis le cloporte</b> ! On va vous faire découvrir le coin de nature qu’on va créer ensemble."></i>
+  <i class="m" data-s="1" data-say="clovis|Et moi, <b>Clovis le cloporte</b> ! On va vous faire découvrir le bosquet fruitier qu’on va créer ensemble."></i>
 </section>
 
 <!-- ================= 2. Du potager au bosquet ================= -->
 <section class="ecran" data-say="coco|Vous vous souvenez du potager de maternelle ? Qu’est-ce qu’on avait planté ?">
-  <div class="tete"><span class="puce">Souvenez-vous</span><h2>Du potager… au bosquet !</h2></div>
+  <div class="tete"><span class="puce">Souvenez-vous</span><h2>Du potager au bosquet fruitier</h2></div>
   <div class="corps">
     <div class="cadre-photo" id="potager" style="left:0;top:0;width:790px;height:593px">
       <img src="img/potager.jpg" alt="Le potager de maternelle">
@@ -324,11 +333,11 @@ h2{font-size:58px;color:#25321e}
     <i class="m" data-s="1" data-say="coco|Des tournesols, des tomates, du maïs, des courges… Et des fleurs pour les abeilles !"></i>
     <div class="compare">
       <div class="carte legume" data-s="2">
-        <h3><span class="emo">🥕</span> Au potager</h3>
+        <h3><span class="emo">🥕</span> Le potager</h3>
         <ul><li>🌱 On sème</li><li>🧺 On récolte</li><li>🔁 Et on recommence chaque année</li></ul>
       </div>
       <div class="carte arbre" data-s="3">
-        <h3><span class="emo">🌳</span> Au bosquet</h3>
+        <h3><span class="emo">🌳</span> Le bosquet fruitier</h3>
         <ul><li>🌱 On plante <b>une seule fois</b></li><li>📅 Les arbres restent des années</li><li>🍊 Des fruits chaque année</li></ul>
       </div>
       <div class="message" data-s="4" data-say="clovis|Les arbres vont grandir en même temps que vous !">Cette fois, on plante pour longtemps !</div>
@@ -337,45 +346,24 @@ h2{font-size:58px;color:#25321e}
 </section>
 
 <!-- ================= 3. Le pêcher et le bosquet ================= -->
-<section class="ecran" data-say="clovis|Regardez près de la porte : c’est le <b>pêcher</b>, planté par les grands l’an dernier. Il va avoir des copains !">
-  <div class="tete"><span class="puce">Notre coin</span><h2>Un premier arbre est déjà là !</h2></div>
+<section class="ecran" data-say="clovis|Regardez près de la porte : c’est le <b>pêcher</b>, planté par les grands l’an dernier. Et juste à côté, une <b>verveine citronnelle</b>. Ils vont avoir des copains !">
+  <div class="tete"><span class="puce">Notre coin</span><h2>Un bosquet fruitier dans la cour de l’école</h2></div>
   <div class="corps">
     <div class="ba" id="ba" style="--pos:100%">
       <img src="img/aujourdhui.jpg" alt="Le coin aujourd’hui">
       <button class="pt" style="left:77%;top:28%;z-index:1"><span class="emo">🍑</span><span class="nom">Le pêcher</span></button>
-      <div class="apres"><img src="img/bosquet-dessin.jpg" alt="Le bosquet une fois terminé (dessin)"></div>
-      <span class="etiq g" data-s="2">Aujourd’hui</span><span class="etiq d" data-s="2">Bientôt</span>
-      <div class="poignee"><b>⇔</b></div>
+      <button class="pt" style="left:58%;top:22%;z-index:1"><span class="emo">🍃</span><span class="nom">La verveine citronnelle</span></button>
+      <div class="apres"><img src="img/bosquet-dessin.jpg" alt="Le bosquet fruitier une fois terminé (dessin)"></div>
+            <div class="poignee"><b>⇔</b></div>
     </div>
     <div class="cote">
-      <div class="carte" data-s="1" data-say="coco|Un bosquet, c’est un petit coin de nature… qu’on peut croquer !">
-        <h3>C’est quoi, un bosquet ?</h3>
-        <div class="ligne"><span class="emo">🍊</span><span>Un coin de nature<br><b>qui se mange</b></span></div>
+      <div class="carte" data-s="1" data-say="coco|Un bosquet fruitier, c’est un petit coin de nature… qu’on peut croquer !">
+        <h3>C’est quoi, un bosquet fruitier ?</h3>
+        <div class="ligne"><span class="emo">🍊</span><span>Un coin de nature<br><b>comestible</b></span></div>
         <div class="ligne"><span class="emo">🐞</span><span>Une maison pour<br><b>les petites bêtes</b></span></div>
       </div>
-      <div class="carte gros" data-s="2" data-say="clovis|Glissez le trait blanc pour voir notre futur bosquet !">
-        <b>⇔ Glissez</b> pour voir comment notre coin va changer.
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ================= 4. Q1 Besoins ================= -->
-<section class="ecran" data-say="coco|À votre avis, de quoi a besoin une plante pour vivre ?">
-  <div class="tete"><span class="puce q">Question 1</span><h2>De quoi a besoin une plante pour vivre ?</h2></div>
-  <div class="corps">
-    <div class="grille4">
-      <div class="carte besoin" data-s="1"><div class="ico emo">☀️</div><h3>Le soleil</h3></div>
-      <div class="carte besoin" data-s="2"><div class="ico emo">💧</div><h3>L’eau</h3></div>
-      <div class="carte besoin" data-s="3"><div class="ico" id="icoTerre"></div><h3>La terre</h3></div>
-      <div class="carte besoin" data-s="4"><div class="ico emo">💨</div><h3>L’air</h3></div>
-    </div>
-    <div class="bas">
-      <div class="zoom-sol" data-s="5" data-say="clovis|Mais dans notre coin, la terre a soif… et elle est toute tassée !"><p>Chez nous, la terre est <b>sèche</b> et <b>tassée</b>…</p></div>
-      <div class="solutions">
-        <div class="carte solution" data-s="6"><span class="emo">🚿</span><h3>L’arrosage automatique</h3><p>On aide la nature à boire.</p></div>
-        <div class="carte solution" data-s="7"><span class="emo">🍂</span><h3>Le compost</h3><p>Le repas de la terre.</p></div>
-        <div class="carte solution" data-s="8" data-say="coco|Les copeaux, c’est comme une couette : la terre reste fraîche et humide."><span class="emo">🪵</span><h3>Le paillage</h3><p>La couverture de la terre.</p></div>
+      <div class="carte gros" data-s="2" data-say="clovis|Glissez le trait blanc pour voir notre futur bosquet fruitier !">
+        <b>⇔ Glissez</b> pour voir notre futur bosquet fruitier.
       </div>
     </div>
   </div>
@@ -383,14 +371,14 @@ h2{font-size:58px;color:#25321e}
 
 <!-- ================= 5. Q2 Fruit ================= -->
 <section class="ecran" data-say="coco|Comment fait un arbre pour faire un fruit ? Qui a une idée ?">
-  <div class="tete"><span class="puce q">Question 2</span><h2>Comment obtient-on un fruit ?</h2></div>
+  <div class="tete"><span class="puce q">Question 1</span><h2>Comment obtient-on un fruit ?</h2></div>
   <div class="corps">
     <div class="etapes">
       <div class="etape" data-s="1" data-say="coco|D’abord, au printemps, l’arbre se couvre de fleurs."><div class="dessin"><span class="num">1</span><span id="dFleur"></span></div><h3>Une fleur s’ouvre</h3></div>
       <span class="fleche" data-s="2">➜</span>
       <div class="etape" data-s="2" data-say="clovis|L’abeille vient boire et transporte le pollen, cette poudre jaune, de fleur en fleur."><div class="dessin"><span class="num">2</span><span id="dAbeille"></span></div><h3>L’abeille passe</h3></div>
       <span class="fleche" data-s="3">➜</span>
-      <div class="etape" data-s="3" data-say="coco|Les pétales tombent… mais au milieu, un tout petit fruit commence à pousser !"><div class="dessin"><span class="num">3</span><span id="dFane"></span></div><h3>La fleur se fane</h3></div>
+      <div class="etape" data-s="3" data-say="coco|Les pétales tombent… mais au milieu, un tout petit fruit commence à pousser !"><div class="dessin"><span class="num">3</span><span id="dFane"></span></div><h3>La fleur fane et un petit fruit apparaît</h3></div>
       <span class="fleche" data-s="4">➜</span>
       <div class="etape" data-s="4" data-say="clovis|Et avec le soleil et l’eau, le fruit grossit… jusqu’à ce qu’on puisse le manger !"><div class="dessin"><span class="num">4</span><span id="dFruit"></span></div><h3>Le fruit grossit</h3></div>
     </div>
@@ -400,14 +388,14 @@ h2{font-size:58px;color:#25321e}
 
 <!-- ================= 6. Q3 Abeilles ================= -->
 <section class="ecran" data-say="clovis|Et les abeilles, à quoi servent-elles dans un jardin ?">
-  <div class="tete"><span class="puce q">Question 3</span><h2>À quoi servent les abeilles et les papillons ?</h2></div>
+  <div class="tete"><span class="puce q">Question 2</span><h2>À quoi servent les abeilles et les papillons ?</h2></div>
   <div class="corps">
     <div class="carte pollen" data-s="1" data-say="coco|Quand l’abeille va de fleur en fleur, elle transporte le pollen. C’est ça qui fait naître les fruits.">
       <span class="scene-p" id="scenePollen"></span>
       <div><div class="tres-gros">Sans abeilles…<br>pas de fruits !</div><p class="gros" style="margin:10px 0 0;color:var(--doux)">Elles transportent le pollen de fleur en fleur.</p></div>
     </div>
     <div class="restaurant" data-s="2" data-say="clovis|Alors on plante leur restaurant préféré : des fleurs pleines de nectar !">
-      <h3>🍽️ Leur restaurant dans notre bosquet</h3>
+      <h3>🍽️ Leur restaurant dans notre bosquet fruitier</h3>
       <div class="menu" id="menu"></div>
     </div>
   </div>
@@ -415,9 +403,9 @@ h2{font-size:58px;color:#25321e}
 
 <!-- ================= 7. Q4 Fruits d'ici ================= -->
 <section class="ecran" data-say="coco|Pourquoi on ne plante pas des mangues ou des noix de coco ? À votre avis ?">
-  <div class="tete"><span class="puce q">Question 4</span><h2 style="font-size:50px">Pourquoi certains fruits poussent ici… et pas d’autres ?</h2></div>
+  <div class="tete"><span class="puce q">Question 3</span><h2 style="font-size:50px">Pourquoi certains fruits poussent ici… et pas d’autres ?</h2></div>
   <div class="corps">
-    <div class="climat" data-s="1" data-say="clovis|Chez nous, il y a beaucoup de soleil, peu de pluie, et l’hiver est doux. Les plantes du bosquet adorent ça !">
+    <div class="climat" data-s="1" data-say="clovis|Chez nous, il y a beaucoup de soleil, peu de pluie, et l’hiver est doux. Les plantes du bosquet fruitier adorent ça !">
       <div class="carte"><span class="emo">☀️</span> Beaucoup de soleil</div>
       <div class="carte"><span class="emo">🌦️</span> Peu de pluie</div>
       <div class="carte"><span class="emo">🧣</span> Un hiver doux</div>
@@ -428,49 +416,37 @@ h2{font-size:58px;color:#25321e}
 
 <!-- ================= 8. Q5 Petites bêtes ================= -->
 <section class="ecran" data-say="clovis|Qui vit sur les plantes et dans le sol ? Touchez les petites bêtes pour les découvrir !">
-  <div class="tete"><span class="puce q">Question 5</span><h2>Quels animaux vivent sur les plantes et dans le sol ?</h2></div>
+  <div class="tete"><span class="puce q">Question 4</span><h2>Quels animaux vivent sur les plantes et dans le sol ?</h2></div>
   <div class="corps">
     <div class="terrain" id="terrain"></div>
-    <i class="m" data-s="3" data-say="clovis|La semaine prochaine, on cherchera ces petites bêtes en creusant ! Moi, je serai sous les feuilles."></i>
-  </div>
-</section>
-
-<!-- ================= 9. Q6 Mare ================= -->
-<section class="ecran" data-say="coco|Et dans une mare, qu’est-ce qu’on peut trouver ?">
-  <div class="tete"><span class="puce q a">Question 6</span><h2>Que peut-on trouver dans une mare ?</h2></div>
-  <div class="corps">
-    <div class="mare-fond" id="mare"></div>
-    <i class="m" data-s="2" data-say="clovis|La mare, on va la creuser ensemble la semaine prochaine !"></i>
+    <i class="m" data-s="3" data-say="clovis|Quand on plantera, on cherchera ces petites bêtes en creusant ! Moi, je serai sous les feuilles."></i>
   </div>
 </section>
 
 <!-- ================= 10. Ce qu'on va planter ================= -->
-<section class="ecran" data-say="coco|Voici notre futur bosquet ! Touchez une pastille pour découvrir chaque plante.">
+<section class="ecran" data-say="coco|Voici notre futur bosquet fruitier ! Touchez une pastille pour découvrir chaque plante.">
   <div class="tete"><span class="puce">Ce qui nous attend</span><h2>Qu’est-ce qu’on va planter ?</h2></div>
   <div class="corps">
-    <div class="plan" id="plan"><img src="img/bosquet-dessin.jpg" alt="Dessin du futur bosquet"></div>
+    <div class="plan" id="plan"><img src="img/bosquet-dessin.jpg" alt="Dessin du futur bosquet fruitier"></div>
     <div class="fiche-plante" id="fichePlante"></div>
   </div>
 </section>
 
-<!-- ================= 11. Aménagements ================= -->
-<section class="ecran" data-say="clovis|Et pour que les petites bêtes se sentent bien, on prépare aussi leur maison.">
-  <div class="tete"><span class="puce">Ce qui nous attend</span><h2>Les aménagements</h2></div>
+<!-- ================= Écosystème ================= -->
+<section class="ecran" data-say="coco|Dans notre bosquet fruitier, tout le monde s’aide : c’est un petit <b>écosystème</b> !">
+  <div class="tete"><span class="puce">En résumé</span><h2>Notre bosquet fruitier, un petit écosystème</h2></div>
   <div class="corps">
-    <div class="amenag">
-      <div class="carte" data-s="1" data-say="coco|Une mini-mare : un coin d’eau pour les libellules, les têtards et les oiseaux qui ont soif.">
-        <span class="grand ico" id="icoMare"></span>
-        <div><h3>La mini-mare</h3><p>Un coin d’eau pour les libellules, les têtards et les oiseaux.</p></div>
-      </div>
-      <div class="carte" data-s="2" data-say="clovis|Les copeaux de bois, c’est ma cachette préférée ! Et la terre reste fraîche en été.">
-        <span class="grand ico" id="icoPaillage"></span>
-        <div><h3>Le paillage en copeaux</h3><p>Une couverture : la terre reste fraîche et les petites bêtes s’y cachent.</p></div>
-      </div>
-    </div>
-    <div class="aussi" data-s="3">
-      <div class="carte"><span class="emo">🍂</span><span><b>Et aussi du compost</b><br>pour nourrir la terre</span></div>
-      <div class="carte"><span class="emo">🚿</span><span><b>Et l’arrosage automatique</b><br>remis en marche</span></div>
-    </div>
+    <svg class="eco-liens" viewBox="0 0 1540 612" aria-hidden="true">
+      <line data-s="1" x1="770" y1="306" x2="300" y2="75"/><line data-s="2" x1="770" y1="306" x2="300" y2="306"/><line data-s="3" x1="770" y1="306" x2="300" y2="537"/>
+      <line data-s="4" x1="770" y1="306" x2="1240" y2="306"/><line data-s="5" x1="770" y1="306" x2="1240" y2="537"/><line data-s="6" x1="770" y1="306" x2="1240" y2="75"/>
+    </svg>
+    <div class="eco-centre"><span class="ico" id="ecoArbre"></span><b>Notre bosquet fruitier</b></div>
+    <div class="carte eco-n" data-s="1" style="left:0;top:10px"><span class="emo">☀️</span><div><h3>Du soleil</h3><p>pour que les plantes poussent</p></div></div>
+    <div class="carte eco-n" data-s="2" style="left:0;top:241px"><span class="emo">💧</span><div><h3>De l’eau</h3><p>l’arrosage automatique remis en marche</p></div></div>
+    <div class="carte eco-n" data-s="3" style="left:0;top:472px" data-say="clovis|Un sol vivant, c’est mon royaume : avec les vers de terre, on transforme les feuilles mortes en terre !"><span class="emo">🪱</span><div><h3>Un sol vivant</h3><p>compost, copeaux de bois et petites bêtes</p></div></div>
+    <div class="carte eco-n" data-s="4" style="right:0;top:241px" data-say="coco|Les fleurs mellifères, pleines de nectar, attirent les abeilles et les papillons."><span class="emo">🌸</span><div><h3>Des plantes mellifères</h3><p>pour attirer les insectes</p></div></div>
+    <div class="carte eco-n" data-s="5" style="right:0;top:472px" data-say="coco|En passant de fleur en fleur, les insectes transportent le pollen… et les fruits apparaissent !"><span class="emo">🐝</span><div><h3>Des insectes</h3><p>qui pollinisent les fleurs</p></div></div>
+    <div class="carte eco-n" data-s="6" style="right:0;top:10px" data-say="clovis|Les arbres nous donnent des fruits, et leurs feuilles qui tombent nourrissent le sol : la boucle est bouclée !"><span class="emo">🌳</span><div><h3>Des arbres fruitiers</h3><p>pour produire à manger</p></div></div>
   </div>
 </section>
 
@@ -481,31 +457,31 @@ h2{font-size:58px;color:#25321e}
     <div class="frise">
       <div class="jalon ici" data-s="1"><span class="ici-etiq">Vous êtes ici !</span><div class="rond">🔍</div><h3>Aujourd’hui</h3>
         <div class="carte">On découvre le projet.</div></div>
-      <div class="jalon" data-s="2" data-say="clovis|La semaine prochaine, on met les mains dans la terre !"><div class="rond">🌱</div><h3>La semaine prochaine</h3>
-        <div class="carte"><ul><li>On plante</li><li>On paille</li><li>On observe le sol</li><li>On crée la mare</li></ul></div></div>
+      <div class="jalon" data-s="2" data-say="clovis|Dans les prochaines semaines, on met les mains dans la terre !"><div class="rond">🌱</div><h3>Dans les prochaines semaines</h3>
+        <div class="carte"><ul><li>On plante</li><li>On paille</li><li>On observe le sol et ses petites bêtes</li></ul></div></div>
       <div class="jalon" data-s="3" data-say="coco|Au printemps, on observe tout ce qui change et on le note dans notre carnet."><div class="rond">🌸</div><h3>Au printemps</h3>
-        <div class="carte"><ul><li>On plante le clémentinier et le bananier</li><li>On observe les fleurs, les insectes et la mare</li><li>On remplit notre <b>carnet d’observation</b></li></ul></div></div>
+        <div class="carte"><ul><li>On plante le clémentinier et le bananier</li><li>On observe les fleurs, les fruits et les insectes</li><li>On remplit notre <b>carnet d’observation</b></li></ul></div></div>
       <div class="jalon" data-s="4" data-say="clovis|Et à la fin, on dessine ensemble un grand croquis pour le montrer aux autres classes !"><div class="rond">🎨</div><h3>À la fin</h3>
-        <div class="carte">On dessine ensemble un <b>grand croquis du bosquet</b>, affiché pour les autres classes.</div></div>
+        <div class="carte">On dessine ensemble un <b>grand croquis du bosquet fruitier</b>, affiché pour les autres classes.</div></div>
     </div>
   </div>
 </section>
 
 <!-- ================= 13. Règles et fin ================= -->
-<section class="ecran" data-say="clovis|Le bosquet est dans la cour de récré. Pour le protéger, on devient tous des gardiens !">
-  <div class="tete"><span class="puce">Ce qui nous attend</span><h2>Les gardiens du bosquet</h2></div>
+<section class="ecran" data-say="clovis|Le bosquet fruitier est dans la cour de récré. Pour le protéger, on devient tous des gardiens !">
+  <div class="tete"><span class="puce">Ce qui nous attend</span><h2>Les gardiens du bosquet fruitier</h2></div>
   <div class="corps">
     <div class="regles">
-      <div class="carte regle" data-s="1"><span class="rond non">👟</span><h3>Je ne marche pas dans le bosquet</h3></div>
+      <div class="carte regle" data-s="1"><span class="rond non">👟</span><h3>Je ne marche pas dans le bosquet fruitier</h3></div>
       <div class="carte regle" data-s="2"><span class="rond">👀</span><h3>J’observe sans arracher</h3></div>
-      <div class="carte regle" data-s="3"><span class="rond">💧</span><h3>Je fais attention à la mare</h3></div>
+      <div class="carte regle" data-s="3"><span class="rond">🐞</span><h3>Je prends soin des petites bêtes</h3></div>
       <div class="carte regle" data-s="4" data-say="coco|Certaines plantes ne se mangent pas : on demande toujours à un adulte !"><span class="rond non">👅</span><h3>Je ne goûte rien sans un adulte</h3></div>
     </div>
   </div>
-  <div class="fin" data-s="5" data-say="coco|Bravo ! Quel nom allez-vous donner à notre bosquet ?">
-    <h1>Bravo ! Vous êtes les<br>jardiniers du bosquet !</h1>
+  <div class="fin" data-s="5" data-say="coco|Bravo ! Quel nom allez-vous donner à notre bosquet fruitier ?">
+    <h1>Bravo ! Vous êtes les jardiniers<br>du bosquet fruitier !</h1>
     <div class="duo"><div class="a" id="finCoco"></div><div class="b" id="finClovis"></div></div>
-    <label class="nom">Notre bosquet s’appelle : <input id="nomBosquet" maxlength="30" placeholder="…" autocomplete="off"></label>
+    <label class="nom">Notre bosquet fruitier s’appelle : <input id="nomBosquet" maxlength="30" placeholder="…" autocomplete="off"></label>
   </div>
 </section>
 
@@ -568,17 +544,6 @@ const SVG = {
   epi: (c, tige='#5c8a4a') => { let e=''; const tiges=[[50,98,50,22],[50,98,22,36],[50,98,78,36]];
     for(const[x1,y1,x2,y2]of tiges){ for(let i=0;i<7;i++){const t=i/7, x=x2+(x1-x2)*t*.55, y=y2+(y1-y2)*t*.55; e+=`<ellipse cx="${x-4}" cy="${y}" rx="5" ry="4" fill="${c}"/><ellipse cx="${x+4}" cy="${y+2}" rx="5" ry="4" fill="${c}"/>`;} }
     return `<svg viewBox="0 0 100 100" aria-hidden="true"><g stroke="${tige}" stroke-width="3" stroke-linecap="round"><path d="M50 98 L50 22 M50 98 L22 36 M50 98 L78 36"/></g>${e}</svg>`; },
-  libellule: `<svg viewBox="0 0 100 100" aria-hidden="true"><ellipse cx="42" cy="34" rx="26" ry="8" fill="#bfe4f6" stroke="#6aaed6" stroke-width="1.5" opacity=".9" transform="rotate(-20 42 34)"/><ellipse cx="58" cy="34" rx="26" ry="8" fill="#bfe4f6" stroke="#6aaed6" stroke-width="1.5" opacity=".9" transform="rotate(20 58 34)"/>
-    <ellipse cx="40" cy="48" rx="24" ry="7" fill="#d4eefa" stroke="#6aaed6" stroke-width="1.5" opacity=".9" transform="rotate(15 40 48)"/><ellipse cx="60" cy="48" rx="24" ry="7" fill="#d4eefa" stroke="#6aaed6" stroke-width="1.5" opacity=".9" transform="rotate(-15 60 48)"/>
-    <path d="M50 40 L50 94" stroke="#1f6fb2" stroke-width="7" stroke-linecap="round"/><circle cx="50" cy="32" r="9" fill="#1f6fb2"/><circle cx="45" cy="29" r="4" fill="#9fe0ff"/><circle cx="55" cy="29" r="4" fill="#9fe0ff"/></svg>`,
-  larve: `<svg viewBox="0 0 100 100" aria-hidden="true"><g stroke="#5b4a2a" stroke-width="3" stroke-linecap="round"><path d="M40 44 l-14 -8 M40 52 l-16 2 M42 60 l-14 10 M60 44 l14 -8 M60 52 l16 2 M58 60 l14 10"/></g>
-    <ellipse cx="50" cy="62" rx="15" ry="28" fill="#8b7a45"/><g stroke="#6d5e30" stroke-width="2"><path d="M37 62 H63 M38 72 H62 M40 81 H60"/></g><ellipse cx="50" cy="34" rx="13" ry="10" fill="#7a6a3a"/><circle cx="43" cy="31" r="4" fill="#2d2a1a"/><circle cx="57" cy="31" r="4" fill="#2d2a1a"/></svg>`,
-  tetard: `<svg viewBox="0 0 100 100" aria-hidden="true"><path d="M52 56 C66 60 74 50 84 58 C92 64 90 74 96 76" stroke="#2f3a2a" stroke-width="7" fill="none" stroke-linecap="round"/><ellipse cx="38" cy="52" rx="22" ry="18" fill="#2f3a2a"/><circle cx="30" cy="46" r="5" fill="#fff"/><circle cx="31" cy="47" r="2.5" fill="#111"/></svg>`,
-  mare: `<svg viewBox="0 0 220 220" aria-hidden="true"><rect width="220" height="220" rx="24" fill="#cfe6c3"/><ellipse cx="110" cy="122" rx="92" ry="62" fill="#9a8a6a"/><ellipse cx="110" cy="118" rx="84" ry="54" fill="#5aa9d6"/><ellipse cx="90" cy="104" rx="40" ry="12" fill="#9fd3ef" opacity=".7"/>
-    <circle cx="140" cy="128" r="14" fill="#5fa04a"/><path d="M140 128 L154 122" stroke="#5aa9d6" stroke-width="4"/><circle cx="82" cy="140" r="10" fill="#6fb04f"/><path d="M40 60 C42 80 44 96 46 110 M52 50 C52 74 54 92 56 108 M176 64 C174 84 172 98 170 110" stroke="#4f8a3c" stroke-width="5" stroke-linecap="round" fill="none"/></svg>`,
-  paillage: (()=>{let c='';const col=['#c98f55','#b57a40','#dba56a','#a86d38'];let s=7;const r=()=>{s=(s*9301+49297)%233280;return s/233280;};
-    for(let i=0;i<70;i++){const x=10+r()*200,y=80+r()*130,w=16+r()*20,a=r()*180;c+=`<rect x="${x}" y="${y}" width="${w}" height="7" rx="3" fill="${col[i%4]}" transform="rotate(${a} ${x} ${y})"/>`;}
-    return `<svg viewBox="0 0 220 220" aria-hidden="true"><rect width="220" height="220" rx="24" fill="#f3e6d6"/><path d="M110 120 C110 90 112 70 118 54" stroke="#4f9a3c" stroke-width="6" fill="none" stroke-linecap="round"/><path d="M116 64 C128 40 158 42 164 50 C150 66 128 70 116 64Z" fill="#6fb04f"/><path d="M110 90 C98 70 72 70 64 78 C78 94 98 96 110 90Z" fill="#8fc46a"/>${c}</svg>`;})(),
   fleur: (p='#f6a6c1',c='#f6c445') => `<svg viewBox="0 0 100 100" aria-hidden="true"><path d="M50 100 C50 80 48 68 50 58" stroke="#6b4a2b" stroke-width="5" fill="none"/>${[0,72,144,216,288].map(a=>`<ellipse cx="50" cy="26" rx="13" ry="18" fill="${p}" transform="rotate(${a} 50 44)"/>`).join('')}<circle cx="50" cy="44" r="10" fill="${c}"/><g fill="#d4a017">${[0,60,120,180,240,300].map(a=>`<circle cx="50" cy="37" r="1.8" transform="rotate(${a} 50 44)"/>`).join('')}</g></svg>`,
 };
 SVG.dAbeille = `<svg viewBox="0 0 100 100" aria-hidden="true">${SVG.fleur().replace(/<\/?svg[^>]*>/g,'')}<g fill="#f6c445">${[[20,20],[26,28],[32,22],[74,70],[80,62]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="2.6"/>`).join('')}</g><text x="56" y="36" font-size="34">🐝</text></svg>`;
@@ -588,10 +553,53 @@ SVG.dFruit = `<svg viewBox="0 0 100 100" aria-hidden="true"><path d="M50 0 C50 1
 SVG.pollen = `<svg viewBox="0 0 560 220" aria-hidden="true"><g transform="translate(10,40) scale(1.7)">${SVG.fleur('#c9b3f2').replace(/<\/?svg[^>]*>/g,'')}</g><g transform="translate(380,40) scale(1.7)">${SVG.fleur('#f6a6c1').replace(/<\/?svg[^>]*>/g,'')}</g>
   <path d="M120 110 C200 20 330 20 400 100" stroke="#d4a017" stroke-width="5" stroke-dasharray="4 14" stroke-linecap="round" fill="none"/><g fill="#f6c445"><circle cx="160" cy="70" r="5"/><circle cx="210" cy="48" r="5"/><circle cx="330" cy="50" r="5"/><circle cx="370" cy="72" r="5"/></g><text x="238" y="70" font-size="64">🐝</text></svg>`;
 
+function arbre(x, g, r, cf, nb){   // arbre fruitier dessiné : pied en (x, g), houppier de rayon r
+  const cy = g - r*1.7; let s = `<path d="M${x-14} ${g} L${x-8} ${cy+20} L${x+8} ${cy+20} L${x+14} ${g} Z" fill="#7a4f2c"/>`;
+  s += `<path d="M${x} ${cy+r*.35} L${x-r*.35} ${cy} M${x} ${cy+r*.45} L${x+r*.38} ${cy+r*.05}" stroke="#7a4f2c" stroke-width="${r*.08}" stroke-linecap="round"/>`;
+  const b = [[0,0,1],[-.55,.2,.7],[.55,.2,.7],[-.3,-.45,.65],[.35,-.4,.65]];
+  for (const [dx,dy,k] of b) s += `<circle cx="${x+dx*r}" cy="${cy+dy*r}" r="${r*k}" fill="#5e9e45"/>`;
+  for (const [dx,dy,k] of b) s += `<circle cx="${x+dx*r-r*.12}" cy="${cy+dy*r-r*.15}" r="${r*k*.68}" fill="#79b85a"/>`;
+  for (let i = 0; i < nb; i++) { const a = i*2.39996, d = Math.sqrt((i+.5)/nb)*r*1.02, fx = x+Math.cos(a)*d, fy = cy+Math.sin(a)*d*.85;
+    s += `<circle cx="${fx}" cy="${fy}" r="${r*.11}" fill="${cf}" stroke="rgba(0,0,0,.15)" stroke-width="2"/><circle cx="${fx-r*.035}" cy="${fy-r*.035}" r="${r*.032}" fill="#fff" opacity=".6"/>`; }
+  return s;
+}
+const abeille = (x,y,k=1) => `<g transform="translate(${x} ${y}) scale(${k})"><ellipse cx="-4" cy="-13" rx="9" ry="7" fill="#fff" opacity=".85"/><ellipse cx="7" cy="-12" rx="8" ry="6" fill="#fff" opacity=".85"/><ellipse rx="17" ry="12" fill="#f6c445"/><path d="M-6 -11 V11 M3 -12 V12" stroke="#2b2a24" stroke-width="5"/><circle cx="15" cy="-2" r="6" fill="#2b2a24"/></g>`;
+const papillon = (x,y,c,k=1) => `<g transform="translate(${x} ${y}) scale(${k}) rotate(-12)"><ellipse cx="-14" cy="-10" rx="15" ry="18" fill="${c}"/><ellipse cx="14" cy="-10" rx="15" ry="18" fill="${c}"/><ellipse cx="-11" cy="14" rx="10" ry="12" fill="${c}" opacity=".85"/><ellipse cx="11" cy="14" rx="10" ry="12" fill="${c}" opacity=".85"/><circle cx="-14" cy="-10" r="5" fill="#fff" opacity=".6"/><circle cx="14" cy="-10" r="5" fill="#fff" opacity=".6"/><rect x="-3" y="-20" width="6" height="40" rx="3" fill="#2b2a24"/><path d="M-2 -20 L-8 -32 M2 -20 L8 -32" stroke="#2b2a24" stroke-width="2"/></g>`;
+SVG.accueil = (() => {
+  let s = `<svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><defs><linearGradient id="acc-ciel" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#bfe6f5"/><stop offset=".65" stop-color="#f4f1dc"/></linearGradient></defs>
+    <rect width="1600" height="900" fill="url(#acc-ciel)"/>
+    <g stroke="#ffd45c" stroke-width="10" stroke-linecap="round">${Array.from({length:12},(_,i)=>{const a=i*Math.PI/6;return `<line x1="${1440+Math.cos(a)*95}" y1="${140+Math.sin(a)*95}" x2="${1440+Math.cos(a)*125}" y2="${140+Math.sin(a)*125}"/>`;}).join('')}</g>
+    <circle cx="1440" cy="140" r="78" fill="#ffd45c"/><circle cx="1418" cy="122" r="26" fill="#ffe89a"/>
+    <g fill="#fff" opacity=".9"><ellipse cx="1060" cy="120" rx="90" ry="34"/><ellipse cx="1010" cy="104" rx="50" ry="40"/><ellipse cx="1100" cy="96" rx="56" ry="44"/></g>
+    <path d="M0 600 C300 520 600 620 900 560 S1400 520 1600 580 V900 H0Z" fill="#b9db93"/>
+    <path d="M0 700 C400 640 900 720 1600 660 V900 H0Z" fill="#9ccb6d"/>
+    <ellipse cx="1060" cy="770" rx="620" ry="88" fill="#c98f55"/>
+    <g fill="#a86d38">${Array.from({length:60},(_,i)=>{const x=480+(i*97)%1180, y=715+(i*53)%110; return `<rect x="${x}" y="${y}" width="22" height="7" rx="3" transform="rotate(${(i*41)%180} ${x} ${y})"/>`;}).join('')}</g>`;
+  s += arbre(760, 745, 92, '#f6c445', 9) + arbre(1500, 740, 88, '#c8323a', 9) + arbre(1030, 770, 132, '#f7a072', 14) + arbre(1290, 762, 112, '#f39a1f', 12);
+  for (const [x,y] of [[860,800],[1180,812],[1400,800]]) s += `<circle cx="${x}" cy="${y}" r="44" fill="#4f8a3c"/><circle cx="${x-14}" cy="${y-12}" r="28" fill="#6fb04f"/>` + [[-20,-4],[12,-18],[18,8],[-6,14]].map(([a,b])=>`<circle cx="${x+a}" cy="${y+b}" r="7" fill="#d6336c"/>`).join('');
+  for (let i = 0; i < 9; i++) { const x = 330 + i*42, h = 70 + (i%3)*18; s += `<path d="M${x} 772 L${x+(i%2?6:-6)} ${772-h}" stroke="#5c8a4a" stroke-width="4"/>` + Array.from({length:6},(_,j)=>`<ellipse cx="${x+(i%2?6:-6)*(1-j/8)}" cy="${772-h+j*9}" rx="6" ry="5" fill="${i%3?'#8b6cc4':'#7f6bd1'}"/>`).join(''); }
+  for (const [x,y,c] of [[300,690,'#f6a6c1'],[560,700,'#f6c445'],[640,742,'#f6a6c1'],[260,740,'#fff']]) s += `<path d="M${x} ${y+40} V${y}" stroke="#5c8a4a" stroke-width="4"/>` + [0,72,144,216,288].map(a=>`<ellipse cx="${x}" cy="${y-11}" rx="7" ry="11" fill="${c}" transform="rotate(${a} ${x} ${y})"/>`).join('') + `<circle cx="${x}" cy="${y}" r="6" fill="#f6a32b"/>`;
+  s += `<path d="M640 480 C700 420 780 470 830 400" stroke="#2b2a24" stroke-width="3" stroke-dasharray="3 12" fill="none" stroke-linecap="round" opacity=".5"/>` + abeille(840, 392, 1.3) + abeille(1190, 610, 1.1) + papillon(560, 560, '#f39a1f', 1.3) + papillon(1360, 360, '#8b6cc4', 1.1);
+  return s + '</svg>';
+})();
+SVG.ecoArbre = `<svg viewBox="0 0 300 300" aria-hidden="true"><ellipse cx="150" cy="280" rx="110" ry="16" fill="#c98f55"/>${arbre(150, 280, 78, '#f7a072', 10)}</svg>`;
+function strate(k){
+  const g = '#d8d3c4', v = '#4f9a3c', c = q => q===k ? v : g;
+  const svg = `<svg viewBox="0 0 240 104" aria-hidden="true"><line x1="4" y1="96" x2="236" y2="96" stroke="#b9ae90" stroke-width="3"/>
+    <ellipse cx="30" cy="92" rx="24" ry="8" fill="${c('couvresol')}"/>
+    <path d="M76 96 V68 M76 80 C66 74 62 66 64 62 C72 64 76 72 76 80 M76 74 C86 68 90 60 88 56 C80 58 76 66 76 74" stroke="${c('herbacee')}" stroke-width="4" fill="${c('herbacee')}"/>
+    <circle cx="112" cy="78" r="16" fill="${c('arbuste')}"/><circle cx="128" cy="74" r="18" fill="${c('arbuste')}"/><circle cx="142" cy="82" r="13" fill="${c('arbuste')}"/>
+    <rect x="178" y="44" width="8" height="52" fill="${c('arbre')}"/><circle cx="182" cy="34" r="26" fill="${c('arbre')}"/>
+    <path d="M224 96 V14" stroke="${c('grimpante')}" stroke-width="4"/><path d="M224 90 C214 82 234 72 224 64 C214 56 234 46 224 38 C214 30 234 22 224 16" stroke="${c('grimpante')}" stroke-width="3" fill="none"/>
+    ${[[218,80],[230,66],[218,50],[230,34]].map(([x,y])=>`<ellipse cx="${x}" cy="${y}" rx="6" ry="4" fill="${c('grimpante')}"/>`).join('')}</svg>`;
+  const nom = {arbre:'Arbre', arbuste:'Arbuste', herbacee:'Plante herbacée', couvresol:'Couvre-sol', grimpante:'Plante grimpante'}[k];
+  return k ? `<div class="strate" title="Strate du végétal">${svg}<b>${nom}</b></div>` : '';
+}
 const ico = (k) => k.startsWith('<svg') ? k : SVG[k] ? SVG[k] : `<span class="emo">${k}</span>`;
 function poser(id, html){ const e=document.getElementById(id); if(e) e.innerHTML=html; }
 poser('icoTerre', SVG.terre); poser('dFleur', SVG.fleur()); poser('dAbeille', SVG.dAbeille); poser('dFane', SVG.dFane); poser('dFruit', SVG.dFruit);
-poser('icoPeche2', SVG.peche); poser('scenePollen', SVG.pollen); poser('icoMare', SVG.mare); poser('icoPaillage', SVG.paillage);
+poser('icoPeche2', SVG.peche); poser('scenePollen', SVG.pollen); 
+poser('accueilIllu', SVG.accueil); poser('ecoArbre', SVG.ecoArbre);
 poser('coco', SVG.coco); poser('clovis', SVG.clovis); poser('finCoco', SVG.coco); poser('finClovis', SVG.clovis);
 
 /* ===================== Contenus ===================== */
@@ -609,12 +617,13 @@ const PLANTES = {
   thym:        {ico:'🌿', nom:'Le thym', tags:['tapis','odeur','abeilles'], txt:'Un petit tapis qui sent bon. Ses minuscules fleurs nourrissent les abeilles.'},
   menthe:      {ico:'🌱', nom:'La menthe', tags:['tapis','odeur'], txt:'Elle pousse vite et couvre le sol. Frottez une feuille : ça sent le chewing-gum !'},
   melisse:     {ico:'🍋', nom:'La mélisse', tags:['odeur','abeilles'], txt:'Frottez une feuille : elle sent le citron !'},
-  mare:        {ico:'💧', nom:'La petite mare', tags:['eau'], txt:'La maison des libellules, des têtards et des escargots d’eau.'},
+  verveine:    {ico:'🍃', nom:'La verveine citronnelle', tags:['odeur','abeilles'], txt:'Elle était déjà là ! Frottez une feuille : elle sent très fort le citron.', badge:['deja','⭐ Déjà là']},
 };
+const STRATE = {"pecher": "arbre", "grenadier": "arbuste", "clementinier": "arbre", "bananier": "arbuste", "framboisier": "arbuste", "vigne": "grimpante", "buddleia": "arbuste", "lavande": "arbuste", "romarin": "arbuste", "geranium": "herbacee", "thym": "couvresol", "menthe": "couvresol", "melisse": "herbacee", "verveine": "arbuste"};
 const TAGS = {fruits:'🍎 Des fruits', abeilles:'🐝 Pour les abeilles', papillons:'🦋 Pour les papillons', odeur:'👃 Ça sent bon', tapis:'🟩 Un tapis vert', geant:'🌴 Une plante géante', fleurs:'🌸 Des fleurs', eau:'🐸 Un coin d’eau'};
 // emplacement des pastilles sur le dessin (en % de l'image)
 const PLAN = [['pecher',74,30],['grenadier',50,30],['clementinier',64,30],['bananier',38,32],['buddleia',16,31],['vigne',46,11],['framboisier',44,48],
-  ['romarin',29,55],['geranium',66,55],['lavande',52,63],['thym',86,44],['melisse',62,72],['menthe',37,85],['mare',27,72]];
+  ['romarin',29,55],['geranium',66,55],['lavande',52,63],['thym',86,44],['melisse',62,72],['menthe',37,85],['verveine',57,40]];
 
 const MENU = ['lavande','buddleia','romarin','thym','melisse'];
 poser('menu', MENU.map(k=>`<div class="carte plat"><span class="ico">${ico(PLANTES[k].ico)}</span><h3>${PLANTES[k].nom.replace(/^(Le |La |L’)/,'').replace(/^./,c=>c.toUpperCase())}</h3></div>`).join(''));
@@ -665,37 +674,16 @@ const BETES = [
   t.addEventListener('click', e=>{ const b=e.target.closest('.bete'); if(!b) return; b.classList.add('vue'); const [i,n,tx]=BETES[b.dataset.k]; ouvrirFiche(i==='clovis'?SVG.clovis:i, n, tx); });
 })();
 
-const MARE = [
-  ['libellule','La libellule','Elle vole très vite au-dessus de l’eau et attrape les moustiques.',30,16],
-  ['larve','La larve de libellule','Avant de voler, la libellule vit sous l’eau pendant des mois !',44,76],
-  ['🐸','La grenouille','Elle saute, nage et mange les insectes. Peut-être qu’elle viendra chez nous !',66,46],
-  ['tetard','Le têtard','C’est un bébé grenouille. Il vit dans l’eau et il a une queue !',56,66],
-  ['🐌','L’escargot d’eau','Il nettoie la mare en mangeant les algues.',30,58],
-  ['🐦','L’oiseau','Il vient boire et prendre son bain.',84,24],
-];
-(function(){
-  const m=document.getElementById('mare');
-  m.innerHTML = `<svg class="decor" viewBox="0 0 1540 612" preserveAspectRatio="none" aria-hidden="true" style="position:absolute;inset:0;width:100%;height:100%">
-    <rect width="1540" height="612" fill="#cfe6c3"/><ellipse cx="770" cy="360" rx="640" ry="230" fill="#a6936c"/><ellipse cx="770" cy="352" rx="610" ry="208" fill="#4f9fd0"/>
-    <ellipse cx="770" cy="420" rx="440" ry="110" fill="#3b85b6"/><ellipse cx="620" cy="250" rx="220" ry="30" fill="#8fcbef" opacity=".55"/>
-    <g fill="#5fa04a"><ellipse cx="1020" cy="300" rx="62" ry="24"/><ellipse cx="560" cy="440" rx="50" ry="20"/><ellipse cx="900" cy="470" rx="44" ry="17"/></g>
-    <g stroke="#4f8a3c" stroke-width="10" stroke-linecap="round" fill="none"><path d="M170 360 C172 280 176 220 186 160"/><path d="M200 380 C200 300 206 250 214 200"/><path d="M1340 370 C1338 290 1332 240 1324 190"/><path d="M1370 380 C1372 310 1376 260 1386 220"/></g>
-    <g fill="#8a5a3b"><rect x="180" y="148" width="14" height="40" rx="7"/><rect x="1316" y="180" width="14" height="40" rx="7"/></g>
-    <g fill="#9a8a6a">${Array.from({length:18},(_,i)=>{const a=i/18*Math.PI*2;return `<ellipse cx="${770+Math.cos(a)*635}" cy="${360+Math.sin(a)*225}" rx="40" ry="24"/>`;}).join('')}</g></svg>
-    <span class="zone" data-s="1" style="left:24px;top:20px">💧 Dans la mare</span>` +
-    MARE.map(([i,n,tx,x,y],k)=>`<button class="bete" data-s="1" data-k="${k}" style="left:${x}%;top:${y}%" aria-label="${n}">${SVG[i]?`<span class="ico">${SVG[i]}</span>`:i}</button>`).join('');
-  m.addEventListener('click', e=>{ const b=e.target.closest('.bete'); if(!b) return; b.classList.add('vue'); const [i,n,tx]=MARE[b.dataset.k]; ouvrirFiche(SVG[i]||i, n, tx); });
-})();
-
 /* Plan des plantations */
 (function(){
   const plan=document.getElementById('plan'), fp=document.getElementById('fichePlante');
   plan.insertAdjacentHTML('beforeend', PLAN.map(([k,x,y])=>{const p=PLANTES[k];return `<button class="pt" data-k="${k}" style="left:${x}%;top:${y}%" aria-label="${p.nom}"><span class="ico" style="width:36px;height:36px;font-size:30px">${ico(p.ico)}</span><span class="nom">${p.nom.replace(/^(Le |La |L’)/,'')}</span></button>`;}).join(''));
-  function accueil(){ fp.innerHTML = `<div class="carte"><span class="grand-ico ico emo">👆</span><h3>Touchez une pastille</h3><p>pour découvrir chaque plante du bosquet.</p></div>
+  function accueil(){ fp.innerHTML = `<div class="carte"><span class="grand-ico ico emo">👆</span><h3>Touchez une pastille</h3><p>pour découvrir chaque plante du bosquet fruitier.</p></div>
     <div class="liste-plantes">${PLAN.map(([k])=>`<button data-k="${k}">${PLANTES[k].nom.replace(/^(Le |La |L’)/,'')}</button>`).join('')}</div>`; }
   function montrer(k){
     const p=PLANTES[k];
     fp.innerHTML = `<div class="carte"><span class="grand-ico ico">${ico(p.ico)}</span><h3>${p.nom}</h3><p>${p.txt}</p>
+      ${strate(STRATE[k])}
       <div class="badges">${p.tags.map(t=>`<span class="badge">${TAGS[t]}</span>`).join('')}${p.badge?`<span class="badge ${p.badge[0]}">${p.badge[1]}</span>`:''}</div></div>
       <div class="liste-plantes">${PLAN.map(([q])=>`<button data-k="${q}" class="${q===k?'choisi':''}">${PLANTES[q].nom.replace(/^(Le |La |L’)/,'')}</button>`).join('')}</div>`;
     plan.querySelectorAll('.pt').forEach(b=>b.classList.toggle('choisi', b.dataset.k===k));
