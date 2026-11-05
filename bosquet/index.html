@@ -754,6 +754,7 @@ function afficher(){
   if (s.querySelector('#potager')) document.getElementById('potager').classList.toggle('tous', pas>=1);
   parole(s);
   document.getElementById('pied').classList.toggle('sansm', !!s.querySelector('.fin.vu'));
+  document.getElementById('nomBosquet').tabIndex = document.querySelector('.fin.vu') ? 0 : -1;
   [...points.children].forEach((p,i)=>p.classList.toggle('on', i===cur));
   document.getElementById('compteur').textContent=`${cur+1} / ${ecrans.length}`;
   fiche.classList.remove('on');
@@ -767,6 +768,7 @@ document.getElementById('bAvant').onclick=precedent;
 function pleinEcran(){ try { if (!document.fullscreenElement) (document.documentElement.requestFullscreen||document.documentElement.webkitRequestFullscreen).call(document.documentElement); else document.exitFullscreen(); } catch(e){} }
 document.getElementById('bPlein').onclick=pleinEcran;
 document.addEventListener('keydown',e=>{
+  if (e.ctrlKey||e.metaKey||e.altKey) return;   // laisse les raccourcis du navigateur
   if (e.target.tagName==='INPUT') { if (e.key==='Enter'||e.key==='Escape') e.target.blur(); return; }
   if (['ArrowRight','ArrowDown','PageDown',' ','Enter'].includes(e.key)) { e.preventDefault(); suivant(); }
   else if (['ArrowLeft','ArrowUp','PageUp','Backspace'].includes(e.key)) { e.preventDefault(); precedent(); }
