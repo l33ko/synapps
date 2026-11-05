@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<script>
+/* SynApps — signalement des erreurs
+   Les erreurs JavaScript rencontrées par les visiteurs sont envoyées, sans donnée personnelle, dans la table
+   « erreurs » de Supabase (Synapps_public en production, Synapps_test ailleurs). Le robot de surveillance
+   GitHub les relit chaque semaine. Au plus 5 envois par page ouverte. */
+(function(){
+  if (!/^https?:$/.test(location.protocol) || !window.fetch) return;
+  var B = /^(app\.synapsium\.com|synapps-bhl\.pages\.dev|l33ko\.github\.io)$/.test(location.hostname)
+    ? {url:'https://qxwypwcxdhhtgmzaskzs.supabase.co', key:'sb_publishable_BZ9SxprfxkC-dUQZori4zA_txbvmngw'}
+    : {url:'https://zlfgcfexvawijldgiqbu.supabase.co', key:'sb_publishable_aLCilH09KKWb4IfJC4Sx1g_df2_RUrC'};
+  var n = 0, vus = {};
+  function net(t, max){                                   // retire tout ce qui pourrait être personnel
+    return String(t == null ? '' : t)
+      .replace(/(https?:\/\/[^\s?#()'"]+)[?#][^\s()'"]*?(:\d+:\d+)?(?=[\s()'"]|$)/g, '$1$2')  // paramètres d'adresse (jetons, code d'invitation…)
+      .replace(/(access_token|refresh_token|token|rejoindre|code)=[^&\s#"']+/gi, '$1=…')
+      .replace(/[^\s@"'<>()\/:]+@[^\s@"'<>()\/:]+\.[a-z]{2,}/gi, '…@…')       // adresses e-mail
+      .slice(0, max);
+  }
+  function app(){ var s = location.pathname.split('/')[1] || ''; return (!s || /\.html?$/.test(s)) ? 'accueil' : s.slice(0, 40); }
+  function envoyer(msg, src, l, c, pile){
+    msg = net(msg, 500); src = net(String(src || '').split(/[?#]/)[0], 300);
+    if (!msg || /^Script error\.?$/i.test(msg)) return;                                       // erreur d'un autre site, sans détail
+    if (/Failed to fetch|Load failed|NetworkError|network error|AbortError|The operation was aborted/i.test(msg)) return;  // réseau coupé
+    if (/^(chrome|moz|safari|safari-web)-extension:/.test(src)) return;                       // extension du navigateur
+    var k = msg + '|' + l; if (vus[k] || n >= 5) return; vus[k] = 1; n++;
+    try {
+      fetch(B.url + '/rest/v1/erreurs', {method:'POST', keepalive:true,
+        headers:{apikey:B.key, 'Content-Type':'application/json', Prefer:'return=minimal'},
+        body:JSON.stringify({app:app(), page:net(location.pathname, 200), message:msg, source:src,
+          ligne:l | 0, colonne:c | 0, pile:net(pile, 2000), navigateur:String(navigator.userAgent).slice(0, 300)})
+      }).catch(function(){});
+    } catch(e){}
+  }
+  addEventListener('error', function(e){
+    if (e.target && e.target !== window && !e.message) return;                                // image ou fichier qui ne charge pas
+    envoyer(e.message, e.filename, e.lineno, e.colno, e.error && e.error.stack);
+  }, true);
+  addEventListener('unhandledrejection', function(e){
+    var r = e.reason; envoyer(r && r.message || r, '', 0, 0, r && r.stack);
+  });
+})();
+</script>
+<title>Notre bosquet fruitier</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#2f3b28">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Fredoka:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --creme:#fbf6ea; --papier:#fffdf7; --encre:#2b2a24; --doux:#6b6655;
+  --vert:#3f7d3a; --vert-clair:#8fc46a; --vert-pale:#e6f2da;
+  --terre:#8a5a3b; --terre-pale:#f3e6d6; --tomate:#d9693b; --ciel:#dff0f7; --eau:#5aa9d6;
+  --jaune:#f6c445; --violet:#7f6bd1;
+  --titre:'Fredoka', 'Arial Rounded MT Bold', system-ui, sans-serif;
+  --texte:'Andika', 'Trebuchet MS', system-ui, sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden;background:#2f3b28;color:var(--encre);font-family:var(--texte);-webkit-tap-highlight-color:transparent}
+button{font:inherit;color:inherit;cursor:pointer}
+#vue{position:fixed;inset:0;overflow:hidden;touch-action:manipulation}
+#scene{position:absolute;left:0;top:0;width:1600px;height:900px;transform-origin:0 0;background:var(--creme);overflow:hidden;border-radius:6px}
+#tourne{display:none;position:fixed;top:12px;left:0;right:0;text-align:center;color:#e8efd9;font:600 15px var(--titre);z-index:5}
+@media (orientation:portrait) and (max-width:700px){#tourne{display:block}}
+
+/* ---------- Écrans ---------- */
+.ecran{position:absolute;inset:0;padding:30px 30px 0;opacity:0;visibility:hidden;transition:opacity .45s,visibility .45s;
+  background:radial-gradient(1200px 500px at 80% -10%,#fff8e3 0,transparent 60%),var(--creme)}
+.ecran.on{opacity:1;visibility:visible}
+.tete{height:112px;display:flex;flex-direction:column;justify-content:center;gap:6px;padding-left:6px}
+.puce{align-self:flex-start;font:600 22px var(--titre);color:#fff;background:var(--vert);padding:4px 16px;border-radius:999px;letter-spacing:.02em}
+.puce.q{background:var(--tomate)}
+.puce.a{background:var(--eau)}
+h1,h2,h3{font-family:var(--titre);margin:0;font-weight:600;line-height:1.08}
+h2{font-size:58px;color:#25321e}
+.corps{position:absolute;left:30px;right:30px;top:150px;height:612px}
+
+/* éléments qui apparaissent pas à pas */
+[data-s]{transition:opacity .5s,transform .5s cubic-bezier(.2,.9,.3,1.3)}
+[data-s]:not(.vu){opacity:0;transform:translateY(24px) scale(.96);pointer-events:none}
+.m{display:none}
+
+.carte{background:var(--papier);border-radius:28px;box-shadow:0 6px 0 rgba(60,50,20,.08),0 14px 34px rgba(60,50,20,.12);padding:24px 28px}
+.gros{font-size:34px;line-height:1.25}
+.tres-gros{font-size:44px;line-height:1.15;font-family:var(--titre);font-weight:600}
+.ico{display:inline-flex;align-items:center;justify-content:center}
+.ico svg{width:100%;height:100%}
+.emo{font-size:1em;line-height:1}
+
+/* ---------- Pied : mascottes, bulle, navigation ---------- */
+#pied{position:absolute;left:0;right:0;bottom:0;height:140px;pointer-events:none;z-index:20}
+.mascotte{position:absolute;bottom:8px;transition:transform .3s,filter .3s,opacity .3s;pointer-events:auto;background:none;border:0;padding:0}
+#coco{left:18px;width:112px;height:112px}
+#clovis{left:124px;width:128px;height:96px;bottom:10px}
+.mascotte.parle{animation:saut .9s ease-in-out infinite}
+.mascotte.muet{filter:saturate(.6);opacity:.85;transform:scale(.9)}
+@keyframes saut{0%,100%{transform:translateY(0)}35%{transform:translateY(-12px) rotate(-3deg)}70%{transform:translateY(0) rotate(2deg)}}
+#bulle{position:absolute;left:276px;bottom:26px;max-width:1010px;min-height:64px;background:#fff;border-radius:26px;padding:14px 26px;
+  font-size:29px;line-height:1.25;box-shadow:0 8px 24px rgba(40,40,20,.18);border:3px solid #25321e;transition:opacity .3s, transform .3s;pointer-events:auto}
+#bulle::before{content:"";position:absolute;left:-19px;bottom:18px;border:11px solid transparent;border-right:16px solid #25321e;border-left:0}
+#bulle::after{content:"";position:absolute;left:-13px;bottom:21px;border:8px solid transparent;border-right:12px solid #fff;border-left:0}
+#bulle b{font-family:var(--titre);font-weight:600}
+#bulle.cache{opacity:0;transform:translateY(10px)}
+#nav{position:absolute;right:18px;bottom:20px;display:flex;align-items:center;gap:10px;pointer-events:auto}
+#nav button{width:62px;height:62px;border-radius:50%;border:0;background:#25321e;color:#fff;font-size:30px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 0 rgba(0,0,0,.2)}
+#nav button:active{transform:translateY(2px)}
+#nav button.petit{width:46px;height:46px;font-size:20px;background:#5d6b52}
+#compteur{font:600 22px var(--titre);color:#25321e;min-width:70px;text-align:center}
+#points{position:absolute;right:20px;bottom:96px;display:flex;gap:6px;pointer-events:auto}
+#points i{width:12px;height:12px;border-radius:50%;background:#cfc8b2;cursor:pointer}
+#points i.on{background:var(--tomate);transform:scale(1.25)}
+.mascotte svg,.fin .duo svg{width:100%;height:100%;display:block}
+#pied.sansm .mascotte,#pied.sansm #bulle{opacity:0;pointer-events:none}
+
+/* ---------- Fiche (fenêtre d'explication) ---------- */
+#fiche{position:absolute;inset:0;z-index:40;display:flex;align-items:center;justify-content:center;background:rgba(30,35,25,.45);opacity:0;visibility:hidden;transition:.3s}
+#fiche.on{opacity:1;visibility:visible}
+#fiche .carte{width:860px;display:flex;gap:34px;align-items:center;padding:36px 44px;transform:scale(.9);transition:transform .3s cubic-bezier(.2,.9,.3,1.4);position:relative}
+#fiche.on .carte{transform:scale(1)}
+#fiche .grand-ico{width:190px;height:190px;font-size:150px;flex:none}
+#fiche h3{font-size:52px;margin-bottom:10px;color:#25321e}
+#fiche p{font-size:34px;line-height:1.3;margin:0}
+#fiche .fermer{position:absolute;right:18px;top:14px;border:0;background:none;font-size:34px;color:var(--doux)}
+
+/* ---------- 1. Titre ---------- */
+.titre{padding:0}
+.titre .fond{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.titre .voile{position:absolute;inset:0;background:linear-gradient(180deg,rgba(20,30,15,.55) 0,rgba(20,30,15,.1) 45%,rgba(251,246,234,.0) 70%,rgba(251,246,234,.9) 86%)}
+.titre-bloc{position:absolute;left:70px;top:70px;color:#fff;text-shadow:0 3px 18px rgba(0,0,0,.45)}
+.titre-bloc .sur{font:600 34px var(--titre);margin:0 0 8px;color:#ffe9a8}
+.titre h1{font-size:118px;font-weight:700}
+.titre .sous{font-size:58px;margin:18px 0 0;letter-spacing:12px}
+
+/* ---------- 2. Potager ---------- */
+.cadre-photo{position:absolute;border-radius:26px;overflow:hidden;box-shadow:0 14px 34px rgba(60,50,20,.25);background:#ddd}
+.cadre-photo>img{width:100%;height:100%;object-fit:cover;display:block}
+.pt{position:absolute;transform:translate(-50%,-50%);border:4px solid #fff;background:rgba(255,255,255,.9);border-radius:999px;
+  min-width:64px;height:64px;padding:0 12px;display:flex;align-items:center;gap:8px;font-size:34px;box-shadow:0 4px 14px rgba(0,0,0,.3);animation:pouls 2.4s infinite}
+.pt .nom{display:none;font:600 26px var(--titre);color:#25321e;white-space:nowrap}
+.pt.ouvert .nom,.tous .pt .nom{display:inline}
+.pt.ouvert,.tous .pt{animation:none}
+@keyframes pouls{0%,100%{box-shadow:0 4px 14px rgba(0,0,0,.3),0 0 0 0 rgba(255,255,255,.7)}50%{box-shadow:0 4px 14px rgba(0,0,0,.3),0 0 0 14px rgba(255,255,255,0)}}
+.compare{position:absolute;left:820px;top:0;width:720px;display:flex;flex-direction:column;gap:20px}
+.compare .carte h3{font-size:40px;margin-bottom:10px;display:flex;align-items:center;gap:12px}
+.compare .carte ul{list-style:none;margin:0;padding:0;font-size:31px;line-height:1.45}
+.compare .legume{border-left:12px solid var(--tomate)}
+.compare .arbre{border-left:12px solid var(--vert)}
+.message{font:600 36px var(--titre);color:#fff;background:var(--vert);border-radius:22px;padding:16px 24px;text-align:center}
+
+/* ---------- 3. Avant / après ---------- */
+.ba{position:absolute;left:0;top:0;width:800px;height:600px;border-radius:26px;overflow:hidden;box-shadow:0 14px 34px rgba(60,50,20,.25);touch-action:none;user-select:none;-webkit-user-select:none}
+.ba img{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none}
+.ba .apres{clip-path:inset(0 0 0 var(--pos,100%))}
+.ba .apres img{transform-origin:0 0;transform:translate(-11.5%,-17.7%) scale(1.18)}
+.ba .apres{position:absolute;inset:0;z-index:2}
+.ba .poignee{position:absolute;top:0;bottom:0;left:var(--pos,100%);width:0;z-index:3}
+.ba .poignee::before{content:"";position:absolute;top:0;bottom:0;left:-3px;width:6px;background:#fff;box-shadow:0 0 10px rgba(0,0,0,.4)}
+.ba .poignee b{position:absolute;top:50%;left:-38px;width:76px;height:76px;margin-top:-38px;border-radius:50%;background:#fff;box-shadow:0 4px 14px rgba(0,0,0,.35);
+  display:flex;align-items:center;justify-content:center;font-size:34px;color:#25321e}
+.ba .etiq{position:absolute;top:18px;font:600 28px var(--titre);color:#fff;background:rgba(30,40,25,.7);padding:6px 16px;border-radius:999px;z-index:2}
+.ba .etiq.g{left:18px}.ba .etiq.d{right:18px}
+.ba.anime .apres{transition:clip-path 1.6s ease-in-out}
+.ba.anime .poignee{transition:left 1.6s ease-in-out}
+.cote{position:absolute;left:840px;top:0;width:700px;display:flex;flex-direction:column;gap:22px}
+.cote .carte h3{font-size:44px;margin-bottom:14px;color:#25321e}
+.cote .ligne{display:flex;align-items:center;gap:18px;font-size:34px;line-height:1.25;margin:10px 0}
+.cote .ligne .emo{font-size:56px;width:70px;text-align:center;flex:none}
+
+/* ---------- Grandes questions ---------- */
+.grille4{display:grid;grid-template-columns:repeat(4,1fr);gap:24px}
+.besoin{text-align:center;padding:20px 10px}
+.besoin .ico{width:110px;height:110px;font-size:92px}
+.besoin h3{font-size:42px;margin-top:6px}
+.bas{display:flex;gap:24px;margin-top:26px;align-items:stretch}
+.zoom-sol{width:470px;height:300px;border-radius:24px;background:url(img/aujourdhui.jpg) 32% 74%/300% no-repeat;position:relative;flex:none;box-shadow:0 10px 26px rgba(60,50,20,.2)}
+.zoom-sol p{position:absolute;left:12px;right:12px;bottom:12px;margin:0;background:rgba(255,255,255,.92);border-radius:16px;padding:10px 14px;font-size:27px;line-height:1.2}
+.solutions{flex:1;display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.solution{text-align:center;padding:20px 16px;display:flex;flex-direction:column;align-items:center;gap:8px}
+.solution .emo{font-size:72px}
+.solution h3{font-size:34px}
+.solution p{margin:0;font-size:27px;color:var(--doux);line-height:1.25}
+
+.etapes{display:flex;align-items:center;justify-content:space-between;height:420px}
+.etape{width:330px;text-align:center}
+.etape .dessin{width:290px;height:290px;margin:0 auto;border-radius:50%;background:var(--vert-pale);display:flex;align-items:center;justify-content:center;position:relative}
+.etape .dessin svg{width:230px;height:230px}
+.etape h3{font-size:36px;margin-top:16px}
+.etape .num{position:absolute;left:6px;top:6px;width:56px;height:56px;border-radius:50%;background:var(--tomate);color:#fff;font:700 32px var(--titre);display:flex;align-items:center;justify-content:center}
+.fleche{font-size:60px;color:#b9b19a}
+.bandeau{margin-top:30px;display:flex;align-items:center;justify-content:center;gap:22px;font-size:36px}
+.bandeau .ico{width:64px;height:64px}
+
+.pollen{display:flex;align-items:center;gap:36px;padding:26px 36px}
+.pollen .scene-p{flex:none;width:560px;height:220px}
+.restaurant{margin-top:24px}
+.restaurant h3{font-size:38px;margin:0 0 14px 6px;color:#25321e}
+.menu{display:grid;grid-template-columns:repeat(5,1fr);gap:18px}
+.plat{text-align:center;padding:18px 10px}
+.plat .ico{width:100px;height:100px;font-size:80px}
+.plat h3{font-size:30px;margin-top:6px}
+
+.climat{display:flex;gap:22px;justify-content:center}
+.climat .carte{display:flex;align-items:center;gap:14px;font-size:32px;padding:14px 26px}
+.climat .emo{font-size:52px}
+.fruits{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-top:24px}
+.fruit{height:215px;perspective:1000px;border:0;background:none;padding:0}
+.fruit .in{position:relative;width:100%;height:100%;transition:transform .6s;transform-style:preserve-3d}
+.fruit.vu-r .in{transform:rotateY(180deg)}
+.fruit .f,.fruit .r{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:26px;background:var(--papier);box-shadow:0 6px 0 rgba(60,50,20,.08),0 14px 30px rgba(60,50,20,.12);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:12px}
+.fruit .f .ico{width:96px;height:96px;font-size:84px}
+.fruit .f h3{font-size:34px}
+.fruit .f small{font:600 22px var(--titre);color:var(--doux)}
+.fruit .r{transform:rotateY(180deg);text-align:center}
+.fruit .r .v{font-size:56px;line-height:1}
+.fruit .r p{margin:6px 0 0;font-size:27px;line-height:1.2}
+.fruit .r.oui{background:#e8f5dc}.fruit .r.non{background:#fde6df}.fruit .r.mais{background:#fff2cc}
+
+/* scène des petites bêtes */
+.terrain{position:absolute;inset:0;border-radius:28px;overflow:hidden;background:linear-gradient(#e9f5fb,#d5ecf5 300px)}
+.terrain svg.decor{position:absolute;inset:0;width:100%;height:100%}
+.zone{position:absolute;font:600 30px var(--titre);color:#25321e;background:rgba(255,255,255,.88);padding:6px 18px;border-radius:999px}
+.zone.sol{color:#fff;background:rgba(60,35,20,.7)}
+.bete{position:absolute;transform:translate(-50%,-50%);width:96px;height:96px;border-radius:50%;border:4px solid #fff;background:rgba(255,255,255,.85);
+  font-size:62px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(0,0,0,.25);padding:0}
+.bete .ico{width:74px;height:74px}
+.bete:hover{transform:translate(-50%,-50%) scale(1.08)}
+.bete.vue{border-color:var(--jaune)}
+.mare-fond{position:absolute;inset:0;border-radius:28px;overflow:hidden;background:#cfe6c3}
+
+/* ---------- Ce qu'on va planter ---------- */
+.plan{position:absolute;left:0;top:0;width:790px;height:609px;border-radius:24px;overflow:hidden;box-shadow:0 14px 34px rgba(60,50,20,.25)}
+.plan img{width:100%;height:100%;display:block}
+.plan .pt{min-width:56px;height:56px;font-size:30px;padding:0 9px}
+.plan .pt.choisi{background:var(--jaune);animation:none}
+.fiche-plante{position:absolute;left:820px;top:0;width:720px;height:609px;display:flex;flex-direction:column}
+.fiche-plante .carte{flex:1;min-height:0;padding:18px 26px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:14px}
+.fiche-plante .grand-ico{width:130px;height:130px;font-size:110px}
+.fiche-plante h3{font-size:50px;color:#25321e}
+.fiche-plante p{font-size:31px;line-height:1.3;margin:0}
+.badges{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.badge{font:600 25px var(--titre);background:var(--vert-pale);color:#2c5a28;padding:6px 16px;border-radius:999px}
+.badge.hiver{background:#dceefa;color:#1f5b86}
+.badge.deja{background:#fff1c2;color:#7a5a00}
+.liste-plantes{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;flex:none}
+.liste-plantes button{border:0;background:#fff;border-radius:999px;padding:4px 11px;font:600 19px var(--titre);box-shadow:0 2px 6px rgba(0,0,0,.1)}
+.liste-plantes button.choisi{background:var(--jaune)}
+
+/* ---------- Aménagements ---------- */
+.amenag{display:grid;grid-template-columns:1fr 1fr;gap:30px}
+.amenag .carte{display:flex;gap:26px;align-items:center;padding:30px}
+.amenag .grand{width:220px;height:220px;flex:none;border-radius:24px}
+.amenag h3{font-size:46px;margin-bottom:10px}
+.amenag p{font-size:32px;line-height:1.3;margin:0}
+.aussi{margin-top:30px;display:flex;gap:30px}
+.aussi .carte{flex:1;display:flex;gap:20px;align-items:center;font-size:31px;line-height:1.25}
+.aussi .emo{font-size:70px}
+
+/* ---------- Frise ---------- */
+.frise{position:relative;display:grid;grid-template-columns:repeat(4,1fr);gap:22px;padding-top:30px}
+.frise::before{content:"";position:absolute;left:12%;right:12%;top:106px;height:10px;border-radius:5px;background:repeating-linear-gradient(90deg,#c9bd98 0 26px,transparent 26px 40px)}
+.jalon{text-align:center;position:relative}
+.jalon .rond{width:150px;height:150px;border-radius:50%;margin:0 auto;background:#fff;border:8px solid var(--vert-clair);display:flex;align-items:center;justify-content:center;font-size:80px;position:relative;z-index:1}
+.jalon.ici .rond{border-color:var(--tomate);box-shadow:0 0 0 10px rgba(217,105,59,.18)}
+.jalon h3{font-size:36px;margin:18px 0 10px;color:#25321e}
+.jalon .carte{padding:16px 18px;font-size:27px;line-height:1.3;text-align:left}
+.jalon .carte ul{margin:0;padding-left:26px}
+.ici-etiq{position:absolute;left:50%;top:-22px;transform:translateX(-50%);background:var(--tomate);color:#fff;font:600 22px var(--titre);padding:4px 14px;border-radius:999px;white-space:nowrap;z-index:2}
+
+/* ---------- Règles et fin ---------- */
+.regles{display:grid;grid-template-columns:repeat(4,1fr);gap:24px}
+.regle{text-align:center;padding:28px 16px;display:flex;flex-direction:column;align-items:center;gap:14px}
+.regle .rond{width:150px;height:150px;border-radius:50%;background:var(--vert-pale);display:flex;align-items:center;justify-content:center;font-size:84px;position:relative}
+.regle .rond.non::after{content:"";position:absolute;inset:8px;border:9px solid #d9483b;border-radius:50%;background:linear-gradient(45deg,transparent 46%,#d9483b 46%,#d9483b 54%,transparent 54%)}
+.regle h3{font-size:34px;line-height:1.15}
+.fin{position:absolute;inset:0;z-index:10;background:radial-gradient(circle at 50% 40%,#fff8de,#f4e7bf);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;padding-bottom:150px}
+.fin h1{font-size:96px;color:#25321e;text-align:center}
+.fin .nom{display:flex;align-items:center;gap:18px;font-size:40px;font-family:var(--titre)}
+.fin input{font:600 48px var(--titre);border:0;border-bottom:6px dashed var(--vert);background:transparent;width:620px;text-align:center;color:var(--vert);outline:none;padding:4px}
+.fin .duo{display:flex;gap:30px;align-items:flex-end}
+.fin .duo .a{width:170px;height:170px}.fin .duo .b{width:200px;height:150px}
+.fin .duo>div{animation:saut 1.1s ease-in-out infinite}
+.fin .duo>div:nth-child(2){animation-delay:.3s}
+.fin>*:not(.feuille){position:relative;z-index:1}
+.feuille{position:absolute;z-index:0;opacity:.85;top:-80px;font-size:48px;animation:tombe linear infinite;pointer-events:none}
+@keyframes tombe{to{transform:translateY(1050px) rotate(540deg)}}
+</style>
+</head>
+<body>
+<div id="tourne">Tournez l’écran à l’horizontale ↻</div>
+<div id="vue"><div id="scene">
+
+<!-- ================= 1. Titre ================= -->
+<section class="ecran titre on" data-say="coco|Bonjour ! Moi, c’est <b>Coco la coccinelle</b>.">
+  <img class="fond" src="img/aujourdhui.jpg" alt="Le coin de la cour où sera créé le bosquet">
+  <div class="voile"></div>
+  <div class="titre-bloc">
+    <p class="sur">Un projet pour notre cour</p>
+    <h1>Notre bosquet<br>fruitier</h1>
+    <p class="sous">🌳🐝🍊🐞💧</p>
+  </div>
+  <i class="m" data-s="1" data-say="clovis|Et moi, <b>Clovis le cloporte</b> ! On va vous faire découvrir le coin de nature qu’on va créer ensemble."></i>
+</section>
+
+<!-- ================= 2. Du potager au bosquet ================= -->
+<section class="ecran" data-say="coco|Vous vous souvenez du potager de maternelle ? Qu’est-ce qu’on avait planté ?">
+  <div class="tete"><span class="puce">Souvenez-vous</span><h2>Du potager… au bosquet !</h2></div>
+  <div class="corps">
+    <div class="cadre-photo" id="potager" style="left:0;top:0;width:790px;height:593px">
+      <img src="img/potager.jpg" alt="Le potager de maternelle">
+      <button class="pt" style="left:12%;top:31%"><span class="emo">🌻</span><span class="nom">Tournesols</span></button>
+      <button class="pt" style="left:42%;top:21%"><span class="emo">🍅</span><span class="nom">Tomates</span></button>
+      <button class="pt" style="left:42%;top:52%"><span class="emo">🌽</span><span class="nom">Maïs</span></button>
+      <button class="pt" style="left:28%;top:82%"><span class="emo">🎃</span><span class="nom">Courges</span></button>
+      <button class="pt" style="left:50%;top:73%"><span class="emo">🌼</span><span class="nom">Soucis</span></button>
+      <button class="pt" style="left:64%;top:36%"><span class="emo">💙</span><span class="nom">Bourrache</span></button>
+      <button class="pt" style="left:86%;top:13%"><span class="emo">🟣</span><span class="nom">Artichauts</span></button>
+    </div>
+    <i class="m" data-s="1" data-say="coco|Des tournesols, des tomates, du maïs, des courges… Et des fleurs pour les abeilles !"></i>
+    <div class="compare">
+      <div class="carte legume" data-s="2">
+        <h3><span class="emo">🥕</span> Au potager</h3>
+        <ul><li>🌱 On sème</li><li>🧺 On récolte</li><li>🔁 Et on recommence chaque année</li></ul>
+      </div>
+      <div class="carte arbre" data-s="3">
+        <h3><span class="emo">🌳</span> Au bosquet</h3>
+        <ul><li>🌱 On plante <b>une seule fois</b></li><li>📅 Les arbres restent des années</li><li>🍊 Des fruits chaque année</li></ul>
+      </div>
+      <div class="message" data-s="4" data-say="clovis|Les arbres vont grandir en même temps que vous !">Cette fois, on plante pour longtemps !</div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 3. Le pêcher et le bosquet ================= -->
+<section class="ecran" data-say="clovis|Regardez près de la porte : c’est le <b>pêcher</b>, planté par les grands l’an dernier. Il va avoir des copains !">
+  <div class="tete"><span class="puce">Notre coin</span><h2>Un premier arbre est déjà là !</h2></div>
+  <div class="corps">
+    <div class="ba" id="ba" style="--pos:100%">
+      <img src="img/aujourdhui.jpg" alt="Le coin aujourd’hui">
+      <button class="pt" style="left:77%;top:28%;z-index:1"><span class="emo">🍑</span><span class="nom">Le pêcher</span></button>
+      <div class="apres"><img src="img/bosquet-dessin.jpg" alt="Le bosquet une fois terminé (dessin)"></div>
+      <span class="etiq g" data-s="2">Aujourd’hui</span><span class="etiq d" data-s="2">Bientôt</span>
+      <div class="poignee"><b>⇔</b></div>
+    </div>
+    <div class="cote">
+      <div class="carte" data-s="1" data-say="coco|Un bosquet, c’est un petit coin de nature… qu’on peut croquer !">
+        <h3>C’est quoi, un bosquet ?</h3>
+        <div class="ligne"><span class="emo">🍊</span><span>Un coin de nature<br><b>qui se mange</b></span></div>
+        <div class="ligne"><span class="emo">🐞</span><span>Une maison pour<br><b>les petites bêtes</b></span></div>
+      </div>
+      <div class="carte gros" data-s="2" data-say="clovis|Glissez le trait blanc pour voir notre futur bosquet !">
+        <b>⇔ Glissez</b> pour voir comment notre coin va changer.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 4. Q1 Besoins ================= -->
+<section class="ecran" data-say="coco|À votre avis, de quoi a besoin une plante pour vivre ?">
+  <div class="tete"><span class="puce q">Question 1</span><h2>De quoi a besoin une plante pour vivre ?</h2></div>
+  <div class="corps">
+    <div class="grille4">
+      <div class="carte besoin" data-s="1"><div class="ico emo">☀️</div><h3>Le soleil</h3></div>
+      <div class="carte besoin" data-s="2"><div class="ico emo">💧</div><h3>L’eau</h3></div>
+      <div class="carte besoin" data-s="3"><div class="ico" id="icoTerre"></div><h3>La terre</h3></div>
+      <div class="carte besoin" data-s="4"><div class="ico emo">💨</div><h3>L’air</h3></div>
+    </div>
+    <div class="bas">
+      <div class="zoom-sol" data-s="5" data-say="clovis|Mais dans notre coin, la terre a soif… et elle est toute tassée !"><p>Chez nous, la terre est <b>sèche</b> et <b>tassée</b>…</p></div>
+      <div class="solutions">
+        <div class="carte solution" data-s="6"><span class="emo">🚿</span><h3>L’arrosage automatique</h3><p>On aide la nature à boire.</p></div>
+        <div class="carte solution" data-s="7"><span class="emo">🍂</span><h3>Le compost</h3><p>Le repas de la terre.</p></div>
+        <div class="carte solution" data-s="8" data-say="coco|Les copeaux, c’est comme une couette : la terre reste fraîche et humide."><span class="emo">🪵</span><h3>Le paillage</h3><p>La couverture de la terre.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 5. Q2 Fruit ================= -->
+<section class="ecran" data-say="coco|Comment fait un arbre pour faire un fruit ? Qui a une idée ?">
+  <div class="tete"><span class="puce q">Question 2</span><h2>Comment obtient-on un fruit ?</h2></div>
+  <div class="corps">
+    <div class="etapes">
+      <div class="etape" data-s="1" data-say="coco|D’abord, au printemps, l’arbre se couvre de fleurs."><div class="dessin"><span class="num">1</span><span id="dFleur"></span></div><h3>Une fleur s’ouvre</h3></div>
+      <span class="fleche" data-s="2">➜</span>
+      <div class="etape" data-s="2" data-say="clovis|L’abeille vient boire et transporte le pollen, cette poudre jaune, de fleur en fleur."><div class="dessin"><span class="num">2</span><span id="dAbeille"></span></div><h3>L’abeille passe</h3></div>
+      <span class="fleche" data-s="3">➜</span>
+      <div class="etape" data-s="3" data-say="coco|Les pétales tombent… mais au milieu, un tout petit fruit commence à pousser !"><div class="dessin"><span class="num">3</span><span id="dFane"></span></div><h3>La fleur se fane</h3></div>
+      <span class="fleche" data-s="4">➜</span>
+      <div class="etape" data-s="4" data-say="clovis|Et avec le soleil et l’eau, le fruit grossit… jusqu’à ce qu’on puisse le manger !"><div class="dessin"><span class="num">4</span><span id="dFruit"></span></div><h3>Le fruit grossit</h3></div>
+    </div>
+    <div class="bandeau carte" data-s="5" data-say="coco|Regardez bien notre pêcher au printemps !"><b>Notre pêcher :</b> 🌸 des fleurs roses au printemps <span class="fleche" style="font-size:40px">➜</span> <span class="ico" id="icoPeche2"></span> des pêches en été</div>
+  </div>
+</section>
+
+<!-- ================= 6. Q3 Abeilles ================= -->
+<section class="ecran" data-say="clovis|Et les abeilles, à quoi servent-elles dans un jardin ?">
+  <div class="tete"><span class="puce q">Question 3</span><h2>À quoi servent les abeilles et les papillons ?</h2></div>
+  <div class="corps">
+    <div class="carte pollen" data-s="1" data-say="coco|Quand l’abeille va de fleur en fleur, elle transporte le pollen. C’est ça qui fait naître les fruits.">
+      <span class="scene-p" id="scenePollen"></span>
+      <div><div class="tres-gros">Sans abeilles…<br>pas de fruits !</div><p class="gros" style="margin:10px 0 0;color:var(--doux)">Elles transportent le pollen de fleur en fleur.</p></div>
+    </div>
+    <div class="restaurant" data-s="2" data-say="clovis|Alors on plante leur restaurant préféré : des fleurs pleines de nectar !">
+      <h3>🍽️ Leur restaurant dans notre bosquet</h3>
+      <div class="menu" id="menu"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 7. Q4 Fruits d'ici ================= -->
+<section class="ecran" data-say="coco|Pourquoi on ne plante pas des mangues ou des noix de coco ? À votre avis ?">
+  <div class="tete"><span class="puce q">Question 4</span><h2 style="font-size:50px">Pourquoi certains fruits poussent ici… et pas d’autres ?</h2></div>
+  <div class="corps">
+    <div class="climat" data-s="1" data-say="clovis|Chez nous, il y a beaucoup de soleil, peu de pluie, et l’hiver est doux. Les plantes du bosquet adorent ça !">
+      <div class="carte"><span class="emo">☀️</span> Beaucoup de soleil</div>
+      <div class="carte"><span class="emo">🌦️</span> Peu de pluie</div>
+      <div class="carte"><span class="emo">🧣</span> Un hiver doux</div>
+    </div>
+    <div class="fruits" id="fruits" data-s="2" data-say="coco|Jouons ! Ce fruit peut-il pousser dans notre cour ? Touchez une carte pour voir."></div>
+  </div>
+</section>
+
+<!-- ================= 8. Q5 Petites bêtes ================= -->
+<section class="ecran" data-say="clovis|Qui vit sur les plantes et dans le sol ? Touchez les petites bêtes pour les découvrir !">
+  <div class="tete"><span class="puce q">Question 5</span><h2>Quels animaux vivent sur les plantes et dans le sol ?</h2></div>
+  <div class="corps">
+    <div class="terrain" id="terrain"></div>
+    <i class="m" data-s="3" data-say="clovis|La semaine prochaine, on cherchera ces petites bêtes en creusant ! Moi, je serai sous les feuilles."></i>
+  </div>
+</section>
+
+<!-- ================= 9. Q6 Mare ================= -->
+<section class="ecran" data-say="coco|Et dans une mare, qu’est-ce qu’on peut trouver ?">
+  <div class="tete"><span class="puce q a">Question 6</span><h2>Que peut-on trouver dans une mare ?</h2></div>
+  <div class="corps">
+    <div class="mare-fond" id="mare"></div>
+    <i class="m" data-s="2" data-say="clovis|La mare, on va la creuser ensemble la semaine prochaine !"></i>
+  </div>
+</section>
+
+<!-- ================= 10. Ce qu'on va planter ================= -->
+<section class="ecran" data-say="coco|Voici notre futur bosquet ! Touchez une pastille pour découvrir chaque plante.">
+  <div class="tete"><span class="puce">Ce qui nous attend</span><h2>Qu’est-ce qu’on va planter ?</h2></div>
+  <div class="corps">
+    <div class="plan" id="plan"><img src="img/bosquet-dessin.jpg" alt="Dessin du futur bosquet"></div>
+    <div class="fiche-plante" id="fichePlante"></div>
+  </div>
+</section>
+
+<!-- ================= 11. Aménagements ================= -->
+<section class="ecran" data-say="clovis|Et pour que les petites bêtes se sentent bien, on prépare aussi leur maison.">
+  <div class="tete"><span class="puce">Ce qui nous attend</span><h2>Les aménagements</h2></div>
+  <div class="corps">
+    <div class="amenag">
+      <div class="carte" data-s="1" data-say="coco|Une mini-mare : un coin d’eau pour les libellules, les têtards et les oiseaux qui ont soif.">
+        <span class="grand ico" id="icoMare"></span>
+        <div><h3>La mini-mare</h3><p>Un coin d’eau pour les libellules, les têtards et les oiseaux.</p></div>
+      </div>
+      <div class="carte" data-s="2" data-say="clovis|Les copeaux de bois, c’est ma cachette préférée ! Et la terre reste fraîche en été.">
+        <span class="grand ico" id="icoPaillage"></span>
+        <div><h3>Le paillage en copeaux</h3><p>Une couverture : la terre reste fraîche et les petites bêtes s’y cachent.</p></div>
+      </div>
+    </div>
+    <div class="aussi" data-s="3">
+      <div class="carte"><span class="emo">🍂</span><span><b>Et aussi du compost</b><br>pour nourrir la terre</span></div>
+      <div class="carte"><span class="emo">🚿</span><span><b>Et l’arrosage automatique</b><br>remis en marche</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 12. Frise ================= -->
+<section class="ecran" data-say="coco|Voici notre grande aventure de l’année !">
+  <div class="tete"><span class="puce">Ce qui nous attend</span><h2>Notre aventure de l’année</h2></div>
+  <div class="corps">
+    <div class="frise">
+      <div class="jalon ici" data-s="1"><span class="ici-etiq">Vous êtes ici !</span><div class="rond">🔍</div><h3>Aujourd’hui</h3>
+        <div class="carte">On découvre le projet.</div></div>
+      <div class="jalon" data-s="2" data-say="clovis|La semaine prochaine, on met les mains dans la terre !"><div class="rond">🌱</div><h3>La semaine prochaine</h3>
+        <div class="carte"><ul><li>On plante</li><li>On paille</li><li>On observe le sol</li><li>On crée la mare</li></ul></div></div>
+      <div class="jalon" data-s="3" data-say="coco|Au printemps, on observe tout ce qui change et on le note dans notre carnet."><div class="rond">🌸</div><h3>Au printemps</h3>
+        <div class="carte"><ul><li>On plante le clémentinier et le bananier</li><li>On observe les fleurs, les insectes et la mare</li><li>On remplit notre <b>carnet d’observation</b></li></ul></div></div>
+      <div class="jalon" data-s="4" data-say="clovis|Et à la fin, on dessine ensemble un grand croquis pour le montrer aux autres classes !"><div class="rond">🎨</div><h3>À la fin</h3>
+        <div class="carte">On dessine ensemble un <b>grand croquis du bosquet</b>, affiché pour les autres classes.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 13. Règles et fin ================= -->
+<section class="ecran" data-say="clovis|Le bosquet est dans la cour de récré. Pour le protéger, on devient tous des gardiens !">
+  <div class="tete"><span class="puce">Ce qui nous attend</span><h2>Les gardiens du bosquet</h2></div>
+  <div class="corps">
+    <div class="regles">
+      <div class="carte regle" data-s="1"><span class="rond non">👟</span><h3>Je ne marche pas dans le bosquet</h3></div>
+      <div class="carte regle" data-s="2"><span class="rond">👀</span><h3>J’observe sans arracher</h3></div>
+      <div class="carte regle" data-s="3"><span class="rond">💧</span><h3>Je fais attention à la mare</h3></div>
+      <div class="carte regle" data-s="4" data-say="coco|Certaines plantes ne se mangent pas : on demande toujours à un adulte !"><span class="rond non">👅</span><h3>Je ne goûte rien sans un adulte</h3></div>
+    </div>
+  </div>
+  <div class="fin" data-s="5" data-say="coco|Bravo ! Quel nom allez-vous donner à notre bosquet ?">
+    <h1>Bravo ! Vous êtes les<br>jardiniers du bosquet !</h1>
+    <div class="duo"><div class="a" id="finCoco"></div><div class="b" id="finClovis"></div></div>
+    <label class="nom">Notre bosquet s’appelle : <input id="nomBosquet" maxlength="30" placeholder="…" autocomplete="off"></label>
+  </div>
+</section>
+
+<!-- ================= Pied ================= -->
+<div id="pied">
+  <button class="mascotte" id="coco" aria-label="Coco la coccinelle"></button>
+  <button class="mascotte" id="clovis" aria-label="Clovis le cloporte"></button>
+  <div id="bulle"></div>
+  <div id="points"></div>
+  <div id="nav">
+    <button class="petit" id="bPlein" title="Plein écran (F)" aria-label="Plein écran">⛶</button>
+    <button id="bAvant" aria-label="Précédent">‹</button>
+    <span id="compteur"></span>
+    <button id="bApres" aria-label="Suivant">›</button>
+  </div>
+</div>
+<div id="fiche"><div class="carte"><button class="fermer" aria-label="Fermer">✕</button><span class="grand-ico ico"></span><div><h3></h3><p></p></div></div></div>
+
+</div></div>
+
+<script>
+/* ===================== Dessins ===================== */
+const SVG = {
+  coco: `<svg viewBox="0 0 120 120" aria-hidden="true">
+    <path d="M50 22 C44 10 36 8 32 12" stroke="#222" stroke-width="3.5" fill="none" stroke-linecap="round"/><circle cx="31" cy="12" r="4" fill="#222"/>
+    <path d="M70 22 C76 10 84 8 88 12" stroke="#222" stroke-width="3.5" fill="none" stroke-linecap="round"/><circle cx="89" cy="12" r="4" fill="#222"/>
+    <path d="M24 88 l-12 6 M22 72 l-13 -2 M96 88 l12 6 M98 72 l13 -2" stroke="#222" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="60" cy="74" r="40" fill="#e23b2e"/>
+    <path d="M60 36 L60 114" stroke="#7a1712" stroke-width="3"/>
+    <circle cx="40" cy="62" r="8" fill="#222"/><circle cx="80" cy="62" r="8" fill="#222"/><circle cx="36" cy="88" r="7" fill="#222"/><circle cx="84" cy="88" r="7" fill="#222"/><circle cx="52" cy="100" r="5" fill="#222"/><circle cx="68" cy="100" r="5" fill="#222"/>
+    <ellipse cx="44" cy="48" rx="9" ry="5" fill="#fff" opacity=".35" transform="rotate(-25 44 48)"/>
+    <ellipse cx="60" cy="36" rx="24" ry="19" fill="#222"/>
+    <circle cx="51" cy="33" r="7" fill="#fff"/><circle cx="69" cy="33" r="7" fill="#fff"/><circle cx="52.5" cy="34" r="3.6" fill="#222"/><circle cx="70.5" cy="34" r="3.6" fill="#222"/>
+    <circle cx="53.5" cy="32.5" r="1.2" fill="#fff"/><circle cx="71.5" cy="32.5" r="1.2" fill="#fff"/>
+    <path d="M52 44 Q60 51 68 44" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <circle cx="44" cy="43" r="3" fill="#ff8a8a" opacity=".8"/><circle cx="76" cy="43" r="3" fill="#ff8a8a" opacity=".8"/></svg>`,
+  clovis: `<svg viewBox="0 0 150 110" aria-hidden="true">
+    <g stroke="#4c4f57" stroke-width="3.5" stroke-linecap="round"><path d="M50 84 l-6 12 M66 87 l-4 13 M82 88 l0 13 M98 87 l4 13 M114 84 l7 12"/></g>
+    <path d="M30 58 C18 40 6 34 2 38" stroke="#4c4f57" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+    <path d="M32 50 C26 30 18 22 12 22" stroke="#4c4f57" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+    <path d="M36 82 C30 40 60 20 92 22 C126 24 146 50 140 82 Z" fill="#8f96a3"/>
+    <g fill="none" stroke="#6d7380" stroke-width="3"><path d="M56 82 C54 54 60 34 66 26"/><path d="M74 83 C74 56 78 34 82 23"/><path d="M92 83 C94 56 96 36 98 23"/><path d="M110 83 C112 60 112 42 112 27"/><path d="M126 82 C128 66 128 52 124 38"/></g>
+    <path d="M60 34 C80 22 110 24 126 40" stroke="#c3c8d1" stroke-width="4" fill="none" stroke-linecap="round" opacity=".8"/>
+    <ellipse cx="38" cy="70" rx="20" ry="16" fill="#7b818d"/>
+    <circle cx="30" cy="64" r="7" fill="#fff"/><circle cx="44" cy="63" r="7" fill="#fff"/><circle cx="31" cy="65" r="3.6" fill="#222"/><circle cx="45" cy="64" r="3.6" fill="#222"/>
+    <circle cx="32" cy="63.5" r="1.2" fill="#fff"/><circle cx="46" cy="62.5" r="1.2" fill="#fff"/>
+    <path d="M30 76 Q38 82 46 75" stroke="#2f3238" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <circle cx="24" cy="74" r="3" fill="#ff9a9a" opacity=".7"/></svg>`,
+  peche: `<svg viewBox="0 0 100 100" aria-hidden="true"><path d="M50 30 C20 26 8 56 22 76 C34 93 66 93 78 76 C92 56 80 26 50 30Z" fill="#f7a072"/>
+    <ellipse cx="36" cy="52" rx="11" ry="15" fill="#ffd59a" opacity=".75"/><path d="M50 32 C42 50 44 72 52 89" stroke="#d0553f" stroke-width="3" fill="none" opacity=".55"/>
+    <path d="M50 32 C50 22 52 16 56 11" stroke="#6b4a2b" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M54 20 C66 6 86 10 88 16 C76 26 62 26 54 20Z" fill="#5fa04a"/></svg>`,
+  grenade: `<svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="58" r="34" fill="#c8323a"/><ellipse cx="37" cy="46" rx="10" ry="7" fill="#ee7a7a" opacity=".7"/>
+    <path d="M38 28 L41 14 L47 22 L50 12 L53 22 L59 14 L62 28 Z" fill="#9c2530"/></svg>`,
+  framboise: (()=>{let c='';const pts=[[50,40],[38,46],[62,46],[30,58],[44,56],[56,56],[70,58],[36,70],[50,68],[64,70],[43,81],[57,81],[50,91]];
+    for(const[x,y]of pts)c+=`<circle cx="${x}" cy="${y}" r="8.5" fill="#d6336c" stroke="#a61e4d" stroke-width="1.5"/><circle cx="${x-2.5}" cy="${y-2.5}" r="2" fill="#fff" opacity=".5"/>`;
+    return `<svg viewBox="0 0 100 100" aria-hidden="true">${c}<path d="M50 34 L36 24 L48 28 L50 16 L52 28 L64 24 Z" fill="#4f9a3c"/></svg>`;})(),
+  mangue: `<svg viewBox="0 0 100 100" aria-hidden="true"><path d="M30 30 C60 10 92 40 80 70 C70 92 36 94 26 74 C18 58 34 50 30 30Z" fill="#f4a93a"/><path d="M30 30 C46 30 70 44 80 70 C70 92 44 90 34 80" fill="#e5612f" opacity=".55"/><path d="M34 28 C40 16 54 14 62 18 C52 22 44 26 34 28Z" fill="#4f9a3c"/></svg>`,
+  coco2: `<svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="54" r="36" fill="#7a4f2c"/><path d="M22 40 C30 30 40 34 46 26 M60 24 C66 32 76 28 82 38 M24 66 C34 62 36 72 46 70" stroke="#5a3519" stroke-width="3" fill="none"/><circle cx="42" cy="42" r="4" fill="#3d2410"/><circle cx="56" cy="40" r="4" fill="#3d2410"/><circle cx="49" cy="52" r="4" fill="#3d2410"/></svg>`,
+  terre: `<svg viewBox="0 0 100 100" aria-hidden="true"><path d="M50 52 C50 38 52 30 56 24" stroke="#4f9a3c" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M54 30 C62 14 82 16 86 22 C76 34 62 36 54 30Z" fill="#6fb04f"/><path d="M50 40 C42 26 24 26 18 32 C28 44 42 46 50 40Z" fill="#8fc46a"/><path d="M6 92 C10 60 90 60 94 92Z" fill="#8a5a3b"/><circle cx="34" cy="78" r="3" fill="#6a4128"/><circle cx="62" cy="74" r="3" fill="#6a4128"/><circle cx="52" cy="86" r="2.5" fill="#6a4128"/></svg>`,
+  epi: (c, tige='#5c8a4a') => { let e=''; const tiges=[[50,98,50,22],[50,98,22,36],[50,98,78,36]];
+    for(const[x1,y1,x2,y2]of tiges){ for(let i=0;i<7;i++){const t=i/7, x=x2+(x1-x2)*t*.55, y=y2+(y1-y2)*t*.55; e+=`<ellipse cx="${x-4}" cy="${y}" rx="5" ry="4" fill="${c}"/><ellipse cx="${x+4}" cy="${y+2}" rx="5" ry="4" fill="${c}"/>`;} }
+    return `<svg viewBox="0 0 100 100" aria-hidden="true"><g stroke="${tige}" stroke-width="3" stroke-linecap="round"><path d="M50 98 L50 22 M50 98 L22 36 M50 98 L78 36"/></g>${e}</svg>`; },
+  libellule: `<svg viewBox="0 0 100 100" aria-hidden="true"><ellipse cx="42" cy="34" rx="26" ry="8" fill="#bfe4f6" stroke="#6aaed6" stroke-width="1.5" opacity=".9" transform="rotate(-20 42 34)"/><ellipse cx="58" cy="34" rx="26" ry="8" fill="#bfe4f6" stroke="#6aaed6" stroke-width="1.5" opacity=".9" transform="rotate(20 58 34)"/>
+    <ellipse cx="40" cy="48" rx="24" ry="7" fill="#d4eefa" stroke="#6aaed6" stroke-width="1.5" opacity=".9" transform="rotate(15 40 48)"/><ellipse cx="60" cy="48" rx="24" ry="7" fill="#d4eefa" stroke="#6aaed6" stroke-width="1.5" opacity=".9" transform="rotate(-15 60 48)"/>
+    <path d="M50 40 L50 94" stroke="#1f6fb2" stroke-width="7" stroke-linecap="round"/><circle cx="50" cy="32" r="9" fill="#1f6fb2"/><circle cx="45" cy="29" r="4" fill="#9fe0ff"/><circle cx="55" cy="29" r="4" fill="#9fe0ff"/></svg>`,
+  larve: `<svg viewBox="0 0 100 100" aria-hidden="true"><g stroke="#5b4a2a" stroke-width="3" stroke-linecap="round"><path d="M40 44 l-14 -8 M40 52 l-16 2 M42 60 l-14 10 M60 44 l14 -8 M60 52 l16 2 M58 60 l14 10"/></g>
+    <ellipse cx="50" cy="62" rx="15" ry="28" fill="#8b7a45"/><g stroke="#6d5e30" stroke-width="2"><path d="M37 62 H63 M38 72 H62 M40 81 H60"/></g><ellipse cx="50" cy="34" rx="13" ry="10" fill="#7a6a3a"/><circle cx="43" cy="31" r="4" fill="#2d2a1a"/><circle cx="57" cy="31" r="4" fill="#2d2a1a"/></svg>`,
+  tetard: `<svg viewBox="0 0 100 100" aria-hidden="true"><path d="M52 56 C66 60 74 50 84 58 C92 64 90 74 96 76" stroke="#2f3a2a" stroke-width="7" fill="none" stroke-linecap="round"/><ellipse cx="38" cy="52" rx="22" ry="18" fill="#2f3a2a"/><circle cx="30" cy="46" r="5" fill="#fff"/><circle cx="31" cy="47" r="2.5" fill="#111"/></svg>`,
+  mare: `<svg viewBox="0 0 220 220" aria-hidden="true"><rect width="220" height="220" rx="24" fill="#cfe6c3"/><ellipse cx="110" cy="122" rx="92" ry="62" fill="#9a8a6a"/><ellipse cx="110" cy="118" rx="84" ry="54" fill="#5aa9d6"/><ellipse cx="90" cy="104" rx="40" ry="12" fill="#9fd3ef" opacity=".7"/>
+    <circle cx="140" cy="128" r="14" fill="#5fa04a"/><path d="M140 128 L154 122" stroke="#5aa9d6" stroke-width="4"/><circle cx="82" cy="140" r="10" fill="#6fb04f"/><path d="M40 60 C42 80 44 96 46 110 M52 50 C52 74 54 92 56 108 M176 64 C174 84 172 98 170 110" stroke="#4f8a3c" stroke-width="5" stroke-linecap="round" fill="none"/></svg>`,
+  paillage: (()=>{let c='';const col=['#c98f55','#b57a40','#dba56a','#a86d38'];let s=7;const r=()=>{s=(s*9301+49297)%233280;return s/233280;};
+    for(let i=0;i<70;i++){const x=10+r()*200,y=80+r()*130,w=16+r()*20,a=r()*180;c+=`<rect x="${x}" y="${y}" width="${w}" height="7" rx="3" fill="${col[i%4]}" transform="rotate(${a} ${x} ${y})"/>`;}
+    return `<svg viewBox="0 0 220 220" aria-hidden="true"><rect width="220" height="220" rx="24" fill="#f3e6d6"/><path d="M110 120 C110 90 112 70 118 54" stroke="#4f9a3c" stroke-width="6" fill="none" stroke-linecap="round"/><path d="M116 64 C128 40 158 42 164 50 C150 66 128 70 116 64Z" fill="#6fb04f"/><path d="M110 90 C98 70 72 70 64 78 C78 94 98 96 110 90Z" fill="#8fc46a"/>${c}</svg>`;})(),
+  fleur: (p='#f6a6c1',c='#f6c445') => `<svg viewBox="0 0 100 100" aria-hidden="true"><path d="M50 100 C50 80 48 68 50 58" stroke="#6b4a2b" stroke-width="5" fill="none"/>${[0,72,144,216,288].map(a=>`<ellipse cx="50" cy="26" rx="13" ry="18" fill="${p}" transform="rotate(${a} 50 44)"/>`).join('')}<circle cx="50" cy="44" r="10" fill="${c}"/><g fill="#d4a017">${[0,60,120,180,240,300].map(a=>`<circle cx="50" cy="37" r="1.8" transform="rotate(${a} 50 44)"/>`).join('')}</g></svg>`,
+};
+SVG.dAbeille = `<svg viewBox="0 0 100 100" aria-hidden="true">${SVG.fleur().replace(/<\/?svg[^>]*>/g,'')}<g fill="#f6c445">${[[20,20],[26,28],[32,22],[74,70],[80,62]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="2.6"/>`).join('')}</g><text x="56" y="36" font-size="34">🐝</text></svg>`;
+SVG.dFane = `<svg viewBox="0 0 100 100" aria-hidden="true"><path d="M50 100 C50 80 48 68 50 58" stroke="#6b4a2b" stroke-width="5" fill="none"/><path d="M42 54 C40 44 46 38 50 40 C54 38 60 44 58 54 Z" fill="#5fa04a"/><ellipse cx="50" cy="44" rx="7" ry="8" fill="#8fc46a"/>
+  <ellipse cx="22" cy="70" rx="9" ry="12" fill="#f6a6c1" opacity=".8" transform="rotate(40 22 70)"/><ellipse cx="78" cy="78" rx="9" ry="12" fill="#f6a6c1" opacity=".7" transform="rotate(-30 78 78)"/><ellipse cx="34" cy="90" rx="8" ry="11" fill="#f6a6c1" opacity=".6" transform="rotate(80 34 90)"/><ellipse cx="72" cy="30" rx="8" ry="11" fill="#f6a6c1" opacity=".9" transform="rotate(-50 72 30)"/></svg>`;
+SVG.dFruit = `<svg viewBox="0 0 100 100" aria-hidden="true"><path d="M50 0 C50 10 50 18 52 26" stroke="#6b4a2b" stroke-width="5" fill="none"/>${SVG.peche.replace(/<svg[^>]*>|<\/svg>/g,'')}</svg>`;
+SVG.pollen = `<svg viewBox="0 0 560 220" aria-hidden="true"><g transform="translate(10,40) scale(1.7)">${SVG.fleur('#c9b3f2').replace(/<\/?svg[^>]*>/g,'')}</g><g transform="translate(380,40) scale(1.7)">${SVG.fleur('#f6a6c1').replace(/<\/?svg[^>]*>/g,'')}</g>
+  <path d="M120 110 C200 20 330 20 400 100" stroke="#d4a017" stroke-width="5" stroke-dasharray="4 14" stroke-linecap="round" fill="none"/><g fill="#f6c445"><circle cx="160" cy="70" r="5"/><circle cx="210" cy="48" r="5"/><circle cx="330" cy="50" r="5"/><circle cx="370" cy="72" r="5"/></g><text x="238" y="70" font-size="64">🐝</text></svg>`;
+
+const ico = (k) => k.startsWith('<svg') ? k : SVG[k] ? SVG[k] : `<span class="emo">${k}</span>`;
+function poser(id, html){ const e=document.getElementById(id); if(e) e.innerHTML=html; }
+poser('icoTerre', SVG.terre); poser('dFleur', SVG.fleur()); poser('dAbeille', SVG.dAbeille); poser('dFane', SVG.dFane); poser('dFruit', SVG.dFruit);
+poser('icoPeche2', SVG.peche); poser('scenePollen', SVG.pollen); poser('icoMare', SVG.mare); poser('icoPaillage', SVG.paillage);
+poser('coco', SVG.coco); poser('clovis', SVG.clovis); poser('finCoco', SVG.coco); poser('finClovis', SVG.clovis);
+
+/* ===================== Contenus ===================== */
+const PLANTES = {
+  pecher:      {ico:SVG.peche, nom:'Le pêcher', tags:['fruits','abeilles'], txt:'Il est déjà là ! Des fleurs roses au printemps, puis des pêches en été.', badge:['deja','⭐ Déjà planté']},
+  grenadier:   {ico:SVG.grenade, nom:'Le grenadier', tags:['fruits','abeilles'], txt:'Des fleurs rouge vif, puis des grenades pleines de petits grains. Il adore la chaleur.'},
+  clementinier:{ico:'🍊', nom:'Le clémentinier', tags:['fruits','odeur'], txt:'Ses fleurs blanches sentent très bon, et ses clémentines mûrissent… en hiver !', badge:['hiver','❄️ Planté après l’hiver']},
+  bananier:    {ico:'🍌', nom:'Le bananier', tags:['geant'], txt:'Une plante géante aux feuilles immenses. Ici, ses bananes ont du mal à mûrir.', badge:['hiver','❄️ Planté après l’hiver']},
+  framboisier: {ico:SVG.framboise, nom:'Le framboisier', tags:['fruits','abeilles'], txt:'Des framboises à cueillir en été… et à partager !'},
+  vigne:       {ico:'🍇', nom:'La vigne', tags:['fruits'], txt:'Elle grimpe en s’accrochant. Des raisins à la fin de l’été.'},
+  buddleia:    {ico:SVG.epi('#8b6cc4'), nom:'L’arbre aux papillons', tags:['papillons','abeilles'], txt:'Ses grandes grappes violettes attirent les papillons tout l’été.'},
+  lavande:     {ico:SVG.epi('#7f6bd1'), nom:'La lavande', tags:['abeilles','odeur'], txt:'Les abeilles l’adorent. Frottez ses fleurs : ça sent bon !'},
+  romarin:     {ico:SVG.epi('#7fa8e0','#4f7a52'), nom:'Le romarin', tags:['abeilles','odeur'], txt:'Il fleurit très tôt, à la fin de l’hiver : un repas pour les premières abeilles.'},
+  geranium:    {ico:'🌺', nom:'Le géranium', tags:['fleurs'], txt:'Des fleurs colorées pendant de longs mois.'},
+  thym:        {ico:'🌿', nom:'Le thym', tags:['tapis','odeur','abeilles'], txt:'Un petit tapis qui sent bon. Ses minuscules fleurs nourrissent les abeilles.'},
+  menthe:      {ico:'🌱', nom:'La menthe', tags:['tapis','odeur'], txt:'Elle pousse vite et couvre le sol. Frottez une feuille : ça sent le chewing-gum !'},
+  melisse:     {ico:'🍋', nom:'La mélisse', tags:['odeur','abeilles'], txt:'Frottez une feuille : elle sent le citron !'},
+  mare:        {ico:'💧', nom:'La petite mare', tags:['eau'], txt:'La maison des libellules, des têtards et des escargots d’eau.'},
+};
+const TAGS = {fruits:'🍎 Des fruits', abeilles:'🐝 Pour les abeilles', papillons:'🦋 Pour les papillons', odeur:'👃 Ça sent bon', tapis:'🟩 Un tapis vert', geant:'🌴 Une plante géante', fleurs:'🌸 Des fleurs', eau:'🐸 Un coin d’eau'};
+// emplacement des pastilles sur le dessin (en % de l'image)
+const PLAN = [['pecher',74,30],['grenadier',50,30],['clementinier',64,30],['bananier',38,32],['buddleia',16,31],['vigne',46,11],['framboisier',44,48],
+  ['romarin',29,55],['geranium',66,55],['lavande',52,63],['thym',86,44],['melisse',62,72],['menthe',37,85],['mare',27,72]];
+
+const MENU = ['lavande','buddleia','romarin','thym','melisse'];
+poser('menu', MENU.map(k=>`<div class="carte plat"><span class="ico">${ico(PLANTES[k].ico)}</span><h3>${PLANTES[k].nom.replace(/^(Le |La |L’)/,'').replace(/^./,c=>c.toUpperCase())}</h3></div>`).join(''));
+
+const FRUITS = [
+  ['peche','La pêche','oui','✅','Oui ! Notre pêcher pousse déjà dans la cour.'],
+  ['grenade','La grenade','oui','✅','Oui ! Le grenadier adore le soleil.'],
+  ['🍊','La clémentine','oui','✅','Oui ! L’hiver est assez doux pour elle.'],
+  ['🍇','Le raisin','oui','✅','Oui ! Il y a plein de vignes autour de chez nous.'],
+  ['framboise','La framboise','oui','✅','Oui ! Avec un peu d’eau en été.'],
+  ['🍌','La banane','mais','🤔','Oui… mais ! La plante pousse, mais les bananes ont du mal à mûrir.'],
+  ['mangue','La mangue','non','❌','Non ! Il lui faut de la chaleur toute l’année.'],
+  ['coco2','La noix de coco','non','❌','Non ! Le cocotier vit dans les pays très chauds.'],
+];
+poser('fruits', FRUITS.map(([i,n,c,v,t])=>`<button class="fruit" aria-label="${n}"><div class="in"><div class="f"><span class="ico">${ico(i)}</span><h3>${n}</h3><small>Ça pousse ici ?</small></div><div class="r ${c}"><span class="v">${v}</span><p>${t}</p></div></div></button>`).join(''));
+document.getElementById('fruits').addEventListener('click', e=>{ const b=e.target.closest('.fruit'); if(b) b.classList.toggle('vu-r'); });
+
+const BETES = [
+  // [icône, nom, texte, x %, y %, étape]
+  ['🐞','La coccinelle','Elle mange les pucerons qui abîment les plantes. C’est l’amie du jardinier !',14,38,1],
+  ['🦋','Le papillon','Il boit le nectar des fleurs avec sa longue trompe.',30,14,1],
+  ['🐝','L’abeille','Elle va de fleur en fleur et transporte le pollen.',45,30,1],
+  ['🐛','La chenille','Elle grignote les feuilles… un jour, elle deviendra papillon !',36,42,1],
+  ['🦎','Le lézard','Il se chauffe au soleil sur les pierres et se cache dans les trous.',70,22,2],
+  ['🕷️','L’araignée','Elle tisse sa toile pour attraper les moucherons.',84,30,2],
+  ['🐌','L’escargot','Il se cache au frais entre les pierres quand il fait sec.',76,42,2],
+  ['🪱','Le ver de terre','Il creuse des tunnels : l’eau et l’air entrent dans la terre.',18,80,3],
+  ['clovis','Le cloporte','Il mange les feuilles mortes et les transforme en terre. Comme Clovis !',42,70,3],
+  ['🐜','La fourmi','Elle construit des galeries et transporte des graines.',64,84,3],
+];
+(function(){
+  const t=document.getElementById('terrain');
+  let pierres=''; const rangs=[[700,250,10],[720,212,9],[745,174,8],[775,136,6]];
+  rangs.forEach(([x0,y,n],j)=>{for(let i=0;i<n;i++)pierres+=`<rect x="${x0+i*78+(j%2)*20}" y="${y}" width="72" height="34" rx="12" fill="${['#e2d2ad','#d6c39a','#cdb88c'][(i+j)%3]}" stroke="#a8936a" stroke-width="2"/>`;});
+  let buissons=''; [[90,280,70],[180,250,90],[300,270,80],[420,240,95],[540,270,70]].forEach(([x,y,r])=>buissons+=`<circle cx="${x}" cy="${y}" r="${r}" fill="#79b058"/><circle cx="${x-r*.3}" cy="${y-r*.35}" r="${r*.55}" fill="#8fc46a"/>`);
+  let fleurs=''; [[120,210,'#f6a6c1'],[230,190,'#c9b3f2'],[350,205,'#f6c445'],[470,180,'#c9b3f2'],[560,225,'#f6a6c1'],[60,240,'#f6c445']].forEach(([x,y,c])=>fleurs+=`<circle cx="${x}" cy="${y}" r="13" fill="${c}"/><circle cx="${x}" cy="${y}" r="5" fill="#fff6c8"/>`);
+  t.innerHTML = `<svg class="decor" viewBox="0 0 1540 612" preserveAspectRatio="none" aria-hidden="true">
+    <rect x="0" y="300" width="1540" height="312" fill="#8a5a3b"/><rect x="0" y="292" width="1540" height="16" rx="8" fill="#6b9a45"/>
+    <g fill="#6f4529">${Array.from({length:40},(_,i)=>`<circle cx="${(i*137)%1540}" cy="${330+((i*71)%270)}" r="${4+(i%4)*2}"/>`).join('')}</g>
+    <path d="M60 520 C160 470 220 560 330 500 S520 470 600 540" stroke="#6a4128" stroke-width="22" fill="none" stroke-linecap="round" opacity=".7"/>
+    <path d="M760 400 C860 450 900 380 1000 430 S1180 520 1300 470" stroke="#6a4128" stroke-width="20" fill="none" stroke-linecap="round" opacity=".7"/>
+    <g fill="#c98f55">${Array.from({length:26},(_,i)=>`<rect x="${(i*61)%1540}" y="${288+(i%3)*4}" width="30" height="8" rx="3" transform="rotate(${(i*37)%60-30} ${(i*61)%1540} 292)"/>`).join('')}</g>
+    ${buissons}${fleurs}${pierres}</svg>
+    <span class="zone" data-s="1" style="left:24px;top:20px">🌿 Sur les plantes</span>
+    <span class="zone" data-s="2" style="left:1180px;top:20px">🧱 Dans le muret</span>
+    <span class="zone sol" data-s="3" style="left:24px;top:330px">🟫 Dans le sol</span>` +
+    BETES.map(([i,n,tx,x,y,s],k)=>`<button class="bete" data-s="${s}" data-k="${k}" style="left:${x}%;top:${y}%" aria-label="${n}">${i==='clovis'?`<span class="ico">${SVG.clovis}</span>`:i}</button>`).join('');
+  t.addEventListener('click', e=>{ const b=e.target.closest('.bete'); if(!b) return; b.classList.add('vue'); const [i,n,tx]=BETES[b.dataset.k]; ouvrirFiche(i==='clovis'?SVG.clovis:i, n, tx); });
+})();
+
+const MARE = [
+  ['libellule','La libellule','Elle vole très vite au-dessus de l’eau et attrape les moustiques.',30,16],
+  ['larve','La larve de libellule','Avant de voler, la libellule vit sous l’eau pendant des mois !',44,76],
+  ['🐸','La grenouille','Elle saute, nage et mange les insectes. Peut-être qu’elle viendra chez nous !',66,46],
+  ['tetard','Le têtard','C’est un bébé grenouille. Il vit dans l’eau et il a une queue !',56,66],
+  ['🐌','L’escargot d’eau','Il nettoie la mare en mangeant les algues.',30,58],
+  ['🐦','L’oiseau','Il vient boire et prendre son bain.',84,24],
+];
+(function(){
+  const m=document.getElementById('mare');
+  m.innerHTML = `<svg class="decor" viewBox="0 0 1540 612" preserveAspectRatio="none" aria-hidden="true" style="position:absolute;inset:0;width:100%;height:100%">
+    <rect width="1540" height="612" fill="#cfe6c3"/><ellipse cx="770" cy="360" rx="640" ry="230" fill="#a6936c"/><ellipse cx="770" cy="352" rx="610" ry="208" fill="#4f9fd0"/>
+    <ellipse cx="770" cy="420" rx="440" ry="110" fill="#3b85b6"/><ellipse cx="620" cy="250" rx="220" ry="30" fill="#8fcbef" opacity=".55"/>
+    <g fill="#5fa04a"><ellipse cx="1020" cy="300" rx="62" ry="24"/><ellipse cx="560" cy="440" rx="50" ry="20"/><ellipse cx="900" cy="470" rx="44" ry="17"/></g>
+    <g stroke="#4f8a3c" stroke-width="10" stroke-linecap="round" fill="none"><path d="M170 360 C172 280 176 220 186 160"/><path d="M200 380 C200 300 206 250 214 200"/><path d="M1340 370 C1338 290 1332 240 1324 190"/><path d="M1370 380 C1372 310 1376 260 1386 220"/></g>
+    <g fill="#8a5a3b"><rect x="180" y="148" width="14" height="40" rx="7"/><rect x="1316" y="180" width="14" height="40" rx="7"/></g>
+    <g fill="#9a8a6a">${Array.from({length:18},(_,i)=>{const a=i/18*Math.PI*2;return `<ellipse cx="${770+Math.cos(a)*635}" cy="${360+Math.sin(a)*225}" rx="40" ry="24"/>`;}).join('')}</g></svg>
+    <span class="zone" data-s="1" style="left:24px;top:20px">💧 Dans la mare</span>` +
+    MARE.map(([i,n,tx,x,y],k)=>`<button class="bete" data-s="1" data-k="${k}" style="left:${x}%;top:${y}%" aria-label="${n}">${SVG[i]?`<span class="ico">${SVG[i]}</span>`:i}</button>`).join('');
+  m.addEventListener('click', e=>{ const b=e.target.closest('.bete'); if(!b) return; b.classList.add('vue'); const [i,n,tx]=MARE[b.dataset.k]; ouvrirFiche(SVG[i]||i, n, tx); });
+})();
+
+/* Plan des plantations */
+(function(){
+  const plan=document.getElementById('plan'), fp=document.getElementById('fichePlante');
+  plan.insertAdjacentHTML('beforeend', PLAN.map(([k,x,y])=>{const p=PLANTES[k];return `<button class="pt" data-k="${k}" style="left:${x}%;top:${y}%" aria-label="${p.nom}"><span class="ico" style="width:36px;height:36px;font-size:30px">${ico(p.ico)}</span><span class="nom">${p.nom.replace(/^(Le |La |L’)/,'')}</span></button>`;}).join(''));
+  function accueil(){ fp.innerHTML = `<div class="carte"><span class="grand-ico ico emo">👆</span><h3>Touchez une pastille</h3><p>pour découvrir chaque plante du bosquet.</p></div>
+    <div class="liste-plantes">${PLAN.map(([k])=>`<button data-k="${k}">${PLANTES[k].nom.replace(/^(Le |La |L’)/,'')}</button>`).join('')}</div>`; }
+  function montrer(k){
+    const p=PLANTES[k];
+    fp.innerHTML = `<div class="carte"><span class="grand-ico ico">${ico(p.ico)}</span><h3>${p.nom}</h3><p>${p.txt}</p>
+      <div class="badges">${p.tags.map(t=>`<span class="badge">${TAGS[t]}</span>`).join('')}${p.badge?`<span class="badge ${p.badge[0]}">${p.badge[1]}</span>`:''}</div></div>
+      <div class="liste-plantes">${PLAN.map(([q])=>`<button data-k="${q}" class="${q===k?'choisi':''}">${PLANTES[q].nom.replace(/^(Le |La |L’)/,'')}</button>`).join('')}</div>`;
+    plan.querySelectorAll('.pt').forEach(b=>b.classList.toggle('choisi', b.dataset.k===k));
+  }
+  plan.addEventListener('click', e=>{ const b=e.target.closest('.pt'); if(b) montrer(b.dataset.k); });
+  fp.addEventListener('click', e=>{ const b=e.target.closest('button[data-k]'); if(b) montrer(b.dataset.k); });
+  accueil();
+})();
+
+/* Pastilles du potager et du pêcher : un toucher affiche le nom */
+document.querySelectorAll('#potager .pt, #ba .pt').forEach(b=>b.addEventListener('click',()=>b.classList.toggle('ouvert')));
+
+/* Avant / après */
+const ba=document.getElementById('ba');
+(function(){
+  let tire=false;
+  function regler(e){ const r=ba.getBoundingClientRect(); const p=Math.max(0,Math.min(100,(e.clientX-r.left)/r.width*100)); ba.classList.remove('anime'); ba.style.setProperty('--pos',p+'%'); }
+  ba.addEventListener('pointerdown',e=>{ if(e.target.closest('.pt')) return; tire=true; ba.setPointerCapture(e.pointerId); regler(e); });
+  ba.addEventListener('pointermove',e=>{ if(tire) regler(e); });
+  ba.addEventListener('pointerup',()=>tire=false); ba.addEventListener('pointercancel',()=>tire=false);
+})();
+
+/* ===================== Fiche ===================== */
+const fiche=document.getElementById('fiche');
+function ouvrirFiche(icone, titre, texte){
+  fiche.querySelector('.grand-ico').innerHTML = icone.startsWith('<svg') ? icone : `<span class="emo">${icone}</span>`;
+  fiche.querySelector('h3').textContent=titre; fiche.querySelector('p').textContent=texte;
+  fiche.classList.add('on');
+}
+fiche.addEventListener('click',()=>fiche.classList.remove('on'));
+
+/* ===================== Navigation pas à pas ===================== */
+const ecrans=[...document.querySelectorAll('.ecran')];
+let cur=0, pas=0;
+const maxPas = s => Math.max(0, ...[...s.querySelectorAll('[data-s]')].map(e=>+e.dataset.s));
+const bulle=document.getElementById('bulle'), coco=document.getElementById('coco'), clovis=document.getElementById('clovis');
+const points=document.getElementById('points');
+points.innerHTML = ecrans.map((_,i)=>`<i data-i="${i}" title="Écran ${i+1}"></i>`).join('');
+points.addEventListener('click',e=>{ if(e.target.dataset.i) aller(+e.target.dataset.i, 0); });
+
+function parole(s){
+  let txt=s.dataset.say;
+  s.querySelectorAll('[data-say][data-s]').forEach(e=>{ if(+e.dataset.s<=pas) txt=e.dataset.say; });
+  const [qui, mots] = (txt||'|').split('|');
+  bulle.classList.add('cache');
+  setTimeout(()=>{ bulle.innerHTML=mots||''; bulle.classList.toggle('cache', !mots); },180);
+  coco.className='mascotte '+(qui==='coco'?'parle':'muet');
+  clovis.className='mascotte '+(qui==='clovis'?'parle':'muet');
+}
+function afficher(){
+  ecrans.forEach((s,i)=>s.classList.toggle('on', i===cur));
+  const s=ecrans[cur];
+  s.querySelectorAll('[data-s]').forEach(e=>e.classList.toggle('vu', +e.dataset.s<=pas));
+  // écrans spéciaux
+  if (s.contains(ba)) { const p = pas>=2 ? 50 : 100; if (ba.dataset.p!=String(p)) { ba.classList.add('anime'); ba.style.setProperty('--pos',p+'%'); ba.dataset.p=p; } }
+  if (s.querySelector('#potager')) document.getElementById('potager').classList.toggle('tous', pas>=1);
+  parole(s);
+  document.getElementById('pied').classList.toggle('sansm', !!s.querySelector('.fin.vu'));
+  [...points.children].forEach((p,i)=>p.classList.toggle('on', i===cur));
+  document.getElementById('compteur').textContent=`${cur+1} / ${ecrans.length}`;
+  fiche.classList.remove('on');
+  try { history.replaceState(null,'','#ecran-'+(cur+1)); } catch(e){}
+}
+function aller(i, p){ cur=Math.max(0,Math.min(ecrans.length-1,i)); pas=p==='fin'?maxPas(ecrans[cur]):p; afficher(); }
+function suivant(){ if (fiche.classList.contains('on')) { fiche.classList.remove('on'); return; } if (pas<maxPas(ecrans[cur])) { pas++; afficher(); } else if (cur<ecrans.length-1) aller(cur+1,0); }
+function precedent(){ if (fiche.classList.contains('on')) { fiche.classList.remove('on'); return; } if (pas>0) { pas--; afficher(); } else if (cur>0) aller(cur-1,'fin'); }
+document.getElementById('bApres').onclick=suivant;
+document.getElementById('bAvant').onclick=precedent;
+function pleinEcran(){ try { if (!document.fullscreenElement) (document.documentElement.requestFullscreen||document.documentElement.webkitRequestFullscreen).call(document.documentElement); else document.exitFullscreen(); } catch(e){} }
+document.getElementById('bPlein').onclick=pleinEcran;
+document.addEventListener('keydown',e=>{
+  if (e.target.tagName==='INPUT') { if (e.key==='Enter'||e.key==='Escape') e.target.blur(); return; }
+  if (['ArrowRight','ArrowDown','PageDown',' ','Enter'].includes(e.key)) { e.preventDefault(); suivant(); }
+  else if (['ArrowLeft','ArrowUp','PageUp','Backspace'].includes(e.key)) { e.preventDefault(); precedent(); }
+  else if (e.key==='Escape') fiche.classList.remove('on');
+  else if (e.key==='f'||e.key==='F') pleinEcran();
+  else if (e.key==='Home') aller(0,0); else if (e.key==='End') aller(ecrans.length-1,0);
+});
+// glisser du doigt (tablette), sauf sur le curseur avant/après
+(function(){ let x0=null; const v=document.getElementById('vue');
+  v.addEventListener('touchstart',e=>{ x0 = e.target.closest('.ba,input') ? null : e.touches[0].clientX; },{passive:true});
+  v.addEventListener('touchend',e=>{ if(x0===null) return; const d=e.changedTouches[0].clientX-x0; if(Math.abs(d)>60) (d<0?suivant:precedent)(); x0=null; },{passive:true});
+})();
+// les mascottes répètent leur phrase quand on les touche
+// un bouton touché ne garde pas le focus (sinon la télécommande ou Espace le réactiverait)
+document.addEventListener('click', e=>{ const b=e.target.closest('button'); if(b) b.blur(); });
+coco.onclick = clovis.onclick = () => parole(ecrans[cur]);
+
+/* Nom du bosquet (gardé sur cet appareil) + feuilles qui tombent */
+(function(){
+  const inp=document.getElementById('nomBosquet');
+  try { inp.value = localStorage.getItem('bosquet-nom') || ''; } catch(e){}
+  inp.addEventListener('input',()=>{ try { localStorage.setItem('bosquet-nom', inp.value); } catch(e){} });
+  const fin=document.querySelector('.fin'); const f=['🍃','🌸','🍂','🌼','🍃','🐞'];
+  for(let i=0;i<16;i++){ const s=document.createElement('span'); s.className='feuille'; s.textContent=f[i%f.length];
+    s.style.left=(i*6.3+2)+'%'; s.style.animationDuration=(7+(i*37)%6)+'s'; s.style.animationDelay=(-(i*1.7)%8)+'s'; fin.appendChild(s); }
+})();
+
+/* Mise à l'échelle : la scène 1600 × 900 remplit l'écran */
+const sc=document.getElementById('scene');
+function ajuster(){ const k=Math.min(innerWidth/1600, innerHeight/900); sc.style.transform=`translate(${(innerWidth-1600*k)/2}px,${(innerHeight-900*k)/2}px) scale(${k})`; }
+addEventListener('resize', ajuster); ajuster();
+
+const m = /^#ecran-(\d+)$/.exec(location.hash); aller(m ? (+m[1]-1) : 0, 0);
+</script>
+
+<script>
+/* SynApps — nouvelle version disponible ?
+   Le navigateur garde une copie des pages (jusqu'à 10 min sur GitHub Pages, parfois bien plus sur iPhone).
+   On compare discrètement le code de la page affichée avec celui en ligne ; s'il a changé, on propose
+   « Mettre à jour », qui recharge la page en contournant la copie gardée en mémoire. */
+(function(){
+  if (!/^https?:$/.test(location.protocol)) return;
+  var KEY = 'synapps-maj:' + location.pathname, last = 0, shown = false;
+  function sig(root){
+    var t = '', els = root.querySelectorAll('script:not([src]),style');
+    for (var i = 0; i < els.length; i++) if (!els[i].hasAttribute('data-runtime')) t += els[i].textContent;
+    var h = 2166136261; for (var j = 0; j < t.length; j++){ h ^= t.charCodeAt(j); h = Math.imul(h, 16777619); }
+    return (h >>> 0).toString(36) + '.' + t.length;
+  }
+  var mine = sig(document);
+  function banner(){
+    if (shown || document.getElementById('synappsMaj')) return; shown = true;
+    var b = document.createElement('div'); b.id = 'synappsMaj';
+    b.setAttribute('style', 'position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom));transform:translateX(-50%);width:max-content;z-index:2147483000;background:#25321e;color:#fff;border-radius:999px;padding:8px 8px 8px 16px;display:flex;align-items:center;gap:10px;font:14px/1.3 system-ui,-apple-system,sans-serif;box-shadow:0 6px 24px rgba(0,0,0,.25);max-width:calc(100% - 24px)');
+    b.innerHTML = '<span>Une nouvelle version est disponible</span><button type="button" style="border:0;border-radius:999px;padding:7px 14px;background:#8fd16a;color:#18240f;font:600 14px system-ui,-apple-system,sans-serif;cursor:pointer;white-space:nowrap">Mettre à jour</button><button type="button" aria-label="Plus tard" style="border:0;background:none;color:#cfd8c6;font-size:18px;cursor:pointer;padding:0 6px">×</button>';
+    var bt = b.querySelectorAll('button');
+    bt[0].onclick = function(){ location.replace(location.pathname + '?v=' + Date.now().toString(36) + location.hash); };
+    bt[1].onclick = function(){ b.remove(); };
+    document.body.appendChild(b);
+  }
+  function check(){
+    var now = Date.now(); if (now - last < 5 * 60 * 1000) return; last = now;
+    fetch(location.pathname + '?nocache=' + now.toString(36), {cache:'no-store'}).then(function(r){ return r.ok ? r.text() : null; }).then(function(html){
+      if (!html) return;
+      var theirs = sig(new DOMParser().parseFromString(html, 'text/html'));
+      if (theirs === mine){ try { sessionStorage.removeItem(KEY); } catch(e){} return; }
+      var tried = null; try { tried = sessionStorage.getItem(KEY); } catch(e){}
+      if (tried === theirs) return;                    // déjà rechargé pour cette version : pas de boucle
+      try { sessionStorage.setItem(KEY, theirs); } catch(e){}
+      banner();
+    }).catch(function(){});
+  }
+  // la page vient d'être rechargée par « Mettre à jour » : on nettoie l'adresse
+  if (/[?&]v=/.test(location.search)) try { history.replaceState(null, '', location.pathname + location.hash); } catch(e){}
+  setTimeout(check, 2500);
+  document.addEventListener('visibilitychange', function(){ if (!document.hidden) check(); });
+})();
+</script>
+<script data-runtime>
+/* SynApps — badge « Version test » (data-runtime : ignoré par la détection de nouvelle version, car lu après elle)
+   Hors de la production (app.synapsium.com et sa copie synapps-bhl.pages.dev), la page est une version test :
+   ses données en ligne vont dans le projet Supabase « Synapps_test », jamais dans les vraies données. */
+(function(){
+  if (!/^https?:$/.test(location.protocol) || /^(app\.synapsium\.com|synapps-bhl\.pages\.dev|l33ko\.github\.io)$/.test(location.hostname)) return;
+  var b = document.createElement('div'); b.id = 'synappsTest'; b.textContent = 'Version test';
+  b.title = 'Version test : les données en ligne vont dans Synapps_test, pas dans les vraies données.';
+  b.setAttribute('style', 'position:fixed;left:8px;bottom:calc(8px + env(safe-area-inset-bottom));z-index:2147482999;pointer-events:none;background:#f38020;color:#fff;border-radius:999px;padding:3px 10px;font:700 12px/1.4 system-ui,-apple-system,sans-serif;letter-spacing:.03em;box-shadow:0 2px 8px rgba(0,0,0,.2);opacity:.92');
+  (document.body || document.documentElement).appendChild(b);
+})();
+</script>
+</body>
+</html>

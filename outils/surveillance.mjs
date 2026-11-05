@@ -31,6 +31,7 @@ const PAGES = [
   ['Rétro Console', '/retro-console/'],
   ['Mes recettes', '/recettes/'],
   ['Mon jardin', '/mon-jardin/'],
+  ['Bosquet (présentation CP)', '/bosquet/'],
 ];
 const APPAREILS = [
   ['iPhone', 'webkit', devices['iPhone 13']],
