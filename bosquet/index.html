@@ -294,7 +294,7 @@ h2{font-size:58px;color:#25321e}
 .fin .nom{display:flex;align-items:center;gap:18px;font-size:40px;font-family:var(--titre)}
 .fin input{font:600 48px var(--titre);border:0;border-bottom:6px dashed var(--vert);background:transparent;width:620px;text-align:center;color:var(--vert);outline:none;padding:4px}
 .fin .duo{display:flex;gap:30px;align-items:flex-end}
-.fin .duo .a{width:170px;height:170px}.fin .duo .b{width:200px;height:150px}
+.fin .duo .a{width:250px;height:250px}.fin .duo .b{width:300px;height:220px}
 .fin .duo>div{animation:saut 1.1s ease-in-out infinite}
 .fin .duo>div:nth-child(2){animation-delay:.3s}
 .fin>*:not(.feuille){position:relative;z-index:1}
@@ -346,7 +346,7 @@ h2{font-size:58px;color:#25321e}
 </section>
 
 <!-- ================= 3. Le pêcher et le bosquet ================= -->
-<section class="ecran" data-say="clovis|Regardez près de la porte : c’est le <b>pêcher</b>, planté par les grands l’an dernier. Et juste à côté, une <b>verveine citronnelle</b>. Ils vont avoir des copains !">
+<section class="ecran" data-say="clovis|Vous reconnaissez ce coin de la cour de récré ? Il y a déjà un <b>pêcher</b>, planté par les grands l’an dernier, et une <b>verveine citronnelle</b>. Ils vont avoir des copains !">
   <div class="tete"><span class="puce">Notre coin</span><h2>Un bosquet fruitier dans la cour de l’école</h2></div>
   <div class="corps">
     <div class="ba" id="ba" style="--pos:100%">
@@ -478,10 +478,9 @@ h2{font-size:58px;color:#25321e}
       <div class="carte regle" data-s="4" data-say="coco|Certaines plantes ne se mangent pas : on demande toujours à un adulte !"><span class="rond non">👅</span><h3>Je ne goûte rien sans un adulte</h3></div>
     </div>
   </div>
-  <div class="fin" data-s="5" data-say="coco|Bravo ! Quel nom allez-vous donner à notre bosquet fruitier ?">
+  <div class="fin" data-s="5" data-say="coco|Bravo ! À très bientôt pour planter, les jardiniers !">
     <h1>Bravo ! Vous êtes les jardiniers<br>du bosquet fruitier !</h1>
     <div class="duo"><div class="a" id="finCoco"></div><div class="b" id="finClovis"></div></div>
-    <label class="nom">Notre bosquet fruitier s’appelle : <input id="nomBosquet" maxlength="30" placeholder="…" autocomplete="off"></label>
   </div>
 </section>
 
@@ -586,13 +585,12 @@ SVG.ecoArbre = `<svg viewBox="0 0 300 300" aria-hidden="true"><ellipse cx="150" 
 function strate(k){
   const g = '#d8d3c4', v = '#4f9a3c', c = q => q===k ? v : g;
   const svg = `<svg viewBox="0 0 240 104" aria-hidden="true"><line x1="4" y1="96" x2="236" y2="96" stroke="#b9ae90" stroke-width="3"/>
-    <ellipse cx="30" cy="92" rx="24" ry="8" fill="${c('couvresol')}"/>
-    <path d="M76 96 V68 M76 80 C66 74 62 66 64 62 C72 64 76 72 76 80 M76 74 C86 68 90 60 88 56 C80 58 76 66 76 74" stroke="${c('herbacee')}" stroke-width="4" fill="${c('herbacee')}"/>
+    <ellipse cx="48" cy="91" rx="32" ry="9" fill="${c('couvresol')}"/>
     <circle cx="112" cy="78" r="16" fill="${c('arbuste')}"/><circle cx="128" cy="74" r="18" fill="${c('arbuste')}"/><circle cx="142" cy="82" r="13" fill="${c('arbuste')}"/>
     <rect x="178" y="44" width="8" height="52" fill="${c('arbre')}"/><circle cx="182" cy="34" r="26" fill="${c('arbre')}"/>
     <path d="M224 96 V14" stroke="${c('grimpante')}" stroke-width="4"/><path d="M224 90 C214 82 234 72 224 64 C214 56 234 46 224 38 C214 30 234 22 224 16" stroke="${c('grimpante')}" stroke-width="3" fill="none"/>
     ${[[218,80],[230,66],[218,50],[230,34]].map(([x,y])=>`<ellipse cx="${x}" cy="${y}" rx="6" ry="4" fill="${c('grimpante')}"/>`).join('')}</svg>`;
-  const nom = {arbre:'Arbre', arbuste:'Arbuste', herbacee:'Plante herbacée', couvresol:'Couvre-sol', grimpante:'Plante grimpante'}[k];
+  const nom = {arbre:'Arbre', arbuste:'Arbuste', couvresol:'Couvre-sol', grimpante:'Plante grimpante'}[k];
   return k ? `<div class="strate" title="Strate du végétal">${svg}<b>${nom}</b></div>` : '';
 }
 const ico = (k) => k.startsWith('<svg') ? k : SVG[k] ? SVG[k] : `<span class="emo">${k}</span>`;
@@ -619,7 +617,7 @@ const PLANTES = {
   melisse:     {ico:'🍋', nom:'La mélisse', tags:['odeur','abeilles'], txt:'Frottez une feuille : elle sent le citron !'},
   verveine:    {ico:'🍃', nom:'La verveine citronnelle', tags:['odeur','abeilles'], txt:'Elle était déjà là ! Frottez une feuille : elle sent très fort le citron.', badge:['deja','⭐ Déjà là']},
 };
-const STRATE = {"pecher": "arbre", "grenadier": "arbuste", "clementinier": "arbre", "bananier": "arbuste", "framboisier": "arbuste", "vigne": "grimpante", "buddleia": "arbuste", "lavande": "arbuste", "romarin": "arbuste", "geranium": "herbacee", "thym": "couvresol", "menthe": "couvresol", "melisse": "herbacee", "verveine": "arbuste"};
+const STRATE = {"pecher": "arbre", "grenadier": "arbuste", "clementinier": "arbre", "bananier": "arbuste", "framboisier": "arbuste", "vigne": "grimpante", "buddleia": "arbuste", "lavande": "arbuste", "romarin": "arbuste", "geranium": "couvresol", "thym": "couvresol", "menthe": "couvresol", "melisse": "couvresol", "verveine": "arbuste"};
 const TAGS = {fruits:'🍎 Des fruits', abeilles:'🐝 Pour les abeilles', papillons:'🦋 Pour les papillons', odeur:'👃 Ça sent bon', tapis:'🟩 Un tapis vert', geant:'🌴 Une plante géante', fleurs:'🌸 Des fleurs', eau:'🐸 Un coin d’eau'};
 // emplacement des pastilles sur le dessin (en % de l'image)
 const PLAN = [['pecher',74,30],['grenadier',50,30],['clementinier',64,30],['bananier',38,32],['buddleia',16,31],['vigne',46,11],['framboisier',44,48],
@@ -742,7 +740,6 @@ function afficher(){
   if (s.querySelector('#potager')) document.getElementById('potager').classList.toggle('tous', pas>=1);
   parole(s);
   document.getElementById('pied').classList.toggle('sansm', !!s.querySelector('.fin.vu'));
-  document.getElementById('nomBosquet').tabIndex = document.querySelector('.fin.vu') ? 0 : -1;
   [...points.children].forEach((p,i)=>p.classList.toggle('on', i===cur));
   document.getElementById('compteur').textContent=`${cur+1} / ${ecrans.length}`;
   fiche.classList.remove('on');
@@ -774,11 +771,8 @@ document.addEventListener('keydown',e=>{
 document.addEventListener('click', e=>{ const b=e.target.closest('button'); if(b) b.blur(); });
 coco.onclick = clovis.onclick = () => parole(ecrans[cur]);
 
-/* Nom du bosquet (gardé sur cet appareil) + feuilles qui tombent */
+/* Feuilles qui tombent sur l'écran final */
 (function(){
-  const inp=document.getElementById('nomBosquet');
-  try { inp.value = localStorage.getItem('bosquet-nom') || ''; } catch(e){}
-  inp.addEventListener('input',()=>{ try { localStorage.setItem('bosquet-nom', inp.value); } catch(e){} });
   const fin=document.querySelector('.fin'); const f=['🍃','🌸','🍂','🌼','🍃','🐞'];
   for(let i=0;i<16;i++){ const s=document.createElement('span'); s.className='feuille'; s.textContent=f[i%f.length];
     s.style.left=(i*6.3+2)+'%'; s.style.animationDuration=(7+(i*37)%6)+'s'; s.style.animationDelay=(-(i*1.7)%8)+'s'; fin.appendChild(s); }
