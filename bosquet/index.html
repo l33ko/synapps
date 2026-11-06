@@ -184,14 +184,15 @@ h2{font-size:58px;color:#25321e}
 .solution h3{font-size:34px}
 .solution p{margin:0;font-size:27px;color:var(--doux);line-height:1.25}
 
-.etapes{display:flex;align-items:center;justify-content:space-between;height:420px}
+.etapes{display:flex;align-items:center;justify-content:space-between;height:470px}
 .etape{width:330px;text-align:center}
 .etape .dessin{width:290px;height:290px;margin:0 auto;border-radius:50%;background:var(--vert-pale);display:flex;align-items:center;justify-content:center;position:relative}
 .etape .dessin svg{width:230px;height:230px}
 .etape h3{font-size:33px;margin-top:16px;line-height:1.12}
 .etape .num{position:absolute;left:6px;top:6px;width:56px;height:56px;border-radius:50%;background:var(--tomate);color:#fff;font:700 32px var(--titre);display:flex;align-items:center;justify-content:center}
 .fleche{font-size:60px;color:#b9b19a}
-.bandeau{margin-top:30px;display:flex;align-items:center;justify-content:center;gap:22px;font-size:36px}
+.terme{display:inline-block;margin-top:10px;font:600 26px var(--titre);color:#b4502a;background:#fde9dc;padding:4px 16px;border-radius:999px}
+.bandeau{margin-top:14px;display:flex;align-items:center;justify-content:center;gap:22px;font-size:36px}
 .bandeau .ico{width:64px;height:64px}
 
 .pollen{display:flex;align-items:center;gap:36px;padding:26px 36px}
@@ -225,6 +226,9 @@ h2{font-size:58px;color:#25321e}
 .terrain svg.decor{position:absolute;inset:0;width:100%;height:100%}
 .zone{position:absolute;font:600 30px var(--titre);color:#25321e;background:rgba(255,255,255,.88);padding:6px 18px;border-radius:999px}
 .zone.sol{color:#fff;background:rgba(60,35,20,.7)}
+.expl{position:absolute;width:470px;display:flex;gap:16px;align-items:flex-start;padding:18px 22px}
+.expl .emo{font-size:52px;flex:none}
+.expl p{margin:0;font-size:28px;line-height:1.28}
 .bete{position:absolute;transform:translate(-50%,-50%);width:96px;height:96px;border-radius:50%;border:4px solid #fff;background:rgba(255,255,255,.85);
   font-size:62px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(0,0,0,.25);padding:0}
 .bete .ico{width:74px;height:74px}
@@ -284,7 +288,7 @@ h2{font-size:58px;color:#25321e}
 .ici-etiq{position:absolute;left:50%;top:-22px;transform:translateX(-50%);background:var(--tomate);color:#fff;font:600 22px var(--titre);padding:4px 14px;border-radius:999px;white-space:nowrap;z-index:2}
 
 /* ---------- Règles et fin ---------- */
-.regles{display:grid;grid-template-columns:repeat(4,1fr);gap:24px}
+.regles{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;height:100%;align-content:center}
 .regle{text-align:center;padding:28px 16px;display:flex;flex-direction:column;align-items:center;gap:14px}
 .regle .rond{width:150px;height:150px;border-radius:50%;background:var(--vert-pale);display:flex;align-items:center;justify-content:center;font-size:84px;position:relative}
 .regle .rond.non::after{content:"";position:absolute;inset:8px;border:9px solid #d9483b;border-radius:50%;background:linear-gradient(45deg,transparent 46%,#d9483b 46%,#d9483b 54%,transparent 54%)}
@@ -298,6 +302,9 @@ h2{font-size:58px;color:#25321e}
 .fin .duo>div{animation:saut 1.1s ease-in-out infinite}
 .fin .duo>div:nth-child(2){animation-delay:.3s}
 .fin>*:not(.feuille){position:relative;z-index:1}
+.questions{background:radial-gradient(circle at 50% 40%,#eef6e4,#d6eac2)}
+.questions h1{font-size:140px}
+.questions .mains{font-size:90px;margin:0;letter-spacing:20px}
 .feuille{position:absolute;z-index:0;opacity:.85;top:-80px;font-size:48px;animation:tombe linear infinite;pointer-events:none}
 @keyframes tombe{to{transform:translateY(1050px) rotate(540deg)}}
 </style>
@@ -347,7 +354,7 @@ h2{font-size:58px;color:#25321e}
 
 <!-- ================= 3. Le pêcher et le bosquet ================= -->
 <section class="ecran" data-say="clovis|Vous reconnaissez ce coin de la cour de récré ? Il y a déjà un <b>pêcher</b>, planté par les grands l’an dernier, et une <b>verveine citronnelle</b>. Ils vont avoir des copains !">
-  <div class="tete"><span class="puce">Notre coin</span><h2>Un bosquet fruitier dans la cour de l’école</h2></div>
+  <div class="tete"><span class="puce">Le projet</span><h2>Un bosquet fruitier dans la cour de l’école</h2></div>
   <div class="corps">
     <div class="ba" id="ba" style="--pos:100%">
       <img src="img/aujourdhui.jpg" alt="Le coin aujourd’hui">
@@ -374,13 +381,13 @@ h2{font-size:58px;color:#25321e}
   <div class="tete"><span class="puce q">Question 1</span><h2>Comment obtient-on un fruit ?</h2></div>
   <div class="corps">
     <div class="etapes">
-      <div class="etape" data-s="1" data-say="coco|D’abord, au printemps, l’arbre se couvre de fleurs."><div class="dessin"><span class="num">1</span><span id="dFleur"></span></div><h3>Une fleur s’ouvre</h3></div>
+      <div class="etape" data-s="1" data-say="coco|D’abord, au printemps, l’arbre se couvre de fleurs."><div class="dessin"><span class="num">1</span><span id="dFleur"></span></div><h3>Une fleur s’ouvre</h3><span class="terme">Floraison</span></div>
       <span class="fleche" data-s="2">➜</span>
-      <div class="etape" data-s="2" data-say="clovis|L’abeille vient boire et transporte le pollen, cette poudre jaune, de fleur en fleur."><div class="dessin"><span class="num">2</span><span id="dAbeille"></span></div><h3>L’abeille passe</h3></div>
+      <div class="etape" data-s="2" data-say="clovis|L’abeille vient boire et transporte le pollen, cette poudre jaune, de fleur en fleur."><div class="dessin"><span class="num">2</span><span id="dAbeille"></span></div><h3>L’abeille passe</h3><span class="terme">Pollinisation</span></div>
       <span class="fleche" data-s="3">➜</span>
-      <div class="etape" data-s="3" data-say="coco|Les pétales tombent… mais au milieu, un tout petit fruit commence à pousser !"><div class="dessin"><span class="num">3</span><span id="dFane"></span></div><h3>La fleur fane et un petit fruit apparaît</h3></div>
+      <div class="etape" data-s="3" data-say="coco|Les pétales tombent… mais au milieu, un tout petit fruit commence à pousser !"><div class="dessin"><span class="num">3</span><span id="dFane"></span></div><h3>La fleur fane et un petit fruit apparaît</h3><span class="terme">Nouaison</span></div>
       <span class="fleche" data-s="4">➜</span>
-      <div class="etape" data-s="4" data-say="clovis|Et avec le soleil et l’eau, le fruit grossit… jusqu’à ce qu’on puisse le manger !"><div class="dessin"><span class="num">4</span><span id="dFruit"></span></div><h3>Le fruit grossit</h3></div>
+      <div class="etape" data-s="4" data-say="clovis|Et avec le soleil et l’eau, le fruit grossit… jusqu’à ce qu’on puisse le manger !"><div class="dessin"><span class="num">4</span><span id="dFruit"></span></div><h3>Le fruit grossit</h3><span class="terme">Croissance et mûrissement</span></div>
     </div>
     <div class="bandeau carte" data-s="5" data-say="coco|Regardez bien notre pêcher au printemps !"><b>Notre pêcher :</b> 🌸 des fleurs roses au printemps <span class="fleche" style="font-size:40px">➜</span> <span class="ico" id="icoPeche2"></span> des pêches en été</div>
   </div>
@@ -394,8 +401,8 @@ h2{font-size:58px;color:#25321e}
       <span class="scene-p" id="scenePollen"></span>
       <div><div class="tres-gros">Sans abeilles…<br>pas de fruits !</div><p class="gros" style="margin:10px 0 0;color:var(--doux)">Elles transportent le pollen de fleur en fleur.</p></div>
     </div>
-    <div class="restaurant" data-s="2" data-say="clovis|Alors on plante leur restaurant préféré : des fleurs pleines de nectar !">
-      <h3>🍽️ Leur restaurant dans notre bosquet fruitier</h3>
+    <div class="restaurant" data-s="2" data-say="clovis|Alors on installe des plantes mellifères : des fleurs pleines de nectar qui attirent les insectes !">
+      <h3>🌸 Des plantes mellifères pour attirer les insectes</h3>
       <div class="menu" id="menu"></div>
     </div>
   </div>
@@ -419,13 +426,15 @@ h2{font-size:58px;color:#25321e}
   <div class="tete"><span class="puce q">Question 4</span><h2>Quels animaux vivent sur les plantes et dans le sol ?</h2></div>
   <div class="corps">
     <div class="terrain" id="terrain"></div>
+    <i class="m" data-s="1" data-say="coco|Les insectes aident les fleurs à devenir des fruits : c’est la pollinisation !"></i>
+    <i class="m" data-s="2" data-say="clovis|Sous la terre, on transforme les feuilles mortes en nourriture pour les racines : des nutriments !"></i>
     <i class="m" data-s="3" data-say="clovis|Quand on plantera, on cherchera ces petites bêtes en creusant ! Moi, je serai sous les feuilles."></i>
   </div>
 </section>
 
 <!-- ================= 10. Ce qu'on va planter ================= -->
 <section class="ecran" data-say="coco|Voici notre futur bosquet fruitier ! Touchez une pastille pour découvrir chaque plante.">
-  <div class="tete"><span class="puce">Ce qui nous attend</span><h2>Qu’est-ce qu’on va planter ?</h2></div>
+  <div class="tete"><span class="puce">Le projet</span><h2>Qu’est-ce qu’on va planter ?</h2></div>
   <div class="corps">
     <div class="plan" id="plan"><img src="img/bosquet-dessin.jpg" alt="Dessin du futur bosquet fruitier"></div>
     <div class="fiche-plante" id="fichePlante"></div>
@@ -452,7 +461,7 @@ h2{font-size:58px;color:#25321e}
 
 <!-- ================= 12. Frise ================= -->
 <section class="ecran" data-say="coco|Voici notre grande aventure de l’année !">
-  <div class="tete"><span class="puce">Ce qui nous attend</span><h2>Notre aventure de l’année</h2></div>
+  <div class="tete"><span class="puce">Le projet</span><h2>Notre aventure de l’année</h2></div>
   <div class="corps">
     <div class="frise">
       <div class="jalon ici" data-s="1"><span class="ici-etiq">Vous êtes ici !</span><div class="rond">🔍</div><h3>Aujourd’hui</h3>
@@ -461,15 +470,15 @@ h2{font-size:58px;color:#25321e}
         <div class="carte"><ul><li>On plante</li><li>On paille</li><li>On observe le sol et ses petites bêtes</li></ul></div></div>
       <div class="jalon" data-s="3" data-say="coco|Au printemps, on observe tout ce qui change et on le note dans notre carnet."><div class="rond">🌸</div><h3>Au printemps</h3>
         <div class="carte"><ul><li>On plante le clémentinier et le bananier</li><li>On observe les fleurs, les fruits et les insectes</li><li>On remplit notre <b>carnet d’observation</b></li></ul></div></div>
-      <div class="jalon" data-s="4" data-say="clovis|Et à la fin, on dessine ensemble un grand croquis pour le montrer aux autres classes !"><div class="rond">🎨</div><h3>À la fin</h3>
-        <div class="carte">On dessine ensemble un <b>grand croquis du bosquet fruitier</b>, affiché pour les autres classes.</div></div>
+      <div class="jalon" data-s="4" data-say="clovis|Et à la fin, chacun dessine un croquis pour expliquer le projet !"><div class="rond">🎨</div><h3>À la fin</h3>
+        <div class="carte">On dessine chacun un <b>croquis explicatif du bosquet fruitier</b> pour expliquer le projet.</div></div>
     </div>
   </div>
 </section>
 
 <!-- ================= 13. Règles et fin ================= -->
-<section class="ecran" data-say="clovis|Le bosquet fruitier est dans la cour de récré. Pour le protéger, on devient tous des gardiens !">
-  <div class="tete"><span class="puce">Ce qui nous attend</span><h2>Les gardiens du bosquet fruitier</h2></div>
+<section class="ecran" data-say="clovis|Le bosquet fruitier est dans la cour de récré. Pour le protéger, voici les grandes règles.">
+  <div class="tete"><span class="puce">Le projet</span><h2>Les grandes règles du bosquet fruitier</h2></div>
   <div class="corps">
     <div class="regles">
       <div class="carte regle" data-s="1"><span class="rond non">👟</span><h3>Je ne marche pas dans le bosquet fruitier</h3></div>
@@ -481,6 +490,11 @@ h2{font-size:58px;color:#25321e}
   <div class="fin" data-s="5" data-say="coco|Bravo ! À très bientôt pour planter, les jardiniers !">
     <h1>Bravo ! Vous êtes les jardiniers<br>du bosquet fruitier !</h1>
     <div class="duo"><div class="a" id="finCoco"></div><div class="b" id="finClovis"></div></div>
+  </div>
+  <div class="fin questions" data-s="6">
+    <h1>Des questions ?</h1>
+    <p class="mains">🙋‍♀️ 🙋 🙋‍♂️</p>
+    <div class="duo"><div class="a" id="qCoco"></div><div class="b" id="qClovis"></div></div>
   </div>
 </section>
 
@@ -593,11 +607,12 @@ function strate(k){
   const nom = {arbre:'Arbre', arbuste:'Arbuste', couvresol:'Couvre-sol', grimpante:'Plante grimpante'}[k];
   return k ? `<div class="strate" title="Strate du végétal">${svg}<b>${nom}</b></div>` : '';
 }
+SVG.melisse = `<svg viewBox="0 0 100 100" aria-hidden="true"><path d="M50 98 V26" stroke="#4f8a3c" stroke-width="4"/>${[[84,30,1],[64,26,.9],[44,22,.75]].map(([y,dx,k])=>`<g transform="translate(50 ${y})"><path d="M0 0 C${-dx*.4} ${-16*k} ${-dx} ${-14*k} ${-dx} ${-2*k} C${-dx*.8} ${8*k} ${-dx*.3} ${8*k} 0 0Z" fill="#6fb04f"/><path d="M0 0 C${dx*.4} ${-16*k} ${dx} ${-14*k} ${dx} ${-2*k} C${dx*.8} ${8*k} ${dx*.3} ${8*k} 0 0Z" fill="#79b85a"/><path d="M0 0 L${-dx*.8} ${-4*k} M0 0 L${dx*.8} ${-4*k}" stroke="#4f8a3c" stroke-width="1.5"/></g>`).join('')}<path d="M50 26 C40 14 44 4 50 2 C56 4 60 14 50 26Z" fill="#8fc46a"/></svg>`;
 const ico = (k) => k.startsWith('<svg') ? k : SVG[k] ? SVG[k] : `<span class="emo">${k}</span>`;
 function poser(id, html){ const e=document.getElementById(id); if(e) e.innerHTML=html; }
 poser('icoTerre', SVG.terre); poser('dFleur', SVG.fleur()); poser('dAbeille', SVG.dAbeille); poser('dFane', SVG.dFane); poser('dFruit', SVG.dFruit);
 poser('icoPeche2', SVG.peche); poser('scenePollen', SVG.pollen); 
-poser('accueilIllu', SVG.accueil); poser('ecoArbre', SVG.ecoArbre);
+poser('accueilIllu', SVG.accueil); poser('qCoco', SVG.coco); poser('qClovis', SVG.clovis); poser('ecoArbre', SVG.ecoArbre);
 poser('coco', SVG.coco); poser('clovis', SVG.clovis); poser('finCoco', SVG.coco); poser('finClovis', SVG.clovis);
 
 /* ===================== Contenus ===================== */
@@ -614,7 +629,7 @@ const PLANTES = {
   geranium:    {ico:'🌺', nom:'Le géranium', tags:['fleurs'], txt:'Des fleurs colorées pendant de longs mois.'},
   thym:        {ico:'🌿', nom:'Le thym', tags:['tapis','odeur','abeilles'], txt:'Un petit tapis qui sent bon. Ses minuscules fleurs nourrissent les abeilles.'},
   menthe:      {ico:'🌱', nom:'La menthe', tags:['tapis','odeur'], txt:'Elle pousse vite et couvre le sol. Frottez une feuille : ça sent le chewing-gum !'},
-  melisse:     {ico:'🍋', nom:'La mélisse', tags:['odeur','abeilles'], txt:'Frottez une feuille : elle sent le citron !'},
+  melisse:     {ico:SVG.melisse, nom:'La mélisse', tags:['odeur','abeilles'], txt:'Frottez une feuille : elle sent le citron !'},
   verveine:    {ico:'🍃', nom:'La verveine citronnelle', tags:['odeur','abeilles'], txt:'Elle était déjà là ! Frottez une feuille : elle sent très fort le citron.', badge:['deja','⭐ Déjà là']},
 };
 const STRATE = {"pecher": "arbre", "grenadier": "arbuste", "clementinier": "arbre", "bananier": "arbuste", "framboisier": "arbuste", "vigne": "grimpante", "buddleia": "arbuste", "lavande": "arbuste", "romarin": "arbuste", "geranium": "couvresol", "thym": "couvresol", "menthe": "couvresol", "melisse": "couvresol", "verveine": "arbuste"};
@@ -641,34 +656,38 @@ document.getElementById('fruits').addEventListener('click', e=>{ const b=e.targe
 
 const BETES = [
   // [icône, nom, texte, x %, y %, étape]
-  ['🐞','La coccinelle','Elle mange les pucerons qui abîment les plantes. C’est l’amie du jardinier !',14,38,1],
-  ['🦋','Le papillon','Il boit le nectar des fleurs avec sa longue trompe.',30,14,1],
-  ['🐝','L’abeille','Elle va de fleur en fleur et transporte le pollen.',45,30,1],
-  ['🐛','La chenille','Elle grignote les feuilles… un jour, elle deviendra papillon !',36,42,1],
-  ['🦎','Le lézard','Il se chauffe au soleil sur les pierres et se cache dans les trous.',70,22,2],
-  ['🕷️','L’araignée','Elle tisse sa toile pour attraper les moucherons.',84,30,2],
-  ['🐌','L’escargot','Il se cache au frais entre les pierres quand il fait sec.',76,42,2],
-  ['🪱','Le ver de terre','Il creuse des tunnels : l’eau et l’air entrent dans la terre.',18,80,3],
-  ['clovis','Le cloporte','Il mange les feuilles mortes et les transforme en terre. Comme Clovis !',42,70,3],
-  ['🐜','La fourmi','Elle construit des galeries et transporte des graines.',64,84,3],
+  ['🐝','L’abeille','Elle va de fleur en fleur et transporte le pollen : c’est la pollinisation !',36,14,1],
+  ['🦋','Le papillon','Il boit le nectar des fleurs… et transporte lui aussi le pollen.',67,9,1],
+  ['🐞','La coccinelle','Elle mange les pucerons qui abîment les plantes. C’est l’amie du jardinier !',58,37,1],
+  ['🐛','La chenille','Elle grignote les feuilles… un jour, elle deviendra papillon !',43,41,1],
+  ['🪱','Le ver de terre','Il creuse des tunnels et mélange la terre : l’eau et l’air arrivent jusqu’aux racines.',40,79,2],
+  ['clovis','Le cloporte','Il mange les feuilles mortes et les transforme en terre riche. Comme Clovis !',64,67,2],
+  ['🐜','La fourmi','Elle creuse des galeries et transporte des graines.',80,87,2],
 ];
 (function(){
   const t=document.getElementById('terrain');
-  let pierres=''; const rangs=[[700,250,10],[720,212,9],[745,174,8],[775,136,6]];
-  rangs.forEach(([x0,y,n],j)=>{for(let i=0;i<n;i++)pierres+=`<rect x="${x0+i*78+(j%2)*20}" y="${y}" width="72" height="34" rx="12" fill="${['#e2d2ad','#d6c39a','#cdb88c'][(i+j)%3]}" stroke="#a8936a" stroke-width="2"/>`;});
-  let buissons=''; [[90,280,70],[180,250,90],[300,270,80],[420,240,95],[540,270,70]].forEach(([x,y,r])=>buissons+=`<circle cx="${x}" cy="${y}" r="${r}" fill="#79b058"/><circle cx="${x-r*.3}" cy="${y-r*.35}" r="${r*.55}" fill="#8fc46a"/>`);
-  let fleurs=''; [[120,210,'#f6a6c1'],[230,190,'#c9b3f2'],[350,205,'#f6c445'],[470,180,'#c9b3f2'],[560,225,'#f6a6c1'],[60,240,'#f6c445']].forEach(([x,y,c])=>fleurs+=`<circle cx="${x}" cy="${y}" r="13" fill="${c}"/><circle cx="${x}" cy="${y}" r="5" fill="#fff6c8"/>`);
-  t.innerHTML = `<svg class="decor" viewBox="0 0 1540 612" preserveAspectRatio="none" aria-hidden="true">
-    <rect x="0" y="300" width="1540" height="312" fill="#8a5a3b"/><rect x="0" y="292" width="1540" height="16" rx="8" fill="#6b9a45"/>
-    <g fill="#6f4529">${Array.from({length:40},(_,i)=>`<circle cx="${(i*137)%1540}" cy="${330+((i*71)%270)}" r="${4+(i%4)*2}"/>`).join('')}</g>
-    <path d="M60 520 C160 470 220 560 330 500 S520 470 600 540" stroke="#6a4128" stroke-width="22" fill="none" stroke-linecap="round" opacity=".7"/>
-    <path d="M760 400 C860 450 900 380 1000 430 S1180 520 1300 470" stroke="#6a4128" stroke-width="20" fill="none" stroke-linecap="round" opacity=".7"/>
-    <g fill="#c98f55">${Array.from({length:26},(_,i)=>`<rect x="${(i*61)%1540}" y="${288+(i%3)*4}" width="30" height="8" rx="3" transform="rotate(${(i*37)%60-30} ${(i*61)%1540} 292)"/>`).join('')}</g>
-    ${buissons}${fleurs}${pierres}</svg>
-    <span class="zone" data-s="1" style="left:24px;top:20px">🌿 Sur les plantes</span>
-    <span class="zone" data-s="2" style="left:1180px;top:20px">🧱 Dans le muret</span>
-    <span class="zone sol" data-s="3" style="left:24px;top:330px">🟫 Dans le sol</span>` +
-    BETES.map(([i,n,tx,x,y,s],k)=>`<button class="bete" data-s="${s}" data-k="${k}" style="left:${x}%;top:${y}%" aria-label="${n}">${i==='clovis'?`<span class="ico">${SVG.clovis}</span>`:i}</button>`).join('');
+  const fleurette=(x,y,col)=>[0,72,144,216,288].map(a=>`<circle cx="${x+Math.cos(a*Math.PI/180)*8}" cy="${y+Math.sin(a*Math.PI/180)*8}" r="7" fill="${col}"/>`).join('')+`<circle cx="${x}" cy="${y}" r="5" fill="#f6c445"/>`;
+  const racines=['M770 336 C740 390 680 420 590 452','M770 336 C782 400 762 470 744 548','M770 336 C812 388 884 410 970 436','M770 336 C792 382 842 470 866 552','M690 424 C670 460 660 490 652 520','M880 412 C900 450 930 470 960 500'];
+  let s=`<svg class="decor" viewBox="0 0 1540 612" preserveAspectRatio="none" aria-hidden="true">
+    <circle cx="1420" cy="86" r="52" fill="#ffd45c"/>
+    <rect x="0" y="330" width="1540" height="282" fill="#8a5a3b"/>
+    <g fill="#6f4529">${Array.from({length:40},(_,i)=>`<circle cx="${(i*137)%1540}" cy="${360+((i*71)%240)}" r="${4+(i%4)*2}"/>`).join('')}</g>
+    <path d="M1020 420 C1100 470 1160 400 1260 450 S1420 520 1520 480" stroke="#6a4128" stroke-width="20" fill="none" stroke-linecap="round" opacity=".7"/>
+    <g stroke="#5a3519" stroke-linecap="round" fill="none">${racines.map((d,i)=>`<path d="${d}" stroke-width="${i<4?12:6}"/>`).join('')}</g>
+    <g fill="#ffe089">${racines.slice(0,4).map((_,i)=>[0.35,0.6,0.85].map(k=>{const P=[[590,452],[744,548],[970,436],[866,552]][i];return `<circle cx="${770+(P[0]-770)*k}" cy="${336+(P[1]-336)*k}" r="6"/>`;}).join('')).join('')}</g>
+    <text x="770" y="598" text-anchor="middle" font-family="Fredoka, sans-serif" font-weight="600" font-size="26" fill="#ffe089">↑ des nutriments pour les racines ↑</text>
+    <rect x="0" y="322" width="1540" height="16" rx="8" fill="#6b9a45"/>
+    <g fill="#d9893b">${[[640,330],[700,326],[860,332],[930,327],[560,329]].map(([x,y],i)=>`<ellipse cx="${x}" cy="${y}" rx="14" ry="6" transform="rotate(${i*35} ${x} ${y})"/>`).join('')}</g>
+    <path d="M750 336 L757 188 L783 188 L790 336 Z" fill="#7a4f2c"/>
+    <path d="M770 230 L715 180 M770 245 L830 192" stroke="#7a4f2c" stroke-width="12" stroke-linecap="round"/>
+    ${[[770,150,120],[660,190,86],[880,190,86],[702,92,80],[842,86,80]].map(([x,y,r])=>`<circle cx="${x}" cy="${y}" r="${r}" fill="#5e9e45"/>`).join('')}
+    ${[[756,132,84],[650,176,60],[868,176,60],[692,80,56],[830,74,56]].map(([x,y,r])=>`<circle cx="${x}" cy="${y}" r="${r}" fill="#79b85a"/>`).join('')}
+    ${[[700,120],[770,70],[840,130],[620,200],[910,210],[760,200],[680,250],[860,260],[810,40],[730,160],[900,120]].map(([x,y],i)=>fleurette(x,y,i%2?'#f6a6c1':'#fff')).join('')}
+    <path d="M580 96 C620 60 660 80 690 108" stroke="#d4a017" stroke-width="4" stroke-dasharray="3 11" stroke-linecap="round" fill="none"/>
+  </svg>
+  <div class="carte expl" data-s="1" style="left:24px;top:24px"><span class="emo">🐝</span><p>Les insectes vont de fleur en fleur et transportent le pollen : c’est la <b>pollinisation</b>.</p></div>
+  <div class="carte expl" data-s="2" style="left:24px;top:372px"><span class="emo">🪱</span><p>Le <b>sol vivant</b> : ses petites bêtes transforment les feuilles mortes en <b>nutriments</b>, la nourriture des racines.</p></div>`;
+  t.innerHTML = s + BETES.map(([i,n,tx,x,y,st],k)=>`<button class="bete" data-s="${st}" data-k="${k}" style="left:${x}%;top:${y}%" aria-label="${n}">${i==='clovis'?`<span class="ico">${SVG.clovis}</span>`:i}</button>`).join('');
   t.addEventListener('click', e=>{ const b=e.target.closest('.bete'); if(!b) return; b.classList.add('vue'); const [i,n,tx]=BETES[b.dataset.k]; ouvrirFiche(i==='clovis'?SVG.clovis:i, n, tx); });
 })();
 
