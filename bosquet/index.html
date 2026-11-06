@@ -226,9 +226,9 @@ h2{font-size:58px;color:#25321e}
 .terrain svg.decor{position:absolute;inset:0;width:100%;height:100%}
 .zone{position:absolute;font:600 30px var(--titre);color:#25321e;background:rgba(255,255,255,.88);padding:6px 18px;border-radius:999px}
 .zone.sol{color:#fff;background:rgba(60,35,20,.7)}
-.expl{position:absolute;width:470px;display:flex;gap:16px;align-items:flex-start;padding:18px 22px}
+.expl{position:absolute;width:520px;display:flex;gap:16px;align-items:flex-start;padding:18px 22px}
 .expl .emo{font-size:52px;flex:none}
-.expl p{margin:0;font-size:28px;line-height:1.28}
+.expl p{margin:0;font-size:26px;line-height:1.25}
 .bete{position:absolute;transform:translate(-50%,-50%);width:96px;height:96px;border-radius:50%;border:4px solid #fff;background:rgba(255,255,255,.85);
   font-size:62px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(0,0,0,.25);padding:0}
 .bete .ico{width:74px;height:74px}
@@ -426,7 +426,7 @@ h2{font-size:58px;color:#25321e}
   <div class="tete"><span class="puce q">Question 4</span><h2>Quels animaux vivent sur les plantes et dans le sol ?</h2></div>
   <div class="corps">
     <div class="terrain" id="terrain"></div>
-    <i class="m" data-s="1" data-say="coco|Les insectes aident les fleurs à devenir des fruits : c’est la pollinisation !"></i>
+    <i class="m" data-s="1" data-say="coco|Certains insectes transportent le pollen, d’autres mangent les pucerons… comme moi !"></i>
     <i class="m" data-s="2" data-say="clovis|Sous la terre, on transforme les feuilles mortes en nourriture pour les racines : des nutriments !"></i>
     <i class="m" data-s="3" data-say="clovis|Quand on plantera, on cherchera ces petites bêtes en creusant ! Moi, je serai sous les feuilles."></i>
   </div>
@@ -487,11 +487,7 @@ h2{font-size:58px;color:#25321e}
       <div class="carte regle" data-s="4" data-say="coco|Certaines plantes ne se mangent pas : on demande toujours à un adulte !"><span class="rond non">👅</span><h3>Je ne goûte rien sans un adulte</h3></div>
     </div>
   </div>
-  <div class="fin" data-s="5" data-say="coco|Bravo ! À très bientôt pour planter, les jardiniers !">
-    <h1>Bravo ! Vous êtes les jardiniers<br>du bosquet fruitier !</h1>
-    <div class="duo"><div class="a" id="finCoco"></div><div class="b" id="finClovis"></div></div>
-  </div>
-  <div class="fin questions" data-s="6">
+  <div class="fin questions" data-s="5" data-say="coco|Des questions ? Levez la main !">
     <h1>Des questions ?</h1>
     <p class="mains">🙋‍♀️ 🙋 🙋‍♂️</p>
     <div class="duo"><div class="a" id="qCoco"></div><div class="b" id="qClovis"></div></div>
@@ -613,7 +609,7 @@ function poser(id, html){ const e=document.getElementById(id); if(e) e.innerHTML
 poser('icoTerre', SVG.terre); poser('dFleur', SVG.fleur()); poser('dAbeille', SVG.dAbeille); poser('dFane', SVG.dFane); poser('dFruit', SVG.dFruit);
 poser('icoPeche2', SVG.peche); poser('scenePollen', SVG.pollen); 
 poser('accueilIllu', SVG.accueil); poser('qCoco', SVG.coco); poser('qClovis', SVG.clovis); poser('ecoArbre', SVG.ecoArbre);
-poser('coco', SVG.coco); poser('clovis', SVG.clovis); poser('finCoco', SVG.coco); poser('finClovis', SVG.clovis);
+poser('coco', SVG.coco); poser('clovis', SVG.clovis); 
 
 /* ===================== Contenus ===================== */
 const PLANTES = {
@@ -656,7 +652,7 @@ document.getElementById('fruits').addEventListener('click', e=>{ const b=e.targe
 
 const BETES = [
   // [icône, nom, texte, x %, y %, étape]
-  ['🐝','L’abeille','Elle va de fleur en fleur et transporte le pollen : c’est la pollinisation !',36,14,1],
+  ['🐝','L’abeille','Elle va de fleur en fleur et transporte le pollen : c’est la pollinisation !',40,12,1],
   ['🦋','Le papillon','Il boit le nectar des fleurs… et transporte lui aussi le pollen.',67,9,1],
   ['🐞','La coccinelle','Elle mange les pucerons qui abîment les plantes. C’est l’amie du jardinier !',58,37,1],
   ['🐛','La chenille','Elle grignote les feuilles… un jour, elle deviendra papillon !',43,41,1],
@@ -685,7 +681,7 @@ const BETES = [
     ${[[700,120],[770,70],[840,130],[620,200],[910,210],[760,200],[680,250],[860,260],[810,40],[730,160],[900,120]].map(([x,y],i)=>fleurette(x,y,i%2?'#f6a6c1':'#fff')).join('')}
     <path d="M580 96 C620 60 660 80 690 108" stroke="#d4a017" stroke-width="4" stroke-dasharray="3 11" stroke-linecap="round" fill="none"/>
   </svg>
-  <div class="carte expl" data-s="1" style="left:24px;top:24px"><span class="emo">🐝</span><p>Les insectes vont de fleur en fleur et transportent le pollen : c’est la <b>pollinisation</b>.</p></div>
+  <div class="carte expl" data-s="1" style="left:24px;top:24px"><span class="emo">🐝</span><p>Certains insectes vont de fleur en fleur et transportent le pollen : c’est la <b>pollinisation</b>.<br>D’autres s’occupent de manger les insectes indésirables comme les pucerons : c’est le cas de la <b>coccinelle</b>.</p></div>
   <div class="carte expl" data-s="2" style="left:24px;top:372px"><span class="emo">🪱</span><p>Le <b>sol vivant</b> : ses petites bêtes transforment les feuilles mortes en <b>nutriments</b>, la nourriture des racines.</p></div>`;
   t.innerHTML = s + BETES.map(([i,n,tx,x,y,st],k)=>`<button class="bete" data-s="${st}" data-k="${k}" style="left:${x}%;top:${y}%" aria-label="${n}">${i==='clovis'?`<span class="ico">${SVG.clovis}</span>`:i}</button>`).join('');
   t.addEventListener('click', e=>{ const b=e.target.closest('.bete'); if(!b) return; b.classList.add('vue'); const [i,n,tx]=BETES[b.dataset.k]; ouvrirFiche(i==='clovis'?SVG.clovis:i, n, tx); });
