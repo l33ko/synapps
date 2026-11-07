@@ -199,7 +199,7 @@ h2{font-size:58px;color:#25321e}
 .pollen .scene-p{flex:none;width:560px;height:220px}
 .restaurant{margin-top:24px}
 .restaurant h3{font-size:38px;margin:0 0 14px 6px;color:#25321e}
-.menu{display:grid;grid-template-columns:repeat(5,1fr);gap:18px}
+.menu{display:grid;grid-template-columns:repeat(6,1fr);gap:16px}
 .plat{text-align:center;padding:18px 10px}
 .plat .ico{width:100px;height:100px;font-size:80px}
 .plat h3{font-size:30px;margin-top:6px}
@@ -258,6 +258,11 @@ h2{font-size:58px;color:#25321e}
 .liste-plantes button.choisi{background:var(--jaune)}
 
 /* ---------- Aménagements ---------- */
+.profil{position:absolute;inset:0;border-radius:28px;overflow:hidden}
+.profil svg{width:100%;height:100%;display:block}
+.etiq-strate{position:absolute;max-width:380px;padding:12px 20px;z-index:2}
+.etiq-strate b{display:block;font:600 34px var(--titre);color:#2c5a28}
+.etiq-strate span{font-size:25px;line-height:1.2;color:var(--doux)}
 .eco-liens{position:absolute;inset:0;width:100%;height:100%}
 .eco-liens line{stroke:#c9bd98;stroke-width:8;stroke-dasharray:4 16;stroke-linecap:round}
 .eco-centre{position:absolute;left:600px;top:126px;width:340px;height:360px;border-radius:50%;background:#fff;box-shadow:0 0 0 14px var(--vert-pale),0 14px 34px rgba(60,50,20,.18);
@@ -429,6 +434,18 @@ h2{font-size:58px;color:#25321e}
     <i class="m" data-s="1" data-say="coco|Certains insectes transportent le pollen, d’autres mangent les pucerons… comme moi !"></i>
     <i class="m" data-s="2" data-say="clovis|Sous la terre, on transforme les feuilles mortes en nourriture pour les racines : des nutriments !"></i>
     <i class="m" data-s="3" data-say="clovis|Quand on plantera, on cherchera ces petites bêtes en creusant ! Moi, je serai sous les feuilles."></i>
+  </div>
+</section>
+
+<!-- ================= Profil des strates ================= -->
+<section class="ecran" data-say="coco|Dans un bosquet fruitier, les plantes poussent à différentes hauteurs, comme les étages d’une maison !">
+  <div class="tete"><span class="puce">Le projet</span><h2>Les 4 strates du bosquet fruitier</h2></div>
+  <div class="corps">
+    <div class="profil" id="profil"></div>
+    <div class="carte etiq-strate" data-s="1" style="left:24px;top:372px;max-width:300px" data-say="clovis|Tout en bas, les <b>couvre-sol</b> : un tapis vert qui protège la terre. C’est mon étage !"><b>Couvre-sol</b><span>thym, menthe, mélisse, géranium</span></div>
+    <div class="carte etiq-strate" data-s="2" style="left:330px;top:90px" data-say="coco|Au-dessus, les <b>arbustes</b> : des buissons pleins de fleurs et de framboises."><b>Arbustes</b><span>grenadier, framboisier, lavande, romarin, sauge, armoise…</span></div>
+    <div class="carte etiq-strate" data-s="3" style="left:780px;top:0" data-say="clovis|Tout en haut, les <b>arbres</b> fruitiers donnent de l’ombre et des fruits."><b>Arbres</b><span>pêcher, clémentinier</span></div>
+    <div class="carte etiq-strate" data-s="4" style="right:10px;top:10px" data-say="coco|Et la <b>vigne</b> grimpe en s’accrochant au mur !"><b>Plante grimpante</b><span>la vigne</span></div>
   </div>
 </section>
 
@@ -604,6 +621,8 @@ function strate(k){
   return k ? `<div class="strate" title="Strate du végétal">${svg}<b>${nom}</b></div>` : '';
 }
 SVG.melisse = `<svg viewBox="0 0 100 100" aria-hidden="true"><path d="M50 98 V26" stroke="#4f8a3c" stroke-width="4"/>${[[84,30,1],[64,26,.9],[44,22,.75]].map(([y,dx,k])=>`<g transform="translate(50 ${y})"><path d="M0 0 C${-dx*.4} ${-16*k} ${-dx} ${-14*k} ${-dx} ${-2*k} C${-dx*.8} ${8*k} ${-dx*.3} ${8*k} 0 0Z" fill="#6fb04f"/><path d="M0 0 C${dx*.4} ${-16*k} ${dx} ${-14*k} ${dx} ${-2*k} C${dx*.8} ${8*k} ${dx*.3} ${8*k} 0 0Z" fill="#79b85a"/><path d="M0 0 L${-dx*.8} ${-4*k} M0 0 L${dx*.8} ${-4*k}" stroke="#4f8a3c" stroke-width="1.5"/></g>`).join('')}<path d="M50 26 C40 14 44 4 50 2 C56 4 60 14 50 26Z" fill="#8fc46a"/></svg>`;
+SVG.armoise = `<svg viewBox="0 0 100 100" aria-hidden="true"><g stroke="#8aa58a" stroke-width="3" stroke-linecap="round" fill="none">${[-50,-30,-12,0,12,30,50].map((a,i)=>{const r=a*Math.PI/180, L=70-Math.abs(a)*.4, x=50+Math.sin(r)*L, y=96-Math.cos(r)*L;
+  let s=`<path d="M50 96 L${x} ${y}"/>`; for(let k=1;k<5;k++){const px=50+(x-50)*k/5, py=96-(96-y)*k/5; s+=`<path d="M${px} ${py} l-8 -6 M${px} ${py} l8 -6" stroke="#a9c2a6"/>`;} return s;}).join('')}</g></svg>`;
 const ico = (k) => k.startsWith('<svg') ? k : SVG[k] ? SVG[k] : `<span class="emo">${k}</span>`;
 function poser(id, html){ const e=document.getElementById(id); if(e) e.innerHTML=html; }
 poser('icoTerre', SVG.terre); poser('dFleur', SVG.fleur()); poser('dAbeille', SVG.dAbeille); poser('dFane', SVG.dFane); poser('dFruit', SVG.dFruit);
@@ -626,15 +645,17 @@ const PLANTES = {
   thym:        {ico:'🌿', nom:'Le thym', tags:['tapis','odeur','abeilles'], txt:'Un petit tapis qui sent bon. Ses minuscules fleurs nourrissent les abeilles.'},
   menthe:      {ico:'🌱', nom:'La menthe', tags:['tapis','odeur'], txt:'Elle pousse vite et couvre le sol. Frottez une feuille : ça sent le chewing-gum !'},
   melisse:     {ico:SVG.melisse, nom:'La mélisse', tags:['odeur','abeilles'], txt:'Frottez une feuille : elle sent le citron !'},
+  sauge:       {ico:SVG.epi('#d63a4a','#4f7a52'), nom:'La sauge fleurie', tags:['abeilles','odeur'], txt:'Des petites fleurs rouges presque toute l’année : un vrai festin pour les abeilles et les papillons.'},
+  armoise:     {ico:SVG.armoise, nom:'L’armoise cola', tags:['odeur'], txt:'Un petit buisson argenté. Frottez une feuille : elle sent… le cola !'},
   verveine:    {ico:'🍃', nom:'La verveine citronnelle', tags:['odeur','abeilles'], txt:'Elle était déjà là ! Frottez une feuille : elle sent très fort le citron.', badge:['deja','⭐ Déjà là']},
 };
-const STRATE = {"pecher": "arbre", "grenadier": "arbuste", "clementinier": "arbre", "bananier": "arbuste", "framboisier": "arbuste", "vigne": "grimpante", "buddleia": "arbuste", "lavande": "arbuste", "romarin": "arbuste", "geranium": "couvresol", "thym": "couvresol", "menthe": "couvresol", "melisse": "couvresol", "verveine": "arbuste"};
+const STRATE = {"pecher": "arbre", "grenadier": "arbuste", "clementinier": "arbre", "bananier": "arbuste", "framboisier": "arbuste", "vigne": "grimpante", "buddleia": "arbuste", "lavande": "arbuste", "romarin": "arbuste", "geranium": "couvresol", "thym": "couvresol", "menthe": "couvresol", "melisse": "couvresol", "sauge": "arbuste", "armoise": "arbuste", "verveine": "arbuste"};
 const TAGS = {fruits:'🍎 Des fruits', abeilles:'🐝 Pour les abeilles', papillons:'🦋 Pour les papillons', odeur:'👃 Ça sent bon', tapis:'🟩 Un tapis vert', geant:'🌴 Une plante géante', fleurs:'🌸 Des fleurs', eau:'🐸 Un coin d’eau'};
 // emplacement des pastilles sur le dessin (en % de l'image)
 const PLAN = [['pecher',74,30],['grenadier',50,30],['clementinier',64,30],['bananier',38,32],['buddleia',16,31],['vigne',46,11],['framboisier',44,48],
-  ['romarin',29,55],['geranium',66,55],['lavande',52,63],['thym',86,44],['melisse',62,72],['menthe',37,85],['verveine',57,40]];
+  ['romarin',29,55],['geranium',66,55],['lavande',52,63],['thym',86,44],['melisse',62,72],['menthe',37,85],['verveine',57,40],['sauge',12,52],['armoise',78,60]];
 
-const MENU = ['lavande','buddleia','romarin','thym','melisse'];
+const MENU = ['lavande','buddleia','romarin','sauge','thym','melisse'];
 poser('menu', MENU.map(k=>`<div class="carte plat"><span class="ico">${ico(PLANTES[k].ico)}</span><h3>${PLANTES[k].nom.replace(/^(Le |La |L’)/,'').replace(/^./,c=>c.toUpperCase())}</h3></div>`).join(''));
 
 const FRUITS = [
@@ -685,6 +706,31 @@ const BETES = [
   <div class="carte expl" data-s="2" style="left:24px;top:372px"><span class="emo">🪱</span><p>Le <b>sol vivant</b> : ses petites bêtes transforment les feuilles mortes en <b>nutriments</b>, la nourriture des racines.</p></div>`;
   t.innerHTML = s + BETES.map(([i,n,tx,x,y,st],k)=>`<button class="bete" data-s="${st}" data-k="${k}" style="left:${x}%;top:${y}%" aria-label="${n}">${i==='clovis'?`<span class="ico">${SVG.clovis}</span>`:i}</button>`).join('');
   t.addEventListener('click', e=>{ const b=e.target.closest('.bete'); if(!b) return; b.classList.add('vue'); const [i,n,tx]=BETES[b.dataset.k]; ouvrirFiche(i==='clovis'?SVG.clovis:i, n, tx); });
+})();
+
+/* Profil des 4 strates */
+(function(){
+  const fl=(x,y,col)=>`<circle cx="${x}" cy="${y}" r="5" fill="${col}"/>`;
+  let couvre='', arbustes='', vigne='';
+  for(let i=0;i<8;i++){ const x=60+i*30; couvre+=`<ellipse cx="${x}" cy="512" rx="24" ry="12" fill="${i%2?'#6fb04f':'#5e9e45'}"/>`+fl(x-6,505,i%3?'#c9b3f2':'#fff')+fl(x+8,508,'#f6a6c1'); }
+  // arbustes : buisson à framboises, lavande, sauge
+  arbustes += `<circle cx="470" cy="455" r="52" fill="#4f8a3c"/><circle cx="452" cy="438" r="34" fill="#6fb04f"/>`+[[440,450],[478,430],[495,468],[456,478],[470,452]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="7" fill="#d6336c"/>`).join('');
+  for(let i=0;i<7;i++){ const x=548+i*16, h=80+(i%3)*14; arbustes+=`<path d="M${x} 520 L${x+(i%2?5:-5)} ${520-h}" stroke="#5c8a4a" stroke-width="3"/>`+Array.from({length:6},(_,j)=>`<ellipse cx="${x+(i%2?5:-5)*(1-j/8)}" cy="${520-h+j*8}" rx="5" ry="4" fill="#7f6bd1"/>`).join(''); }
+  arbustes += `<circle cx="690" cy="470" r="44" fill="#5e9e45"/><circle cx="676" cy="458" r="28" fill="#79b85a"/>`+[[668,440],[700,450],[712,476],[680,486],[694,430]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="6" fill="#d63a4a"/>`).join('');
+  // vigne sur le mur
+  vigne += `<path d="M1405 520 C1385 470 1430 440 1408 390 C1386 340 1432 300 1410 250 C1392 210 1420 170 1412 140" stroke="#7a4f2c" stroke-width="7" fill="none" stroke-linecap="round"/>`;
+  for(const [x,y] of [[1398,470],[1428,420],[1396,360],[1430,300],[1400,240],[1420,180]]) vigne += `<path d="M${x} ${y} c-22 -6 -30 -26 -18 -36 c8 8 22 4 28 14 c6 -12 22 -10 26 0 c-8 10 -20 18 -36 22z" fill="#5e9e45"/>`;
+  for(const [x,y] of [[1440,440],[1384,320]]) vigne += Array.from({length:6},(_,k)=>`<circle cx="${x+[0,10,-10,5,-5,0][k]}" cy="${y+[0,0,0,10,10,20][k]}" r="7" fill="#6b3fa0"/>`).join('');
+  const lignes=[[490,'≈ 30 cm'],[380,'1 à 3 m'],[110,'4 à 6 m']].map(([y,t])=>`<line x1="0" y1="${y}" x2="1340" y2="${y}" stroke="#b9ae90" stroke-width="2" stroke-dasharray="8 10"/>`).join('');
+  const hauteurs=[[490,'≈ 30 cm',1338,'end'],[380,'1 à 3 m',1338,'end'],[110,'4 à 6 m',14,'start']].map(([y,t,x,ta])=>`<text x="${x}" y="${y-8}" text-anchor="${ta}" font-family="Fredoka, sans-serif" font-size="22" font-weight="600" fill="#7d735a" stroke="#fff" stroke-width="6" paint-order="stroke">${t}</text>`).join('');
+  document.getElementById('profil').innerHTML = `<svg viewBox="0 0 1540 612" preserveAspectRatio="none" aria-hidden="true">
+    <rect width="1540" height="612" fill="#e9f5fb"/>${lignes}
+    <rect x="1350" y="120" width="190" height="400" fill="#e7dcc4"/>${Array.from({length:10},(_,i)=>`<line x1="1350" y1="${160+i*40}" x2="1540" y2="${160+i*40}" stroke="#d3c5a6" stroke-width="2"/>`).join('')}
+    <rect x="0" y="520" width="1540" height="92" fill="#8a5a3b"/><rect x="0" y="514" width="1540" height="12" rx="6" fill="#6b9a45"/>
+    <g data-s="1">${couvre}</g>
+    <g data-s="2"><g transform="translate(610 520) scale(1.45) translate(-560 -520)">${arbustes}</g></g>
+    <g data-s="3">${arbre(1120, 520, 150, '#f7a072', 14)}${arbre(925, 520, 105, '#f39a1f', 10)}</g>
+    <g data-s="4">${vigne}</g>${hauteurs}</svg>`;
 })();
 
 /* Plan des plantations */
