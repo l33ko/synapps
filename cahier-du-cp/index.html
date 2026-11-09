@@ -151,10 +151,10 @@ textarea.inp{width:100%;min-height:90px;font-size:1rem;word-break:break-all;disp
 @keyframes pop{50%{transform:scale(1.07)}}
 @keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
 .chip.optb{text-align:left;border-radius:16px;padding:14px 18px;line-height:1.4}
-.txt{font-size:1.25rem;line-height:1.75;text-align:left;margin:0 0 10px}
+.txt{font-size:1.7rem;line-height:1.65;text-align:left;margin:0 0 10px}
 .qq{background:var(--card);border:3px solid var(--sh);border-radius:14px;padding:8px 12px;margin-top:10px;text-align:center}
-.qq small{display:block;opacity:.75;font-size:.9rem}.qq b{font-size:1.2rem}
-.opt.rd{font-size:1.15rem;font-weight:700;min-height:56px;padding:8px;line-height:1.25}
+.qq small{display:block;opacity:.75;font-size:.9rem}.qq b{font-size:1.5rem;line-height:1.35;text-wrap:balance}
+.opt.rd{font-size:1.5rem;font-weight:700;min-height:64px;padding:10px 12px;line-height:1.3}
 .sess{background:var(--card);border:3px solid var(--sh);border-radius:18px;padding:10px 14px;margin:0 0 14px;display:flex;align-items:center;gap:10px}
 .sess .bar{margin-top:4px}
 .bonus{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:20px}
@@ -244,7 +244,8 @@ const MENU=[
 const app=document.getElementById('app');
 let TH=(()=>{try{return localStorage.getItem('cp-theme')||'light'}catch(e){return'light'}})();document.documentElement.dataset.theme=TH;
 function togTheme(){TH=TH==='dark'?'light':'dark';try{localStorage.setItem('cp-theme',TH)}catch(e){}document.documentElement.dataset.theme=TH;menu()}
-let stars=0,Q=null,LV={},P='',D={profiles:{},last:'',set:{min:15},ver:2},DBREF=null,PLAY={};const lvS=id=>Math.min(10,Math.max(1,parseInt(LV[id])||1)),lv=id=>PLAY[id]||lvS(id);
+let stars=0,Q=null,LV={},P='',D={profiles:{},last:'',set:{min:15},ver:2},DBREF=null,PLAY={};const NOHARD=['mix','pb','mul','cmp'],HARD=()=>!(D.set&&D.set.hard===false),MAXL=id=>NOHARD.includes(id)||HARD()?10:7;
+const lvS=id=>Math.min(MAXL(id),Math.max(1,parseInt(LV[id])||1)),lv=id=>Math.min(MAXL(id),PLAY[id]||lvS(id));
 const mig=ps=>{for(const k in ps){const l=(ps[k]&&ps[k].lv)||{};for(const id in l)l[id]=[1,4,7][(parseInt(l[id])||1)-1]||1}};
 try{D=JSON.parse(localStorage.getItem('cp-data'))||D}catch(e){}
 D.set=D.set||{min:15};D.profiles=D.profiles||{};
@@ -272,7 +273,7 @@ document.addEventListener('pointerdown',()=>{if(window.__vu)return;window.__vu=1
 function setVoice(n){try{if(n)localStorage.setItem('cp-voice',n);else localStorage.removeItem('cp-voice')}catch(e){}loadVoice();testVoice()}
 function testVoice(){VERR='';say('Bonjour ! Je suis la voix de ton cahier.');setTimeout(()=>{const m=document.getElementById('vm'),n=(()=>{try{return speechSynthesis.getVoices().length}catch(e){return 0}})();if(m)m.textContent=!window.speechSynthesis?'Ce navigateur ne sait pas parler.':`Voix : ${VOICE?VOICE.name:'aucune voix française trouvée'} (${n} voix sur l’appareil)${VERR?' · erreur : '+VERR:''}`},900)}
 
-function prog(id){const n=lvS(id);return `<span class="pg"><span class="pgb" aria-hidden="true">${Array.from({length:10},(_,i)=>`<i${i<n?' class="on"':''}></i>`).join('')}</span></span>`}
+function prog(id){const n=lvS(id);return `<span class="pg"><span class="pgb" aria-hidden="true">${Array.from({length:MAXL(id)},(_,i)=>`<i${i<n?' class="on"':''}></i>`).join('')}</span></span>`}
 /* mini-jeux bonus */
 const BMODE=()=>D.set&&D.set.bonus==='direct'?'direct':'coffre';
 const BEFF=()=>DUR()?BMODE():'direct';
@@ -300,7 +301,7 @@ function menu(){
  stopBT();Q=null;PLAY={};setTimeout(tick,0);
  app.innerHTML=`<div class="top"><h1>Salut ${esc(P)} ! 👋</h1><span class="stars">⭐ ${stars}</span></div>
  <button class="chip" onclick="parents()">⚙️ Parents</button> <button class="chip" onclick="who()">👤 Changer de joueur</button> <button class="chip" onclick="togTheme()">${TH==='dark'?'☀️ Mode clair':'🌙 Mode sombre'}</button><p class="sub">À quoi veux-tu jouer ?</p>${sessBar()}<div class="grid">`+
- MENU.filter(m=>!OFF(m.id)).map(m=>`<button class="card" style="background:var(${m.c})" aria-label="${m.t}, niveau ${lvS(m.id)} sur 10" onclick="lvl('${m.id}')"><span class="e">${m.e}</span>${m.t}${prog(m.id)}</button>`).join('')+`</div>${bonusHome()}`;
+ MENU.filter(m=>!OFF(m.id)).map(m=>`<button class="card" style="background:var(${m.c})" aria-label="${m.t}, niveau ${lvS(m.id)} sur ${MAXL(m.id)}" onclick="lvl('${m.id}')"><span class="e">${m.e}</span>${m.t}${prog(m.id)}</button>`).join('')+`</div>${bonusHome()}`;
 }
 
 const R=(a,b)=>a+rnd(b-a+1);
@@ -351,7 +352,7 @@ TXB=[
  [["Le boulanger se lève très tôt.","Il fait cuire des baguettes et des croissants.","Les clients arrivent à sept heures."],"Que fait cuire le boulanger ?","Des baguettes et des croissants",["Des gâteaux et des bonbons","Des pizzas","Des biscuits"]]];
 function genTxt(L){
  const it=pick(L>=9&&Math.random()<(L>=10?.85:.6)?TXB:TXA),[ph,q,a,wr]=it,txt=ph.join(' ');
- return {nr:'Lis le texte et réponds à la question.',nb:true,rd:true,
+ return {nr:'Lis le texte et réponds à la question.',nb:true,rd:true,three:true,
   q:`<div class="txt script">${esc(txt)}</div><div class="qq"><b class="script">${esc(q)}</b></div>`,
   opts:shuffle([a,...wr]).map(o=>({h:esc(o),ok:o===a,f:'script rd'}))}}
 function genLec(){
@@ -463,9 +464,13 @@ const SOUM=[0,0,0,1,2,3,4,6,8,10],SOUP=[0,0,0,.25,.35,.45,.5,.5,.5,.5];
 function genAS(){const L=lv('add');return Math.random()<SOUP[L-1]?genMath('sou',SOUM[L-1],L):genMath('add',L)}
 function gen(id){return id==='add'?genAS():id==='lec'?genLec():id==='ecr'?genEcr():id==='pho'?genPho():id==='phr'?genPhr():id==='sui'?genSui():id==='pb'?genPb():id==='int'?genInt():genMath(id==='mix'?pick(['add','sou','cmp','mul'].filter(o=>!OFF(o))):id,lv(id))}
 
-function start(id){if(STARTERS[id])return STARTERS[id]();Q={id,n:0,score:0,N:10};next()}
+/* série mélangée : à partir du niveau 4, 4 questions sur 10 plus faciles (dont les deux dernières) pour finir sur une réussite */
+const EASYAT=[2,5,8,9];
+function start(id){if(STARTERS[id])return STARTERS[id]();Q={id,n:0,score:0,N:10,ms:0};
+ const L=lv(id);if(L>=4){let e=Math.max(1,Math.min(L-3,lvS(id)));if(id==='lec'&&L>=7)e=Math.max(7,e);Q.plan=Array.from({length:10},(_,i)=>EASYAT.includes(i));Q.easyL=e}
+ next()}
 const sigQ=c=>c?[c.q,c.ws&&c.ws.join(' '),c.say,c.btn,c.nr,(c.opts||[]).filter(o=>o.ok).map(o=>o.h||o.t||o.v||'').join()].join('|'):'';
-function next(){if(Q.n>=Q.N)return end();Q.seen=Q.seen||new Set();let c,sg,k=0;do{c=gen(Q.id);sg=sigQ(c);k++}while(Q.seen.has(sg)&&k<60);Q.seen.add(sg);Q.cur=c;Q.tries=0;Q.done=false;Q.hinted=false;draw();setTimeout(()=>{if(NAR()&&Q&&Q.cur&&!Q.done&&(Q.cur.sp||Q.cur.nr)&&!(Q.id==='int'&&Q.n>0))say(Q.cur.sp||Q.cur.nr,Q.cur.rate)},350)}
+function next(){if(Q.cur&&!Q.cur.easy)Q.ms+=Q.score-Q.s0;if(Q.n>=Q.N)return end();Q.seen=Q.seen||new Set();let c,sg,k=0;const easy=!!(Q.plan&&Q.plan[Q.n]),keep=PLAY[Q.id];if(easy)PLAY[Q.id]=Q.easyL;try{do{c=gen(Q.id);sg=sigQ(c);k++}while(Q.seen.has(sg)&&k<60)}finally{if(easy){if(keep===undefined)delete PLAY[Q.id];else PLAY[Q.id]=keep}}Q.seen.add(sg);c.easy=easy;Q.s0=Q.score;Q.cur=c;Q.tries=0;Q.done=false;Q.hinted=false;draw();setTimeout(()=>{if(NAR()&&Q&&Q.cur&&!Q.done&&(Q.cur.sp||Q.cur.nr)&&!(Q.id==='int'&&Q.n>0))say(Q.cur.sp||Q.cur.nr,Q.cur.rate)},350)}
 function draw(){
  const c=Q.cur,m=MENU.find(x=>x.id===Q.id);if(c.type==='phr')return drawPhr(c,m);if(c.type==='txt')return drawTxt(c,m);if(c.key)return drawKey(c,m);
  app.innerHTML=`<div class="top"><button class="back" onclick="menu()" aria-label="Retour">←</button><div class="bar"><i style="width:${Q.n/Q.N*100}%"></i></div><span class="stars">${Q.n+1}/${Q.N}</span></div>
@@ -489,13 +494,15 @@ function ans(i,btn){
  }
 }
 function end(){
- const sc=Q.score,st=sc>=9?3:sc>=6?2:1,id=Q.id;
- stars+=st;const pl=lv(id),sv=lvS(id);let nl=sv;
- if(sc>=9){if(pl>=sv)nl=Math.min(10,pl+1)}else if(sc<=4){if(pl===sv)nl=Math.max(1,sv-1)}
+ const sc=Q.score,id=Q.id,pl=lv(id),sv=lvS(id),defi=pl>sv,mx=MAXL(id);let st=sc>=9?3:sc>=6?2:1;
+ if(defi||pl>=8)st=Math.max(st,2);
+ stars+=st;let nl=sv;
+ const mN=Q.plan?Q.plan.filter(x=>!x).length:Q.N,ms=Q.plan?Q.ms:sc;
+ if(ms>=mN-1){if(pl>=sv)nl=Math.min(mx,pl+1)}else if(ms<=Math.floor(.4*mN)){if(pl===sv)nl=Math.max(1,sv-1)}
  LV[id]=nl;if(pl===sv)PLAY[id]=nl;persist();
- const msg=nl>sv?'⬆️ Niveau supérieur !':nl<sv?'On s’entraîne encore un peu 🌱':pl<sv?'Bravo pour ce rappel ! Ton niveau reste le même.':'Même niveau, continue !';
- app.innerHTML=`<div class="end"><h1>${sc>=9?'Champion !':sc>=6?'Très bien !':'Continue !'}</h1>
- <div class="s">${'⭐'.repeat(st)}</div><p class="sub">${GAMES.includes(id)?`Score : ${sc} sur ${Q.N}`:`${sc} bonnes réponses du premier coup sur ${Q.N}`}</p><p class="sub">${msg} (niveau ${nl}/10)</p>
+ const msg=nl>sv?'⬆️ Niveau supérieur !':nl<sv?'On s’entraîne encore un peu 🌱':pl<sv?'Bravo pour ce rappel ! Ton niveau reste le même.':pl>sv?'Tu as essayé un niveau plus haut : bravo ! Ton niveau reste le même.':'Même niveau, continue !';
+ app.innerHTML=`<div class="end"><h1>${sc>=9?'Champion !':sc>=6?'Très bien !':defi||pl>=8?'Bravo, tu as relevé un défi !':'Bravo, tu as bien travaillé !'}</h1>
+ <div class="s">${'⭐'.repeat(st)}</div><p class="sub">${GAMES.includes(id)?`Score : ${sc} sur ${Q.N}`:`${sc} bonnes réponses du premier coup sur ${Q.N}`}</p><p class="sub">${msg} (niveau ${nl}/${mx})</p>${sc<6?`<p class="sub">${defi||pl>=8?'Ce niveau est difficile, c’est normal de se tromper. Tu y arriveras bientôt ! 💪':'Chaque essai te fait progresser. 💪'}</p>`:''}
  ${DUR()&&SS&&LEFT()<=0?'<p class="sub">⏰ Le temps de jeu est terminé. À bientôt !</p>':`<button class="again" onclick="start('${id}')">🔁 Rejouer</button><button class="again" onclick="lvl('${id}')">🎚️ Niveau</button>`}<button class="again" onclick="menu()">🏠 Menu</button></div>`;
 }
 const hdr=(p,l)=>`<div class="top"><button class="back" onclick="menu()" aria-label="Retour">←</button><div class="bar"><i style="width:${p*100}%"></i></div><span class="stars">${l}</span></div>`;
@@ -562,7 +569,7 @@ function newP(){const n=document.getElementById('nm').value.trim().slice(0,16);i
 }catch(e){}})();
 /* choix du niveau */
 function lvl(id){PLAY={};const m=MENU.find(x=>x.id===id),c=lvS(id);if(NAR())say(m.t);
- app.innerHTML=hdr(0,'⭐ '+stars)+`<h1>${m.t}</h1><button class="card" style="background:var(--c3);width:100%;margin-top:10px" onclick="setL('${id}',${c})"><span class="e">▶️</span>Jouer au niveau ${c}<small>Le niveau monte quand tu réussis !</small></button><p class="sub" style="margin-top:22px">Ou choisis un autre niveau :</p><div class="lvgrid">`+[...Array(10)].map((_,i)=>`<button class="lvb t${i<3?1:i<7?2:3} ${i+1===c?'on':''}" onclick="setL('${id}',${i+1})">${i+1}</button>`).join('')+`</div><p class="sub" style="margin-top:18px">Tu peux reprendre un niveau plus facile quand tu veux.</p>`}
+ app.innerHTML=hdr(0,'⭐ '+stars)+`<h1>${m.t}</h1><button class="card" style="background:var(--c3);width:100%;margin-top:10px" onclick="setL('${id}',${c})"><span class="e">▶️</span>Jouer au niveau ${c}<small>Le niveau monte quand tu réussis !</small></button><p class="sub" style="margin-top:22px">Ou choisis un autre niveau :</p><div class="lvgrid">`+[...Array(MAXL(id))].map((_,i)=>`<button class="lvb t${i<3?1:i<7?2:3} ${i+1===c?'on':''}" onclick="setL('${id}',${i+1})">${i+1}</button>`).join('')+`</div><p class="sub" style="margin-top:18px">Tu peux reprendre un niveau plus facile quand tu veux.</p>`}
 function setL(id,n){PLAY[id]=n;start(id)}
 /* problèmes */
 const HEROES=['Léa','Tom','Lola','Théo','Zoé','Nina'],NAMES=['Maman','Papa','Mamie','Papi','Lucie','Max'],ITEMS=[['pommes','🍎'],['billes','🔵'],['bonbons','🍬'],['crayons','✏️'],['fleurs','🌸'],['gâteaux','🍰'],['ballons','🎈']],BUY=[['une pomme','🍎'],['un gâteau','🍰'],['une glace','🍦'],['un livre','📖'],['un ballon','🎈']];
@@ -686,9 +693,12 @@ ${!cur?`<p class="sub" style="font-size:.9rem">Sans limite de temps, il n'y a pa
 <h2 class="h2">🔊 Voix et consignes</h2><div class="row"><button class="chip ${NAR()?'on':''}" onclick="togNar()">${NAR()?'Consignes orales : oui':'Consignes orales : non'}</button></div>
 <select id="vsel" class="inp" style="width:100%;margin-bottom:10px" onchange="setVoice(this.value)"><option value="">Voix automatique</option>${fr.map(v=>`<option value="${esc(v.name)}" ${v.name===pv?'selected':''}>${HQ(v)?'★ ':''}${esc(v.name)}${v.localService?'':' (en ligne)'}</option>`).join('')}</select>
 <button class="chip" onclick="testVoice()">🔈 Tester la voix</button><p class="sub" style="font-size:.85rem;margin:10px 0 0">Pour une voix plus naturelle (★), installe une voix « améliorée » ou « premium » dans les réglages de ton appareil. Sur Mac : Réglages Système › Accessibilité › Contenu énoncé › Voix du système › Gérer les voix › Français.</p><p class="msg" id="vm" style="font-size:.85rem;font-weight:400"></p>
+<h2 class="h2">🎯 Niveaux difficiles</h2><p class="sub" style="font-size:.95rem;margin-bottom:8px">Les niveaux 8 à 10 sont plus durs que le programme de CP. Sans eux, chaque exercice s'arrête au niveau 7 (sauf Maths mélangées, Problèmes, Doubles et moitiés et Compléments).</p>
+<div class="row"><button class="chip ${HARD()?'on':''}" onclick="togHard()">${HARD()?'✓ Niveaux 8 à 10 : activés':'✖ Niveaux 8 à 10 : désactivés'}</button></div>
 <h2 class="h2">🧩 Modules proposés</h2><p class="sub">Touche pour activer ou désactiver :</p><div class="row">${DIS.map(d=>`<button class="chip ${OFF(d[0])?'':'on'}" onclick="togMod('${d[0]}')">${OFF(d[0])?'✖ ':'✓ '}${d[1]}</button>`).join('')}</div>
 <h2 class="h2">☁️ Retrouver mes données</h2><p class="sub">${cloudLine()}</p><div class="row"><button class="chip" onclick="cloud('p')">${AUTH?'Synchronisation':'Se connecter avec un e-mail'}</button><button class="chip" onclick="backup(1)">💾 Code de sauvegarde</button></div>
 <button class="again" style="margin-top:18px" onclick="closeCfg()">Fermer</button>`)}
+function togHard(){D.set.hard=!HARD();saveD();persist();parentPanel()}
 function setBonus(m){D.set.bonus=m;saveD();persist();parentPanel()}
 function setDur(m){D.set.min=m;saveD();persist();if(!SS)newSession();parentPanel()}
 function startSess(){newSession();closeOvT()}
@@ -699,7 +709,7 @@ function applyCode(o,sets,quiet){let n=0;const ids=MENU.map(x=>x.id);
  for(const k in o.p){const nm=String(k).trim().slice(0,16);if(!nm||nm==='__proto__')continue;const b=o.p[k]||{},st=Math.min(99999,Math.max(0,parseInt(b.stars)||0)),l={};
   for(const id of ids){let v=parseInt((b.lv||{})[id]);if(!(v>=1))continue;if(o.v!==2)v=[1,4,7][v-1]||1;if(v>=1&&v<=10)l[id]=v}
   const a=D.profiles[nm];if(!a||st>(a.stars||0))D.profiles[nm]={stars:st,lv:l};n++}
- if(o.s&&sets!==false){if(DURS.includes(+o.s.min))D.set.min=+o.s.min;if(Array.isArray(o.s.off))D.set.off=o.s.off.filter(x=>typeof x==='string').slice(0,20);if(o.s.bonus==='direct'||o.s.bonus==='coffre')D.set.bonus=o.s.bonus}
+ if(o.s&&sets!==false){if(DURS.includes(+o.s.min))D.set.min=+o.s.min;if(Array.isArray(o.s.off))D.set.off=o.s.off.filter(x=>typeof x==='string').slice(0,20);if(o.s.bonus==='direct'||o.s.bonus==='coffre')D.set.bonus=o.s.bonus;if(typeof o.s.hard==='boolean')D.set.hard=o.s.hard}
  if(P&&D.profiles[P]){stars=D.profiles[P].stars||0;LV=D.profiles[P].lv||{}}
  saveD();if(!quiet)persist();return n}
 let BKP=false;
