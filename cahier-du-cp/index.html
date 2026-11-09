@@ -268,7 +268,32 @@ const NAR=()=>{try{return localStorage.getItem('cp-nar')!=='0'}catch(e){return t
 function togNar(){try{localStorage.setItem('cp-nar',NAR()?'0':'1')}catch(e){}parentPanel()}
 const spk=c=>c.nb?'':'<button class="tile" onclick="say(Q.cur.btn||Q.cur.nr)" aria-label="Écouter">🔊 Écouter</button>';
 let VERR='';
-function say(t,r){try{const s=speechSynthesis;if(!VOICE)loadVoice();if(s.speaking||s.pending)s.cancel();setTimeout(()=>{s.resume();[].concat(t).forEach(x=>{const u=new SpeechSynthesisUtterance(x);u.lang='fr-FR';if(VOICE)u.voice=VOICE;u.rate=r||.9;u.pitch=1;u.volume=1;u.onerror=e=>{VERR=e.error||'erreur'};s.speak(u)})},120)}catch(e){VERR=String(e)}}
+function sayDev(t,r){try{const s=speechSynthesis;if(!VOICE)loadVoice();if(s.speaking||s.pending)s.cancel();setTimeout(()=>{s.resume();[].concat(t).forEach(x=>{const u=new SpeechSynthesisUtterance(x);u.lang='fr-FR';if(VOICE)u.voice=VOICE;u.rate=r||.9;u.pitch=1;u.volume=1;u.onerror=e=>{VERR=e.error||'erreur'};s.speak(u)})},120)}catch(e){VERR=String(e)}}
+/* voix naturelle (ElevenLabs, voix Alice) : sons enregistrés dans le dossier voix/. Les textes qui n'y sont pas (énoncés des problèmes…) sont lus par la voix de l'appareil */
+let VIDX=null,VAC=null,VBUF={},VTOK=0,VSRC=[];
+const vnorm=t=>String(t).toLowerCase().replace(/[^\p{L}\p{N} ]/gu,' ').replace(/\s+/g,' ').trim();
+const VU=['zéro','un','deux','trois','quatre','cinq','six','sept','huit','neuf','dix','onze','douze','treize','quatorze','quinze','seize','dix-sept','dix-huit','dix-neuf'],VD={2:'vingt',3:'trente',4:'quarante',5:'cinquante'};
+const vnum=n=>n<20?VU[n]:n%10===0?VD[n/10]:VD[Math.floor(n/10)]+(n%10===1?' et un':'-'+VU[n%10]);
+try{fetch('voix/index.json').then(r=>r.ok?r.json():null).then(j=>{VIDX=j}).catch(()=>{})}catch(e){}
+function vseg(t){if(!VIDX)return null;
+ const w=vnorm(String(t).replace(/\d+/g,m=>' '+(+m<=50?vnum(+m):'?')+' ')).split(' ').filter(Boolean),n=w.length;if(!n)return null;
+ const best=[0],prev=[];
+ for(let i=1;i<=n;i++){best[i]=null;for(let j=0;j<i;j++){if(best[j]==null)continue;const k=w.slice(j,i).join(' ');if(VIDX[k]&&(best[i]==null||best[j]+1<best[i])){best[i]=best[j]+1;prev[i]=j}}}
+ if(best[n]==null)return null;const out=[];for(let i=n;i>0;i=prev[i])out.unshift(VIDX[w.slice(prev[i],i).join(' ')]);return out}
+function vctx(){if(!VAC){try{VAC=new (window.AudioContext||window.webkitAudioContext)()}catch(e){}}return VAC}
+function vload(f){return VBUF[f]||(VBUF[f]=fetch('voix/'+f).then(r=>{if(!r.ok)throw 0;return r.arrayBuffer()}).then(b=>new Promise((ok,ko)=>VAC.decodeAudioData(b,ok,ko))).catch(e=>{delete VBUF[f];throw e}))}
+function vstop(){VSRC.forEach(x=>{try{x.stop()}catch(e){}});VSRC=[]}
+function say(t,r){
+ VTOK++;const tok=VTOK;vstop();
+ let files=null;try{const parts=[].concat(t).map(vseg);if(parts.length&&parts.every(Boolean)&&vctx())files=parts.flat()}catch(e){}
+ if(!files)return sayDev(t,r);
+ try{const s=speechSynthesis;if(s.speaking||s.pending)s.cancel()}catch(e){}
+ Promise.all(files.map(vload)).then(bufs=>{
+  if(tok!==VTOK)return;try{VAC.resume()}catch(e){}
+  let at=VAC.currentTime+.05;
+  bufs.forEach(b=>{const src=VAC.createBufferSource();src.buffer=b;src.connect(VAC.destination);src.start(at);at+=b.duration+.04;VSRC.push(src)})
+ }).catch(()=>{if(tok===VTOK)sayDev(t,r)})}
+document.addEventListener('pointerdown',()=>{if(window.__vau)return;window.__vau=1;try{vctx();VAC.resume();const b=VAC.createBuffer(1,1,22050),x=VAC.createBufferSource();x.buffer=b;x.connect(VAC.destination);x.start(0)}catch(e){}},true);
 document.addEventListener('pointerdown',()=>{if(window.__vu)return;window.__vu=1;try{const u=new SpeechSynthesisUtterance(' ');u.volume=0;speechSynthesis.speak(u)}catch(e){}},true);
 function setVoice(n){try{if(n)localStorage.setItem('cp-voice',n);else localStorage.removeItem('cp-voice')}catch(e){}loadVoice();testVoice()}
 function testVoice(){VERR='';say('Bonjour ! Je suis la voix de ton cahier.');setTimeout(()=>{const m=document.getElementById('vm'),n=(()=>{try{return speechSynthesis.getVoices().length}catch(e){return 0}})();if(m)m.textContent=!window.speechSynthesis?'Ce navigateur ne sait pas parler.':`Voix : ${VOICE?VOICE.name:'aucune voix française trouvée'} (${n} voix sur l’appareil)${VERR?' · erreur : '+VERR:''}`},900)}
@@ -457,7 +482,7 @@ function genMath(op,L,KL){L=L||1;
  const s2=new Set([ans]);let g=0;
  while(s2.size<4&&g++<200){const d=ans+pick([-10,-3,-2,-1,1,2,3,10]);if(d>=0)s2.add(d)}
  const opts=shuffle([...s2]).map(n=>({h:n,ok:n===ans})),kb=(KL||L)>=4,fs=txt.length>13?' style="font-size:2.2rem"':'';
- const nb=op==='add'||op==='sou',nr=nb?null:cm?'Trouve le bon nombre pour compléter le calcul.':/^(Le double|La moitié)/.test(txt)?'Quel est '+txt[0].toLowerCase()+txt.slice(1)+' ?':/groupes/.test(txt)?`Combien font ${txt} ?`:`Combien font ${txt.replace(' + ',' plus ').replace(' − ',' moins ').replace(' × ',' fois ')} ?`;
+ const nb=op==='add'||op==='sou',nr=nb?null:cm?'Trouve le bon nombre pour compléter le calcul.':/^(Le double|La moitié)/.test(txt)?(/^La moitié/.test(txt)?'Quelle est ':'Quel est ')+txt[0].toLowerCase()+txt.slice(1)+' ?':/groupes/.test(txt)?`Combien font ${txt} ?`:`Combien font ${txt.replace(' + ',' plus ').replace(' − ',' moins ').replace(' × ',' fois ')} ?`;
  if(cm)return {nr,nb,q:`<div class="math">${a} + ? = ${t}</div>`,opts,key:kb?{ml:`${a} +`,mr:`= ${t}`,ans,v:''}:null};
  return {nr,nb,q:`<div class="math"${fs}>${txt} = ?</div>`,opts,key:kb?{txt,ans,v:''}:null};
 }
@@ -696,7 +721,7 @@ function parentPanel0(){const cur=DUR(),left=SS?LEFT():0;const fr=frVoices();
 ${!cur?`<p class="sub" style="font-size:.9rem">Sans limite de temps, il n'y a pas de fin de séance : les jeux restent accessibles.</p>`:''}
 <h2 class="h2">🔊 Voix et consignes</h2><div class="row"><button class="chip ${NAR()?'on':''}" onclick="togNar()">${NAR()?'Consignes orales : oui':'Consignes orales : non'}</button></div>
 <select id="vsel" class="inp" style="width:100%;margin-bottom:10px" onchange="setVoice(this.value)"><option value="">Voix automatique</option>${fr.map(v=>`<option value="${esc(v.name)}" ${v.name===pv?'selected':''}>${HQ(v)?'★ ':''}${esc(v.name)}${v.localService?'':' (en ligne)'}</option>`).join('')}</select>
-<button class="chip" onclick="testVoice()">🔈 Tester la voix</button><p class="sub" style="font-size:.85rem;margin:10px 0 0">Pour une voix plus naturelle (★), installe une voix « améliorée » ou « premium » dans les réglages de ton appareil. Sur Mac : Réglages Système › Accessibilité › Contenu énoncé › Voix du système › Gérer les voix › Français.</p><p class="msg" id="vm" style="font-size:.85rem;font-weight:400"></p>
+<button class="chip" onclick="testVoice()">🔈 Tester la voix</button><p class="sub" style="font-size:.85rem;margin:10px 0 0">La voix « Alice » (enregistrée) lit les mots, les phrases et les consignes ; la voix ci-dessus ne sert que pour le reste, comme les énoncés des problèmes. Pour une voix plus naturelle (★), installe une voix « améliorée » ou « premium » dans les réglages de ton appareil. Sur Mac : Réglages Système › Accessibilité › Contenu énoncé › Voix du système › Gérer les voix › Français.</p><p class="msg" id="vm" style="font-size:.85rem;font-weight:400"></p>
 <h2 class="h2">🎯 Niveaux difficiles</h2><p class="sub" style="font-size:.95rem;margin-bottom:8px">Les niveaux 8 à 10 sont plus durs que le programme de CP. Sans eux, chaque exercice s'arrête au niveau 7 (sauf Maths mélangées, Problèmes, Doubles et moitiés et Compléments).</p>
 <div class="row"><button class="chip ${HARD()?'on':''}" onclick="togHard()">${HARD()?'✓ Niveaux 8 à 10 : activés':'✖ Niveaux 8 à 10 : désactivés'}</button></div>
 <h2 class="h2">🧩 Modules proposés</h2><p class="sub">Touche pour activer ou désactiver :</p><div class="row">${DIS.map(d=>`<button class="chip ${OFF(d[0])?'':'on'}" onclick="togMod('${d[0]}')">${OFF(d[0])?'✖ ':'✓ '}${d[1]}</button>`).join('')}</div>
