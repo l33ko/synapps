@@ -301,7 +301,7 @@ function menu(){
  stopBT();Q=null;PLAY={};setTimeout(tick,0);
  app.innerHTML=`<div class="top"><h1>Salut ${esc(P)} ! 👋</h1><span class="stars">⭐ ${stars}</span></div>
  <button class="chip" onclick="parents()">⚙️ Parents</button> <button class="chip" onclick="who()">👤 Changer de joueur</button> <button class="chip" onclick="togTheme()">${TH==='dark'?'☀️ Mode clair':'🌙 Mode sombre'}</button><p class="sub">À quoi veux-tu jouer ?</p>${sessBar()}<div class="grid">`+
- MENU.filter(m=>!OFF(m.id)).map(m=>`<button class="card" style="background:var(${m.c})" aria-label="${m.t}, niveau ${lvS(m.id)} sur 10" onclick="lvl('${m.id}')"><span class="e">${m.e}</span>${m.t}${prog(m.id)}</button>`).join('')+`</div>${bonusHome()}`;
+ MENU.filter(m=>!OFF(m.id)).map(m=>`<button class="card" style="background:var(${m.c})" aria-label="${m.t}, niveau ${lvS(m.id)} sur ${MAXL(m.id)}" onclick="lvl('${m.id}')"><span class="e">${m.e}</span>${m.t}${prog(m.id)}</button>`).join('')+`</div>${bonusHome()}`;
 }
 
 const R=(a,b)=>a+rnd(b-a+1);
@@ -498,7 +498,7 @@ function end(){
  if(defi||pl>=8)st=Math.max(st,2);
  stars+=st;let nl=sv;
  const mN=Q.plan?Q.plan.filter(x=>!x).length:Q.N,ms=Q.plan?Q.ms:sc;
- if(ms>=Math.ceil(.9*mN)){if(pl>=sv)nl=Math.min(mx,pl+1)}else if(ms<=Math.floor(.4*mN)){if(pl===sv)nl=Math.max(1,sv-1)}
+ if(ms>=mN-1){if(pl>=sv)nl=Math.min(mx,pl+1)}else if(ms<=Math.floor(.4*mN)){if(pl===sv)nl=Math.max(1,sv-1)}
  LV[id]=nl;if(pl===sv)PLAY[id]=nl;persist();
  const msg=nl>sv?'⬆️ Niveau supérieur !':nl<sv?'On s’entraîne encore un peu 🌱':pl<sv?'Bravo pour ce rappel ! Ton niveau reste le même.':pl>sv?'Tu as essayé un niveau plus haut : bravo ! Ton niveau reste le même.':'Même niveau, continue !';
  app.innerHTML=`<div class="end"><h1>${sc>=9?'Champion !':sc>=6?'Très bien !':defi||pl>=8?'Bravo, tu as relevé un défi !':'Bravo, tu as bien travaillé !'}</h1>
@@ -698,7 +698,7 @@ ${!cur?`<p class="sub" style="font-size:.9rem">Sans limite de temps, il n'y a pa
 <h2 class="h2">🧩 Modules proposés</h2><p class="sub">Touche pour activer ou désactiver :</p><div class="row">${DIS.map(d=>`<button class="chip ${OFF(d[0])?'':'on'}" onclick="togMod('${d[0]}')">${OFF(d[0])?'✖ ':'✓ '}${d[1]}</button>`).join('')}</div>
 <h2 class="h2">☁️ Retrouver mes données</h2><p class="sub">${cloudLine()}</p><div class="row"><button class="chip" onclick="cloud('p')">${AUTH?'Synchronisation':'Se connecter avec un e-mail'}</button><button class="chip" onclick="backup(1)">💾 Code de sauvegarde</button></div>
 <button class="again" style="margin-top:18px" onclick="closeCfg()">Fermer</button>`)}
-function togHard(){D.set.hard=!HARD();MENU.forEach(m=>{if(!NOHARD.includes(m.id)&&LV[m.id]>MAXL(m.id))LV[m.id]=MAXL(m.id)});saveD();persist();parentPanel()}
+function togHard(){D.set.hard=!HARD();saveD();persist();parentPanel()}
 function setBonus(m){D.set.bonus=m;saveD();persist();parentPanel()}
 function setDur(m){D.set.min=m;saveD();persist();if(!SS)newSession();parentPanel()}
 function startSess(){newSession();closeOvT()}
