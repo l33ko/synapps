@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<script>
+/* SynApps — signalement des erreurs
+   Les erreurs JavaScript rencontrées par les visiteurs sont envoyées, sans donnée personnelle, dans la table
+   « erreurs » de Supabase (Synapps_public en production, Synapps_test ailleurs). Le robot de surveillance
+   GitHub les relit chaque semaine. Au plus 5 envois par page ouverte. */
+(function(){
+  if (!/^https?:$/.test(location.protocol) || !window.fetch) return;
+  var B = /^(app\.synapsium\.com|synapps-bhl\.pages\.dev|l33ko\.github\.io)$/.test(location.hostname)
+    ? {url:'https://qxwypwcxdhhtgmzaskzs.supabase.co', key:'sb_publishable_BZ9SxprfxkC-dUQZori4zA_txbvmngw'}
+    : {url:'https://zlfgcfexvawijldgiqbu.supabase.co', key:'sb_publishable_aLCilH09KKWb4IfJC4Sx1g_df2_RUrC'};
+  var n = 0, vus = {};
+  function net(t, max){                                   // retire tout ce qui pourrait être personnel
+    return String(t == null ? '' : t)
+      .replace(/(https?:\/\/[^\s?#()'"]+)[?#][^\s()'"]*?(:\d+:\d+)?(?=[\s()'"]|$)/g, '$1$2')  // paramètres d'adresse (jetons, code d'invitation…)
+      .replace(/(access_token|refresh_token|token|rejoindre|code)=[^&\s#"']+/gi, '$1=…')
+      .replace(/[^\s@"'<>()\/:]+@[^\s@"'<>()\/:]+\.[a-z]{2,}/gi, '…@…')       // adresses e-mail
+      .slice(0, max);
+  }
+  function app(){ var s = location.pathname.split('/')[1] || ''; return (!s || /\.html?$/.test(s)) ? 'accueil' : s.slice(0, 40); }
+  function envoyer(msg, src, l, c, pile){
+    msg = net(msg, 500); src = net(String(src || '').split(/[?#]/)[0], 300);
+    if (!msg || /^Script error\.?$/i.test(msg)) return;                                       // erreur d'un autre site, sans détail
+    if (/Failed to fetch|Load failed|NetworkError|network error|AbortError|The operation was aborted/i.test(msg)) return;  // réseau coupé
+    if (/^(chrome|moz|safari|safari-web)-extension:/.test(src)) return;                       // extension du navigateur
+    var k = msg + '|' + l; if (vus[k] || n >= 5) return; vus[k] = 1; n++;
+    try {
+      fetch(B.url + '/rest/v1/erreurs', {method:'POST', keepalive:true,
+        headers:{apikey:B.key, 'Content-Type':'application/json', Prefer:'return=minimal'},
+        body:JSON.stringify({app:app(), page:net(location.pathname, 200), message:msg, source:src,
+          ligne:l | 0, colonne:c | 0, pile:net(pile, 2000), navigateur:String(navigator.userAgent).slice(0, 300)})
+      }).catch(function(){});
+    } catch(e){}
+  }
+  addEventListener('error', function(e){
+    if (e.target && e.target !== window && !e.message) return;                                // image ou fichier qui ne charge pas
+    envoyer(e.message, e.filename, e.lineno, e.colno, e.error && e.error.stack);
+  }, true);
+  addEventListener('unhandledrejection', function(e){
+    var r = e.reason; envoyer(r && r.message || r, '', 0, 0, r && r.stack);
+  });
+})();
+</script>
+<title>Le bosquet fruitier des CP</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#2f3b28">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Fredoka:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --creme:#fbf6ea; --papier:#fffdf7; --encre:#2b2a24; --doux:#6b6655;
+  --vert:#3f7d3a; --vert-clair:#8fc46a; --vert-pale:#e6f2da;
+  --terre:#8a5a3b; --terre-pale:#f3e6d6; --tomate:#d9693b; --ciel:#dff0f7; --eau:#5aa9d6;
+  --jaune:#f6c445; --violet:#7f6bd1;
+  --titre:'Fredoka', 'Arial Rounded MT Bold', system-ui, sans-serif;
+  --texte:'Andika', 'Trebuchet MS', system-ui, sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden;background:#2f3b28;color:var(--encre);font-family:var(--texte);-webkit-tap-highlight-color:transparent}
+button{font:inherit;color:inherit;cursor:pointer}
+#vue{position:fixed;inset:0;overflow:hidden;touch-action:manipulation}
+#scene{position:absolute;left:0;top:0;width:1600px;height:900px;transform-origin:0 0;background:var(--creme);overflow:hidden;border-radius:6px}
+#tourne{display:none;position:fixed;top:12px;left:0;right:0;text-align:center;color:#e8efd9;font:600 15px var(--titre);z-index:5}
+@media (orientation:portrait) and (max-width:700px){#tourne{display:block}}
+
+/* ---------- Écrans ---------- */
+.ecran{position:absolute;inset:0;padding:30px 30px 0;opacity:0;visibility:hidden;transition:opacity .45s,visibility .45s;
+  background:radial-gradient(1200px 500px at 80% -10%,#fff8e3 0,transparent 60%),var(--creme)}
+.ecran.on{opacity:1;visibility:visible}
+.tete{height:112px;display:flex;flex-direction:column;justify-content:center;gap:6px;padding-left:6px}
+.puce{align-self:flex-start;font:600 22px var(--titre);color:#fff;background:var(--vert);padding:4px 16px;border-radius:999px;letter-spacing:.02em}
+.puce.q{background:var(--tomate)}
+.puce.a{background:var(--eau)}
+h1,h2,h3{font-family:var(--titre);margin:0;font-weight:600;line-height:1.08}
+h2{font-size:58px;color:#25321e}
+.corps{position:absolute;left:30px;right:30px;top:150px;height:612px}
+
+/* éléments qui apparaissent pas à pas */
+[data-s]{transition:opacity .5s,transform .5s cubic-bezier(.2,.9,.3,1.3)}
+[data-s]:not(.vu){opacity:0;transform:translateY(24px) scale(.96);pointer-events:none}
+.m{display:none}
+
+.carte{background:var(--papier);border-radius:28px;box-shadow:0 6px 0 rgba(60,50,20,.08),0 14px 34px rgba(60,50,20,.12);padding:24px 28px}
+.gros{font-size:34px;line-height:1.25}
+.tres-gros{font-size:44px;line-height:1.15;font-family:var(--titre);font-weight:600}
+.ico{display:inline-flex;align-items:center;justify-content:center}
+.ico svg{width:100%;height:100%}
+.emo{font-size:1em;line-height:1}
+
+/* ---------- Pied : mascottes, bulle, navigation ---------- */
+#pied{position:absolute;left:0;right:0;bottom:0;height:140px;pointer-events:none;z-index:20}
+.mascotte{position:absolute;bottom:8px;transition:transform .3s,filter .3s,opacity .3s;pointer-events:auto;background:none;border:0;padding:0}
+#coco{left:18px;width:112px;height:112px}
+#clovis{left:124px;width:128px;height:96px;bottom:10px}
+.mascotte.parle{animation:saut .9s ease-in-out infinite}
+.mascotte.muet{filter:saturate(.6);opacity:.85;transform:scale(.9)}
+@keyframes saut{0%,100%{transform:translateY(0)}35%{transform:translateY(-12px) rotate(-3deg)}70%{transform:translateY(0) rotate(2deg)}}
+#bulle{position:absolute;left:276px;bottom:26px;max-width:1010px;min-height:64px;background:#fff;border-radius:26px;padding:14px 26px;
+  font-size:29px;line-height:1.25;box-shadow:0 8px 24px rgba(40,40,20,.18);border:3px solid #25321e;transition:opacity .3s, transform .3s;pointer-events:auto}
+#bulle::before{content:"";position:absolute;left:-19px;bottom:18px;border:11px solid transparent;border-right:16px solid #25321e;border-left:0}
+#bulle::after{content:"";position:absolute;left:-13px;bottom:21px;border:8px solid transparent;border-right:12px solid #fff;border-left:0}
+#bulle b{font-family:var(--titre);font-weight:600}
+#bulle.cache{opacity:0;transform:translateY(10px)}
+#nav{position:absolute;right:18px;bottom:20px;display:flex;align-items:center;gap:10px;pointer-events:auto}
+#nav button{width:62px;height:62px;border-radius:50%;border:0;background:#25321e;color:#fff;font-size:30px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 0 rgba(0,0,0,.2)}
+#nav button:active{transform:translateY(2px)}
+#nav button.petit{width:46px;height:46px;font-size:20px;background:#5d6b52}
+#compteur{font:600 22px var(--titre);color:#25321e;min-width:70px;text-align:center}
+#points{position:absolute;right:20px;bottom:96px;display:flex;gap:6px;pointer-events:auto}
+#points i{width:12px;height:12px;border-radius:50%;background:#cfc8b2;cursor:pointer}
+#points i.on{background:var(--tomate);transform:scale(1.25)}
+.mascotte svg,.fin .duo svg{width:100%;height:100%;display:block}
+#pied.sansm .mascotte,#pied.sansm #bulle{opacity:0;pointer-events:none}
+
+/* ---------- Fiche (fenêtre d'explication) ---------- */
+#fiche{position:absolute;inset:0;z-index:40;display:flex;align-items:center;justify-content:center;background:rgba(30,35,25,.45);opacity:0;visibility:hidden;transition:.3s}
+#fiche.on{opacity:1;visibility:visible}
+#fiche .carte{width:860px;display:flex;gap:34px;align-items:center;padding:36px 44px;transform:scale(.9);transition:transform .3s cubic-bezier(.2,.9,.3,1.4);position:relative}
+#fiche.on .carte{transform:scale(1)}
+#fiche .grand-ico{width:190px;height:190px;font-size:150px;flex:none}
+#fiche h3{font-size:52px;margin-bottom:10px;color:#25321e}
+#fiche p{font-size:34px;line-height:1.3;margin:0}
+#fiche .fermer{position:absolute;right:18px;top:14px;border:0;background:none;font-size:34px;color:var(--doux)}
+
+/* ---------- 1. Titre ---------- */
+.titre{padding:0}
+.titre .fond{position:absolute;inset:0}
+.titre .fond svg{width:100%;height:100%;display:block}
+.titre-bloc{position:absolute;left:70px;top:64px;color:#25321e;text-shadow:0 0 18px rgba(255,255,255,.9),0 0 4px #fff}
+.titre-bloc .sur{font:600 32px var(--titre);margin:0 0 10px;color:#b4502a}
+.titre h1{font-size:112px;font-weight:700}
+
+/* ---------- 2. Potager ---------- */
+.cadre-photo{position:absolute;border-radius:26px;overflow:hidden;box-shadow:0 14px 34px rgba(60,50,20,.25);background:#ddd}
+.cadre-photo>img{width:100%;height:100%;object-fit:cover;display:block}
+.pt{position:absolute;transform:translate(-50%,-50%);border:4px solid #fff;background:rgba(255,255,255,.9);border-radius:999px;
+  min-width:64px;height:64px;padding:0 12px;display:flex;align-items:center;gap:8px;font-size:34px;box-shadow:0 4px 14px rgba(0,0,0,.3);animation:pouls 2.4s infinite}
+.pt .nom{display:none;font:600 26px var(--titre);color:#25321e;white-space:nowrap}
+.pt.ouvert .nom,.tous .pt .nom{display:inline}
+.pt.ouvert,.tous .pt{animation:none}
+@keyframes pouls{0%,100%{box-shadow:0 4px 14px rgba(0,0,0,.3),0 0 0 0 rgba(255,255,255,.7)}50%{box-shadow:0 4px 14px rgba(0,0,0,.3),0 0 0 14px rgba(255,255,255,0)}}
+.compare{position:absolute;left:820px;top:0;width:720px;display:flex;flex-direction:column;gap:20px}
+.compare .carte h3{font-size:40px;margin-bottom:10px;display:flex;align-items:center;gap:12px}
+.compare .carte ul{list-style:none;margin:0;padding:0;font-size:31px;line-height:1.45}
+.compare .legume{border-left:12px solid var(--tomate)}
+.compare .arbre{border-left:12px solid var(--vert)}
+.message{font:600 36px var(--titre);color:#fff;background:var(--vert);border-radius:22px;padding:16px 24px;text-align:center}
+
+/* ---------- 3. Avant / après ---------- */
+.ba{position:absolute;left:0;top:0;width:800px;height:600px;border-radius:26px;overflow:hidden;box-shadow:0 14px 34px rgba(60,50,20,.25);touch-action:none;user-select:none;-webkit-user-select:none}
+.ba img{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none}
+.ba .apres{clip-path:inset(0 0 0 var(--pos,100%))}
+.ba .apres img{transform-origin:0 0;transform:translate(-11.5%,-17.7%) scale(1.18)}
+.ba .apres{position:absolute;inset:0;z-index:2}
+.ba .poignee{position:absolute;top:0;bottom:0;left:var(--pos,100%);width:0;z-index:3}
+.ba .poignee::before{content:"";position:absolute;top:0;bottom:0;left:-3px;width:6px;background:#fff;box-shadow:0 0 10px rgba(0,0,0,.4)}
+.ba .poignee b{position:absolute;top:50%;left:-38px;width:76px;height:76px;margin-top:-38px;border-radius:50%;background:#fff;box-shadow:0 4px 14px rgba(0,0,0,.35);
+  display:flex;align-items:center;justify-content:center;font-size:34px;color:#25321e}
+.ba .etiq{position:absolute;top:18px;font:600 28px var(--titre);color:#fff;background:rgba(30,40,25,.7);padding:6px 16px;border-radius:999px;z-index:2}
+.ba .etiq.g{left:18px}.ba .etiq.d{right:18px}
+.ba.anime .apres{transition:clip-path 1.6s ease-in-out}
+.ba.anime .poignee{transition:left 1.6s ease-in-out}
+.cote{position:absolute;left:840px;top:0;width:700px;display:flex;flex-direction:column;gap:22px}
+.cote .carte h3{font-size:38px;margin-bottom:14px;color:#25321e}
+.cote .ligne{display:flex;align-items:center;gap:18px;font-size:34px;line-height:1.25;margin:10px 0}
+.cote .ligne .emo{font-size:56px;width:70px;text-align:center;flex:none}
+
+/* ---------- Grandes questions ---------- */
+.grille4{display:grid;grid-template-columns:repeat(4,1fr);gap:24px}
+.besoin{text-align:center;padding:20px 10px}
+.besoin .ico{width:110px;height:110px;font-size:92px}
+.besoin h3{font-size:42px;margin-top:6px}
+.bas{display:flex;gap:24px;margin-top:26px;align-items:stretch}
+.zoom-sol{width:470px;height:300px;border-radius:24px;background:url(img/aujourdhui.jpg) 32% 74%/300% no-repeat;position:relative;flex:none;box-shadow:0 10px 26px rgba(60,50,20,.2)}
+.zoom-sol p{position:absolute;left:12px;right:12px;bottom:12px;margin:0;background:rgba(255,255,255,.92);border-radius:16px;padding:10px 14px;font-size:27px;line-height:1.2}
+.solutions{flex:1;display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.solution{text-align:center;padding:20px 16px;display:flex;flex-direction:column;align-items:center;gap:8px}
+.solution .emo{font-size:72px}
+.solution h3{font-size:34px}
+.solution p{margin:0;font-size:27px;color:var(--doux);line-height:1.25}
+
+.etapes{display:flex;align-items:center;justify-content:space-between;height:470px}
+.etape{width:330px;text-align:center}
+.etape .dessin{width:290px;height:290px;margin:0 auto;border-radius:50%;background:var(--vert-pale);display:flex;align-items:center;justify-content:center;position:relative}
+.etape .dessin svg{width:230px;height:230px}
+.etape h3{font-size:33px;margin-top:16px;line-height:1.12}
+.etape .num{position:absolute;left:6px;top:6px;width:56px;height:56px;border-radius:50%;background:var(--tomate);color:#fff;font:700 32px var(--titre);display:flex;align-items:center;justify-content:center}
+.fleche{font-size:60px;color:#b9b19a}
+.terme{display:inline-block;margin-top:10px;font:600 26px var(--titre);color:#b4502a;background:#fde9dc;padding:4px 16px;border-radius:999px}
+.bandeau{margin-top:14px;display:flex;align-items:center;justify-content:center;gap:22px;font-size:36px}
+.bandeau .ico{width:64px;height:64px}
+
+.pollen{display:flex;align-items:center;gap:36px;padding:26px 36px}
+.pollen .scene-p{flex:none;width:560px;height:220px}
+.restaurant{margin-top:24px}
+.restaurant h3{font-size:38px;margin:0 0 14px 6px;color:#25321e}
+.menu{display:grid;grid-template-columns:repeat(6,1fr);gap:16px}
+.plat{text-align:center;padding:18px 10px}
+.plat .ico{width:100px;height:100px;font-size:80px}
+.plat h3{font-size:30px;margin-top:6px}
+
+.climat{display:flex;gap:22px;justify-content:center}
+.climat .carte{display:flex;align-items:center;gap:14px;font-size:32px;padding:14px 26px}
+.climat .emo{font-size:52px}
+.fruits{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-top:24px}
+.fruit{height:215px;perspective:1000px;border:0;background:none;padding:0}
+.fruit .in{position:relative;width:100%;height:100%;transition:transform .6s;transform-style:preserve-3d}
+.fruit.vu-r .in{transform:rotateY(180deg)}
+.fruit .f,.fruit .r{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:26px;background:var(--papier);box-shadow:0 6px 0 rgba(60,50,20,.08),0 14px 30px rgba(60,50,20,.12);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:12px}
+.fruit .f .ico{width:96px;height:96px;font-size:84px}
+.fruit .f h3{font-size:34px}
+.fruit .f small{font:600 22px var(--titre);color:var(--doux)}
+.fruit .r{transform:rotateY(180deg);text-align:center}
+.fruit .r .v{font-size:56px;line-height:1}
+.fruit .r p{margin:6px 0 0;font-size:27px;line-height:1.2}
+.fruit .r.oui{background:#e8f5dc}.fruit .r.non{background:#fde6df}.fruit .r.mais{background:#fff2cc}
+
+/* scène des petites bêtes */
+.terrain{position:absolute;inset:0;border-radius:28px;overflow:hidden;background:linear-gradient(#e9f5fb,#d5ecf5 300px)}
+.terrain svg.decor{position:absolute;inset:0;width:100%;height:100%}
+.zone{position:absolute;font:600 30px var(--titre);color:#25321e;background:rgba(255,255,255,.88);padding:6px 18px;border-radius:999px}
+.zone.sol{color:#fff;background:rgba(60,35,20,.7)}
+.expl{position:absolute;width:520px;display:flex;gap:16px;align-items:flex-start;padding:18px 22px}
+.expl .emo{font-size:52px;flex:none}
+.expl p{margin:0;font-size:26px;line-height:1.25}
+.bete{position:absolute;transform:translate(-50%,-50%);width:96px;height:96px;border-radius:50%;border:4px solid #fff;background:rgba(255,255,255,.85);
+  font-size:62px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(0,0,0,.25);padding:0}
+.bete .ico{width:74px;height:74px}
+.bete:hover{transform:translate(-50%,-50%) scale(1.08)}
+.bete.vue{border-color:var(--jaune)}
+
+/* ---------- Ce qu'on va planter ---------- */
+.plan{position:absolute;left:0;top:0;width:790px;height:609px;border-radius:24px;overflow:hidden;box-shadow:0 14px 34px rgba(60,50,20,.25)}
+.plan img{width:100%;height:100%;display:block}
+.plan .pt{min-width:56px;height:56px;font-size:30px;padding:0 9px}
+.plan .pt.choisi{background:var(--jaune);animation:none}
+.fiche-plante{position:absolute;left:820px;top:0;width:720px;height:609px;display:flex;flex-direction:column}
+.fiche-plante .carte{flex:1;min-height:0;padding:18px 26px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:14px}
+.fiche-plante .grand-ico{width:130px;height:130px;font-size:110px}
+.fiche-plante h3{font-size:50px;color:#25321e}
+.fiche-plante p{font-size:31px;line-height:1.3;margin:0}
+.strate{position:absolute;right:14px;top:14px;width:214px;background:#f6f2e6;border-radius:16px;padding:8px 10px 6px;text-align:center}
+.strate svg{width:194px;height:84px;display:block;margin:0 auto}
+.strate b{display:block;font:600 21px var(--titre);color:#2c5a28;margin-top:2px}
+.fiche-plante .carte{position:relative}
+.badges{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.badge{font:600 25px var(--titre);background:var(--vert-pale);color:#2c5a28;padding:6px 16px;border-radius:999px}
+.badge.hiver{background:#dceefa;color:#1f5b86}
+.badge.deja{background:#fff1c2;color:#7a5a00}
+.liste-plantes{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;flex:none}
+.liste-plantes button{border:0;background:#fff;border-radius:999px;padding:4px 11px;font:600 19px var(--titre);box-shadow:0 2px 6px rgba(0,0,0,.1)}
+.liste-plantes button.choisi{background:var(--jaune)}
+
+/* ---------- Aménagements ---------- */
+.profil{position:absolute;inset:0;border-radius:28px;overflow:hidden}
+.profil svg{width:100%;height:100%;display:block}
+.etiq-strate{position:absolute;max-width:380px;padding:12px 20px;z-index:2}
+.etiq-strate b{display:block;font:600 34px var(--titre);color:#2c5a28}
+.etiq-strate span{font-size:25px;line-height:1.2;color:var(--doux)}
+.eco-liens{position:absolute;inset:0;width:100%;height:100%}
+.eco-liens line{stroke:#c9bd98;stroke-width:8;stroke-dasharray:4 16;stroke-linecap:round}
+.eco-centre{position:absolute;left:600px;top:126px;width:340px;height:360px;border-radius:50%;background:#fff;box-shadow:0 0 0 14px var(--vert-pale),0 14px 34px rgba(60,50,20,.18);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font:600 32px/1.1 var(--titre);color:#25321e;padding:10px 40px 30px}
+.eco-centre .ico{width:230px;height:230px}
+.eco-n{position:absolute;width:470px;height:130px;display:flex;align-items:center;gap:20px;padding:16px 24px}
+.eco-n .emo{font-size:68px;flex:none}
+.eco-n h3{font-size:36px;color:#25321e}
+.eco-n p{margin:4px 0 0;font-size:26px;line-height:1.2;color:var(--doux)}
+.amenag{display:grid;grid-template-columns:1fr 1fr;gap:30px}
+.amenag .carte{display:flex;gap:26px;align-items:center;padding:30px}
+.amenag .grand{width:220px;height:220px;flex:none;border-radius:24px}
+.amenag h3{font-size:46px;margin-bottom:10px}
+.amenag p{font-size:32px;line-height:1.3;margin:0}
+.aussi{margin-top:30px;display:flex;gap:30px}
+.aussi .carte{flex:1;display:flex;gap:20px;align-items:center;font-size:31px;line-height:1.25}
+.aussi .emo{font-size:70px}
+
+/* ---------- Frise ---------- */
+.frise{position:relative;display:grid;grid-template-columns:repeat(4,1fr);gap:22px;padding-top:30px}
+.frise::before{content:"";position:absolute;left:12%;right:12%;top:106px;height:10px;border-radius:5px;background:repeating-linear-gradient(90deg,#c9bd98 0 26px,transparent 26px 40px)}
+.jalon{text-align:center;position:relative}
+.jalon .rond{width:150px;height:150px;border-radius:50%;margin:0 auto;background:#fff;border:8px solid var(--vert-clair);display:flex;align-items:center;justify-content:center;font-size:80px;position:relative;z-index:1}
+.jalon.ici .rond{border-color:var(--tomate);box-shadow:0 0 0 10px rgba(217,105,59,.18)}
+.jalon h3{font-size:36px;margin:18px 0 10px;color:#25321e}
+.jalon .carte{padding:16px 18px;font-size:27px;line-height:1.3;text-align:left}
+.jalon .carte ul{margin:0;padding-left:26px}
+.ici-etiq{position:absolute;left:50%;top:-22px;transform:translateX(-50%);background:var(--tomate);color:#fff;font:600 22px var(--titre);padding:4px 14px;border-radius:999px;white-space:nowrap;z-index:2}
+
+/* ---------- Règles et fin ---------- */
+.regles{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;height:100%;align-content:center}
+.regle{text-align:center;padding:28px 16px;display:flex;flex-direction:column;align-items:center;gap:14px}
+.regle .rond{width:150px;height:150px;border-radius:50%;background:var(--vert-pale);display:flex;align-items:center;justify-content:center;font-size:84px;position:relative}
+.regle .rond.non::after{content:"";position:absolute;inset:8px;border:9px solid #d9483b;border-radius:50%;background:linear-gradient(45deg,transparent 46%,#d9483b 46%,#d9483b 54%,transparent 54%)}
+.regle h3{font-size:34px;line-height:1.15}
+.fin{position:absolute;inset:0;z-index:10;background:radial-gradient(circle at 50% 40%,#fff8de,#f4e7bf);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;padding-bottom:150px}
+.fin h1{font-size:84px;color:#25321e;text-align:center}
+.fin .nom{display:flex;align-items:center;gap:18px;font-size:40px;font-family:var(--titre)}
+.fin input{font:600 48px var(--titre);border:0;border-bottom:6px dashed var(--vert);background:transparent;width:620px;text-align:center;color:var(--vert);outline:none;padding:4px}
+.fin .duo{display:flex;gap:30px;align-items:flex-end}
+.fin .duo .a{width:250px;height:250px}.fin .duo .b{width:300px;height:220px}
+.fin .duo>div{animation:saut 1.1s ease-in-out infinite}
+.fin .duo>div:nth-child(2){animation-delay:.3s}
+.fin>*:not(.feuille){position:relative;z-index:1}
+.questions{background:radial-gradient(circle at 50% 40%,#eef6e4,#d6eac2)}
+.questions h1{font-size:140px}
+.questions .mains{font-size:90px;margin:0;letter-spacing:20px}
+.feuille{position:absolute;z-index:0;opacity:.85;top:-80px;font-size:48px;animation:tombe linear infinite;pointer-events:none}
+@keyframes tombe{to{transform:translateY(1050px) rotate(540deg)}}
+</style>
+</head>
+<body>
+<div id="tourne">Tournez l’écran à l’horizontale ↻</div>
+<div id="vue"><div id="scene">
+
+<!-- ================= 1. Titre ================= -->
+<section class="ecran titre on" data-say="coco|Bonjour ! Moi, c’est <b>Coco la coccinelle</b>.">
+  <div class="fond" id="accueilIllu" role="img" aria-label="Dessin d’un bosquet fruitier"></div>
+  <div class="titre-bloc">
+    <p class="sur">Un coin de nature comestible dans la cour de l’école</p>
+    <h1>Le bosquet<br>fruitier des CP</h1>
+  </div>
+  <i class="m" data-s="1" data-say="clovis|Et moi, <b>Clovis le cloporte</b> ! On va vous faire découvrir le bosquet fruitier qu’on va créer ensemble."></i>
+</section>
+
+<!-- ================= 2. Du potager au bosquet ================= -->
+<section class="ecran" data-say="coco|Vous vous souvenez du potager de maternelle ? Qu’est-ce qu’on avait planté ?">
+  <div class="tete"><span class="puce">Souvenez-vous</span><h2>Du potager au bosquet fruitier</h2></div>
+  <div class="corps">
+    <div class="cadre-photo" id="potager" style="left:0;top:0;width:790px;height:593px">
+      <img src="img/potager.jpg" alt="Le potager de maternelle">
+      <button class="pt" style="left:12%;top:31%"><span class="emo">🌻</span><span class="nom">Tournesols</span></button>
+      <button class="pt" style="left:42%;top:21%"><span class="emo">🍅</span><span class="nom">Tomates</span></button>
+      <button class="pt" style="left:42%;top:52%"><span class="emo">🌽</span><span class="nom">Maïs</span></button>
+      <button class="pt" style="left:28%;top:82%"><span class="emo">🎃</span><span class="nom">Courges</span></button>
+      <button class="pt" style="left:50%;top:73%"><span class="emo">🌼</span><span class="nom">Soucis</span></button>
+      <button class="pt" style="left:64%;top:36%"><span class="emo">💙</span><span class="nom">Bourrache</span></button>
+      <button class="pt" style="left:86%;top:13%"><span class="emo">🟣</span><span class="nom">Artichauts</span></button>
+      <button class="pt" style="left:12%;top:60%"><span class="emo">🥬</span><span class="nom">Salades</span></button>
+      <button class="pt" style="left:74%;top:62%"><span class="emo">🫑</span><span class="nom">Poivrons</span></button>
+      <button class="pt" style="left:84%;top:84%"><span class="emo">🍆</span><span class="nom">Aubergines</span></button>
+    </div>
+    <i class="m" data-s="1" data-say="coco|Des tournesols, des tomates, du maïs, des courges… Et des fleurs pour les abeilles !"></i>
+    <div class="compare">
+      <div class="carte legume" data-s="2">
+        <h3><span class="emo">🥕</span> Le potager</h3>
+        <ul><li>🌱 On sème</li><li>🧺 On récolte des légumes</li><li>🔁 Et on recommence chaque année</li></ul>
+      </div>
+      <div class="carte arbre" data-s="3">
+        <h3><span class="emo">🌳</span> Le bosquet fruitier</h3>
+        <ul><li>🌱 On plante <b>une seule fois</b></li><li>📅 Les arbres restent des années</li><li>🍊 Des fruits chaque année</li></ul>
+      </div>
+      <div class="message" data-s="4" data-say="clovis|Les arbres vont grandir en même temps que vous !">Cette fois, on plante pour longtemps !</div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 3. Le pêcher et le bosquet ================= -->
+<section class="ecran" data-say="clovis|Vous reconnaissez ce coin de la cour de récré ? Il y a déjà un <b>pêcher</b>, planté par les grands l’an dernier, et une <b>verveine citronnelle</b>. Ils vont avoir des copains !">
+  <div class="tete"><span class="puce">Le projet</span><h2>Un bosquet fruitier dans la cour de l’école</h2></div>
+  <div class="corps">
+    <div class="ba" id="ba" style="--pos:100%">
+      <img src="img/aujourdhui.jpg" alt="Le coin aujourd’hui">
+      <button class="pt" style="left:77%;top:28%;z-index:1"><span class="emo">🍑</span><span class="nom">Le pêcher</span></button>
+      <button class="pt" style="left:58%;top:22%;z-index:1"><span class="emo">🍃</span><span class="nom">La verveine citronnelle</span></button>
+      <div class="apres"><img src="img/bosquet-dessin.jpg" alt="Le bosquet fruitier une fois terminé (dessin)"></div>
+            <div class="poignee"><b>⇔</b></div>
+    </div>
+    <div class="cote">
+      <div class="carte" data-s="1" data-say="coco|Un bosquet fruitier, c’est un petit coin de nature… qu’on peut croquer !">
+        <h3>C’est quoi, un bosquet fruitier ?</h3>
+        <div class="ligne"><span class="emo">🍊</span><span>Un coin de nature<br><b>comestible</b></span></div>
+        <div class="ligne"><span class="emo">🐞</span><span>Une maison pour<br><b>les petites bêtes</b></span></div>
+      </div>
+      <div class="carte gros" data-s="2" data-say="clovis|Glissez le trait blanc pour voir notre futur bosquet fruitier !">
+        <b>⇔ Glissez</b> pour voir notre futur bosquet fruitier.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 5. Q2 Fruit ================= -->
+<section class="ecran" data-say="coco|Comment fait un arbre pour faire un fruit ? Qui a une idée ?">
+  <div class="tete"><span class="puce q">Question 1</span><h2>Comment obtient-on un fruit ?</h2></div>
+  <div class="corps">
+    <div class="etapes">
+      <div class="etape" data-s="1" data-say="coco|D’abord, au printemps, l’arbre se couvre de fleurs."><div class="dessin"><span class="num">1</span><span id="dFleur"></span></div><h3>Une fleur s’ouvre</h3><span class="terme">Floraison</span></div>
+      <span class="fleche" data-s="2">➜</span>
+      <div class="etape" data-s="2" data-say="clovis|L’abeille vient boire et transporte le pollen, cette poudre jaune, de fleur en fleur."><div class="dessin"><span class="num">2</span><span id="dAbeille"></span></div><h3>L’abeille passe</h3><span class="terme">Pollinisation</span></div>
+      <span class="fleche" data-s="3">➜</span>
+      <div class="etape" data-s="3" data-say="coco|Les pétales tombent… mais au milieu, un tout petit fruit commence à pousser !"><div class="dessin"><span class="num">3</span><span id="dFane"></span></div><h3>La fleur fane et un petit fruit apparaît</h3><span class="terme">Nouaison</span></div>
+      <span class="fleche" data-s="4">➜</span>
+      <div class="etape" data-s="4" data-say="clovis|Et avec le soleil et l’eau, le fruit grossit… jusqu’à ce qu’on puisse le manger !"><div class="dessin"><span class="num">4</span><span id="dFruit"></span></div><h3>Le fruit grossit</h3><span class="terme">Croissance et mûrissement</span></div>
+    </div>
+    <div class="bandeau carte" data-s="5" data-say="coco|Regardez bien notre pêcher au printemps !"><b>Notre pêcher :</b> 🌸 des fleurs roses au printemps <span class="fleche" style="font-size:40px">➜</span> <span class="ico" id="icoPeche2"></span> des pêches en été</div>
+  </div>
+</section>
+
+<!-- ================= 6. Q3 Abeilles ================= -->
+<section class="ecran" data-say="clovis|Et les abeilles, à quoi servent-elles dans un jardin ?">
+  <div class="tete"><span class="puce q">Question 2</span><h2>À quoi servent les abeilles et les papillons ?</h2></div>
+  <div class="corps">
+    <div class="carte pollen" data-s="1" data-say="coco|Quand l’abeille va de fleur en fleur, elle transporte le pollen. C’est ça qui fait naître les fruits.">
+      <span class="scene-p" id="scenePollen"></span>
+      <div><div class="tres-gros">Sans abeilles…<br>pas de fruits !</div><p class="gros" style="margin:10px 0 0;color:var(--doux)">Elles transportent le pollen de fleur en fleur.</p></div>
+    </div>
+    <div class="restaurant" data-s="2" data-say="clovis|Alors on installe des plantes mellifères : des fleurs pleines de nectar qui attirent les insectes !">
+      <h3>🌸 Des plantes mellifères pour attirer les insectes</h3>
+      <div class="menu" id="menu"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 7. Q4 Fruits d'ici ================= -->
+<section class="ecran" data-say="coco|Pourquoi on ne plante pas des mangues ou des noix de coco ? À votre avis ?">
+  <div class="tete"><span class="puce q">Question 3</span><h2 style="font-size:50px">Pourquoi certains fruits poussent ici… et pas d’autres ?</h2></div>
+  <div class="corps">
+    <div class="climat" data-s="1" data-say="clovis|Chez nous, il y a beaucoup de soleil, peu de pluie, et l’hiver est doux. Les plantes du bosquet fruitier adorent ça !">
+      <div class="carte"><span class="emo">☀️</span> Beaucoup de soleil</div>
+      <div class="carte"><span class="emo">🌦️</span> Peu de pluie</div>
+      <div class="carte"><span class="emo">🧣</span> Un hiver doux</div>
+    </div>
+    <div class="fruits" id="fruits" data-s="2" data-say="coco|Jouons ! Ce fruit peut-il pousser dans notre cour ? Touchez une carte pour voir."></div>
+  </div>
+</section>
+
+<!-- ================= 8. Q5 Petites bêtes ================= -->
+<section class="ecran" data-say="clovis|Qui vit sur les plantes et dans le sol ? Touchez les petites bêtes pour les découvrir !">
+  <div class="tete"><span class="puce q">Question 4</span><h2>Quels animaux vivent sur les plantes et dans le sol ?</h2></div>
+  <div class="corps">
+    <div class="terrain" id="terrain"></div>
+    <i class="m" data-s="1" data-say="coco|Certains insectes transportent le pollen, d’autres mangent les pucerons… comme moi !"></i>
+    <i class="m" data-s="2" data-say="clovis|Sous la terre, on transforme les feuilles mortes en nourriture pour les racines : des nutriments !"></i>
+    <i class="m" data-s="3" data-say="clovis|Quand on plantera, on cherchera ces petites bêtes en creusant ! Moi, je serai sous les feuilles."></i>
+  </div>
+</section>
+
+<!-- ================= 10. Ce qu'on va planter ================= -->
+<section class="ecran" data-say="coco|Voici notre futur bosquet fruitier ! Touchez une pastille pour découvrir chaque plante.">
+  <div class="tete"><span class="puce">Le projet</span><h2>Qu’est-ce qu’on va planter ?</h2></div>
+  <div class="corps">
+    <div class="plan" id="plan"><img src="img/bosquet-dessin.jpg" alt="Dessin du futur bosquet fruitier"></div>
+    <div class="fiche-plante" id="fichePlante"></div>
+  </div>
+</section>
+
+<!-- ================= Profil des strates ================= -->
+<section class="ecran" data-say="coco|Dans un bosquet fruitier, les plantes poussent à différentes hauteurs, comme les étages d’une maison !">
+  <div class="tete"><span class="puce">Le projet</span><h2>Les 4 strates du bosquet fruitier</h2></div>
+  <div class="corps">
+    <div class="profil" id="profil"></div>
+    <div class="carte etiq-strate" data-s="1" style="left:24px;top:250px;max-width:420px" data-say="clovis|Tout en bas, les <b>couvre-sol</b> : des plantes basses qui couvrent et protègent la terre. C’est mon étage !"><b>Couvre-sol</b><span>thym, menthe, mélisse, géranium, lavande, romarin, sauge, armoise</span></div>
+    <div class="carte etiq-strate" data-s="2" style="left:520px;top:70px" data-say="coco|Au-dessus, les <b>arbustes</b> : grenadier, clémentinier, framboisier… des fruits à hauteur d’enfant !"><b>Arbustes</b><span>grenadier, clémentinier, framboisier, bananier, verveine citronnelle…</span></div>
+    <div class="carte etiq-strate" data-s="3" style="left:930px;top:0" data-say="clovis|Tout en haut, l’<b>arbre</b> : notre pêcher. Il donne de l’ombre et des pêches."><b>Arbre</b><span>le pêcher</span></div>
+    <div class="carte etiq-strate" data-s="4" style="right:10px;top:10px" data-say="coco|Et la <b>vigne</b> grimpe en s’accrochant au mur !"><b>Plante grimpante</b><span>la vigne</span></div>
+  </div>
+</section>
+
+<!-- ================= Écosystème ================= -->
+<section class="ecran" data-say="coco|Dans notre bosquet fruitier, tout le monde s’aide : c’est un petit <b>écosystème</b> !">
+  <div class="tete"><span class="puce">En résumé</span><h2>Notre bosquet fruitier, un petit écosystème</h2></div>
+  <div class="corps">
+    <svg class="eco-liens" viewBox="0 0 1540 612" aria-hidden="true">
+      <line data-s="1" x1="770" y1="306" x2="300" y2="75"/><line data-s="2" x1="770" y1="306" x2="300" y2="306"/><line data-s="3" x1="770" y1="306" x2="300" y2="537"/>
+      <line data-s="4" x1="770" y1="306" x2="1240" y2="306"/><line data-s="5" x1="770" y1="306" x2="1240" y2="537"/><line data-s="6" x1="770" y1="306" x2="1240" y2="75"/>
+    </svg>
+    <div class="eco-centre"><span class="ico" id="ecoArbre"></span><b>Notre bosquet fruitier</b></div>
+    <div class="carte eco-n" data-s="1" style="left:0;top:10px"><span class="emo">☀️</span><div><h3>Du soleil</h3><p>pour que les plantes poussent</p></div></div>
+    <div class="carte eco-n" data-s="2" style="left:0;top:241px"><span class="emo">💧</span><div><h3>De l’eau</h3><p>l’arrosage automatique remis en marche</p></div></div>
+    <div class="carte eco-n" data-s="3" style="left:0;top:472px" data-say="clovis|Un sol vivant, c’est mon royaume : avec les vers de terre, on transforme les feuilles mortes en terre !"><span class="emo">🪱</span><div><h3>Un sol vivant</h3><p>compost, copeaux de bois et petites bêtes</p></div></div>
+    <div class="carte eco-n" data-s="4" style="right:0;top:241px" data-say="coco|Les fleurs mellifères, pleines de nectar, attirent les abeilles et les papillons."><span class="emo">🌸</span><div><h3>Des plantes mellifères</h3><p>pour attirer les insectes</p></div></div>
+    <div class="carte eco-n" data-s="5" style="right:0;top:472px" data-say="coco|En passant de fleur en fleur, les insectes transportent le pollen… et les fruits apparaissent !"><span class="emo">🐝</span><div><h3>Des insectes</h3><p>qui pollinisent les fleurs</p></div></div>
+    <div class="carte eco-n" data-s="6" style="right:0;top:10px" data-say="clovis|Les arbres nous donnent des fruits, et leurs feuilles qui tombent nourrissent le sol : la boucle est bouclée !"><span class="emo">🌳</span><div><h3>Des arbres fruitiers</h3><p>pour produire à manger</p></div></div>
+  </div>
+</section>
+
+<!-- ================= 12. Frise ================= -->
+<section class="ecran" data-say="coco|Voici notre grande aventure de l’année !">
+  <div class="tete"><span class="puce">Le projet</span><h2>Notre aventure de l’année</h2></div>
+  <div class="corps">
+    <div class="frise">
+      <div class="jalon ici" data-s="1"><span class="ici-etiq">Vous êtes ici !</span><div class="rond">🔍</div><h3>Aujourd’hui</h3>
+        <div class="carte">On découvre le projet.</div></div>
+      <div class="jalon" data-s="2" data-say="clovis|Dans les prochaines semaines, on met les mains dans la terre !"><div class="rond">🌱</div><h3>Dans les prochaines semaines</h3>
+        <div class="carte"><ul><li>On plante</li><li>On paille</li><li>On observe le sol et ses petites bêtes</li></ul></div></div>
+      <div class="jalon" data-s="3" data-say="coco|Au printemps, on observe tout ce qui change et on le note dans notre carnet."><div class="rond">🌸</div><h3>Au printemps</h3>
+        <div class="carte"><ul><li>On plante le clémentinier et le bananier</li><li>On observe les fleurs, les fruits et les insectes</li><li>On remplit notre <b>carnet d’observation</b></li></ul></div></div>
+      <div class="jalon" data-s="4" data-say="clovis|Et à la fin, chacun dessine un croquis pour expliquer le projet !"><div class="rond">🎨</div><h3>À la fin</h3>
+        <div class="carte">On dessine chacun un <b>croquis explicatif du bosquet fruitier</b> pour expliquer le projet.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 13. Règles et fin ================= -->
+<section class="ecran" data-say="clovis|Le bosquet fruitier est dans la cour de récré. Pour le protéger, voici les grandes règles.">
+  <div class="tete"><span class="puce">Le projet</span><h2>Les grandes règles du bosquet fruitier</h2></div>
+  <div class="corps">
+    <div class="regles">
+      <div class="carte regle" data-s="1"><span class="rond non">👟</span><h3>Je ne marche pas dans le bosquet fruitier</h3></div>
+      <div class="carte regle" data-s="2"><span class="rond">👀</span><h3>J’observe sans arracher</h3></div>
+      <div class="carte regle" data-s="3"><span class="rond">🐞</span><h3>Je prends soin des petites bêtes</h3></div>
+      <div class="carte regle" data-s="4" data-say="coco|Certaines plantes ne se mangent pas : on demande toujours à un adulte !"><span class="rond non">👅</span><h3>Je ne goûte rien sans un adulte</h3></div>
+    </div>
+  </div>
+  <div class="fin questions" data-s="5" data-say="coco|Des questions ? Levez la main !">
+    <h1>Des questions ?</h1>
+    <p class="mains">🙋‍♀️ 🙋 🙋‍♂️</p>
+    <div class="duo"><div class="a" id="qCoco"></div><div class="b" id="qClovis"></div></div>
+  </div>
+</section>
+
+<!-- ================= Pied ================= -->
+<div id="pied">
+  <button class="mascotte" id="coco" aria-label="Coco la coccinelle"></button>
+  <button class="mascotte" id="clovis" aria-label="Clovis le cloporte"></button>
+  <div id="bulle"></div>
+  <div id="points"></div>
+  <div id="nav">
+    <button class="petit" id="bPlein" title="Plein écran (F)" aria-label="Plein écran">⛶</button>
+    <button id="bAvant" aria-label="Précédent">‹</button>
+    <span id="compteur"></span>
+    <button id="bApres" aria-label="Suivant">›</button>
+  </div>
+</div>
+<div id="fiche"><div class="carte"><button class="fermer" aria-label="Fermer">✕</button><span class="grand-ico ico"></span><div><h3></h3><p></p></div></div></div>
+
+</div></div>
+
+<script>
+/* ===================== Dessins ===================== */
+const SVG = {
+  coco: `<svg viewBox="0 0 120 120" aria-hidden="true">
+    <path d="M50 22 C44 10 36 8 32 12" stroke="#222" stroke-width="3.5" fill="none" stroke-linecap="round"/><circle cx="31" cy="12" r="4" fill="#222"/>
+    <path d="M70 22 C76 10 84 8 88 12" stroke="#222" stroke-width="3.5" fill="none" stroke-linecap="round"/><circle cx="89" cy="12" r="4" fill="#222"/>
+    <path d="M24 88 l-12 6 M22 72 l-13 -2 M96 88 l12 6 M98 72 l13 -2" stroke="#222" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="60" cy="74" r="40" fill="#e23b2e"/>
+    <path d="M60 36 L60 114" stroke="#7a1712" stroke-width="3"/>
+    <circle cx="40" cy="62" r="8" fill="#222"/><circle cx="80" cy="62" r="8" fill="#222"/><circle cx="36" cy="88" r="7" fill="#222"/><circle cx="84" cy="88" r="7" fill="#222"/><circle cx="52" cy="100" r="5" fill="#222"/><circle cx="68" cy="100" r="5" fill="#222"/>
+    <ellipse cx="44" cy="48" rx="9" ry="5" fill="#fff" opacity=".35" transform="rotate(-25 44 48)"/>
+    <ellipse cx="60" cy="36" rx="24" ry="19" fill="#222"/>
+    <circle cx="51" cy="33" r="7" fill="#fff"/><circle cx="69" cy="33" r="7" fill="#fff"/><circle cx="52.5" cy="34" r="3.6" fill="#222"/><circle cx="70.5" cy="34" r="3.6" fill="#222"/>
+    <circle cx="53.5" cy="32.5" r="1.2" fill="#fff"/><circle cx="71.5" cy="32.5" r="1.2" fill="#fff"/>
+    <path d="M52 44 Q60 51 68 44" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <circle cx="44" cy="43" r="3" fill="#ff8a8a" opacity=".8"/><circle cx="76" cy="43" r="3" fill="#ff8a8a" opacity=".8"/></svg>`,
+  clovis: `<svg viewBox="0 0 150 110" aria-hidden="true">
+    <g stroke="#4c4f57" stroke-width="3.5" stroke-linecap="round"><path d="M50 84 l-6 12 M66 87 l-4 13 M82 88 l0 13 M98 87 l4 13 M114 84 l7 12"/></g>
+    <path d="M30 58 C18 40 6 34 2 38" stroke="#4c4f57" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+    <path d="M32 50 C26 30 18 22 12 22" stroke="#4c4f57" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+    <path d="M36 82 C30 40 60 20 92 22 C126 24 146 50 140 82 Z" fill="#8f96a3"/>
+    <g fill="none" stroke="#6d7380" stroke-width="3"><path d="M56 82 C54 54 60 34 66 26"/><path d="M74 83 C74 56 78 34 82 23"/><path d="M92 83 C94 56 96 36 98 23"/><path d="M110 83 C112 60 112 42 112 27"/><path d="M126 82 C128 66 128 52 124 38"/></g>
+    <path d="M60 34 C80 22 110 24 126 40" stroke="#c3c8d1" stroke-width="4" fill="none" stroke-linecap="round" opacity=".8"/>
+    <ellipse cx="38" cy="70" rx="20" ry="16" fill="#7b818d"/>
+    <circle cx="30" cy="64" r="7" fill="#fff"/><circle cx="44" cy="63" r="7" fill="#fff"/><circle cx="31" cy="65" r="3.6" fill="#222"/><circle cx="45" cy="64" r="3.6" fill="#222"/>
+    <circle cx="32" cy="63.5" r="1.2" fill="#fff"/><circle cx="46" cy="62.5" r="1.2" fill="#fff"/>
+    <path d="M30 76 Q38 82 46 75" stroke="#2f3238" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <circle cx="24" cy="74" r="3" fill="#ff9a9a" opacity=".7"/></svg>`,
+  peche: `<svg viewBox="0 0 100 100" aria-hidden="true"><path d="M50 30 C20 26 8 56 22 76 C34 93 66 93 78 76 C92 56 80 26 50 30Z" fill="#f7a072"/>
+    <ellipse cx="36" cy="52" rx="11" ry="15" fill="#ffd59a" opacity=".75"/><path d="M50 32 C42 50 44 72 52 89" stroke="#d0553f" stroke-width="3" fill="none" opacity=".55"/>
+    <path d="M50 32 C50 22 52 16 56 11" stroke="#6b4a2b" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M54 20 C66 6 86 10 88 16 C76 26 62 26 54 20Z" fill="#5fa04a"/></svg>`,
+  grenade: `<svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="58" r="34" fill="#c8323a"/><ellipse cx="37" cy="46" rx="10" ry="7" fill="#ee7a7a" opacity=".7"/>
+    <path d="M38 28 L41 14 L47 22 L50 12 L53 22 L59 14 L62 28 Z" fill="#9c2530"/></svg>`,
+  framboise: (()=>{let c='';const pts=[[50,40],[38,46],[62,46],[30,58],[44,56],[56,56],[70,58],[36,70],[50,68],[64,70],[43,81],[57,81],[50,91]];
+    for(const[x,y]of pts)c+=`<circle cx="${x}" cy="${y}" r="8.5" fill="#d6336c" stroke="#a61e4d" stroke-width="1.5"/><circle cx="${x-2.5}" cy="${y-2.5}" r="2" fill="#fff" opacity=".5"/>`;
+    return `<svg viewBox="0 0 100 100" aria-hidden="true">${c}<path d="M50 34 L36 24 L48 28 L50 16 L52 28 L64 24 Z" fill="#4f9a3c"/></svg>`;})(),
+  mangue: `<svg viewBox="0 0 100 100" aria-hidden="true"><path d="M30 30 C60 10 92 40 80 70 C70 92 36 94 26 74 C18 58 34 50 30 30Z" fill="#f4a93a"/><path d="M30 30 C46 30 70 44 80 70 C70 92 44 90 34 80" fill="#e5612f" opacity=".55"/><path d="M34 28 C40 16 54 14 62 18 C52 22 44 26 34 28Z" fill="#4f9a3c"/></svg>`,
+  coco2: `<svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="54" r="36" fill="#7a4f2c"/><path d="M22 40 C30 30 40 34 46 26 M60 24 C66 32 76 28 82 38 M24 66 C34 62 36 72 46 70" stroke="#5a3519" stroke-width="3" fill="none"/><circle cx="42" cy="42" r="4" fill="#3d2410"/><circle cx="56" cy="40" r="4" fill="#3d2410"/><circle cx="49" cy="52" r="4" fill="#3d2410"/></svg>`,
+  terre: `<svg viewBox="0 0 100 100" aria-hidden="true"><path d="M50 52 C50 38 52 30 56 24" stroke="#4f9a3c" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M54 30 C62 14 82 16 86 22 C76 34 62 36 54 30Z" fill="#6fb04f"/><path d="M50 40 C42 26 24 26 18 32 C28 44 42 46 50 40Z" fill="#8fc46a"/><path d="M6 92 C10 60 90 60 94 92Z" fill="#8a5a3b"/><circle cx="34" cy="78" r="3" fill="#6a4128"/><circle cx="62" cy="74" r="3" fill="#6a4128"/><circle cx="52" cy="86" r="2.5" fill="#6a4128"/></svg>`,
+  epi: (c, tige='#5c8a4a') => { let e=''; const tiges=[[50,98,50,22],[50,98,22,36],[50,98,78,36]];
+    for(const[x1,y1,x2,y2]of tiges){ for(let i=0;i<7;i++){const t=i/7, x=x2+(x1-x2)*t*.55, y=y2+(y1-y2)*t*.55; e+=`<ellipse cx="${x-4}" cy="${y}" rx="5" ry="4" fill="${c}"/><ellipse cx="${x+4}" cy="${y+2}" rx="5" ry="4" fill="${c}"/>`;} }
+    return `<svg viewBox="0 0 100 100" aria-hidden="true"><g stroke="${tige}" stroke-width="3" stroke-linecap="round"><path d="M50 98 L50 22 M50 98 L22 36 M50 98 L78 36"/></g>${e}</svg>`; },
+  fleur: (p='#f6a6c1',c='#f6c445') => `<svg viewBox="0 0 100 100" aria-hidden="true"><path d="M50 100 C50 80 48 68 50 58" stroke="#6b4a2b" stroke-width="5" fill="none"/>${[0,72,144,216,288].map(a=>`<ellipse cx="50" cy="26" rx="13" ry="18" fill="${p}" transform="rotate(${a} 50 44)"/>`).join('')}<circle cx="50" cy="44" r="10" fill="${c}"/><g fill="#d4a017">${[0,60,120,180,240,300].map(a=>`<circle cx="50" cy="37" r="1.8" transform="rotate(${a} 50 44)"/>`).join('')}</g></svg>`,
+};
+SVG.dAbeille = `<svg viewBox="0 0 100 100" aria-hidden="true">${SVG.fleur().replace(/<\/?svg[^>]*>/g,'')}<g fill="#f6c445">${[[20,20],[26,28],[32,22],[74,70],[80,62]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="2.6"/>`).join('')}</g><text x="56" y="36" font-size="34">🐝</text></svg>`;
+SVG.dFane = `<svg viewBox="0 0 100 100" aria-hidden="true"><path d="M50 100 C50 80 48 68 50 58" stroke="#6b4a2b" stroke-width="5" fill="none"/><path d="M42 54 C40 44 46 38 50 40 C54 38 60 44 58 54 Z" fill="#5fa04a"/><ellipse cx="50" cy="44" rx="7" ry="8" fill="#8fc46a"/>
+  <ellipse cx="22" cy="70" rx="9" ry="12" fill="#f6a6c1" opacity=".8" transform="rotate(40 22 70)"/><ellipse cx="78" cy="78" rx="9" ry="12" fill="#f6a6c1" opacity=".7" transform="rotate(-30 78 78)"/><ellipse cx="34" cy="90" rx="8" ry="11" fill="#f6a6c1" opacity=".6" transform="rotate(80 34 90)"/><ellipse cx="72" cy="30" rx="8" ry="11" fill="#f6a6c1" opacity=".9" transform="rotate(-50 72 30)"/></svg>`;
+SVG.dFruit = `<svg viewBox="0 0 100 100" aria-hidden="true"><path d="M50 0 C50 10 50 18 52 26" stroke="#6b4a2b" stroke-width="5" fill="none"/>${SVG.peche.replace(/<svg[^>]*>|<\/svg>/g,'')}</svg>`;
+SVG.pollen = `<svg viewBox="0 0 560 220" aria-hidden="true"><g transform="translate(10,40) scale(1.7)">${SVG.fleur('#c9b3f2').replace(/<\/?svg[^>]*>/g,'')}</g><g transform="translate(380,40) scale(1.7)">${SVG.fleur('#f6a6c1').replace(/<\/?svg[^>]*>/g,'')}</g>
+  <path d="M120 110 C200 20 330 20 400 100" stroke="#d4a017" stroke-width="5" stroke-dasharray="4 14" stroke-linecap="round" fill="none"/><g fill="#f6c445"><circle cx="160" cy="70" r="5"/><circle cx="210" cy="48" r="5"/><circle cx="330" cy="50" r="5"/><circle cx="370" cy="72" r="5"/></g><text x="238" y="70" font-size="64">🐝</text></svg>`;
+
+function arbre(x, g, r, cf, nb){   // arbre fruitier dessiné : pied en (x, g), houppier de rayon r
+  const cy = g - r*1.7; let s = `<path d="M${x-14} ${g} L${x-8} ${cy+20} L${x+8} ${cy+20} L${x+14} ${g} Z" fill="#7a4f2c"/>`;
+  s += `<path d="M${x} ${cy+r*.35} L${x-r*.35} ${cy} M${x} ${cy+r*.45} L${x+r*.38} ${cy+r*.05}" stroke="#7a4f2c" stroke-width="${r*.08}" stroke-linecap="round"/>`;
+  const b = [[0,0,1],[-.55,.2,.7],[.55,.2,.7],[-.3,-.45,.65],[.35,-.4,.65]];
+  for (const [dx,dy,k] of b) s += `<circle cx="${x+dx*r}" cy="${cy+dy*r}" r="${r*k}" fill="#5e9e45"/>`;
+  for (const [dx,dy,k] of b) s += `<circle cx="${x+dx*r-r*.12}" cy="${cy+dy*r-r*.15}" r="${r*k*.68}" fill="#79b85a"/>`;
+  for (let i = 0; i < nb; i++) { const a = i*2.39996, d = Math.sqrt((i+.5)/nb)*r*1.02, fx = x+Math.cos(a)*d, fy = cy+Math.sin(a)*d*.85;
+    s += `<circle cx="${fx}" cy="${fy}" r="${r*.11}" fill="${cf}" stroke="rgba(0,0,0,.15)" stroke-width="2"/><circle cx="${fx-r*.035}" cy="${fy-r*.035}" r="${r*.032}" fill="#fff" opacity=".6"/>`; }
+  return s;
+}
+const abeille = (x,y,k=1) => `<g transform="translate(${x} ${y}) scale(${k})"><ellipse cx="-4" cy="-13" rx="9" ry="7" fill="#fff" opacity=".85"/><ellipse cx="7" cy="-12" rx="8" ry="6" fill="#fff" opacity=".85"/><ellipse rx="17" ry="12" fill="#f6c445"/><path d="M-6 -11 V11 M3 -12 V12" stroke="#2b2a24" stroke-width="5"/><circle cx="15" cy="-2" r="6" fill="#2b2a24"/></g>`;
+const papillon = (x,y,c,k=1) => `<g transform="translate(${x} ${y}) scale(${k}) rotate(-12)"><ellipse cx="-14" cy="-10" rx="15" ry="18" fill="${c}"/><ellipse cx="14" cy="-10" rx="15" ry="18" fill="${c}"/><ellipse cx="-11" cy="14" rx="10" ry="12" fill="${c}" opacity=".85"/><ellipse cx="11" cy="14" rx="10" ry="12" fill="${c}" opacity=".85"/><circle cx="-14" cy="-10" r="5" fill="#fff" opacity=".6"/><circle cx="14" cy="-10" r="5" fill="#fff" opacity=".6"/><rect x="-3" y="-20" width="6" height="40" rx="3" fill="#2b2a24"/><path d="M-2 -20 L-8 -32 M2 -20 L8 -32" stroke="#2b2a24" stroke-width="2"/></g>`;
+SVG.accueil = (() => {
+  let s = `<svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><defs><linearGradient id="acc-ciel" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#bfe6f5"/><stop offset=".65" stop-color="#f4f1dc"/></linearGradient></defs>
+    <rect width="1600" height="900" fill="url(#acc-ciel)"/>
+    <g stroke="#ffd45c" stroke-width="10" stroke-linecap="round">${Array.from({length:12},(_,i)=>{const a=i*Math.PI/6;return `<line x1="${1440+Math.cos(a)*95}" y1="${140+Math.sin(a)*95}" x2="${1440+Math.cos(a)*125}" y2="${140+Math.sin(a)*125}"/>`;}).join('')}</g>
+    <circle cx="1440" cy="140" r="78" fill="#ffd45c"/><circle cx="1418" cy="122" r="26" fill="#ffe89a"/>
+    <g fill="#fff" opacity=".9"><ellipse cx="1060" cy="120" rx="90" ry="34"/><ellipse cx="1010" cy="104" rx="50" ry="40"/><ellipse cx="1100" cy="96" rx="56" ry="44"/></g>
+    <path d="M0 600 C300 520 600 620 900 560 S1400 520 1600 580 V900 H0Z" fill="#b9db93"/>
+    <path d="M0 700 C400 640 900 720 1600 660 V900 H0Z" fill="#9ccb6d"/>
+    <ellipse cx="1060" cy="770" rx="620" ry="88" fill="#c98f55"/>
+    <g fill="#a86d38">${Array.from({length:60},(_,i)=>{const x=480+(i*97)%1180, y=715+(i*53)%110; return `<rect x="${x}" y="${y}" width="22" height="7" rx="3" transform="rotate(${(i*41)%180} ${x} ${y})"/>`;}).join('')}</g>`;
+  s += arbre(760, 745, 92, '#f6c445', 9) + arbre(1500, 740, 88, '#c8323a', 9) + arbre(1030, 770, 132, '#f7a072', 14) + arbre(1290, 762, 112, '#f39a1f', 12);
+  for (const [x,y] of [[860,800],[1180,812],[1400,800]]) s += `<circle cx="${x}" cy="${y}" r="44" fill="#4f8a3c"/><circle cx="${x-14}" cy="${y-12}" r="28" fill="#6fb04f"/>` + [[-20,-4],[12,-18],[18,8],[-6,14]].map(([a,b])=>`<circle cx="${x+a}" cy="${y+b}" r="7" fill="#d6336c"/>`).join('');
+  for (let i = 0; i < 9; i++) { const x = 330 + i*42, h = 70 + (i%3)*18; s += `<path d="M${x} 772 L${x+(i%2?6:-6)} ${772-h}" stroke="#5c8a4a" stroke-width="4"/>` + Array.from({length:6},(_,j)=>`<ellipse cx="${x+(i%2?6:-6)*(1-j/8)}" cy="${772-h+j*9}" rx="6" ry="5" fill="${i%3?'#8b6cc4':'#7f6bd1'}"/>`).join(''); }
+  for (const [x,y,c] of [[300,690,'#f6a6c1'],[560,700,'#f6c445'],[640,742,'#f6a6c1'],[260,740,'#fff']]) s += `<path d="M${x} ${y+40} V${y}" stroke="#5c8a4a" stroke-width="4"/>` + [0,72,144,216,288].map(a=>`<ellipse cx="${x}" cy="${y-11}" rx="7" ry="11" fill="${c}" transform="rotate(${a} ${x} ${y})"/>`).join('') + `<circle cx="${x}" cy="${y}" r="6" fill="#f6a32b"/>`;
+  s += `<path d="M640 480 C700 420 780 470 830 400" stroke="#2b2a24" stroke-width="3" stroke-dasharray="3 12" fill="none" stroke-linecap="round" opacity=".5"/>` + abeille(840, 392, 1.3) + abeille(1190, 610, 1.1) + papillon(560, 560, '#f39a1f', 1.3) + papillon(1360, 360, '#8b6cc4', 1.1);
+  return s + '</svg>';
+})();
+SVG.ecoArbre = `<svg viewBox="0 0 300 300" aria-hidden="true"><ellipse cx="150" cy="280" rx="110" ry="16" fill="#c98f55"/>${arbre(150, 280, 78, '#f7a072', 10)}</svg>`;
+function strate(k){
+  const g = '#d8d3c4', v = '#4f9a3c', c = q => q===k ? v : g;
+  const svg = `<svg viewBox="0 0 240 104" aria-hidden="true"><line x1="4" y1="96" x2="236" y2="96" stroke="#b9ae90" stroke-width="3"/>
+    <ellipse cx="48" cy="91" rx="32" ry="9" fill="${c('couvresol')}"/>
+    <circle cx="112" cy="78" r="16" fill="${c('arbuste')}"/><circle cx="128" cy="74" r="18" fill="${c('arbuste')}"/><circle cx="142" cy="82" r="13" fill="${c('arbuste')}"/>
+    <rect x="178" y="44" width="8" height="52" fill="${c('arbre')}"/><circle cx="182" cy="34" r="26" fill="${c('arbre')}"/>
+    <path d="M224 96 V14" stroke="${c('grimpante')}" stroke-width="4"/><path d="M224 90 C214 82 234 72 224 64 C214 56 234 46 224 38 C214 30 234 22 224 16" stroke="${c('grimpante')}" stroke-width="3" fill="none"/>
+    ${[[218,80],[230,66],[218,50],[230,34]].map(([x,y])=>`<ellipse cx="${x}" cy="${y}" rx="6" ry="4" fill="${c('grimpante')}"/>`).join('')}</svg>`;
+  const nom = {arbre:'Arbre', arbuste:'Arbuste', couvresol:'Couvre-sol', grimpante:'Plante grimpante'}[k];
+  return k ? `<div class="strate" title="Strate du végétal">${svg}<b>${nom}</b></div>` : '';
+}
+SVG.melisse = `<svg viewBox="0 0 100 100" aria-hidden="true"><path d="M50 98 V26" stroke="#4f8a3c" stroke-width="4"/>${[[84,30,1],[64,26,.9],[44,22,.75]].map(([y,dx,k])=>`<g transform="translate(50 ${y})"><path d="M0 0 C${-dx*.4} ${-16*k} ${-dx} ${-14*k} ${-dx} ${-2*k} C${-dx*.8} ${8*k} ${-dx*.3} ${8*k} 0 0Z" fill="#6fb04f"/><path d="M0 0 C${dx*.4} ${-16*k} ${dx} ${-14*k} ${dx} ${-2*k} C${dx*.8} ${8*k} ${dx*.3} ${8*k} 0 0Z" fill="#79b85a"/><path d="M0 0 L${-dx*.8} ${-4*k} M0 0 L${dx*.8} ${-4*k}" stroke="#4f8a3c" stroke-width="1.5"/></g>`).join('')}<path d="M50 26 C40 14 44 4 50 2 C56 4 60 14 50 26Z" fill="#8fc46a"/></svg>`;
+SVG.armoise = `<svg viewBox="0 0 100 100" aria-hidden="true"><g stroke="#8aa58a" stroke-width="3" stroke-linecap="round" fill="none">${[-50,-30,-12,0,12,30,50].map((a,i)=>{const r=a*Math.PI/180, L=70-Math.abs(a)*.4, x=50+Math.sin(r)*L, y=96-Math.cos(r)*L;
+  let s=`<path d="M50 96 L${x} ${y}"/>`; for(let k=1;k<5;k++){const px=50+(x-50)*k/5, py=96-(96-y)*k/5; s+=`<path d="M${px} ${py} l-8 -6 M${px} ${py} l8 -6" stroke="#a9c2a6"/>`;} return s;}).join('')}</g></svg>`;
+const ico = (k) => k.startsWith('<svg') ? k : SVG[k] ? SVG[k] : `<span class="emo">${k}</span>`;
+function poser(id, html){ const e=document.getElementById(id); if(e) e.innerHTML=html; }
+poser('icoTerre', SVG.terre); poser('dFleur', SVG.fleur()); poser('dAbeille', SVG.dAbeille); poser('dFane', SVG.dFane); poser('dFruit', SVG.dFruit);
+poser('icoPeche2', SVG.peche); poser('scenePollen', SVG.pollen); 
+poser('accueilIllu', SVG.accueil); poser('qCoco', SVG.coco); poser('qClovis', SVG.clovis); poser('ecoArbre', SVG.ecoArbre);
+poser('coco', SVG.coco); poser('clovis', SVG.clovis); 
+
+/* ===================== Contenus ===================== */
+const PLANTES = {
+  pecher:      {ico:SVG.peche, nom:'Le pêcher', tags:['fruits','abeilles'], txt:'Il est déjà là ! Des fleurs roses au printemps, puis des pêches en été.', badge:['deja','⭐ Déjà planté']},
+  grenadier:   {ico:SVG.grenade, nom:'Le grenadier', tags:['fruits','abeilles'], txt:'Des fleurs rouge vif, puis des grenades pleines de petits grains. Il adore la chaleur.'},
+  clementinier:{ico:'🍊', nom:'Le clémentinier', tags:['fruits','odeur'], txt:'Ses fleurs blanches sentent très bon, et ses clémentines mûrissent… en hiver !', badge:['hiver','❄️ Planté après l’hiver']},
+  bananier:    {ico:'🍌', nom:'Le bananier', tags:['geant'], txt:'Une plante géante aux feuilles immenses. Ici, ses bananes ont du mal à mûrir.', badge:['hiver','❄️ Planté après l’hiver']},
+  framboisier: {ico:SVG.framboise, nom:'Le framboisier', tags:['fruits','abeilles'], txt:'Des framboises à cueillir en été… et à partager !'},
+  vigne:       {ico:'🍇', nom:'La vigne', tags:['fruits'], txt:'Elle grimpe en s’accrochant. Des raisins à la fin de l’été.'},
+  buddleia:    {ico:SVG.epi('#8b6cc4'), nom:'L’arbre aux papillons', tags:['papillons','abeilles'], txt:'Ses grandes grappes violettes attirent les papillons tout l’été.'},
+  lavande:     {ico:SVG.epi('#7f6bd1'), nom:'La lavande', tags:['abeilles','odeur'], txt:'Les abeilles l’adorent. Frottez ses fleurs : ça sent bon !'},
+  romarin:     {ico:SVG.epi('#7fa8e0','#4f7a52'), nom:'Le romarin', tags:['abeilles','odeur'], txt:'Il fleurit très tôt, à la fin de l’hiver : un repas pour les premières abeilles.'},
+  geranium:    {ico:'🌺', nom:'Le géranium', tags:['fleurs'], txt:'Des fleurs colorées pendant de longs mois.'},
+  thym:        {ico:'🌿', nom:'Le thym', tags:['tapis','odeur','abeilles'], txt:'Un petit tapis qui sent bon. Ses minuscules fleurs nourrissent les abeilles.'},
+  menthe:      {ico:'🌱', nom:'La menthe', tags:['tapis','odeur'], txt:'Elle pousse vite et couvre le sol. Frottez une feuille : ça sent le chewing-gum !'},
+  melisse:     {ico:SVG.melisse, nom:'La mélisse', tags:['odeur','abeilles'], txt:'Frottez une feuille : elle sent le citron !'},
+  sauge:       {ico:SVG.epi('#d63a4a','#4f7a52'), nom:'La sauge fleurie', tags:['abeilles','odeur'], txt:'Des petites fleurs rouges presque toute l’année : un vrai festin pour les abeilles et les papillons.'},
+  armoise:     {ico:SVG.armoise, nom:'L’armoise cola', tags:['odeur'], txt:'Un petit buisson argenté. Frottez une feuille : elle sent… le cola !'},
+  verveine:    {ico:'🍃', nom:'La verveine citronnelle', tags:['odeur','abeilles'], txt:'Elle était déjà là ! Frottez une feuille : elle sent très fort le citron.', badge:['deja','⭐ Déjà là']},
+};
+const STRATE = {"pecher": "arbre", "grenadier": "arbuste", "clementinier": "arbuste", "bananier": "arbuste", "framboisier": "arbuste", "vigne": "grimpante", "buddleia": "arbuste", "lavande": "couvresol", "romarin": "couvresol", "geranium": "couvresol", "thym": "couvresol", "menthe": "couvresol", "melisse": "couvresol", "sauge": "couvresol", "armoise": "couvresol", "verveine": "arbuste"};
+const TAGS = {fruits:'🍎 Des fruits', abeilles:'🐝 Pour les abeilles', papillons:'🦋 Pour les papillons', odeur:'👃 Ça sent bon', tapis:'🟩 Un tapis vert', geant:'🌴 Une plante géante', fleurs:'🌸 Des fleurs', eau:'🐸 Un coin d’eau'};
+// emplacement des pastilles sur le dessin (en % de l'image)
+const PLAN = [['pecher',74,30],['grenadier',50,30],['clementinier',64,30],['bananier',38,32],['buddleia',16,31],['vigne',46,11],['framboisier',44,48],
+  ['romarin',29,55],['geranium',66,55],['lavande',52,63],['thym',86,44],['melisse',62,72],['menthe',37,85],['verveine',57,40],['sauge',12,52],['armoise',78,60]];
+
+const MENU = ['lavande','buddleia','romarin','sauge','thym','melisse'];
+poser('menu', MENU.map(k=>`<div class="carte plat"><span class="ico">${ico(PLANTES[k].ico)}</span><h3>${PLANTES[k].nom.replace(/^(Le |La |L’)/,'').replace(/^./,c=>c.toUpperCase())}</h3></div>`).join(''));
+
+const FRUITS = [
+  ['peche','La pêche','oui','✅','Oui ! Notre pêcher pousse déjà dans la cour.'],
+  ['grenade','La grenade','oui','✅','Oui ! Le grenadier adore le soleil.'],
+  ['🍊','La clémentine','oui','✅','Oui ! L’hiver est assez doux pour elle.'],
+  ['🍇','Le raisin','oui','✅','Oui ! Il y a plein de vignes autour de chez nous.'],
+  ['framboise','La framboise','oui','✅','Oui ! Avec un peu d’eau en été.'],
+  ['🍌','La banane','mais','🤔','Oui… mais ! La plante pousse, mais les bananes ont du mal à mûrir.'],
+  ['mangue','La mangue','non','❌','Non ! Il lui faut de la chaleur toute l’année.'],
+  ['coco2','La noix de coco','non','❌','Non ! Le cocotier vit dans les pays très chauds.'],
+];
+poser('fruits', FRUITS.map(([i,n,c,v,t])=>`<button class="fruit" aria-label="${n}"><div class="in"><div class="f"><span class="ico">${ico(i)}</span><h3>${n}</h3><small>Ça pousse ici ?</small></div><div class="r ${c}"><span class="v">${v}</span><p>${t}</p></div></div></button>`).join(''));
+document.getElementById('fruits').addEventListener('click', e=>{ const b=e.target.closest('.fruit'); if(b) b.classList.toggle('vu-r'); });
+
+const BETES = [
+  // [icône, nom, texte, x %, y %, étape]
+  ['🐝','L’abeille','Elle va de fleur en fleur et transporte le pollen : c’est la pollinisation !',40,12,1],
+  ['🦋','Le papillon','Il boit le nectar des fleurs… et transporte lui aussi le pollen.',67,9,1],
+  ['🐞','La coccinelle','Elle mange les pucerons qui abîment les plantes. C’est l’amie du jardinier !',58,37,1],
+  ['🐛','La chenille','Elle grignote les feuilles… un jour, elle deviendra papillon !',43,41,1],
+  ['🪱','Le ver de terre','Il creuse des tunnels et mélange la terre : l’eau et l’air arrivent jusqu’aux racines.',40,79,2],
+  ['clovis','Le cloporte','Il mange les feuilles mortes et les transforme en terre riche. Comme Clovis !',64,67,2],
+  ['🐜','La fourmi','Elle creuse des galeries et transporte des graines.',80,87,2],
+];
+(function(){
+  const t=document.getElementById('terrain');
+  const fleurette=(x,y,col)=>[0,72,144,216,288].map(a=>`<circle cx="${x+Math.cos(a*Math.PI/180)*8}" cy="${y+Math.sin(a*Math.PI/180)*8}" r="7" fill="${col}"/>`).join('')+`<circle cx="${x}" cy="${y}" r="5" fill="#f6c445"/>`;
+  const racines=['M770 336 C740 390 680 420 590 452','M770 336 C782 400 762 470 744 548','M770 336 C812 388 884 410 970 436','M770 336 C792 382 842 470 866 552','M690 424 C670 460 660 490 652 520','M880 412 C900 450 930 470 960 500'];
+  let s=`<svg class="decor" viewBox="0 0 1540 612" preserveAspectRatio="none" aria-hidden="true">
+    <circle cx="1420" cy="86" r="52" fill="#ffd45c"/>
+    <rect x="0" y="330" width="1540" height="282" fill="#8a5a3b"/>
+    <g fill="#6f4529">${Array.from({length:40},(_,i)=>`<circle cx="${(i*137)%1540}" cy="${360+((i*71)%240)}" r="${4+(i%4)*2}"/>`).join('')}</g>
+    <path d="M1020 420 C1100 470 1160 400 1260 450 S1420 520 1520 480" stroke="#6a4128" stroke-width="20" fill="none" stroke-linecap="round" opacity=".7"/>
+    <g stroke="#5a3519" stroke-linecap="round" fill="none">${racines.map((d,i)=>`<path d="${d}" stroke-width="${i<4?12:6}"/>`).join('')}</g>
+    <g fill="#ffe089">${racines.slice(0,4).map((_,i)=>[0.35,0.6,0.85].map(k=>{const P=[[590,452],[744,548],[970,436],[866,552]][i];return `<circle cx="${770+(P[0]-770)*k}" cy="${336+(P[1]-336)*k}" r="6"/>`;}).join('')).join('')}</g>
+    <text x="770" y="598" text-anchor="middle" font-family="Fredoka, sans-serif" font-weight="600" font-size="26" fill="#ffe089">↑ des nutriments pour les racines ↑</text>
+    <rect x="0" y="322" width="1540" height="16" rx="8" fill="#6b9a45"/>
+    <g fill="#d9893b">${[[640,330],[700,326],[860,332],[930,327],[560,329]].map(([x,y],i)=>`<ellipse cx="${x}" cy="${y}" rx="14" ry="6" transform="rotate(${i*35} ${x} ${y})"/>`).join('')}</g>
+    <path d="M750 336 L757 188 L783 188 L790 336 Z" fill="#7a4f2c"/>
+    <path d="M770 230 L715 180 M770 245 L830 192" stroke="#7a4f2c" stroke-width="12" stroke-linecap="round"/>
+    ${[[770,150,120],[660,190,86],[880,190,86],[702,92,80],[842,86,80]].map(([x,y,r])=>`<circle cx="${x}" cy="${y}" r="${r}" fill="#5e9e45"/>`).join('')}
+    ${[[756,132,84],[650,176,60],[868,176,60],[692,80,56],[830,74,56]].map(([x,y,r])=>`<circle cx="${x}" cy="${y}" r="${r}" fill="#79b85a"/>`).join('')}
+    ${[[700,120],[770,70],[840,130],[620,200],[910,210],[760,200],[680,250],[860,260],[810,40],[730,160],[900,120]].map(([x,y],i)=>fleurette(x,y,i%2?'#f6a6c1':'#fff')).join('')}
+    <path d="M580 96 C620 60 660 80 690 108" stroke="#d4a017" stroke-width="4" stroke-dasharray="3 11" stroke-linecap="round" fill="none"/>
+  </svg>
+  <div class="carte expl" data-s="1" style="left:24px;top:24px"><span class="emo">🐝</span><p>Certains insectes vont de fleur en fleur et transportent le pollen : c’est la <b>pollinisation</b>.<br>D’autres s’occupent de manger les insectes indésirables comme les pucerons : c’est le cas de la <b>coccinelle</b>.</p></div>
+  <div class="carte expl" data-s="2" style="left:24px;top:372px"><span class="emo">🪱</span><p>Le <b>sol vivant</b> : ses petites bêtes transforment les feuilles mortes en <b>nutriments</b>, la nourriture des racines.</p></div>`;
+  t.innerHTML = s + BETES.map(([i,n,tx,x,y,st],k)=>`<button class="bete" data-s="${st}" data-k="${k}" style="left:${x}%;top:${y}%" aria-label="${n}">${i==='clovis'?`<span class="ico">${SVG.clovis}</span>`:i}</button>`).join('');
+  t.addEventListener('click', e=>{ const b=e.target.closest('.bete'); if(!b) return; b.classList.add('vue'); const [i,n,tx]=BETES[b.dataset.k]; ouvrirFiche(i==='clovis'?SVG.clovis:i, n, tx); });
+})();
+
+/* Profil des 4 strates */
+(function(){
+  const fl=(x,y,col)=>`<circle cx="${x}" cy="${y}" r="5" fill="${col}"/>`;
+  let couvre='', arbustes='', vigne='';
+  for(let i=0;i<8;i++){ const x=60+i*30; couvre+=`<ellipse cx="${x}" cy="512" rx="24" ry="12" fill="${i%2?'#6fb04f':'#5e9e45'}"/>`+fl(x-6,505,i%3?'#c9b3f2':'#fff')+fl(x+8,508,'#f6a6c1'); }
+  // couvre-sol : lavande, sauge et romarin, bas et touffus
+  for(let i=0;i<7;i++){ const x=300+i*13, h=46+(i%3)*10; couvre+=`<path d="M${x} 520 L${x+(i%2?4:-4)} ${520-h}" stroke="#5c8a4a" stroke-width="3"/>`+Array.from({length:5},(_,j)=>`<ellipse cx="${x+(i%2?4:-4)*(1-j/8)}" cy="${520-h+j*7}" rx="4.5" ry="3.5" fill="#7f6bd1"/>`).join(''); }
+  couvre += `<ellipse cx="430" cy="500" rx="40" ry="24" fill="#5e9e45"/>`+[[410,488],[432,480],[452,492],[424,500]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="5" fill="#d63a4a"/>`).join('');
+  couvre += `<ellipse cx="510" cy="502" rx="36" ry="20" fill="#9fb59a"/><ellipse cx="560" cy="504" rx="30" ry="17" fill="#6f9a6a"/>`+[[548,494],[566,498]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="4" fill="#7fa8e0"/>`).join('');
+  // arbustes : framboisier, grenadier, clémentinier
+  arbustes += `<circle cx="650" cy="470" r="48" fill="#4f8a3c"/><circle cx="634" cy="454" r="31" fill="#6fb04f"/>`+[[622,466],[656,446],[672,482],[640,492],[652,468]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="7" fill="#d6336c"/>`).join('');
+  arbustes += arbre(770, 520, 62, '#c8323a', 7) + arbre(905, 520, 70, '#f39a1f', 8);
+  // vigne sur le mur
+  vigne += `<path d="M1405 520 C1385 470 1430 440 1408 390 C1386 340 1432 300 1410 250 C1392 210 1420 170 1412 140" stroke="#7a4f2c" stroke-width="7" fill="none" stroke-linecap="round"/>`;
+  for(const [x,y] of [[1398,470],[1428,420],[1396,360],[1430,300],[1400,240],[1420,180]]) vigne += `<path d="M${x} ${y} c-22 -6 -30 -26 -18 -36 c8 8 22 4 28 14 c6 -12 22 -10 26 0 c-8 10 -20 18 -36 22z" fill="#5e9e45"/>`;
+  for(const [x,y] of [[1440,440],[1384,320]]) vigne += Array.from({length:6},(_,k)=>`<circle cx="${x+[0,10,-10,5,-5,0][k]}" cy="${y+[0,0,0,10,10,20][k]}" r="7" fill="#6b3fa0"/>`).join('');
+  const lignes=[[490,'≈ 30 cm'],[380,'1 à 3 m'],[110,'4 à 6 m']].map(([y,t])=>`<line x1="0" y1="${y}" x2="1340" y2="${y}" stroke="#b9ae90" stroke-width="2" stroke-dasharray="8 10"/>`).join('');
+  const hauteurs=[[490,'≈ 30 cm',1338,'end'],[380,'1 à 3 m',1338,'end'],[110,'4 à 6 m',14,'start']].map(([y,t,x,ta])=>`<text x="${x}" y="${y-8}" text-anchor="${ta}" font-family="Fredoka, sans-serif" font-size="22" font-weight="600" fill="#7d735a" stroke="#fff" stroke-width="6" paint-order="stroke">${t}</text>`).join('');
+  document.getElementById('profil').innerHTML = `<svg viewBox="0 0 1540 612" preserveAspectRatio="none" aria-hidden="true">
+    <rect width="1540" height="612" fill="#e9f5fb"/>${lignes}
+    <rect x="1350" y="120" width="190" height="400" fill="#e7dcc4"/>${Array.from({length:10},(_,i)=>`<line x1="1350" y1="${160+i*40}" x2="1540" y2="${160+i*40}" stroke="#d3c5a6" stroke-width="2"/>`).join('')}
+    <rect x="0" y="520" width="1540" height="92" fill="#8a5a3b"/><rect x="0" y="514" width="1540" height="12" rx="6" fill="#6b9a45"/>
+    <g data-s="1">${couvre}</g>
+    <g data-s="2">${arbustes}</g>
+    <g data-s="3">${arbre(1130, 520, 150, '#f7a072', 14)}</g>
+    <g data-s="4">${vigne}</g>${hauteurs}</svg>`;
+})();
+
+/* Plan des plantations */
+(function(){
+  const plan=document.getElementById('plan'), fp=document.getElementById('fichePlante');
+  plan.insertAdjacentHTML('beforeend', PLAN.map(([k,x,y])=>{const p=PLANTES[k];return `<button class="pt" data-k="${k}" style="left:${x}%;top:${y}%" aria-label="${p.nom}"><span class="ico" style="width:36px;height:36px;font-size:30px">${ico(p.ico)}</span><span class="nom">${p.nom.replace(/^(Le |La |L’)/,'')}</span></button>`;}).join(''));
+  function accueil(){ fp.innerHTML = `<div class="carte"><span class="grand-ico ico emo">👆</span><h3>Touchez une pastille</h3><p>pour découvrir chaque plante du bosquet fruitier.</p></div>
+    <div class="liste-plantes">${PLAN.map(([k])=>`<button data-k="${k}">${PLANTES[k].nom.replace(/^(Le |La |L’)/,'')}</button>`).join('')}</div>`; }
+  function montrer(k){
+    const p=PLANTES[k];
+    fp.innerHTML = `<div class="carte"><span class="grand-ico ico">${ico(p.ico)}</span><h3>${p.nom}</h3><p>${p.txt}</p>
+      ${strate(STRATE[k])}
+      <div class="badges">${p.tags.map(t=>`<span class="badge">${TAGS[t]}</span>`).join('')}${p.badge?`<span class="badge ${p.badge[0]}">${p.badge[1]}</span>`:''}</div></div>
+      <div class="liste-plantes">${PLAN.map(([q])=>`<button data-k="${q}" class="${q===k?'choisi':''}">${PLANTES[q].nom.replace(/^(Le |La |L’)/,'')}</button>`).join('')}</div>`;
+    plan.querySelectorAll('.pt').forEach(b=>b.classList.toggle('choisi', b.dataset.k===k));
+  }
+  plan.addEventListener('click', e=>{ const b=e.target.closest('.pt'); if(b) montrer(b.dataset.k); });
+  fp.addEventListener('click', e=>{ const b=e.target.closest('button[data-k]'); if(b) montrer(b.dataset.k); });
+  accueil();
+})();
+
+/* Pastilles du potager et du pêcher : un toucher affiche le nom */
+document.querySelectorAll('#potager .pt, #ba .pt').forEach(b=>b.addEventListener('click',()=>b.classList.toggle('ouvert')));
+
+/* Avant / après */
+const ba=document.getElementById('ba');
+(function(){
+  let tire=false;
+  function regler(e){ const r=ba.getBoundingClientRect(); const p=Math.max(0,Math.min(100,(e.clientX-r.left)/r.width*100)); ba.classList.remove('anime'); ba.style.setProperty('--pos',p+'%'); }
+  ba.addEventListener('pointerdown',e=>{ if(e.target.closest('.pt')) return; tire=true; ba.setPointerCapture(e.pointerId); regler(e); });
+  ba.addEventListener('pointermove',e=>{ if(tire) regler(e); });
+  ba.addEventListener('pointerup',()=>tire=false); ba.addEventListener('pointercancel',()=>tire=false);
+})();
+
+/* ===================== Fiche ===================== */
+const fiche=document.getElementById('fiche');
+function ouvrirFiche(icone, titre, texte){
+  fiche.querySelector('.grand-ico').innerHTML = icone.startsWith('<svg') ? icone : `<span class="emo">${icone}</span>`;
+  fiche.querySelector('h3').textContent=titre; fiche.querySelector('p').textContent=texte;
+  fiche.classList.add('on');
+}
+fiche.addEventListener('click',()=>fiche.classList.remove('on'));
+
+/* ===================== Navigation pas à pas ===================== */
+const ecrans=[...document.querySelectorAll('.ecran')];
+let cur=0, pas=0;
+const maxPas = s => Math.max(0, ...[...s.querySelectorAll('[data-s]')].map(e=>+e.dataset.s));
+const bulle=document.getElementById('bulle'), coco=document.getElementById('coco'), clovis=document.getElementById('clovis');
+const points=document.getElementById('points');
+points.innerHTML = ecrans.map((_,i)=>`<i data-i="${i}" title="Écran ${i+1}"></i>`).join('');
+points.addEventListener('click',e=>{ if(e.target.dataset.i) aller(+e.target.dataset.i, 0); });
+
+function parole(s){
+  let txt=s.dataset.say;
+  s.querySelectorAll('[data-say][data-s]').forEach(e=>{ if(+e.dataset.s<=pas) txt=e.dataset.say; });
+  const [qui, mots] = (txt||'|').split('|');
+  bulle.classList.add('cache');
+  setTimeout(()=>{ bulle.innerHTML=mots||''; bulle.classList.toggle('cache', !mots); },180);
+  coco.className='mascotte '+(qui==='coco'?'parle':'muet');
+  clovis.className='mascotte '+(qui==='clovis'?'parle':'muet');
+}
+function afficher(){
+  ecrans.forEach((s,i)=>s.classList.toggle('on', i===cur));
+  const s=ecrans[cur];
+  s.querySelectorAll('[data-s]').forEach(e=>e.classList.toggle('vu', +e.dataset.s<=pas));
+  // écrans spéciaux
+  if (s.contains(ba)) { const p = pas>=2 ? 50 : 100; if (ba.dataset.p!=String(p)) { ba.classList.add('anime'); ba.style.setProperty('--pos',p+'%'); ba.dataset.p=p; } }
+  if (s.querySelector('#potager')) document.getElementById('potager').classList.toggle('tous', pas>=1);
+  parole(s);
+  document.getElementById('pied').classList.toggle('sansm', !!s.querySelector('.fin.vu'));
+  [...points.children].forEach((p,i)=>p.classList.toggle('on', i===cur));
+  document.getElementById('compteur').textContent=`${cur+1} / ${ecrans.length}`;
+  fiche.classList.remove('on');
+  try { history.replaceState(null,'','#ecran-'+(cur+1)); } catch(e){}
+}
+function aller(i, p){ cur=Math.max(0,Math.min(ecrans.length-1,i)); pas=p==='fin'?maxPas(ecrans[cur]):p; afficher(); }
+function suivant(){ if (fiche.classList.contains('on')) { fiche.classList.remove('on'); return; } if (pas<maxPas(ecrans[cur])) { pas++; afficher(); } else if (cur<ecrans.length-1) aller(cur+1,0); }
+function precedent(){ if (fiche.classList.contains('on')) { fiche.classList.remove('on'); return; } if (pas>0) { pas--; afficher(); } else if (cur>0) aller(cur-1,'fin'); }
+document.getElementById('bApres').onclick=suivant;
+document.getElementById('bAvant').onclick=precedent;
+function pleinEcran(){ try { if (!document.fullscreenElement) (document.documentElement.requestFullscreen||document.documentElement.webkitRequestFullscreen).call(document.documentElement); else document.exitFullscreen(); } catch(e){} }
+document.getElementById('bPlein').onclick=pleinEcran;
+document.addEventListener('keydown',e=>{
+  if (e.ctrlKey||e.metaKey||e.altKey) return;   // laisse les raccourcis du navigateur
+  if (e.target.tagName==='INPUT') { if (e.key==='Enter'||e.key==='Escape') e.target.blur(); return; }
+  if (['ArrowRight','ArrowDown','PageDown',' ','Enter'].includes(e.key)) { e.preventDefault(); suivant(); }
+  else if (['ArrowLeft','ArrowUp','PageUp','Backspace'].includes(e.key)) { e.preventDefault(); precedent(); }
+  else if (e.key==='Escape') fiche.classList.remove('on');
+  else if (e.key==='f'||e.key==='F') pleinEcran();
+  else if (e.key==='Home') aller(0,0); else if (e.key==='End') aller(ecrans.length-1,0);
+});
+// glisser du doigt (tablette), sauf sur le curseur avant/après
+(function(){ let x0=null; const v=document.getElementById('vue');
+  v.addEventListener('touchstart',e=>{ x0 = e.target.closest('.ba,input') ? null : e.touches[0].clientX; },{passive:true});
+  v.addEventListener('touchend',e=>{ if(x0===null) return; const d=e.changedTouches[0].clientX-x0; if(Math.abs(d)>60) (d<0?suivant:precedent)(); x0=null; },{passive:true});
+})();
+// les mascottes répètent leur phrase quand on les touche
+// un bouton touché ne garde pas le focus (sinon la télécommande ou Espace le réactiverait)
+document.addEventListener('click', e=>{ const b=e.target.closest('button'); if(b) b.blur(); });
+coco.onclick = clovis.onclick = () => parole(ecrans[cur]);
+
+/* Feuilles qui tombent sur l'écran final */
+(function(){
+  const fin=document.querySelector('.fin'); const f=['🍃','🌸','🍂','🌼','🍃','🐞'];
+  for(let i=0;i<16;i++){ const s=document.createElement('span'); s.className='feuille'; s.textContent=f[i%f.length];
+    s.style.left=(i*6.3+2)+'%'; s.style.animationDuration=(7+(i*37)%6)+'s'; s.style.animationDelay=(-(i*1.7)%8)+'s'; fin.appendChild(s); }
+})();
+
+/* Mise à l'échelle : la scène 1600 × 900 remplit l'écran */
+const sc=document.getElementById('scene');
+function ajuster(){ const k=Math.min(innerWidth/1600, innerHeight/900); sc.style.transform=`translate(${(innerWidth-1600*k)/2}px,${(innerHeight-900*k)/2}px) scale(${k})`; }
+addEventListener('resize', ajuster); ajuster();
+
+const m = /^#ecran-(\d+)$/.exec(location.hash); aller(m ? (+m[1]-1) : 0, 0);
+</script>
+
+<script>
+/* SynApps — nouvelle version disponible ?
+   Le navigateur garde une copie des pages (jusqu'à 10 min sur GitHub Pages, parfois bien plus sur iPhone).
+   On compare discrètement le code de la page affichée avec celui en ligne ; s'il a changé, on propose
+   « Mettre à jour », qui recharge la page en contournant la copie gardée en mémoire. */
+(function(){
+  if (!/^https?:$/.test(location.protocol)) return;
+  var KEY = 'synapps-maj:' + location.pathname, last = 0, shown = false;
+  function sig(root){
+    var t = '', els = root.querySelectorAll('script:not([src]),style');
+    for (var i = 0; i < els.length; i++) if (!els[i].hasAttribute('data-runtime')) t += els[i].textContent;
+    var h = 2166136261; for (var j = 0; j < t.length; j++){ h ^= t.charCodeAt(j); h = Math.imul(h, 16777619); }
+    return (h >>> 0).toString(36) + '.' + t.length;
+  }
+  var mine = sig(document);
+  function banner(){
+    if (shown || document.getElementById('synappsMaj')) return; shown = true;
+    var b = document.createElement('div'); b.id = 'synappsMaj';
+    b.setAttribute('style', 'position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom));transform:translateX(-50%);width:max-content;z-index:2147483000;background:#25321e;color:#fff;border-radius:999px;padding:8px 8px 8px 16px;display:flex;align-items:center;gap:10px;font:14px/1.3 system-ui,-apple-system,sans-serif;box-shadow:0 6px 24px rgba(0,0,0,.25);max-width:calc(100% - 24px)');
+    b.innerHTML = '<span>Une nouvelle version est disponible</span><button type="button" style="border:0;border-radius:999px;padding:7px 14px;background:#8fd16a;color:#18240f;font:600 14px system-ui,-apple-system,sans-serif;cursor:pointer;white-space:nowrap">Mettre à jour</button><button type="button" aria-label="Plus tard" style="border:0;background:none;color:#cfd8c6;font-size:18px;cursor:pointer;padding:0 6px">×</button>';
+    var bt = b.querySelectorAll('button');
+    bt[0].onclick = function(){ location.replace(location.pathname + '?v=' + Date.now().toString(36) + location.hash); };
+    bt[1].onclick = function(){ b.remove(); };
+    document.body.appendChild(b);
+  }
+  function check(){
+    var now = Date.now(); if (now - last < 5 * 60 * 1000) return; last = now;
+    fetch(location.pathname + '?nocache=' + now.toString(36), {cache:'no-store'}).then(function(r){ return r.ok ? r.text() : null; }).then(function(html){
+      if (!html) return;
+      var theirs = sig(new DOMParser().parseFromString(html, 'text/html'));
+      if (theirs === mine){ try { sessionStorage.removeItem(KEY); } catch(e){} return; }
+      var tried = null; try { tried = sessionStorage.getItem(KEY); } catch(e){}
+      if (tried === theirs) return;                    // déjà rechargé pour cette version : pas de boucle
+      try { sessionStorage.setItem(KEY, theirs); } catch(e){}
+      banner();
+    }).catch(function(){});
+  }
+  // la page vient d'être rechargée par « Mettre à jour » : on nettoie l'adresse
+  if (/[?&]v=/.test(location.search)) try { history.replaceState(null, '', location.pathname + location.hash); } catch(e){}
+  setTimeout(check, 2500);
+  document.addEventListener('visibilitychange', function(){ if (!document.hidden) check(); });
+})();
+</script>
+<script data-runtime>
+/* SynApps — badge « Version test » (data-runtime : ignoré par la détection de nouvelle version, car lu après elle)
+   Hors de la production (app.synapsium.com et sa copie synapps-bhl.pages.dev), la page est une version test :
+   ses données en ligne vont dans le projet Supabase « Synapps_test », jamais dans les vraies données. */
+(function(){
+  if (!/^https?:$/.test(location.protocol) || /^(app\.synapsium\.com|synapps-bhl\.pages\.dev|l33ko\.github\.io)$/.test(location.hostname)) return;
+  var b = document.createElement('div'); b.id = 'synappsTest'; b.textContent = 'Version test';
+  b.title = 'Version test : les données en ligne vont dans Synapps_test, pas dans les vraies données.';
+  b.setAttribute('style', 'position:fixed;left:8px;bottom:calc(8px + env(safe-area-inset-bottom));z-index:2147482999;pointer-events:none;background:#f38020;color:#fff;border-radius:999px;padding:3px 10px;font:700 12px/1.4 system-ui,-apple-system,sans-serif;letter-spacing:.03em;box-shadow:0 2px 8px rgba(0,0,0,.2);opacity:.92');
+  (document.body || document.documentElement).appendChild(b);
+})();
+</script>
+</body>
+</html>
