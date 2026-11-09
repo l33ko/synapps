@@ -268,7 +268,8 @@ const NAR=()=>{try{return localStorage.getItem('cp-nar')!=='0'}catch(e){return t
 function togNar(){try{localStorage.setItem('cp-nar',NAR()?'0':'1')}catch(e){}parentPanel()}
 const spk=c=>c.nb?'':'<button class="tile" onclick="say(Q.cur.btn||Q.cur.nr)" aria-label="Écouter">🔊 Écouter</button>';
 let VERR='';
-function sayDev(t,r){try{const s=speechSynthesis;if(!VOICE)loadVoice();if(s.speaking||s.pending)s.cancel();setTimeout(()=>{s.resume();[].concat(t).forEach(x=>{const u=new SpeechSynthesisUtterance(x);u.lang='fr-FR';if(VOICE)u.voice=VOICE;u.rate=r||.9;u.pitch=1;u.volume=1;u.onerror=e=>{VERR=e.error||'erreur'};s.speak(u)})},120)}catch(e){VERR=String(e)}}
+let SDT=0;
+function sayDev(t,r){try{const s=speechSynthesis;if(!VOICE)loadVoice();if(s.speaking||s.pending)s.cancel();clearTimeout(SDT);SDT=setTimeout(()=>{s.resume();[].concat(t).forEach(x=>{const u=new SpeechSynthesisUtterance(x);u.lang='fr-FR';if(VOICE)u.voice=VOICE;u.rate=r||.9;u.pitch=1;u.volume=1;u.onerror=e=>{VERR=e.error||'erreur'};s.speak(u)})},120)}catch(e){VERR=String(e)}}
 /* voix naturelle (ElevenLabs, voix Alice) : sons enregistrés dans le dossier voix/. Les textes qui n'y sont pas (énoncés des problèmes…) sont lus par la voix de l'appareil */
 let VIDX=null,VAC=null,VBUF={},VTOK=0,VSRC=[];
 const vnorm=t=>String(t).toLowerCase().replace(/[^\p{L}\p{N} ]/gu,' ').replace(/\s+/g,' ').trim();
@@ -280,18 +281,21 @@ function vseg(t){if(!VIDX)return null;
  const best=[0],prev=[];
  for(let i=1;i<=n;i++){best[i]=null;for(let j=0;j<i;j++){if(best[j]==null)continue;const k=w.slice(j,i).join(' ');if(VIDX[k]&&(best[i]==null||best[j]+1<best[i])){best[i]=best[j]+1;prev[i]=j}}}
  if(best[n]==null)return null;const out=[];for(let i=n;i>0;i=prev[i])out.unshift(VIDX[w.slice(prev[i],i).join(' ')]);return out}
-function vctx(){if(!VAC){try{VAC=new (window.AudioContext||window.webkitAudioContext)()}catch(e){}}return VAC}
+function vctx(){if(!VAC){try{if(navigator.audioSession)navigator.audioSession.type='playback'}catch(e){}try{VAC=new (window.AudioContext||window.webkitAudioContext)()}catch(e){}}return VAC}
 function vload(f){return VBUF[f]||(VBUF[f]=fetch('voix/'+f).then(r=>{if(!r.ok)throw 0;return r.arrayBuffer()}).then(b=>new Promise((ok,ko)=>VAC.decodeAudioData(b,ok,ko))).catch(e=>{delete VBUF[f];throw e}))}
 function vstop(){VSRC.forEach(x=>{try{x.stop()}catch(e){}});VSRC=[]}
 function say(t,r){
- VTOK++;const tok=VTOK;vstop();
+ VTOK++;const tok=VTOK;vstop();clearTimeout(SDT);
  let files=null;try{const parts=[].concat(t).map(vseg);if(parts.length&&parts.every(Boolean)&&vctx())files=parts.flat()}catch(e){}
  if(!files)return sayDev(t,r);
  try{const s=speechSynthesis;if(s.speaking||s.pending)s.cancel()}catch(e){}
  Promise.all(files.map(vload)).then(bufs=>{
-  if(tok!==VTOK)return;try{VAC.resume()}catch(e){}
-  let at=VAC.currentTime+.05;
-  bufs.forEach(b=>{const src=VAC.createBufferSource();src.buffer=b;src.connect(VAC.destination);src.start(at);at+=b.duration+.04;VSRC.push(src)})
+  if(tok!==VTOK)return;
+  const ready=VAC.state==='running'?Promise.resolve():Promise.race([Promise.resolve(VAC.resume()).catch(()=>{}),new Promise(ok=>setTimeout(ok,400))]);
+  return ready.then(()=>{
+   if(tok!==VTOK)return;if(VAC.state!=='running')return sayDev(t,r);
+   let at=VAC.currentTime+.05;
+   bufs.forEach(b=>{const src=VAC.createBufferSource();src.buffer=b;src.connect(VAC.destination);src.start(at);at+=b.duration+.04;VSRC.push(src)})})
  }).catch(()=>{if(tok===VTOK)sayDev(t,r)})}
 document.addEventListener('pointerdown',()=>{if(window.__vau)return;window.__vau=1;try{vctx();VAC.resume();const b=VAC.createBuffer(1,1,22050),x=VAC.createBufferSource();x.buffer=b;x.connect(VAC.destination);x.start(0)}catch(e){}},true);
 document.addEventListener('pointerdown',()=>{if(window.__vu)return;window.__vu=1;try{const u=new SpeechSynthesisUtterance(' ');u.volume=0;speechSynthesis.speak(u)}catch(e){}},true);
@@ -535,7 +539,7 @@ function end(){
  ${DUR()&&SS&&LEFT()<=0?'<p class="sub">⏰ Le temps de jeu est terminé. À bientôt !</p>':`<button class="again" onclick="start('${id}')">🔁 Rejouer</button><button class="again" onclick="lvl('${id}')">🎚️ Niveau</button>`}<button class="again" onclick="menu()">🏠 Menu</button></div>`;
 }
 const hdr=(p,l)=>`<div class="top"><button class="back" onclick="menu()" aria-label="Retour">←</button><div class="bar"><i style="width:${p*100}%"></i></div><span class="stars">${l}</span></div>`;
-const fbk=t=>{const e=document.getElementById('fb');if(e)e.textContent=t;if(NAR())say(t.replace(/[^\p{L} ]/gu,''))};
+const fbk=t=>{const e=document.getElementById('fb');if(e)e.textContent=t;if(NAR())say(t.replace(/[^\p{L}'’ ]/gu,''))};
 const curM=()=>MENU.find(x=>x.id===Q.id);
 /* clavier */
 function drawKey(c,m){const k=c.key,fs=k.txt&&k.txt.length>13?' style="font-size:2.2rem"':'',v=`<span class="kv">${k.v||'?'}</span>`;app.innerHTML=hdr(Q.n/Q.N,`${Q.n+1}/${Q.N}`)+`<div class="q" style="background:var(${m.c});min-height:130px">${k.html||''}${Q.id==='pb'?'':spk(c)}<div class="math"${fs}>${k.ml!==undefined?k.ml+' '+v+' '+k.mr:(k.html?'':k.txt+' ')+'= '+v}</div></div><div class="keys">`+[1,2,3,4,5,6,7,8,9,'⌫',0,'✔'].map(x=>`<button class="opt k${x==='✔'?' go':''}" onclick="key('${x}')">${x==='✔'?'✓':x}</button>`).join('')+`</div><div class="fb" id="fb" aria-live="polite"></div>`}
@@ -695,7 +699,7 @@ function tick(){const b=document.getElementById('tm');if(!b)return;
  if(OVM==='lock')closeOv();
  b.style.display=OVM?'none':'';b.textContent='⏱️ '+fmt(left);b.classList.toggle('low',left<60000)}
 setInterval(tick,1000);
-function showLock(){try{speechSynthesis.cancel()}catch(e){}
+function showLock(){VTOK++;vstop();try{speechSynthesis.cancel()}catch(e){}
  if(P&&BEFF()==='coffre'){const n=BPLAYED(),T=BP(),par='<button class="chip" onclick="parents()">🔒 Parents</button>';
   if(n>=T)return openOv('lock',`<div class="end"><div class="fete">🌟🎉🌟</div><h1>Le coffre est vide !</h1><p class="sub">Tu as joué tes ${T} parties bonus.<br>À demain pour une nouvelle surprise !</p><div class="emo" style="font-size:6rem">😴</div>${par}</div>`);
   if(!BOPEN)return openOv('lock',`<div class="end"><div class="fete">🎉⭐🎉</div><h1>Bravo ${esc(P)} !</h1><p class="sub">Ta séance est terminée. Tu as gagné un cadeau !</p><button class="coffre" id="cf" onclick="openChest()" aria-label="Ouvrir le coffre">🎁</button><div class="tap">👆 Touche le coffre !</div><p>${par}</p></div>`);
