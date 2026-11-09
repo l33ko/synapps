@@ -273,11 +273,15 @@ function sayDev(t,r){try{const s=speechSynthesis;if(!VOICE)loadVoice();if(s.spea
 /* voix naturelle (ElevenLabs, voix Alice) : sons enregistrés dans le dossier voix/. Les textes qui n'y sont pas (énoncés des problèmes…) sont lus par la voix de l'appareil */
 let VIDX=null,VAC=null,VBUF={},VTOK=0,VSRC=[];
 const vnorm=t=>String(t).toLowerCase().replace(/[^\p{L}\p{N} ]/gu,' ').replace(/\s+/g,' ').trim();
-const VU=['zéro','un','deux','trois','quatre','cinq','six','sept','huit','neuf','dix','onze','douze','treize','quatorze','quinze','seize','dix-sept','dix-huit','dix-neuf'],VD={2:'vingt',3:'trente',4:'quarante',5:'cinquante'};
-const vnum=n=>n<20?VU[n]:n%10===0?VD[n/10]:VD[Math.floor(n/10)]+(n%10===1?' et un':'-'+VU[n%10]);
+const VU=['zéro','un','deux','trois','quatre','cinq','six','sept','huit','neuf','dix','onze','douze','treize','quatorze','quinze','seize','dix-sept','dix-huit','dix-neuf'],VD={2:'vingt',3:'trente',4:'quarante',5:'cinquante',6:'soixante'};
+const vnum=n=>{if(n<20)return VU[n];const t=Math.floor(n/10),u=n%10;
+ if(t<=6)return VD[t]+(u===0?'':u===1?' et un':'-'+VU[u]);
+ if(t===7)return 'soixante'+(u===1?' et onze':'-'+VU[10+u]);
+ if(t===8)return 'quatre-vingt'+(u===0?'s':'-'+VU[u]);
+ return 'quatre-vingt-'+VU[10+u]};
 try{fetch('voix/index.json').then(r=>r.ok?r.json():null).then(j=>{VIDX=j}).catch(()=>{})}catch(e){}
 function vseg(t){if(!VIDX)return null;
- const w=vnorm(String(t).replace(/\d+/g,m=>' '+(+m<=50?vnum(+m):'?')+' ')).split(' ').filter(Boolean),n=w.length;if(!n)return null;
+ const w=vnorm(String(t).replace(/\d+/g,m=>' '+(+m<=99?vnum(+m):'?')+' ')).split(' ').filter(Boolean),n=w.length;if(!n)return null;
  const best=[0],prev=[];
  for(let i=1;i<=n;i++){best[i]=null;for(let j=0;j<i;j++){if(best[j]==null)continue;const k=w.slice(j,i).join(' ');if(VIDX[k]&&(best[i]==null||best[j]+1<best[i])){best[i]=best[j]+1;prev[i]=j}}}
  if(best[n]==null)return null;const out=[];for(let i=n;i>0;i=prev[i])out.unshift(VIDX[w.slice(prev[i],i).join(' ')]);return out}
@@ -486,9 +490,9 @@ function genMath(op,L,KL){L=L||1;
  const s2=new Set([ans]);let g=0;
  while(s2.size<4&&g++<200){const d=ans+pick([-10,-3,-2,-1,1,2,3,10]);if(d>=0)s2.add(d)}
  const opts=shuffle([...s2]).map(n=>({h:n,ok:n===ans})),kb=(KL||L)>=4,fs=txt.length>13?' style="font-size:2.2rem"':'';
- const nb=op==='add'||op==='sou',nr=nb?null:cm?'Trouve le bon nombre pour compléter le calcul.':/^(Le double|La moitié)/.test(txt)?(/^La moitié/.test(txt)?'Quelle est ':'Quel est ')+txt[0].toLowerCase()+txt.slice(1)+' ?':/groupes/.test(txt)?`Combien font ${txt} ?`:`Combien font ${txt.replace(' + ',' plus ').replace(' − ',' moins ').replace(' × ',' fois ')} ?`;
- if(cm)return {nr,nb,q:`<div class="math">${a} + ? = ${t}</div>`,opts,key:kb?{ml:`${a} +`,mr:`= ${t}`,ans,v:''}:null};
- return {nr,nb,q:`<div class="math"${fs}>${txt} = ?</div>`,opts,key:kb?{txt,ans,v:''}:null};
+ const nb=op==='add'||op==='sou',nr=nb?'Fais le calcul et donne la bonne réponse.':cm?'Trouve le bon nombre pour compléter le calcul.':/^(Le double|La moitié)/.test(txt)?(/^La moitié/.test(txt)?'Quelle est ':'Quel est ')+txt[0].toLowerCase()+txt.slice(1)+' ?':/groupes/.test(txt)?`Combien font ${txt} ?`:`Combien font ${txt.replace(' + ',' plus ').replace(' − ',' moins ').replace(' × ',' fois ')} ?`;
+ if(cm)return {nr,nb,once:true,q:`<div class="math">${a} + ? = ${t}</div>`,opts,key:kb?{ml:`${a} +`,mr:`= ${t}`,ans,v:''}:null};
+ return {nr,nb,once:nb,q:`<div class="math"${fs}>${txt} = ?</div>`,opts,key:kb?{txt,ans,v:''}:null};
 }
 /* additions et soustractions : que des additions aux niveaux faciles, soustractions faciles dès le niveau 4 */
 const SOUM=[0,0,0,1,2,3,4,6,8,10],SOUP=[0,0,0,.25,.35,.45,.5,.5,.5,.5];
@@ -503,7 +507,7 @@ function start(id){if(STARTERS[id])return STARTERS[id]();Q={id,n:0,score:0,N:10,
 /* Lecture, Écriture et Mots à compléter : un même mot ne revient qu'une fois par série, quelle que soit la forme de la question */
 const WKEY=['lec','ecr','pho'],dedup=c=>c&&WKEY.includes(Q.id)&&c.btn&&!c.rd?'mot:'+c.btn:sigQ(c);
 const sigQ=c=>c?[c.q,c.ws&&c.ws.join(' '),c.say,c.btn,c.nr,(c.opts||[]).filter(o=>o.ok).map(o=>o.h||o.t||o.v||'').join()].join('|'):'';
-function next(){if(Q.cur&&!Q.cur.easy)Q.ms+=Q.score-Q.s0;if(Q.n>=Q.N)return end();Q.seen=Q.seen||new Set();let c,sg,k=0;const easy=!!(Q.plan&&Q.plan[Q.n]),keep=PLAY[Q.id];if(easy)PLAY[Q.id]=Q.easyL;try{do{c=gen(Q.id);sg=dedup(c);k++}while(Q.seen.has(sg)&&k<60)}finally{if(easy){if(keep===undefined)delete PLAY[Q.id];else PLAY[Q.id]=keep}}Q.seen.add(sg);c.easy=easy;Q.s0=Q.score;Q.cur=c;Q.tries=0;Q.done=false;Q.hinted=false;draw();setTimeout(()=>{if(NAR()&&Q&&Q.cur&&!Q.done&&(Q.cur.sp||Q.cur.nr)&&!(Q.id==='int'&&Q.n>0))say(Q.cur.sp||Q.cur.nr,Q.cur.rate)},350)}
+function next(){if(Q.cur&&!Q.cur.easy)Q.ms+=Q.score-Q.s0;if(Q.n>=Q.N)return end();Q.seen=Q.seen||new Set();let c,sg,k=0;const easy=!!(Q.plan&&Q.plan[Q.n]),keep=PLAY[Q.id];if(easy)PLAY[Q.id]=Q.easyL;try{do{c=gen(Q.id);sg=dedup(c);k++}while(Q.seen.has(sg)&&k<60)}finally{if(easy){if(keep===undefined)delete PLAY[Q.id];else PLAY[Q.id]=keep}}Q.seen.add(sg);c.easy=easy;Q.s0=Q.score;Q.cur=c;Q.tries=0;Q.done=false;Q.hinted=false;draw();setTimeout(()=>{if(!(NAR()&&Q&&Q.cur&&!Q.done))return;const c=Q.cur,t=Q.n===0||!(c.once||c.sh)?(c.sp||c.nr):c.sh;if(t)say(t,c.rate)},350)}
 function draw(){
  const c=Q.cur,m=MENU.find(x=>x.id===Q.id);if(c.type==='phr')return drawPhr(c,m);if(c.type==='txt')return drawTxt(c,m);if(c.key)return drawKey(c,m);
  app.innerHTML=`<div class="top"><button class="back" onclick="menu()" aria-label="Retour">←</button><div class="bar"><i style="width:${Q.n/Q.N*100}%"></i></div><span class="stars">${Q.n+1}/${Q.N}</span></div>
@@ -564,13 +568,13 @@ function genPho(){const L=lv('pho'),w=pick(wpool(L)),t=w[0];let p,k;
   if(isDG&&pl.length)s2.add(pick(pl));
   else if(k===1)s2.add(pick([...(vow?V:C)]));
   else s2.add(Math.random()<.5?pick([...C+V])+miss.slice(1):miss.slice(0,-1)+pick([...C+V]))}
- return {nr:`Trouve ${k>1?'les lettres manquantes':'la lettre manquante'} pour former le mot ${t}.`,btn:t,q:`<div class="emo">${w[1]}</div><div class="word script">${t.slice(0,p)}<span class="blank">${miss}</span>${t.slice(p+k)}</div><p>${k>1?'Quelles lettres manquent ?':'Quelle lettre manque ?'}</p>`,opts:shuffle([...s2]).map(x=>({h:x,ok:x===miss,f:'script'}))}}
+ return {nr:`Trouve ${k>1?'les lettres manquantes':'la lettre manquante'} pour former le mot ${t}.`,sh:t,btn:t,q:`<div class="emo">${w[1]}</div><div class="word script">${t.slice(0,p)}<span class="blank">${miss}</span>${t.slice(p+k)}</div><p>${k>1?'Quelles lettres manquent ?':'Quelle lettre manque ?'}</p>`,opts:shuffle([...s2]).map(x=>({h:x,ok:x===miss,f:'script'}))}}
 /* phrases */
 const SENT={1:[['Le chat dort','🐱'],['Le chien court','🐶'],['La lune brille','🌙'],['Le soleil brille','☀️'],['Le bateau flotte','⛵'],['Le lion rugit','🦁'],['La vache mange','🐄'],['Le cheval galope','🐴'],['La poule pond','🐔'],['Le singe saute','🐵'],['Le vent souffle','💨']],
 2:[['Papa lit un livre','📖'],['Maman mange une pomme','🍎'],['Léa fait du vélo','🚲'],['Le poisson nage vite','🐟'],['Maman fait un gâteau','🍰'],['Papa lave la voiture','🚗'],['Le chat boit du lait','🥛'],['Paul joue au ballon','⚽'],['Le bébé dort bien','👶'],['Lola lit un livre','📚'],['Le chien mange un os','🦴']],
 3:[['Le lapin mange une banane','🐰'],['Léa mange une grosse glace','🍦'],['Le petit chat boit du lait','🐱'],['Papa roule en voiture rouge','🚗'],['La fleur pousse dans le jardin','🌸'],['Le petit oiseau chante dans l’arbre','🐦'],['Maman prépare une bonne soupe chaude','🍲'],['Le gros camion roule sur la route','🚚'],['Paul range ses jouets dans sa chambre','🧸'],['La petite souris mange du fromage','🐭']],
 4:[['Où est le chat ?','🐱'],['Qui mange la pomme ?','🍎'],['Que fait le lapin ?','🐰'],['Quel beau soleil !','☀️'],['Le chien court vite !','🐶'],['Vive les vacances !','🏖️'],['Comment tu t’appelles ?','🙋'],['Quel temps fait-il ?','🌦️'],['Bravo, tu as gagné !','🏆'],['Où va le train ?','🚂'],['Joyeux anniversaire !','🎂']]};
-function genPhr(){const L=lv('phr'),[s,e]=pick(SENT[L<=2?1:L<=4?2:L<=7?3:4]);const ws=s.split(' ');if(!/[.?!]$/.test(s))ws[ws.length-1]+='.';let t;do{t=shuffle(ws.map((w,i)=>({w,i})))}while(t.every((x,i)=>x.i===i));return {nr:null,nb:true,type:'phr',emo:e,ws,tiles:t,placed:[]}}
+function genPhr(){const L=lv('phr'),[s,e]=pick(SENT[L<=2?1:L<=4?2:L<=7?3:4]);const ws=s.split(' ');if(!/[.?!]$/.test(s))ws[ws.length-1]+='.';let t;do{t=shuffle(ws.map((w,i)=>({w,i})))}while(t.every((x,i)=>x.i===i));return {nr:'Remets les étiquettes dans l’ordre.',once:true,nb:true,type:'phr',emo:e,ws,tiles:t,placed:[]}}
 function drawPhr(c,m){app.innerHTML=hdr(Q.n/Q.N,`${Q.n+1}/${Q.N}`)+`<div class="q" style="background:var(${m.c})"><div class="emo">${c.emo}</div><p>Remets les étiquettes dans l’ordre</p><div class="line">`+c.placed.map(i=>`<button class="tile" onclick="unplace(${i})">${c.ws[i]}</button>`).join('')+`</div></div><div class="pool">`+c.tiles.map(t=>`<button class="tile" ${c.placed.includes(t.i)?'disabled':''} onclick="place(${t.i})">${t.w}</button>`).join('')+`</div><div class="fb" id="fb" aria-live="polite"></div>`}
 const rp=()=>drawPhr(Q.cur,curM());
 function place(i){const c=Q.cur;if(Q.done||c.placed.includes(i))return;c.placed.push(i);if(/[A-Za-zÀ-ÿ]/.test(c.ws[i]))say(c.ws[i].replace('.',''));rp();if(c.placed.length<c.ws.length)return;Q.done=true;
@@ -630,10 +634,10 @@ function genSui(){const L=lv('sui');
   if(L===7){d=1;s0=R(1,15)}else if(L===8){d=pick([2,5,10]);s0=R(0,10)}else if(L===9){d=pick([1,2,5,10]);up=false;s0=R(40,60)}else{d=pick([2,3,4,5,10]);up=Math.random()<.6;s0=up?R(0,20):R(40,70)}
   const seq=[0,1,2,3].map(i=>up?s0+i*d:s0-i*d),ans=up?s0+4*d:s0-4*d,s2=new Set([ans]);let g=0;
   while(s2.size<4&&g++<200){const x=ans+pick([-d,d,-1,1,2,-2]);if(x>=0)s2.add(x)}
-  return {nb:true,nr:'Complète la suite.',q:`<div class="word" style="font-size:2.4rem">${seq.join(' , ')} , <span class="kv">?</span></div><p>Quel nombre vient ensuite ?</p>`,opts:shuffle([...s2]).map(x=>({h:x,ok:x===ans}))}}
+  return {nb:true,nr:'Complète la suite.',once:true,q:`<div class="word" style="font-size:2.4rem">${seq.join(' , ')} , <span class="kv">?</span></div><p>Quel nombre vient ensuite ?</p>`,opts:shuffle([...s2]).map(x=>({h:x,ok:x===ans}))}}
  const S=shuffle(EMS).slice(0,4),U=pick(PT[L]),len=Math.min(10,U.length*2+rnd(U.length)),sh=Array.from({length:len},(_,i)=>S[U[i%U.length]]),ans=S[U[len%U.length]],pool=[...new Set(U.map(i=>S[i]))];
  while(pool.length<(L<=2?3:4))pool.push(pick(EMS.filter(e=>!pool.includes(e))));
- return {nb:true,nr:'Complète la suite.',q:`<div class="word" style="font-size:2.2rem;line-height:1.5">${sh.join(' ')} <span class="kv">❓</span></div><p>Que vient ensuite ?</p>`,opts:shuffle(pool).map(x=>({h:x,ok:x===ans}))}}
+ return {nb:true,nr:'Complète la suite.',once:true,q:`<div class="word" style="font-size:2.2rem;line-height:1.5">${sh.join(' ')} <span class="kv">❓</span></div><p>Que vient ensuite ?</p>`,opts:shuffle(pool).map(x=>({h:x,ok:x===ans}))}}
 /* morpion */
 const WL=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]],win=(b,s)=>WL.some(l=>l.every(i=>b[i]===s));
 function startMor(){Q={id:'mor',bonus:true,n:0,score:0,N:10,b:Array(9).fill(''),over:false,busy:false};const first=Math.random()<.5;if(first){Q.busy=true;drawMor('🐶 commence…');BT.push(setTimeout(comp,900))}else{drawMor();if(NAR())say('À toi de jouer ! Tu es le chat.')}}
@@ -672,9 +676,9 @@ function genInt(){const L=lv('int'),top='<div class="emo" style="font-size:3rem"
   if(rule==='par'){const ev=Math.random()<.5;same=shuffle(pool.filter(x=>(x%2===0)===ev)).slice(0,3);odd=pick(pool.filter(x=>(x%2===0)!==ev))}
   else if(rule==='m5'){same=shuffle(pool.filter(x=>x%5===0)).slice(0,3);odd=pick(pool.filter(x=>x%5!==0))}
   else{same=shuffle(pool.filter(x=>x%10===0)).slice(0,3);odd=pick(pool.filter(x=>x%10!==0))}
-  return {nr:'Trouve l’intrus.',nb:true,q:top+'<p>Trouve le nombre qui n’est pas comme les autres !</p>',opts:shuffle([...same,odd]).map(x=>({h:x,ok:x===odd}))}}
+  return {nr:'Trouve l’intrus.',once:true,nb:true,q:top+'<p>Trouve le nombre qui n’est pas comme les autres !</p>',opts:shuffle([...same,odd]).map(x=>({h:x,ok:x===odd}))}}
  const subtle=[['ferme','sauvages'],['fruits','legumes'],['mer','sauvages'],['mer','ferme']],[a,b]=L<=2?shuffle(['fruits','vehicules','vetements','ferme']).slice(0,2):L<=4?shuffle(Object.keys(GR)).slice(0,2):shuffle(pick(subtle)),same=shuffle(GR[a]).slice(0,3),odd=pick(GR[b]);
- return {nr:'Trouve l’intrus.',nb:true,q:top+'<p>Trouve l’intrus : lequel n’est pas comme les autres ?</p>',opts:shuffle([...same,odd]).map(x=>({h:x,ok:x===odd}))}}
+ return {nr:'Trouve l’intrus.',once:true,nb:true,q:top+'<p>Trouve l’intrus : lequel n’est pas comme les autres ?</p>',opts:shuffle([...same,odd]).map(x=>({h:x,ok:x===odd}))}}
 /* temps de jeu, espace parents, sauvegarde */
 const DURS=[5,10,15,20,30,45,60,0];
 let SS=null,OVM='',GATE=null;
