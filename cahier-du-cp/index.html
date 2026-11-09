@@ -368,8 +368,10 @@ function genLec(){
  return {nr:listen?'Écoute le mot, puis touche-le.':'Trouve le mot qui correspond à l’image.',btn:w[0],nb:listen,sp:listen?['Écoute le mot, puis touche-le.',w[0]]:null,q:listen?`<button class="big" onclick="say('${w[0]}')" aria-label="Écouter">🔊</button><p>Écoute, puis trouve le mot</p>`:`<div class="emo">${w[1]}</div><p>Quel est ce mot ?</p>`,opts,say:listen?w[0]:null,hint:listen?w[1]:null,three:opts.length===3};
 }
 const AZ=['azertyuiop','qsdfghjklm','wxcvbn'],ACC='éèêàâçîôù';
+/* longueur des mots à écrire : de plus en plus longs aux niveaux 7 à 10 */
+const ECRLEN=L=>L<=2?[1,4]:L<=4?[1,5]:L<=6?[1,7]:L===7?[4,6]:L===8?[5,7]:L===9?[6,8]:[7,10];
 function genEcr(){
- const L=lv('ecr'),mx=L<=2?4:L<=4?5:L<=6?7:12,pl=wpool(L).filter(x=>x[0].length<=mx),r=Math.random();
+ const L=lv('ecr'),[lo,hi]=ECRLEN(L),pl=wpool(L).filter(x=>x[0].length>=lo&&x[0].length<=hi),r=Math.random();
  let mode=L<=2?(r<.5?'match':'copy'):L<=4?(r<.3?'match':r<.7?'copy':'pic'):L<=6?(r<.2?'match':r<.4?'copy':r<.8?'pic':'dic'):L<=8?(r<.1?'match':r<.2?'copy':r<.6?'pic':'dic'):(r<.05?'match':r<.5?'pic':'dic');
  if(mode==='dic'&&!window.speechSynthesis)mode='pic';
  if(mode==='match')return genEcrM();
@@ -406,7 +408,7 @@ function tchk(){const c=Q.cur;drawTxt(c,curM());if(emptySlot(c)>=0)return;
   /* 1re erreur : le mot est redit */
   if(Q.tries===1)say(c.w)},1300)}
 function genEcrM(){
- const L=lv('ecr'),mx=L<=2?4:L<=4?5:L<=6?7:12,all=wpool(L).map(x=>x[0]),w=pick(all.filter(x=>x.length<=mx)),toCur=Math.random()<.5;
+ const L=lv('ecr'),[lo,hi]=ECRLEN(L),all=wpool(L).map(x=>x[0]),w=pick(all.filter(x=>x.length>=lo&&x.length<=hi)),toCur=Math.random()<.5;
  let dis=shuffle(all.filter(x=>x!==w));
  if(L>=5)dis.sort((a,b)=>Math.abs(a.length-w.length)-Math.abs(b.length-w.length));
  dis=dis.slice(0,L>=6?3:2);
@@ -469,8 +471,10 @@ const EASYAT=[2,5,8,9];
 function start(id){if(STARTERS[id])return STARTERS[id]();Q={id,n:0,score:0,N:10,ms:0};
  const L=lv(id);if(L>=4){let e=Math.max(1,Math.min(L-3,lvS(id)));if(id==='lec'&&L>=7)e=Math.max(7,e);Q.plan=Array.from({length:10},(_,i)=>EASYAT.includes(i));Q.easyL=e}
  next()}
+/* Lecture, Écriture et Mots à compléter : un même mot ne revient qu'une fois par série, quelle que soit la forme de la question */
+const WKEY=['lec','ecr','pho'],dedup=c=>c&&WKEY.includes(Q.id)&&c.btn&&!c.rd?'mot:'+c.btn:sigQ(c);
 const sigQ=c=>c?[c.q,c.ws&&c.ws.join(' '),c.say,c.btn,c.nr,(c.opts||[]).filter(o=>o.ok).map(o=>o.h||o.t||o.v||'').join()].join('|'):'';
-function next(){if(Q.cur&&!Q.cur.easy)Q.ms+=Q.score-Q.s0;if(Q.n>=Q.N)return end();Q.seen=Q.seen||new Set();let c,sg,k=0;const easy=!!(Q.plan&&Q.plan[Q.n]),keep=PLAY[Q.id];if(easy)PLAY[Q.id]=Q.easyL;try{do{c=gen(Q.id);sg=sigQ(c);k++}while(Q.seen.has(sg)&&k<60)}finally{if(easy){if(keep===undefined)delete PLAY[Q.id];else PLAY[Q.id]=keep}}Q.seen.add(sg);c.easy=easy;Q.s0=Q.score;Q.cur=c;Q.tries=0;Q.done=false;Q.hinted=false;draw();setTimeout(()=>{if(NAR()&&Q&&Q.cur&&!Q.done&&(Q.cur.sp||Q.cur.nr)&&!(Q.id==='int'&&Q.n>0))say(Q.cur.sp||Q.cur.nr,Q.cur.rate)},350)}
+function next(){if(Q.cur&&!Q.cur.easy)Q.ms+=Q.score-Q.s0;if(Q.n>=Q.N)return end();Q.seen=Q.seen||new Set();let c,sg,k=0;const easy=!!(Q.plan&&Q.plan[Q.n]),keep=PLAY[Q.id];if(easy)PLAY[Q.id]=Q.easyL;try{do{c=gen(Q.id);sg=dedup(c);k++}while(Q.seen.has(sg)&&k<60)}finally{if(easy){if(keep===undefined)delete PLAY[Q.id];else PLAY[Q.id]=keep}}Q.seen.add(sg);c.easy=easy;Q.s0=Q.score;Q.cur=c;Q.tries=0;Q.done=false;Q.hinted=false;draw();setTimeout(()=>{if(NAR()&&Q&&Q.cur&&!Q.done&&(Q.cur.sp||Q.cur.nr)&&!(Q.id==='int'&&Q.n>0))say(Q.cur.sp||Q.cur.nr,Q.cur.rate)},350)}
 function draw(){
  const c=Q.cur,m=MENU.find(x=>x.id===Q.id);if(c.type==='phr')return drawPhr(c,m);if(c.type==='txt')return drawTxt(c,m);if(c.key)return drawKey(c,m);
  app.innerHTML=`<div class="top"><button class="back" onclick="menu()" aria-label="Retour">←</button><div class="bar"><i style="width:${Q.n/Q.N*100}%"></i></div><span class="stars">${Q.n+1}/${Q.N}</span></div>
