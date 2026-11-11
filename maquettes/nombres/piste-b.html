@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Maquette Nombres, piste B : on manipule</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* ---------- style repris de « Mon cahier du CP » ---------- */
+:root{--paper:#fffaf0;--line:#c9dcf7;--margin:#f4a0b8;--ink:#2b2d6e;--card:#fff;--c1:#ffc4d6;--c2:#bfe3ff;--c3:#c4f0b6;--c4:#ffe58f;--c5:#dacbff;--c6:#ffcfa0;--good:#2e9e4f;--bad:#d8553d;--sh:#2b2d6e;
+--diz:#5aa9f0;--dizt:#1f6fd0;--uni:#ffa94d;--unit:#c9620a}
+*{box-sizing:border-box}
+html,body{touch-action:pan-x pan-y;-webkit-text-size-adjust:100%}
+body{margin:0;min-height:100vh;min-height:100dvh;font-family:'Andika','Comic Sans MS',sans-serif;color:var(--ink);background-color:var(--paper);
+background-image:linear-gradient(var(--line) 1px,transparent 1px);background-size:100% 32px;-webkit-tap-highlight-color:transparent}
+button{touch-action:manipulation}
+#app{max-width:620px;margin:0 auto;padding:16px 16px 70px;position:relative}
+h1{font-size:2rem;margin:.2em 0 0;line-height:1.2}
+.sub{margin:0 0 18px;font-size:1.1rem}
+.top{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.stars{margin-left:auto;font-weight:700;background:#2b2d6e;color:#fff;border:3px solid var(--sh);border-radius:99px;padding:4px 14px;white-space:nowrap}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.card,.opt,.back,.big,.again{font:inherit;color:inherit;cursor:pointer;border:3px solid var(--sh);transition:transform .08s,box-shadow .08s}
+.card:active,.opt:active,.big:active,.again:active,.back:active{transform:scale(.97)}
+.card{border-radius:22px;padding:18px 8px;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:1.15rem;font-weight:700;min-height:112px;justify-content:center;position:relative}
+.card .e{font-size:2.4rem;line-height:1}
+.card small{font-weight:400;font-size:.85rem}
+.pg{display:flex;flex-direction:column;align-items:center;gap:3px;width:82%}
+.pgb{display:flex;gap:2px;width:100%}
+.pgb i{flex:1;height:7px;border-radius:3px;background:rgba(127,127,127,.3)}
+.pgb i.on{background:var(--ink)}
+.back{border-radius:14px;background:var(--card);font-size:1.4rem;padding:6px 14px}
+.bar{flex:1;height:18px;border:3px solid var(--sh);border-radius:99px;background:var(--card);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--good);transition:width .3s}
+.q{background:var(--card);border:3px solid var(--sh);border-radius:24px;padding:18px;text-align:center;margin-bottom:14px}
+.q p{margin:0;font-size:1.05rem}
+.big{background:var(--c2);border-radius:99px;font-size:1.8rem;width:64px;height:64px;padding:0;flex:none}
+.opt{background:var(--card);border-radius:20px;padding:8px 6px;font-size:1.8rem;font-weight:700;min-height:64px}
+.opt.go{background:#2e9e4f;color:#fff;border-color:var(--sh)}
+.fb{text-align:center;font-size:1.5rem;font-weight:700;min-height:44px;margin:10px 0 8px;line-height:1.2}
+.fb small{display:block;font-size:1rem;font-weight:400}
+.fb.good{color:var(--good)}.fb.bad{color:var(--bad)}
+.end{text-align:center}
+.end .s{font-size:4rem;letter-spacing:.1em}
+.again{border-radius:99px;background:var(--c4);font-size:1.3rem;font-weight:700;padding:12px 26px;margin:6px}
+.chip{font:inherit;color:inherit;background:var(--card);border:3px solid var(--sh);border-radius:99px;padding:6px 16px;margin:0 0 14px;cursor:pointer}
+.h2{font-size:1.3rem;margin:22px 0 8px}
+.lvgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.lvb{font:inherit;color:inherit;border:3px solid var(--sh);border-radius:16px;font-size:1.5rem;font-weight:700;padding:12px 0;cursor:pointer}
+.lvb.t1{background:var(--c3)}.lvb.t2{background:var(--c4)}.lvb.t3{background:var(--c6)}
+.lvb.on{outline:6px solid #e8336d;outline-offset:2px}
+:focus-visible{outline:4px solid var(--good);outline-offset:3px}
+@keyframes pop{50%{transform:scale(1.12)}}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+@keyframes bob{50%{transform:translateY(-7px)}}
+
+/* ---------- module Nombres : ce qui est nouveau ---------- */
+.new{position:absolute;top:-10px;right:-6px;background:#e8336d;color:#fff;font-size:.8rem;font-weight:700;border:3px solid var(--sh);border-radius:99px;padding:1px 10px;transform:rotate(6deg)}
+.cons{display:grid;grid-template-columns:auto 1fr;align-items:center;gap:2px 12px;padding:10px 14px}
+.cons .big{grid-row:1/3}
+.cons .pic{display:flex;align-items:center;justify-content:center;gap:10px;font-size:2.1rem;line-height:1;min-height:52px}
+.cons .num{font-size:3.1rem;font-weight:700;line-height:1}
+.cons .num .d{color:var(--dizt)}.cons .num .u{color:var(--unit)}
+.cons .arr{font-size:1.5rem;opacity:.6}
+.ok{width:100%;display:flex;align-items:center;justify-content:center}
+.ok svg{width:44px;height:44px}
+.ok.wait{opacity:.45}
+.cnt{display:inline-flex;align-items:center;justify-content:center;min-width:2.1em;height:2.1em;padding:0 .35em;border-radius:99px;background:var(--ink);color:#fff;font-size:1.25rem;font-weight:700;font-style:normal}
+.hand{position:relative}
+.hand::after{content:'👆';position:absolute;left:50%;top:62%;margin-left:-.5em;font-size:1.9rem;line-height:1;animation:bob 1s ease-in-out infinite;pointer-events:none;z-index:3;filter:drop-shadow(0 2px 0 #fff)}
+
+/* 1. le panier */
+.basket{position:relative;background:var(--c4);border:3px solid var(--sh);border-radius:16px 16px 34px 34px;padding:26px 12px 14px;margin:20px 0 12px;min-height:128px;
+background-image:repeating-linear-gradient(45deg,rgba(43,45,110,.07) 0 6px,transparent 6px 12px)}
+.basket.big2{min-height:226px}
+.basket .tag{position:absolute;top:-22px;left:10px;font-size:2.2rem;line-height:1;display:flex;align-items:center;gap:6px}
+.basket.good{background-color:var(--c3);border-color:var(--good);animation:pop .4s}
+.basket.bad{border-color:var(--bad);animation:shake .3s}
+.bgrid{display:grid;grid-template-columns:repeat(5,minmax(0,52px));gap:6px;justify-content:center}
+.pgrid{display:grid;grid-template-columns:repeat(6,minmax(0,56px));gap:6px;justify-content:center}
+.it{font:inherit;position:relative;aspect-ratio:1;border:0;background:none;padding:0;font-size:2.15rem;line-height:1;cursor:pointer;border-radius:14px;display:flex;align-items:center;justify-content:center}
+.it:active{transform:scale(.9)}
+.it:disabled{opacity:.16;filter:grayscale(1);cursor:default}
+.it.in{animation:pop .3s}
+.it b{position:absolute;right:-2px;bottom:-2px;min-width:1.5em;height:1.5em;border-radius:99px;background:var(--ink);color:#fff;font-size:.8rem;display:flex;align-items:center;justify-content:center;border:2px solid #fff}
+.it.lit b{animation:pop .25s}
+
+/* 2. ranger */
+.scale{display:flex;align-items:flex-end;gap:8px;margin:2px 4px 6px}
+.scale .s1{font-size:1.4rem;line-height:1}.scale .s2{font-size:2.6rem;line-height:1}
+.scale i{flex:1;height:26px;background:var(--c5);border:0;clip-path:polygon(0 100%,100% 0,100% 100%)}
+.slots{display:flex;gap:8px;justify-content:center;align-items:flex-end;margin-bottom:16px;border-bottom:3px solid var(--sh)}
+.sl{flex:1 1 0;max-width:96px;min-width:0;display:flex;flex-direction:column;gap:5px}
+.sl .hole{font:inherit;color:inherit;height:66px;border:3px dashed var(--sh);border-radius:14px;background:rgba(255,255,255,.6);font-size:1.75rem;font-weight:700;cursor:pointer;padding:0;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.1}
+.sl .hole.full{border-style:solid;background:var(--card);animation:pop .25s}
+.sl .hole.lk{background:var(--c3);border-color:var(--good);border-style:solid;cursor:default}
+.sl .hole.no{background:var(--c6);border-color:var(--bad);animation:shake .3s}
+.sl .hole.next{border-color:#e8336d;background:rgba(255,229,143,.55)}
+.sl .st{background:var(--c5);border:3px solid var(--sh);border-radius:6px 6px 0 0;border-bottom:0}
+.pool{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;min-height:70px}
+.tile{font:inherit;color:inherit;background:var(--card);border:3px solid var(--sh);border-radius:14px;padding:6px 10px;min-width:62px;min-height:62px;font-size:1.9rem;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.1}
+.tile:active{transform:scale(.95)}
+.tile:disabled{opacity:.2;cursor:default}
+.dots{display:grid;grid-template-columns:repeat(5,6px);gap:2px;margin-top:3px}
+.dots i{width:6px;height:6px;border-radius:50%;background:var(--unit)}
+
+/* 3. fabriquer : barres de dix et cubes */
+.mat{--w:clamp(21px,calc((min(100vw,620px) - 112px)/11.4),30px);--c:calc(var(--w)*1.2);--h:calc(var(--c)*5 + 16px);
+position:relative;background:var(--card);border:3px solid var(--sh);border-radius:20px;padding:10px;margin-bottom:12px;display:flex;gap:14px;justify-content:center}
+.mat.good{background:var(--c3);border-color:var(--good);animation:pop .4s}
+.mat.bad{border-color:var(--bad);animation:shake .3s}
+.zone{display:flex;flex-direction:column;gap:4px}
+.zone .lab{font-size:.8rem;font-weight:700;text-align:center;line-height:1.2}
+.zone.zd .lab{color:var(--dizt)}.zone.zu .lab{color:var(--unit)}
+.zone .in{height:var(--h);border-radius:10px;border:2px dashed rgba(43,45,110,.3);padding:0;box-sizing:content-box}
+.zd .in{width:calc(var(--w)*9 + 32px);display:flex;gap:4px}
+.zu .in{width:calc(var(--c)*2 + 4px);display:grid;grid-template-columns:repeat(2,var(--c));grid-template-rows:repeat(5,var(--c));grid-auto-flow:column;gap:4px;align-content:start}
+.zu.only .in{width:calc(var(--c)*5 + 16px);height:calc(var(--c)*2 + 4px);grid-template-columns:repeat(5,var(--c));grid-template-rows:repeat(2,var(--c));grid-auto-flow:row}
+.barre{width:var(--w);height:var(--h);padding:0;border:2.5px solid var(--sh);border-radius:5px;cursor:pointer;background:var(--diz);
+background-image:repeating-linear-gradient(to bottom,transparent 0 calc(10% - 2px),var(--sh) calc(10% - 2px) 10%)}
+.cube{width:var(--c);height:var(--c);padding:0;border:2.5px solid var(--sh);border-radius:5px;cursor:pointer;background:var(--uni)}
+.barre.in2,.cube.in2{animation:pop .3s}
+.barre.lit,.cube.lit{box-shadow:0 0 0 4px #e8336d;z-index:1;position:relative}
+.barre.fus{animation:pop .5s;box-shadow:0 0 0 4px var(--uni)}
+.mat .cnt{position:absolute;top:-18px;left:10px;font-size:1.4rem}
+.adds{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:0}
+.adds.one{grid-template-columns:1fr}
+.add{display:flex;align-items:center;justify-content:center;gap:10px;font-size:1rem;line-height:1.15;padding:6px 8px;min-height:74px}
+.add .pl{font-size:2.2rem;line-height:1}
+.add.b{background:var(--c2)}.add.c{background:var(--c6)}
+.add i.mb{width:14px;height:56px;border:2px solid var(--sh);border-radius:3px;background:var(--diz);background-image:repeating-linear-gradient(to bottom,transparent 0 calc(10% - 1.5px),var(--sh) calc(10% - 1.5px) 10%);flex:none}
+.add i.mc{width:26px;height:26px;border:2px solid var(--sh);border-radius:4px;background:var(--uni);flex:none}
+.add.no{animation:shake .3s}
+.mini{display:flex;gap:3px;align-items:flex-end;justify-content:center;margin-top:6px;min-height:44px}
+.mini .b{width:7px;height:44px;border:1.5px solid var(--sh);border-radius:2px;background:var(--diz)}
+.mini .us{display:grid;grid-template-rows:repeat(5,7px);grid-auto-flow:column;gap:2px;margin-left:3px}
+.mini .us i{width:7px;height:7px;border:1.5px solid var(--sh);border-radius:1px;background:var(--uni)}
+
+/* 4. comparer : le crocodile */
+.duel{display:grid;grid-template-columns:1fr clamp(78px,24%,130px) 1fr;gap:6px;align-items:center;margin-bottom:6px}
+.side{font:inherit;color:inherit;background:var(--card);border:3px solid var(--sh);border-radius:22px;min-height:170px;padding:8px 4px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:transform .15s}
+.side .n{font-size:3.4rem;font-weight:700;line-height:1}
+.side .heap{display:flex;flex-wrap:wrap;justify-content:center;gap:1px 2px;font-size:1.75rem;line-height:1.15;max-width:7.2em}
+.side .n.sm{font-size:1.5rem;margin-top:4px;background:var(--ink);color:#fff;border-radius:99px;min-width:1.9em;padding:2px 8px}
+.side.sel{background:var(--c4);transform:scale(1.04);border-width:5px}
+.side.good{background:var(--c3);border-color:var(--good);animation:pop .4s}
+.side.bad{background:var(--c6);border-color:var(--bad);animation:shake .3s}
+.croc{width:100%;display:block;overflow:visible}
+.croc .flip{transform-origin:60px 45px;transition:transform .25s}
+.croc.l .flip{transform:scaleX(-1)}
+.croc .up,.croc .lo{transform-origin:26px 52px;transition:transform .3s}
+.croc.open .up{transform:rotate(-24deg)}
+.croc.open .lo{transform:rotate(15deg)}
+.croc.idle .flip{animation:look 2.6s steps(1) infinite}
+.croc.miam .lo{animation:miam .28s 3}
+.croc.non{animation:shake .3s 2}
+@keyframes look{50%{transform:scaleX(-1)}}
+@keyframes miam{50%{transform:rotate(2deg)}}
+.eq{display:inline-flex;gap:14px;align-items:center;font-size:2.2rem;line-height:1}
+.eq .sg{color:var(--good)}
+
+@media (max-width:640px),(max-height:860px){
+#app{padding:10px 14px 46px}
+.top{margin-bottom:8px}
+.back{padding:2px 12px;font-size:1.2rem}
+.stars{padding:2px 12px}
+.q{border-radius:20px;margin-bottom:10px}
+.cons{padding:8px 12px}
+.cons .big{width:56px;height:56px;font-size:1.6rem}
+.cons .num{font-size:2.7rem}
+.cons .pic{font-size:1.9rem;min-height:46px}
+.q p{font-size:1rem}
+.fb{min-height:40px;margin:6px 0;font-size:1.35rem}
+.fb small{font-size:.95rem}
+.basket{margin:18px 0 10px;padding:22px 8px 10px;min-height:110px}
+.basket.big2{min-height:196px}
+.bgrid{grid-template-columns:repeat(5,minmax(0,44px));gap:4px}
+.pgrid{grid-template-columns:repeat(6,minmax(0,50px));gap:4px}
+.it{font-size:1.9rem}
+.side{min-height:150px}
+.side .n{font-size:3rem}
+.side .heap{font-size:1.55rem}
+.add{min-height:66px}
+.opt.ok{min-height:58px}
+}
+@media (min-width:900px){
+#app{padding-left:44px;min-height:100vh}
+#app::before{content:'';position:absolute;top:0;bottom:0;left:28px;width:2px;background:var(--margin);z-index:-1;pointer-events:none}
+}
+
+/* ---------- bandeau de la maquette (ne fait pas partie de l'app) ---------- */
+#mq{font-family:system-ui,-apple-system,'Segoe UI',sans-serif;background:#1d1f33;color:#eef;font-size:13px;line-height:1.4;padding:10px 12px}
+#mq h2{font-size:15px;margin:0 0 2px}
+#mq h2 span{background:#ffe58f;color:#1d1f33;border-radius:6px;padding:1px 7px;margin-right:6px}
+#mq p{margin:0 0 6px}
+#mq summary{cursor:pointer;font-weight:600;padding:3px 0}
+#mq ul{margin:2px 0 6px;padding-left:18px}
+#mq .cols b{display:block;margin-top:4px}
+#mq .pf b{color:#9fe6ae}#mq .li b{color:#ffb9a6}
+#mq .nav{display:flex;flex-wrap:wrap;gap:5px;align-items:center;margin-top:5px}
+#mq .nav em{font-style:normal;opacity:.7;margin-right:2px;min-width:44px}
+#mq .nav button{font:inherit;color:#eef;background:#33365a;border:1px solid #5b5f8f;border-radius:99px;padding:5px 10px;cursor:pointer}
+#mq .nav button.on{background:#ffe58f;color:#1d1f33;border-color:#ffe58f;font-weight:700}
+#mq .nav button:disabled{opacity:.35;cursor:default}
+#mq .note{opacity:.75;font-size:12px;margin:6px 0 0}
+#mq .navs{display:flex;flex-wrap:wrap;gap:0 14px}
+@media (max-width:899px){#mq{padding:8px 10px}#mq p{margin-bottom:2px}#mq .nav em{min-width:0}#mq .nav button{padding:4px 9px}}
+@media (min-width:900px){
+#mq{position:fixed;left:0;top:0;bottom:0;width:310px;overflow:auto;padding:18px 16px;z-index:5}
+#stage{margin-left:310px;min-height:100vh}
+#mq h2{font-size:17px;margin-bottom:8px}
+#mq .nav{margin-top:9px}
+#mq .nav em{width:100%}
+}
+</style>
+</head>
+<body>
+
+<aside id="mq" aria-label="À propos de cette maquette">
+ <h2><span>Piste B</span>On manipule</h2>
+ <p>L'enfant ne choisit pas parmi des réponses : il fabrique la réponse en touchant les objets, puis valide avec le bouton vert.</p>
+ <details id="mqd">
+  <summary>Points forts et limites</summary>
+  <div class="cols">
+   <div class="pf"><b>Points forts</b>
+    <ul><li>Rien à lire : un toucher déplace l'objet, un autre le reprend, comme les étiquettes de « Phrases ».</li>
+    <li>Impossible de répondre au hasard : il faut vraiment compter, ranger, construire.</li>
+    <li>L'erreur aide : le comptage apparaît seulement après un essai, puis reste affiché.</li></ul></div>
+   <div class="li"><b>Limites</b>
+    <ul><li>Plus lent : beaucoup de touchers par question (14 pommes, c'est 15 touchers).</li>
+    <li>Écrans chargés sur un petit téléphone à partir de 20 objets ; le panier s'arrête au niveau 4.</li>
+    <li>Un bouton vert à ne pas oublier, et quatre gestes différents à apprendre.</li></ul></div>
+  </div>
+  <p class="note">Maquette : rien n'est enregistré. La consigne est dite par la voix de l'appareil (dans l'app, ce serait la voix enregistrée).</p>
+ </details>
+ <div class="nav" id="nvA"><em>Écran</em></div>
+ <div class="navs"><div class="nav" id="nvL"><em>Niveau</em></div>
+ <div class="nav" id="nvS"><em>État</em>
+  <button onclick="demo(true)">Réussi</button><button onclick="demo(false)">Essaie encore</button></div></div>
+</aside>
+
+<div id="stage"><div id="app"></div></div>
+
+<script>
+/* Maquette cliquable : aucune donnée enregistrée, aucun appel réseau. */
+const app=document.getElementById('app');
+const rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const pick=a=>a[rnd(0,a.length-1)];
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=rnd(0,i);[a[i],a[j]]=[a[j],a[i]]}return a};
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+function say(t){try{if(!('speechSynthesis' in window)||!t)return;speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='fr-FR';u.rate=.85;speechSynthesis.speak(u)}catch(e){}}
+const CHECK='<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M9 25l10 10 20-23" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const ARROW='<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M8 24h30M27 11l13 13-13 13" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+const MENU=[
+ {t:'Lecture',e:'📖',c:'--c1',l:4},{t:'Écriture',e:'✏️',c:'--c2',l:3},
+ {t:'Mots à compléter',e:'🔤',c:'--c5',l:3},{t:'Phrases',e:'🧩',c:'--c6',l:2},
+ {t:'Memory',e:'🃏',c:'--c2',l:2},
+ {id:'nb',t:'Nombres',e:'🧺',c:'--c4',l:1,nw:1},
+ {t:'Calcul',e:'<b style="display:inline-flex;align-items:center;justify-content:center;width:2.4rem;height:2.4rem;border-radius:12px;color:#fff;background:#2e9e4f">+</b>',c:'--c3',l:3},
+ {t:'Compléments',e:'🧮',c:'--c3',l:2},{t:'Problèmes',e:'🛒',c:'--c4',l:1},{t:'Suites',e:'🔗',c:'--c5',l:2}];
+const ITEMS=[['pomme','pommes','🍎'],['fraise','fraises','🍓'],['carotte','carottes','🥕'],['poire','poires','🍐']];
+const ACTS={pan:'Panier',ran:'Ranger',fab:'Fabriquer',cmp:'Comparer'};
+let S={lvl:1,i:0,N:10,score:0,stars:12,order:[],seen:{},cur:null,scr:'menu'};
+let NAVL=1;
+const maxOf=L=>L<=2?10:L<=4?20:L<=6?59:99;
+const actsOf=L=>L<=4?['pan','cmp','ran','fab']:['fab','ran','cmp'];
+
+/* ---------- écrans hors exercice ---------- */
+function show(html,scr){S.scr=scr;app.innerHTML=html;nav()}
+function menu(){S.cur=null;
+ show(`<div class="top"><h1>Salut Zoé ! 👋</h1><span class="stars">⭐ ${S.stars}</span></div>
+ <p class="sub">À quoi veux-tu jouer ?</p><div class="grid">`+MENU.map(m=>`<button class="card" style="background:var(${m.c})" ${m.id?`onclick="lvl()" aria-label="Nombres, nouveau, niveau ${S.lvl} sur 10"`:'onclick="lvl()" tabindex="-1" aria-hidden="true"'}>${m.nw?'<span class="new">Nouveau</span>':''}<span class="e">${m.e}</span>${m.t}<span class="pg"><span class="pgb">${Array.from({length:10},(_,i)=>`<i class="${i<(m.id?S.lvl:m.l)?'on':''}"></i>`).join('')}</span><small>niveau ${m.id?S.lvl:m.l}</small></span></button>`).join('')+`</div>`,'menu')}
+function lvl(){S.cur=null;const c=S.lvl;
+ show(`<div class="top"><button class="back" onclick="menu()" aria-label="Retour">←</button><div style="flex:1"></div><span class="stars">⭐ ${S.stars}</span></div><h1>Nombres</h1>
+ <button class="card" style="background:var(--c3);width:100%;margin-top:10px" onclick="start(${c})"><span class="e">▶️</span>Jouer au niveau ${c}<small>Réussis 2 séries pour monter de niveau !</small></button>
+ <p class="h2">Ou choisis ton niveau :</p><div class="lvgrid">`+Array.from({length:10},(_,i)=>`<button class="lvb ${i<4?'t1':i<7?'t2':'t3'}${i+1===c?' on':''}" onclick="start(${i+1})" aria-label="Niveau ${i+1}">${i+1}</button>`).join('')+`</div>
+ <p class="sub" style="font-size:.9rem;margin-top:16px">1-2 : jusqu’à 10 · 3-4 : jusqu’à 20 · 5-6 : jusqu’à 59, dizaines et unités · 7 : jusqu’à 99 · 8 à 10 : défis</p>`,'lvl')}
+function start(L,first){S.lvl=L;S.i=0;S.score=0;S.seen={};const a=actsOf(L);let k=Math.max(0,a.indexOf(first));
+ S.order=Array.from({length:S.N},(_,i)=>a[(k+i)%a.length]);S.cur=gen();S.scr='q';draw();say(S.cur.sp);goTop()}
+function next(){S.i++;if(S.i>=S.N)return end();S.cur=gen();draw();say(S.cur.sp);goTop()}
+function goTop(){const y=app.getBoundingClientRect().top+window.scrollY;if(window.scrollY>y)window.scrollTo(0,y)}
+function end(sc){if(sc!=null)S.score=sc;const s=S.score,st=s>=9?3:s>=6?2:1;S.cur=null;
+ show(`<div class="end"><h1>${s>=9?'Champion !':s>=6?'Très bien !':'Bravo, tu as bien travaillé !'}</h1>
+ <div class="s">${'⭐'.repeat(st)}</div><p class="sub">${s} bonnes réponses du premier coup sur ${S.N}</p>
+ <p class="sub">${s>=8?'Encore une série réussie et tu montes de niveau.':'Chaque essai te fait progresser. 💪'} (niveau ${S.lvl}/10)</p>
+ <div style="font-size:2.6rem;margin:0 0 12px">🧺🍎 🐊 <span style="display:inline-block;width:.32em;height:1em;background:var(--diz);border:2px solid var(--sh);border-radius:3px;vertical-align:-.12em"></span><span style="display:inline-block;width:.42em;height:.42em;background:var(--uni);border:2px solid var(--sh);border-radius:3px;margin-left:4px"></span></div>
+ <button class="again" onclick="start(${S.lvl})">🔁 Rejouer</button><button class="again" onclick="lvl()">🎚️ Niveau</button><button class="again" onclick="menu()">🏠 Menu</button></div>`,'end');
+ say(s>=9?'Champion !':s>=6?'Très bien !':'Bravo, tu as bien travaillé !');goTop()}
+
+/* ---------- questions ---------- */
+function gen(){const t=S.order[S.i],L=S.lvl,first=!S.seen[t]&&[1,4,6].includes(L);S.seen[t]=1;const M=maxOf(L);
+ const base={type:t,tries:0,done:0,help:0,fb:'',fbk:'',res:'',hint:S.i===0};
+ if(t==='pan'){const n=first?(L<=2?7:14):(L<=2?rnd(3,10):rnd(11,20)),it=first?ITEMS[0]:pick(ITEMS);
+  return {...base,n,it,pool:Array(L<=2?12:24).fill(true),bask:[],lit:0,sp:`Mets ${n} ${it[1]} dans le panier.`}}
+ if(t==='ran'){const k=L<=2?3:L<=4?4:5;let nums;
+  if(first)nums=L<=2?[5,2,8]:L<=4?[12,7,19,15]:[34,43,18,52,27];
+  else{const s=new Set();while(s.size<k)s.add(rnd(L<=4?1:10,M));nums=shuffle([...s])}
+  return {...base,nums,slots:Array(k).fill(null),lock:[],no:[],sp:'Range les nombres, du plus petit au plus grand.'}}
+ if(t==='fab'){const n=first?(L<=2?6:L<=4?16:34):(L<=2?rnd(2,9):L<=4?rnd(11,20):rnd(21,M));
+  return {...base,n,d:0,u:0,lit:0,run:0,sp:L<=2?`Fabrique ${n} avec des cubes.`:`Fabrique ${n} avec des barres de dix et des cubes.`}}
+ let a,b;if(first)[a,b]=L<=2?[5,8]:L<=4?[17,13]:[46,64];else do{a=rnd(L<=4?1:10,M);b=rnd(L<=4?1:10,M)}while(a===b);
+ return {...base,a,b,pick:null,it:first?ITEMS[0]:pick(ITEMS),sp:'Touche le plus grand. Le crocodile veut le manger !'}}
+
+const hdr=()=>`<div class="top"><button class="back" onclick="lvl()" aria-label="Retour">←</button><div class="bar" role="progressbar" aria-label="Question ${S.i+1} sur ${S.N}"><i style="width:${S.i/S.N*100}%"></i></div><span class="stars">⭐ ${S.stars}</span></div>`;
+const cons=(pic,txt)=>`<div class="q cons"><button class="big" onclick="say(S.cur.sp)" aria-label="Écouter la consigne">🔊</button><div class="pic" aria-hidden="true">${pic}</div><p>${txt}</p></div>`;
+const foot=(c,ready=true)=>`<div class="fb ${c.fbk}" id="fb" role="status">${c.fb}</div><button class="opt go ok${ready||c.done?'':' wait'}" onclick="${c.done?'next()':'check()'}" aria-label="${c.done?'Question suivante':'Valider ma réponse'}">${c.done?ARROW:CHECK}</button>`;
+const numH=(n,col)=>col&&n>9?`<span class="num"><span class="d">${Math.floor(n/10)}</span><span class="u">${n%10}</span></span>`:`<span class="num">${n}</span>`;
+const mini=n=>`<span class="mini" aria-hidden="true">${'<i class="b"></i>'.repeat(Math.floor(n/10))}${n%10?`<span class="us">${'<i></i>'.repeat(n%10)}</span>`:''}</span>`;
+const dots=n=>`<span class="dots" aria-hidden="true">${'<i></i>'.repeat(n)}</span>`;
+function draw(){const c=S.cur;if(!c)return;({pan:drawPan,ran:drawRan,fab:drawFab,cmp:drawCmp})[c.type](c);nav()}
+function touch(c){if(c.busy||c.done)return false;c.hint=0;if(c.res==='bad'||c.res==='msg'){c.res='';c.fb='';c.fbk='';c.no=[]}return true}
+function good(c,msg,extra){c.busy=0;c.done=1;c.res='good';c.fbk='good';c.fb=(extra||'Bravo ! ⭐');if(!c.tries){S.score++;S.stars++}say(msg);draw()}
+function bad(c,msg,count=true){c.busy=0;if(count){c.tries++;c.help=1}c.res='bad';c.fbk='bad';c.fb=`${count?'Essaie encore 💪':'👆'}<small>${msg}</small>`;say(msg);draw()}
+function check(){const c=S.cur;if(!c||c.busy||c.done)return;({pan:checkPan,ran:checkRan,fab:checkFab,cmp:checkCmp})[c.type](c)}
+
+/* 1. le panier : toucher pour mettre, toucher pour reprendre */
+function drawPan(c){const it=c.it,firstOn=c.pool.indexOf(true);
+ const b=c.bask.map((pi,k)=>`<button class="it${c.last===pi?' in':''}${c.lit===k+1?' lit':''}" onclick="panOut(${pi})" aria-label="Reprendre une ${it[0]}">${it[2]}${c.help||c.lit>k?`<b>${k+1}</b>`:''}</button>`).join('');
+ const p=c.pool.map((on,pi)=>`<button class="it${c.hint&&pi===firstOn?' hand':''}" ${on?'':'disabled'} onclick="panIn(${pi})" aria-label="Mettre une ${it[0]} dans le panier">${it[2]}</button>`).join('');
+ app.innerHTML=hdr()+cons(`${numH(c.n)}<span>${it[2]}</span><span class="arr">➜</span><span>🧺</span>`,`Mets <b>${c.n}</b> ${it[1]} dans le panier.`)
+ +`<div class="basket${c.pool.length>12?' big2':''} ${c.res}"><span class="tag">🧺${c.help?`<b class="cnt" aria-label="${c.bask.length} dans le panier">${c.bask.length}</b>`:''}</span><div class="bgrid">${b}</div></div><div class="pgrid">${p}</div>`+foot(c,c.bask.length>0);c.last=null}
+function panIn(pi){const c=S.cur;if(!touch(c)||!c.pool[pi])return;c.pool[pi]=false;c.bask.push(pi);c.last=pi;draw()}
+function panOut(pi){const c=S.cur;if(!touch(c))return;c.bask=c.bask.filter(x=>x!==pi);c.pool[pi]=true;draw()}
+async function checkPan(c){const m=c.bask.length,it=c.it;if(!m)return bad(c,`Touche les ${it[1]} pour les mettre dans le panier.`,false);
+ c.busy=1;c.res='';c.fb='';for(let k=1;k<=m;k++){c.lit=k;draw();await wait(m>12?110:190)}
+ if(S.cur!==c)return;await wait(250);c.lit=0;
+ m===c.n?(c.help=1,good(c,`Bravo ! ${c.n} ${it[1]} !`)):bad(c,`Tu as mis ${m} ${m>1?it[1]:it[0]}. Il en faut ${c.n}.`)}
+
+/* 2. ranger : on touche les étiquettes dans l'ordre */
+function drawRan(c){const k=c.nums.length,used=c.slots.filter(x=>x!=null),nx=c.slots.indexOf(null),low=S.lvl<=2;
+ const sl=c.slots.map((ni,j)=>{const lk=c.lock.includes(j),no=c.no.includes(j);
+  return `<div class="sl"><button class="hole${ni!=null?' full':''}${lk?' lk':''}${no?' no':''}${j===nx&&!c.done?' next':''}" onclick="ranOut(${j})" ${ni==null||lk?'tabindex="-1"':''} aria-label="${ni!=null?`Case ${j+1} : ${c.nums[ni]}${lk?', bien placé':', toucher pour reprendre'}`:`Case ${j+1}, vide`}">${ni!=null?c.nums[ni]+(low?dots(c.nums[ni]):''):''}</button><i class="st" style="height:${8+j*Math.round(36/k)}px"></i></div>`}).join('');
+ const firstFree=c.nums.findIndex((_,ni)=>!used.includes(ni));
+ const pool=c.nums.map((n,ni)=>`<button class="tile${c.hint&&ni===firstFree?' hand':''}" ${used.includes(ni)?'disabled':''} onclick="ranIn(${ni})" aria-label="${n}">${n}${low?dots(n):''}</button>`).join('');
+ app.innerHTML=hdr()+cons(`<span style="font-size:1.3rem">🐭</span><span class="arr">➜</span><span style="font-size:2.5rem">🐘</span>`,`Range du plus <b>petit</b> au plus <b>grand</b>.`)
+ +`<div class="scale" aria-hidden="true"><span class="s1">🐭</span><i></i><span class="s2">🐘</span></div><div class="slots">${sl}</div><div class="pool">${pool}</div>`+foot(c,nx<0)}
+function ranIn(ni){const c=S.cur;if(!touch(c))return;const j=c.slots.indexOf(null);if(j<0||c.slots.includes(ni))return;c.slots[j]=ni;draw()}
+function ranOut(j){const c=S.cur;if(c.slots[j]==null||c.lock.includes(j)||!touch(c))return;c.slots[j]=null;draw()}
+async function checkRan(c){if(c.slots.includes(null))return bad(c,'Touche les étiquettes une par une, la plus petite d’abord.',false);
+ const so=[...c.nums].sort((a,b)=>a-b);c.no=[];c.slots.forEach((ni,j)=>{if(c.nums[ni]===so[j]){if(!c.lock.includes(j))c.lock.push(j)}else c.no.push(j)});
+ if(!c.no.length)return good(c,'Bravo ! C’est bien rangé.');
+ c.busy=1;c.tries++;c.fbk='bad';c.fb=`Essaie encore 💪<small>${c.lock.length?'Les étiquettes vertes sont bien placées.':'Cherche d’abord le plus petit.'}</small>`;say(c.lock.length?'Presque ! Les étiquettes vertes sont bien placées. Range les autres.':'Essaie encore. Cherche d’abord le plus petit nombre.');draw();
+ await wait(900);if(S.cur!==c)return;c.no.forEach(j=>c.slots[j]=null);c.no=[];c.busy=0;c.res='bad';draw()}
+
+/* 3. fabriquer un nombre : barres de dix et cubes */
+function drawFab(c){const L=S.lvl,only=L<=2,col=L>=3&&L<=6;let k=0;
+ const bars=Array.from({length:c.d},(_,i)=>`<button class="barre${c.last==='d'&&i===c.d-1?(c.fus?' fus':' in2'):''}${c.lit===++k?' lit':''}" onclick="fabRem(10)" aria-label="Enlever une barre de dix"></button>`).join('');
+ const cubes=Array.from({length:c.u},(_,i)=>`<button class="cube${c.last==='u'&&i===c.u-1?' in2':''}${c.lit===++k?' lit':''}" onclick="fabRem(1)" aria-label="Enlever un cube"></button>`).join('');
+ const showCnt=c.help||c.busy||c.done;
+ app.innerHTML=hdr()+cons(`${numH(c.n,col)}<span class="arr">➜</span>${only?'':'<i class="mb" style="display:inline-block;width:12px;height:44px;border:2px solid var(--sh);border-radius:3px;background:var(--diz)"></i>'}<i style="display:inline-block;width:22px;height:22px;border:2px solid var(--sh);border-radius:4px;background:var(--uni)"></i>`,only?`Fabrique <b>${c.n}</b> avec des cubes.`:`Fabrique <b>${c.n}</b> avec des barres et des cubes.`)
+ +`<div class="mat ${c.res}">${showCnt?`<b class="cnt" aria-label="Tu as fabriqué ${c.busy?c.run:c.d*10+c.u}">${c.busy?c.run:c.d*10+c.u}</b>`:''}
+ ${only?'':`<div class="zone zd"><span class="lab">dizaines</span><div class="in">${bars}</div></div>`}
+ <div class="zone zu${only?' only':''}"><span class="lab">${only?'cubes':'unités'}</span><div class="in">${cubes}</div></div></div>
+ <div class="adds${only?' one':''}">${only?'':`<button class="opt add b${c.hint?' hand':''}${c.shk==='d'?' no':''}" onclick="fabAdd(10)" aria-label="Ajouter une barre de dix"><span class="pl">+</span><i class="mb"></i><span>une barre<br>de 10</span></button>`}
+ <button class="opt add c${c.hint&&only?' hand':''}${c.shk==='u'?' no':''}" onclick="fabAdd(1)" aria-label="Ajouter un cube"><span class="pl">+</span><i class="mc"></i><span>un cube</span></button></div>`+foot(c,c.d+c.u>0);c.last=null;c.fus=0;c.shk=null}
+function fabAdd(v){const c=S.cur;if(!touch(c))return;const only=S.lvl<=2;
+ if(v===10){if(c.d>=9){c.shk='d';return draw()}c.d++;c.last='d'}
+ else if(c.u>=9){if(only||c.d>=9){c.shk='u';return draw()}c.u=0;c.d++;c.last='d';c.fus=1;c.fb='<small>10 cubes, ça fait une barre de 10 !</small>';c.fbk='';say('Dix cubes, ça fait une barre de dix !');c.res='msg';draw();return}
+ else{c.u++;c.last='u'}draw()}
+function fabRem(v){const c=S.cur;if(!touch(c))return;v===10?c.d--:c.u--;draw()}
+async function checkFab(c){const m=c.d+c.u,v=c.d*10+c.u;if(!m)return bad(c,'Touche les boutons plus pour ajouter des barres et des cubes.',false);
+ c.busy=1;c.res='';c.fb='';c.run=0;for(let k=1;k<=m;k++){c.lit=k;c.run+=k<=c.d?10:1;draw();await wait(m>10?170:260)}
+ if(S.cur!==c)return;await wait(300);c.lit=0;c.busy=0;
+ v===c.n?good(c,`Bravo ! Tu as fabriqué ${c.n}.`):bad(c,`Tu as fabriqué ${v}. Il faut ${c.n}.`)}
+
+/* 4. comparer : le crocodile ouvre la bouche vers le plus grand */
+function croc(c){const cls=c.pick==null?'idle':(c.pick?'':'l')+' open'+(c.res==='good'?' miam':c.res==='bad'?' non':'');
+ return `<svg class="croc ${cls}" viewBox="0 0 120 92" role="img" aria-label="Crocodile"><g class="flip"><g class="lo"><path d="M26 52h84q8 2 4 9-3 5-12 5H46q-18 0-20-14z" fill="#3f9d4d" stroke="#2b2d6e" stroke-width="3" stroke-linejoin="round"/><path d="M58 52l5-9 5 9zM74 52l5-9 5 9zM90 52l5-9 5 9z" fill="#fff" stroke="#2b2d6e" stroke-width="2" stroke-linejoin="round"/></g><g class="up"><path d="M58 52l5 9 5-9zM74 52l5 9 5-9zM90 52l5 9 5-9z" fill="#fff" stroke="#2b2d6e" stroke-width="2" stroke-linejoin="round"/><path d="M8 52q-2-24 20-28 6-14 18-12 9 2 10 14l48 10q12 3 10 12-1 4-6 4z" fill="#57b85f" stroke="#2b2d6e" stroke-width="3" stroke-linejoin="round"/><circle cx="42" cy="24" r="8" fill="#fff" stroke="#2b2d6e" stroke-width="3"/><circle cx="44" cy="24" r="3.4" fill="#2b2d6e"/><circle cx="104" cy="42" r="2.2" fill="#2b2d6e"/></g></g></svg>`}
+function sideH(c,w){const n=w?c.b:c.a,L=S.lvl,sel=c.pick===w,st=sel&&c.res?(' '+c.res):sel?' sel':'';
+ const inner=L<=2?`<span class="heap" aria-hidden="true">${c.it[2].repeat(n)}</span>${c.help||c.done?`<span class="n sm">${n}</span>`:''}`:`<span class="n">${n}</span>${L<=4||c.help||c.done?mini(n):''}`;
+ return `<button class="side${st}${c.hint&&w===0?' hand':''}" onclick="cmpPick(${w})" aria-label="${L<=2?`${n} ${c.it[1]}`:n}${sel?', choisi':''}">${inner}</button>`}
+function drawCmp(c){
+ app.innerHTML=hdr()+cons(`<span>🐊</span><span class="arr">➜</span><span style="font-size:1.1rem">●</span><span style="font-size:2.6rem;color:var(--good)">●</span>`,`Touche le plus <b>grand</b> : le crocodile veut le manger !`)
+ +`<div class="duel">${sideH(c,0)}${croc(c)}${sideH(c,1)}</div>`+foot(c,c.pick!=null)}
+function cmpPick(w){const c=S.cur;if(!touch(c))return;c.pick=w;draw()}
+function checkCmp(c){if(c.pick==null)return bad(c,'Touche le plus grand des deux.',false);
+ const big=Math.max(c.a,c.b),small=Math.min(c.a,c.b),ok=(c.pick?c.b:c.a)===big;
+ if(ok)return good(c,`Miam ! ${big}, c’est plus grand que ${small}.`,`<span class="eq">${c.a} <span class="sg">${c.a<c.b?'&lt;':'&gt;'}</span> ${c.b} ⭐</span>`);
+ bad(c,`Beurk ! Le crocodile veut le plus grand.`)}
+
+/* ---------- raccourcis de la maquette ---------- */
+function nav(){const t=S.cur&&S.cur.type,L=NAVL;
+ document.getElementById('nvA').innerHTML='<em>Écran</em>'+`<button class="${S.scr==='menu'?'on':''}" onclick="menu();goTop()">Menu</button><button class="${S.scr==='lvl'?'on':''}" onclick="lvl();goTop()">Niveaux</button>`
+ +Object.keys(ACTS).map(a=>`<button class="${t===a?'on':''}" ${a==='pan'&&L===6?'disabled title="Au niveau 6, le panier laisse la place aux barres de dix"':''} onclick="start(NAVL,'${a}')">${ACTS[a]}</button>`).join('')+`<button class="${S.scr==='end'?'on':''}" onclick="S.lvl=NAVL;end(8)">Fin</button>`;
+ document.getElementById('nvL').innerHTML='<em>Niveau</em>'+[1,4,6].map(l=>`<button class="${l===L?'on':''}" onclick="setNavL(${l})">${l}</button>`).join('')}
+function setNavL(l){NAVL=l;const t=S.cur&&S.cur.type;if(t)start(l,l===6&&t==='pan'?'fab':t);else{S.lvl=l;S.scr==='lvl'?lvl():S.scr==='end'?end(8):menu()}}
+/* montre directement l'état réussi ou « essaie encore » de l'écran en cours */
+function demo(ok){if(!S.cur)start(NAVL,'pan');let c=S.cur;if(c.done||c.tries){const t=c.type;start(S.lvl,t);c=S.cur}
+ c.hint=0;const n=c.n;
+ if(c.type==='pan'){const m=ok?n:n-2;c.pool.fill(true);c.bask=[];for(let i=0;i<m;i++){c.pool[i]=false;c.bask.push(i)}}
+ if(c.type==='ran'){const so=c.nums.map((v,i)=>i).sort((a,b)=>c.nums[a]-c.nums[b]);if(!ok)[so[1],so[2]]=[so[2],so[1]];c.slots=so}
+ if(c.type==='fab'){if(ok){c.d=Math.floor(n/10);c.u=n%10}else if(n>10&&n%10&&n%10!==Math.floor(n/10)&&S.lvl>4){c.d=n%10;c.u=Math.floor(n/10)}else{c.d=Math.floor(n/10);c.u=Math.max(0,n%10-2)||n%10+1}}
+ if(c.type==='cmp')c.pick=(c.b>c.a)===ok?1:0;
+ draw();check()}
+
+if(matchMedia('(min-width:900px)').matches)document.getElementById('mqd').open=true;
+menu();
+</script>
+</body>
+</html>
