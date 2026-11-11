@@ -581,7 +581,7 @@ function end(){
  const msg=nl>sv?'⬆️ Niveau supérieur !':half?'👍 Série réussie ! Encore une et tu montes de niveau.':nl<sv?'On s’entraîne encore un peu 🌱':pl<sv?'Bravo pour ce rappel ! Ton niveau reste le même.':pl>sv?'Tu as essayé un niveau plus haut : bravo ! Ton niveau reste le même.':'Même niveau, continue !';
  app.innerHTML=`<div class="end"><h1>${sc>=9?'Champion !':sc>=6?'Très bien !':defi||pl>=8?'Bravo, tu as relevé un défi !':'Bravo, tu as bien travaillé !'}</h1>
  <div class="s">${'⭐'.repeat(st)}</div><p class="sub">${GAMES.includes(id)?`Score : ${sc} sur ${Q.N}`:`${sc} bonnes réponses du premier coup sur ${Q.N}`}</p><p class="sub">${msg} (niveau ${nl}/${mx})</p>${sc<6?`<p class="sub">${defi||pl>=8?'Ce niveau est difficile, c’est normal de se tromper. Tu y arriveras bientôt ! 💪':'Chaque essai te fait progresser. 💪'}</p>`:''}
- ${DUR()&&SS&&LEFT()<=0?'<p class="sub">⏰ Le temps de jeu est terminé. À bientôt !</p>':`<button class="again" onclick="start('${id}')">🔁 Rejouer</button><button class="again" onclick="lvl('${id}')">🎚️ Niveau</button>`}<button class="again" onclick="menu()">🏠 Menu</button></div>`;
+ ${DUR()&&SS&&LEFT()<=0?'<p class="sub">⏰ Le temps de jeu est terminé. À bientôt !</p>':`<button class="again" onclick="start('${id}')">${ms>=mN-1?'▶️ Continuer':'🔁 Rejouer'}</button><button class="again" onclick="lvl('${id}')">🎚️ Niveau</button>`}<button class="again" onclick="menu()">🏠 Menu</button></div>`;
 }
 const hdr=(p,l)=>`<div class="top"><button class="back" onclick="menu()" aria-label="Retour">←</button><div class="bar"><i style="width:${p*100}%"></i></div><span class="stars">${l}</span></div>`;
 const fbk=t=>{const e=document.getElementById('fb');if(e)e.textContent=t;if(NAR())say(t.replace(/[^\p{L}'’ ]/gu,''))};
