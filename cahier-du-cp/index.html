@@ -408,7 +408,7 @@ function genTxt(L){
 function genLI(L){
  const [s,e]=pick((L<=4?[1]:L===5?[1,2]:[2,3]).flatMap(k=>SENT[k])),stop=/^(le|la|les|l|un|une|du|des|de|au|a|est|dans|sur|son|ses|sa|en|avec|très|pour)$/,
   key=x=>x.toLowerCase().replace(/[.?!]/g,'').split(/[ ’']/).map(w=>w.replace(/[sx]$/,'')).filter(w=>w&&!stop.test(w)),kw=key(s),
-  em=[...new Set(shuffle([1,2,3,4].flatMap(k=>SENT[k]).filter(x=>x[1]!==e&&!key(x[0]).some(w=>kw.includes(w)))).map(x=>x[1]))].slice(0,3);
+  em=[...new Set(shuffle([1,2,3,4].flatMap(k=>SENT[k]).filter(x=>x[1]!==e&&!('🐓🐔'.includes(e)&&'🐓🐔'.includes(x[1]))&&!key(x[0]).some(w=>kw.includes(w)))).map(x=>x[1]))].slice(0,3);
  return {nr:'Lis la phrase et trouve la bonne image.',once:true,nb:true,q:`<div class="txt script" style="text-align:center">${esc(s)}.</div><p>Quelle image va avec la phrase ?</p>`,opts:shuffle([e,...em]).map(o=>({h:o,ok:o===e,f:'pic'}))}}
 /* Lecture : 1-3 des mots, 4-6 des phrases (puis un premier texte), 7-10 des textes */
 function genLec(){
@@ -449,8 +449,8 @@ function drawTxt(c,m){const ek=c.rev?-1:emptySlot(c);const sl=[...c.w].map((x,i)
   :`<div class="kr bank">${c.bank.map((b,i)=>`<button class="kk" ${b.used?'disabled':''} onclick="tk1(${i})">${b.ch}</button>`).join('')}<button class="kk del" onclick="tdel()" aria-label="Effacer">⌫</button></div>`;
  app.innerHTML=hdr(Q.n/Q.N,`${Q.n+1}/${Q.N}`)+`<div class="q" style="background:var(${m.c})">${c.top}<div class="slots">${sl}</div>${spk(c)}</div>${keys}<div class="fb" id="fb" aria-live="polite"></div>`}
 const emptySlot=c=>c.v.findIndex(x=>!x);
-function tk1(i){const c=Q.cur;if(Q.done||c.bank[i].used)return;const k=emptySlot(c);if(k<0)return;c.bank[i].used=true;c.v[k]={ch:c.bank[i].ch,bi:i};tchk()}
-function tk2(ch){const c=Q.cur;if(Q.done)return;const k=emptySlot(c);if(k<0)return;c.v[k]={ch,bi:-1};tchk()}
+function tk1(i){const c=Q.cur;if(Q.done||c.bank[i].used||(c.mem&&c.show))return;const k=emptySlot(c);if(k<0)return;c.bank[i].used=true;c.v[k]={ch:c.bank[i].ch,bi:i};tchk()}
+function tk2(ch){const c=Q.cur;if(Q.done||(c.mem&&c.show))return;const k=emptySlot(c);if(k<0)return;c.v[k]={ch,bi:-1};tchk()}
 function tdel(){const c=Q.cur;if(Q.done)return;let k=-1;for(let i=c.v.length-1;i>=0;i--)if(c.v[i]&&!c.v[i].lock){k=i;break}if(k<0)return;const x=c.v[k];c.v[k]=null;if(x.bi>=0)c.bank[x.bi].used=false;drawTxt(c,curM())}
 function tchk(){const c=Q.cur;drawTxt(c,curM());if(emptySlot(c)>=0)return;
  if(c.v.map(x=>x.ch).join('')===c.w){Q.done=true;if(!Q.tries)Q.score++;sfx(true);c.rev=true;drawTxt(c,curM());say(c.w);setTimeout(()=>{Q.n++;next()},1500);return}
@@ -505,8 +505,10 @@ function genMath(op,L,KL){L=L||1;
    x=R(30,99);y=R(11,x-1);return x%10<y%10&&[x,y]})||[9,4];ans=a-b;txt=`${a} − ${b}`}
  else if(op==='cmp'){cm=true;
    if(L<=1){a=R(5,9);t=10}else if(L===2){a=R(1,9);t=10}
-   else if(L===3){a=R(11,19);t=20}else if(L===4){a=R(1,19);t=20}
-   else if(L<=6){a=gl(()=>{const x=L===5?R(21,59):R(21,89);return x%10>0&&x})||23;t=a+10-a%10}
+   else if(L===3){a=R(11,19);t=20}
+   else if(L===4||(L===5&&Math.random()<.5)){a=gl(()=>{const x=L===4?R(21,59):R(21,89);return x%10>0&&x})||23;t=a+10-a%10}
+   else if(L===5){a=R(6,19);t=20}
+   else if(L===6){if(Math.random()<.5){a=R(1,19);t=20}else{a=10*R(5,9);t=100}}
    else if(L===7){a=10*R(1,9);t=100}else if(L===8){a=5*R(2,19);t=100}else if(L===9){a=R(51,95);t=100}else{a=R(11,95);t=100}
    ans=t-a;txt=`${a} + ? = ${t}`}
  else{ // doubles, moitiés, groupes, puis tables : du plus simple au plus difficile
@@ -619,8 +621,8 @@ const SENT={1:[['Le chat dort','🐱'],['Le chien court','🐶'],['La lune brill
 4:[['Le petit chat boit du lait','🐱'],['La fleur pousse dans le jardin','🌸'],['Le petit oiseau chante dans l’arbre','🐦'],['Maman prépare une bonne soupe chaude','🍲'],['Le gros camion roule sur la route','🚚'],['Paul range ses jouets dans sa chambre','🧸'],['La petite souris mange du fromage','🐭'],['Le chat dort sur le lit','🛏️'],['Tom joue au ballon avec Papa','⚽'],['La vache mange de l’herbe verte','🐄'],['Zoé fait un beau dessin bleu','🖍️'],['Le lapin se cache dans le jardin','🐰'],['Mamie tricote un pull pour Léa','🧶']],
 5:[['Où est le chat ?','🐱'],['Qui mange la pomme ?','🍎'],['Que fait le lapin ?','🐰'],['Quel beau soleil !','☀️'],['Le chien court vite !','🐶'],['Vive les vacances !','🏖️'],['Comment tu t’appelles ?','🙋'],['Quel temps fait-il ?','🌦️'],['Bravo, tu as gagné !','🏆'],['Où va le train ?','🚂'],['Joyeux anniversaire !','🎂'],['Où est mon livre ?','📖'],['Qui a pris le ballon ?','⚽'],['Que mange le lapin ?','🥕'],['Quelle belle fleur !','🌸'],['Attention au loup !','🐺']],
 6:[['Où est caché le petit chat ?','🐱'],['Qui a mangé tout le gâteau ?','🍰'],['Comme ce gâteau est bon !','🍰'],['Que fait Papa dans le jardin ?','🌳'],['Où va le gros camion rouge ?','🚚'],['Est-ce que tu viens jouer ?','🙋'],['Quel joli dessin tu as fait !','🖍️'],['Qui veut une part de tarte ?','🥧'],['Comment va ton petit chien ?','🐶'],['Regarde le bel oiseau bleu !','🐦'],['Où sont rangés mes jouets ?','🧸']]};
-/* paliers de phrases par niveau : 3 mots, 4 mots, 5 mots, 6-7 mots, questions, longues questions (les niveaux pairs mélangent deux paliers) */
-const PHP=L=>{const r=Math.random();return L<=1?1:L===2?(r<.6?1:2):L===3?2:L===4?(r<.6?2:3):L===5?3:L===6?(r<.5?3:4):L===7?4:L===8?(r<.5?4:5):L===9?(r<.5?5:6):6};
+/* paliers de phrases par niveau : 1 = 3 mots, 2 = 4 mots, 3 = 5 mots, 4 = 6-7 mots, 5 = questions courtes (dès le niveau 5), 6 = longues questions */
+const PHP=L=>{const r=Math.random();return L<=1?1:L===2?(r<.6?1:2):L===3?2:L===4?(r<.6?2:3):L===5?(r<.6?3:5):L===6?(r<.5?3:4):L===7?4:L===8?(r<.5?4:6):L===9?(r<.3?4:6):6};
 function genPhr(){const L=lv('phr'),[s,e]=pick(SENT[PHP(L)]);const ws=s.split(' ');if(!/[.?!]$/.test(s))ws[ws.length-1]+='.';let t;do{t=shuffle(ws.map((w,i)=>({w,i})))}while(t.every((x,i)=>x.i===i));return {nr:'Remets les étiquettes dans l’ordre.',once:true,nb:true,type:'phr',emo:e,ws,tiles:t,placed:[]}}
 function drawPhr(c,m){app.innerHTML=hdr(Q.n/Q.N,`${Q.n+1}/${Q.N}`)+`<div class="q" style="background:var(${m.c})"><div class="emo">${c.emo}</div><p>Remets les étiquettes dans l’ordre</p><div class="line">`+c.placed.map(i=>`<button class="tile" onclick="unplace(${i})">${c.ws[i]}</button>`).join('')+`</div></div><div class="pool">`+c.tiles.map(t=>`<button class="tile" ${c.placed.includes(t.i)?'disabled':''} onclick="place(${t.i})">${t.w}</button>`).join('')+`</div><div class="fb" id="fb" aria-live="polite"></div>`}
 const rp=()=>drawPhr(Q.cur,curM());
@@ -677,10 +679,10 @@ function genPb(){const L=lv('pb'),n=pick(HEROES),f=pick(NAMES),[it,em0]=pick(ITE
 /* suites */
 const EMS=['🍎','🐱','⭐','🌙','🚗','🎈','🐟','🌸','🐶','🍌'];
 const PT={1:[[0,1]],2:[[0,0,1],[0,1,1]],3:[[0,1,2],[0,0,1]],4:[[0,1,1],[0,0,1,1],[0,1,2]],5:[[0,1,0,2],[0,0,1,1],[0,1,2,1]],6:[[0,1,2,0,1,3],[0,0,1,0,0,2],[0,1,0,2,0,3]]};
-/* suites de nombres : [part de nombres, pas possibles, sens (1 monte, -1 descend, 0 les deux), départ] ; le reste du temps, des motifs en images */
-const SUN={3:[.5,[1],1,[1,15]],4:[.5,[1],1,[10,30]],5:[.5,[2],1,[0,10]],6:[.6,[5,10],1,[0,10]],7:[.75,[2,5,10],1,[1,30]],8:[1,[1,2],-1,[20,40]],9:[1,[3,5,10],0],10:[1,[3,4,6],0]};
+/* suites de nombres : [part de nombres, variantes [pas, sens (1 monte, -1 descend), départ mini, départ maxi, départ multiple du pas]] ; le reste du temps, des motifs en images */
+const SUN={3:[.5,[[1,1,1,15]]],4:[.5,[[1,1,10,30],[1,-1,10,20]]],5:[.5,[[2,1,0,10]]],6:[.6,[[5,1,0,4,1],[10,1,0,5,1]]],7:[.75,[[2,1,1,30],[2,-1,20,40]]],8:[1,[[5,1,1,30],[10,1,1,40],[5,-1,30,60],[10,-1,50,99]]],9:[1,[[3,1,0,20],[3,-1,20,50],[4,1,0,20]]],10:[1,[[4,-1,30,60],[6,1,0,30],[6,-1,40,70],[3,-1,30,60]]]};
 function genSui(){const L=lv('sui'),sn=SUN[L];
- if(sn&&Math.random()<sn[0]){const d=pick(sn[1]),up=sn[2]>0||(sn[2]===0&&Math.random()<.5),s0=sn[2]===0?(up?R(0,20):R(5*d,5*d+30)):R(sn[3][0],sn[3][1]);
+ if(sn&&Math.random()<sn[0]){const [d,dir,lo,hi,mult]=pick(sn[1]),up=dir>0,s0=mult?d*R(lo,hi):R(lo,hi);
   const seq=[0,1,2,3].map(i=>up?s0+i*d:s0-i*d),ans=up?s0+4*d:s0-4*d,s2=new Set([ans]);let g=0;
   while(s2.size<4&&g++<200){const x=ans+pick([-d,d,-1,1,2,-2]);if(x>=0)s2.add(x)}
   return {nb:true,nr:'Complète la suite.',once:true,q:`<div class="word" style="font-size:2.4rem">${seq.join(' , ')} , <span class="kv">?</span></div><p>Quel nombre vient ensuite ?</p>`,opts:shuffle([...s2]).map(x=>({h:x,ok:x===ans}))}}
