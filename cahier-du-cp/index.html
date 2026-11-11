@@ -76,6 +76,7 @@ h1{font-size:2rem;margin:.2em 0 0;line-height:1.2}
 .pgb{display:flex;gap:2px;width:100%}
 .pgb i{flex:1;height:7px;border-radius:3px;background:rgba(127,127,127,.3)}
 .pgb i.on{background:var(--ink,#2a3b5c)}
+.pgb i.half{background:linear-gradient(90deg,var(--ink,#2a3b5c) 50%,rgba(127,127,127,.3) 50%)}
 .card small{font-weight:400;font-size:.85rem}
 .back{border-radius:14px;background:var(--card);font-size:1.4rem;padding:6px 14px}
 .bar{flex:1;height:18px;border:3px solid var(--sh);border-radius:99px;background:var(--card);overflow:hidden}
@@ -154,6 +155,7 @@ textarea.inp{width:100%;min-height:90px;font-size:1rem;word-break:break-all;disp
 .txt{font-size:1.7rem;line-height:1.65;text-align:left;margin:0 0 10px}
 .qq{background:var(--card);border:3px solid var(--sh);border-radius:14px;padding:8px 12px;margin-top:10px;text-align:center}
 .qq small{display:block;opacity:.75;font-size:.9rem}.qq b{font-size:1.5rem;line-height:1.35;text-wrap:balance}
+.opt.pic{font-size:2.8rem}
 .opt.rd{font-size:1.5rem;font-weight:700;min-height:64px;padding:10px 12px;line-height:1.3}
 .sess{background:var(--card);border:3px solid var(--sh);border-radius:18px;padding:10px 14px;margin:0 0 14px;display:flex;align-items:center;gap:10px}
 .sess .bar{margin-top:4px}
@@ -306,7 +308,7 @@ document.addEventListener('pointerdown',()=>{if(window.__vu)return;window.__vu=1
 function setVoice(n){try{if(n)localStorage.setItem('cp-voice',n);else localStorage.removeItem('cp-voice')}catch(e){}loadVoice();testVoice()}
 function testVoice(){VERR='';say('Bonjour ! Je suis la voix de ton cahier.');setTimeout(()=>{const m=document.getElementById('vm'),n=(()=>{try{return speechSynthesis.getVoices().length}catch(e){return 0}})();if(m)m.textContent=!window.speechSynthesis?'Ce navigateur ne sait pas parler.':`Voix : ${VOICE?VOICE.name:'aucune voix française trouvée'} (${n} voix sur l’appareil)${VERR?' · erreur : '+VERR:''}`},900)}
 
-function prog(id){const n=lvS(id);return `<span class="pg"><span class="pgb" aria-hidden="true">${Array.from({length:MAXL(id)},(_,i)=>`<i${i<n?' class="on"':''}></i>`).join('')}</span></span>`}
+function prog(id){const n=lvS(id);return `<span class="pg"><span class="pgb" aria-hidden="true">${Array.from({length:MAXL(id)},(_,i)=>`<i${i<n?' class="on"':i===n&&LV[id+'_ok']?' class="half"':''}></i>`).join('')}</span></span>`}
 /* mini-jeux bonus */
 const BMODE=()=>D.set&&D.set.bonus==='direct'?'direct':'coffre';
 const BEFF=()=>DUR()?BMODE():'direct';
@@ -352,6 +354,14 @@ const WSIM=[
  [['rose','🌹'],['robe','👗'],['roi','👑'],['rat','🐀']],
  [['chien','🐶'],['cheval','🐴'],['chaise','🪑'],['chèvre','🐐']]];
 const TXA=[
+ [["Nina a un vélo bleu.","Elle roule dans le parc."],"Où roule Nina ?","Dans le parc",["Dans la rue","Dans la cour","Dans le jardin"]],
+ [["Le chat de Tom est gris.","Il dort sur le lit."],"Où dort le chat ?","Sur le lit",["Sur le tapis","Dans le jardin","Sous la table"]],
+ [["Mamie fait une tarte aux pommes.","Zoé met la table."],"Qui met la table ?","Zoé",["Mamie","Papa","Tom"]],
+ [["Il pleut ce matin.","Max prend son parapluie jaune."],"De quelle couleur est le parapluie ?","Jaune",["Rouge","Vert","Bleu"]],
+ [["Lola a trois poissons rouges.","Elle leur donne à manger le matin."],"Combien de poissons a Lola ?","Trois",["Deux","Quatre","Cinq"]],
+ [["Papa plante un arbre dans le jardin.","Théo arrose l’arbre."],"Que plante Papa ?","Un arbre",["Une fleur","Des tomates","Une salade"]],
+ [["La poule a pondu un œuf.","Léa le met dans le panier."],"Où Léa met-elle l’œuf ?","Dans le panier",["Dans le sac","Dans la boîte","Dans le bol"]],
+ [["Le bus arrive devant l’école.","Les enfants montent vite."],"Qui monte dans le bus ?","Les enfants",["Les parents","Les chats","Les maîtres"]],
  [["Tom a un chien noir.","Le chien court dans le jardin."],"De quelle couleur est le chien ?","Noir",["Blanc","Marron","Gris"]],
  [["Léa mange une pomme rouge.","Elle est très bonne."],"Que mange Léa ?","Une pomme",["Une poire","Un gâteau","Une banane"]],
  [["Papa prépare le repas.","Il fait une soupe chaude."],"Qui prépare le repas ?","Papa",["Maman","Tom","Mamie"]],
@@ -369,6 +379,12 @@ const TXA=[
  [["Ma sœur a un pull vert.","Il est trop grand pour elle."],"De quelle couleur est le pull ?","Vert",["Bleu","Rouge","Jaune"]],
  [["Ce soir, il fait nuit.","On voit la lune et des étoiles."],"Que voit-on dans le ciel ce soir ?","La lune et des étoiles",["Le soleil","Un arc-en-ciel","Un nuage noir"]]],
 TXB=[
+ [["C’est mercredi.","Tom va à la piscine avec Papi.","Il nage avec une bouée verte."],"Avec qui Tom va-t-il à la piscine ?","Avec Papi",["Avec Papa","Avec Mamie","Avec Max"]],
+ [["Zoé a perdu son doudou.","Elle cherche sous le lit et dans le salon.","Le doudou était dans la voiture."],"Où était le doudou ?","Dans la voiture",["Sous le lit","Dans le salon","Dans le jardin"]],
+ [["Ce soir, Maman prépare une soupe.","Léa coupe les carottes.","Max met quatre bols sur la table."],"Que coupe Léa ?","Les carottes",["Les tomates","Le pain","Les pommes"]],
+ [["Le petit lapin a faim.","Il sort de son terrier.","Il trouve une carotte dans le potager."],"Que trouve le lapin ?","Une carotte",["Une salade","Une pomme","Un chou"]],
+ [["Nina a dessiné une maison rouge.","Elle a ajouté un grand soleil jaune.","Elle donne son dessin à Mamie."],"À qui Nina donne-t-elle son dessin ?","À Mamie",["À Maman","À Papi","À Lola"]],
+ [["Il neige depuis ce matin.","Théo met son bonnet et ses gants.","Il fait un bonhomme de neige avec Lola."],"Que fait Théo avec Lola ?","Un bonhomme de neige",["Un gâteau","Une cabane","Un dessin"]],
  [["Le renard roux se cache dans la forêt.","Il guette une souris grise.","Soudain, il bondit !"],"De quelle couleur est le renard ?","Roux",["Gris","Blanc","Noir"]],
  [["Ce matin, Zoé se lève tôt.","Elle met son manteau et ses bottes.","Puis elle sort dans la neige."],"Où sort Zoé ?","Dans la neige",["Dans le jardin","Dans la cour","Au parc"]],
  [["Lucas veut faire un gâteau.","Il casse deux œufs et ajoute de la farine.","Maman met le gâteau au four."],"Qui met le gâteau au four ?","Maman",["Lucas","Papa","Mamie"]],
@@ -384,19 +400,29 @@ TXB=[
  [["Chloé a perdu son chapeau jaune.","Elle le cherche partout dans la maison.","Il était sous le canapé."],"Où était le chapeau de Chloé ?","Sous le canapé",["Sur le lit","Dans le jardin","Dans un sac"]],
  [["Le boulanger se lève très tôt.","Il fait cuire des baguettes et des croissants.","Les clients arrivent à sept heures."],"Que fait cuire le boulanger ?","Des baguettes et des croissants",["Des gâteaux et des bonbons","Des pizzas","Des biscuits"]]];
 function genTxt(L){
- const it=pick(L>=9&&Math.random()<(L>=10?.85:.6)?TXB:TXA),[ph,q,a,wr]=it,txt=ph.join(' ');
+ const it=pick(Math.random()<[0,.5,.8,1][Math.max(0,L-7)]?TXB:TXA),[ph,q,a,wr]=it,txt=ph.join(' ');
  return {nr:'Lis le texte et réponds à la question.',nb:true,rd:true,three:true,
   q:`<div class="txt script">${esc(txt)}</div><div class="qq"><b class="script">${esc(q)}</b></div>`,
   opts:shuffle([a,...wr]).map(o=>({h:esc(o),ok:o===a,f:'script rd'}))}}
+/* lis la phrase et trouve la bonne image (les images qui pourraient aussi convenir sont écartées) */
+function genLI(L){
+ const [s,e]=pick((L<=4?[1]:L===5?[1,2]:[2,3]).flatMap(k=>SENT[k])),stop=/^(le|la|les|l|un|une|du|des|de|au|a|est|dans|sur|son|ses|sa|en|avec|très|pour)$/,
+  key=x=>x.toLowerCase().replace(/[.?!]/g,'').split(/[ ’']/).map(w=>w.replace(/[sx]$/,'')).filter(w=>w&&!stop.test(w)),kw=key(s),
+  em=[...new Set(shuffle([1,2,3,4].flatMap(k=>SENT[k]).filter(x=>x[1]!==e&&!key(x[0]).some(w=>kw.includes(w)))).map(x=>x[1]))].slice(0,3);
+ return {nr:'Lis la phrase et trouve la bonne image.',once:true,nb:true,q:`<div class="txt script">${esc(s)}.</div><p>Quelle image va avec la phrase ?</p>`,opts:shuffle([e,...em]).map(o=>({h:o,ok:o===e,f:'pic'}))}}
+/* Lecture : 1-3 des mots, 4-6 des phrases (puis un premier texte), 7-10 des textes */
 function genLec(){
  const L=lv('lec');if(L>=7)return genTxt(L);
- const pool=wpool(L),sim=L>=7&&Math.random()<[.35,.5,.65,.8][L-7],g=sim?pick(WSIM):null,w=sim?pick(g):pick(pool),
-  listen=Math.random()<(sim?.6:L>=5?.45:.3)&&!!window.speechSynthesis;
+ const r=Math.random();
+ if(L===6&&r<.5)return genTxt(6);
+ if(L>=4&&r<(L===4?.4:L===5?.6:1))return genLI(L);
+ const pool=wpool(L),sim=L===5,g=sim?pick(WSIM):null,w=sim?pick(g):pick(pool),
+  listen=Math.random()<(L>=2?.4:.3)&&!!window.speechSynthesis;
  const sc=x=>(x[0][0]===w[0][0]?0:3)+Math.abs(x[0].length-w[0].length)+Math.random();
  let dis=shuffle(pool.filter(x=>x!==w));
- if(L>=6)dis=dis.map(x=>[sc(x),x]).sort((a,b)=>a[0]-b[0]).map(x=>x[1]);
+ if(L>=4)dis=dis.map(x=>[sc(x),x]).sort((a,b)=>a[0]-b[0]).map(x=>x[1]);
  if(sim)dis=[...shuffle(g.filter(x=>x!==w)),...dis.filter(x=>!g.some(y=>y[0]===x[0]))];
- dis=dis.slice(0,L>=5?3:2);
+ dis=dis.slice(0,L>=2?3:2);
  const opts=shuffle([w,...dis]).map(o=>({h:o[0],ok:o===w,f:'script'}));
  return {nr:listen?'Écoute le mot, puis touche-le.':'Trouve le mot qui correspond à l’image.',btn:w[0],nb:listen,sp:listen?['Écoute le mot, puis touche-le.',w[0]]:null,q:listen?`<button class="big" onclick="say('${w[0]}')" aria-label="Écouter">🔊</button><p>Écoute, puis trouve le mot</p>`:`<div class="emo">${w[1]}</div><p>Quel est ce mot ?</p>`,opts,say:listen?w[0]:null,hint:listen?w[1]:null,three:opts.length===3};
 }
@@ -405,14 +431,19 @@ const AZ=['azertyuiop','qsdfghjklm','wxcvbn'],ACC='éèêàâçîôù';
 const ECRLEN=L=>L<=2?[1,4]:L<=4?[1,5]:L<=6?[1,7]:L===7?[4,6]:L===8?[5,7]:L===9?[6,8]:[7,10];
 function genEcr(){
  const L=lv('ecr'),[lo,hi]=ECRLEN(L),pl=wpool(L).filter(x=>x[0].length>=lo&&x[0].length<=hi),r=Math.random();
- let mode=L<=2?(r<.5?'match':'copy'):L<=4?(r<.3?'match':r<.7?'copy':'pic'):L<=6?(r<.2?'match':r<.4?'copy':r<.8?'pic':'dic'):L<=8?(r<.1?'match':r<.2?'copy':r<.6?'pic':'dic'):(r<.05?'match':r<.5?'pic':'dic');
+ let mode=L<=2?(r<.5?'match':'copy'):L<=4?(r<.3?'match':r<.7?'copy':'pic'):L===5?(r<.2?'match':r<.4?'mem':r<.8?'pic':'dic'):L===6?(r<.15?'match':r<.3?'mem':r<.75?'pic':'dic'):L===7?(r<.3?'mem':r<.8?'pic':'dic'):L===8?(r<.15?'mem':r<.6?'pic':'dic'):(r<.05?'match':r<.5?'pic':'dic');
  if(mode==='dic'&&!window.speechSynthesis)mode='pic';
  if(mode==='match')return genEcrM();
- const [w,e]=pick(pl),cur=Math.random()<.6,kb=L>=7,ex=L<=2?2:L<=4?3:4,
+ const [w,e]=pick(pl),cur=Math.random()<.6,kb=L>=7,ex=L<=2?2:L<=4?3:L===5?4:6,
   bank=kb?null:shuffle([...w,...shuffle([...'abcdefghijlmnoprstuv'].filter(c=>!w.includes(c))).slice(0,ex)]).map(ch=>({ch,used:false}));
  const top=mode==='copy'?`<div class="emo">${e}</div><div class="word ${cur?'cursive':'script'}">${w}</div><p>Écris le mot</p>`:mode==='pic'?`<div class="emo">${e}</div><p>Regarde l’image et écris le mot</p>`:`<button class="big" onclick="say('${w}')" aria-label="Écouter">🔊</button>${L<=8?`<div class="emo" style="font-size:3.5rem">${e}</div>`:''}<p>Écoute le mot et écris-le</p>`;
- const nr=mode==='copy'?'Écris le mot.':mode==='pic'?'Regarde l’image et écris le mot.':'Écoute le mot et écris-le.';
- return {type:'txt',w,kb,bank,v:[...w].map(()=>null),top,nr,nb:mode!=='copy',btn:w,sp:mode==='dic'?[nr,w]:null}}
+ const nr=mode==='copy'?'Écris le mot.':mode==='mem'?'Regarde bien le mot, puis écris-le de mémoire.':mode==='pic'?'Regarde l’image et écris le mot.':'Écoute le mot et écris-le.';
+ const c={type:'txt',w,kb,bank,v:[...w].map(()=>null),top,nr,nb:mode==='pic'||mode==='dic',btn:w,sp:mode==='dic'?[nr,w]:null};
+ /* copie de mémoire : le mot s'affiche quelques secondes puis se cache */
+ if(mode==='mem'){c.mem=true;c.show=true;const A=`<div class="emo">${e}</div><div class="word ${cur?'cursive':'script'}">${w}</div><p>Regarde bien le mot…</p>`,B=`<div class="emo">${e}</div><button class="tile" onclick="peek()">👁️ Revoir le mot</button><p>Écris le mot de mémoire</p>`;Object.defineProperty(c,'top',{get(){return this.show?A:B}})}
+ return c}
+function memHide(c,ms){clearTimeout(c.mt);c.mt=setTimeout(()=>{if(!Q||Q.cur!==c)return;c.show=false;if(!Q.done&&!c.rev)drawTxt(c,curM())},ms)}
+function peek(){const c=Q&&Q.cur;if(!c||!c.mem||Q.done)return;c.show=true;drawTxt(c,curM());memHide(c,2000)}
 function drawTxt(c,m){const ek=c.rev?-1:emptySlot(c);const sl=[...c.w].map((x,i)=>`<span class="slot ${c.rev?'r':c.v[i]&&c.v[i].hint?'':c.v[i]&&c.v[i].lock?'lk':c.bad&&c.v[i]?'bad':''}${i===ek?' cur':''}">${c.rev?x:c.v[i]?c.v[i].ch:''}</span>`).join('');
  const keys=c.kb?AZ.map((r,k)=>`<div class="kr">${[...r].map(ch=>`<button class="kk" onclick="tk2('${ch}')">${ch}</button>`).join('')}${k===2?'<button class="kk del" onclick="tdel()" aria-label="Effacer">⌫</button>':''}</div>`).join('')+`<div class="kr">${[...ACC].map(ch=>`<button class="kk acc" onclick="tk2('${ch}')">${ch}</button>`).join('')}</div>`
   :`<div class="kr bank">${c.bank.map((b,i)=>`<button class="kk" ${b.used?'disabled':''} onclick="tk1(${i})">${b.ch}</button>`).join('')}<button class="kk del" onclick="tdel()" aria-label="Effacer">⌫</button></div>`;
@@ -473,19 +504,24 @@ function genMath(op,L,KL){L=L||1;
    if(L===9){x=R(30,99);y=R(10,x-1);return x%10>=y%10&&[x,y]}
    x=R(30,99);y=R(11,x-1);return x%10<y%10&&[x,y]})||[9,4];ans=a-b;txt=`${a} − ${b}`}
  else if(op==='cmp'){cm=true;
-   if(L<=1){a=R(5,9);t=10}else if(L<=3){a=R(1,9);t=10}
-   else if(L===4){a=R(11,19);t=20}else if(L===5){a=R(1,19);t=20}
-   else if(L<=7){a=gl(()=>{const x=L===6?R(21,59):R(21,89);return x%10>0&&x})||23;t=a+10-a%10}
-   else if(L===8){a=10*R(1,9);t=100}else if(L===9){a=5*R(2,19);t=100}else{a=R(11,95);t=100}
+   if(L<=1){a=R(5,9);t=10}else if(L===2){a=R(1,9);t=10}
+   else if(L===3){a=R(11,19);t=20}else if(L===4){a=R(1,19);t=20}
+   else if(L<=6){a=gl(()=>{const x=L===5?R(21,59):R(21,89);return x%10>0&&x})||23;t=a+10-a%10}
+   else if(L===7){a=10*R(1,9);t=100}else if(L===8){a=5*R(2,19);t=100}else if(L===9){a=R(51,95);t=100}else{a=R(11,95);t=100}
    ans=t-a;txt=`${a} + ? = ${t}`}
- else{ // doubles, moitiés, puis tables
-   if(L<=1){const n=R(1,5);txt=`Le double de ${n}`;ans=2*n}
-   else if(L===2){if(Math.random()<.5){const n=R(3,10);txt=`Le double de ${n}`;ans=2*n}else{const n=2*R(1,5);txt=`La moitié de ${n}`;ans=n/2}}
-   else if(L===3){if(Math.random()<.5){const n=R(5,10);txt=`Le double de ${n}`;ans=2*n}else{const n=2*R(2,10);txt=`La moitié de ${n}`;ans=n/2}}
-   else if(L===4){if(Math.random()<.5){const n=10*R(1,5);txt=`Le double de ${n}`;ans=2*n}else{const n=2*R(3,10);txt=`La moitié de ${n}`;ans=n/2}}
-   else if(L===5){if(Math.random()<.5){const n=R(11,25);txt=`Le double de ${n}`;ans=2*n}else{const n=2*R(5,25);txt=`La moitié de ${n}`;ans=n/2}}
-   else if(L===6){[a,b]=gl(()=>{const g=R(2,5),e=pick([2,3,5,10]);return g*e<=30&&[g,e]})||[2,5];txt=`${a} groupes de ${b}`;ans=a*b}
-   else{const A=L===7?[2,5,10]:L===8?[2,5,10]:L===9?[2,3,4,5,10]:[2,3,4,5,10];a=pick(A);b=L===7?R(1,5):R(1,10);if(L>=9&&a<=5&&Math.random()<.5)a=pick([3,4]);txt=`${a} × ${b}`;ans=a*b}
+ else{ // doubles, moitiés, groupes, puis tables : du plus simple au plus difficile
+   const h=Math.random()<.5,dbl=(lo,hi,m=1)=>{const n=m*R(lo,hi);txt=`Le double de ${n}`;ans=2*n},hlf=(lo,hi)=>{const n=2*R(lo,hi);txt=`La moitié de ${n}`;ans=n/2},
+    grp=()=>{[a,b]=gl(()=>{const g=R(2,5),e=pick([2,3,5,10]);return g*e<=30&&[g,e]})||[2,5];txt=`${a} groupes de ${b}`;ans=a*b},
+    tab=(A,mx)=>{a=pick(A);b=R(1,mx);txt=`${a} × ${b}`;ans=a*b};
+   if(L<=1)dbl(1,5);else if(L===2)dbl(1,10);
+   else if(L===3)h?dbl(3,10):hlf(1,5);
+   else if(L===4)h?dbl(5,10):hlf(2,10);
+   else if(L===5)h?grp():dbl(1,5,10);
+   else if(L===6)h?tab([2,5,10],5):grp();
+   else if(L===7)tab([2,5,10],10);
+   else if(L===8)h?dbl(11,25):hlf(5,25);
+   else if(L===9)tab([3,4,3,4,2,5,10],10);
+   else{const r=Math.random();r<.4?tab([3,4,5],10):r<.7?dbl(26,49):hlf(26,49)}
  }
  const s2=new Set([ans]);let g=0;
  while(s2.size<4&&g++<200){const d=ans+pick([-10,-3,-2,-1,1,2,3,10]);if(d>=0)s2.add(d)}
@@ -507,7 +543,7 @@ function start(id){if(STARTERS[id])return STARTERS[id]();Q={id,n:0,score:0,N:10,
 /* Lecture, Écriture et Mots à compléter : un même mot ne revient qu'une fois par série, quelle que soit la forme de la question */
 const WKEY=['lec','ecr','pho'],dedup=c=>c&&WKEY.includes(Q.id)&&c.btn&&!c.rd?'mot:'+c.btn:sigQ(c);
 const sigQ=c=>c?[c.q,c.ws&&c.ws.join(' '),c.say,c.btn,c.nr,(c.opts||[]).filter(o=>o.ok).map(o=>o.h||o.t||o.v||'').join()].join('|'):'';
-function next(){if(Q.cur&&!Q.cur.easy)Q.ms+=Q.score-Q.s0;if(Q.n>=Q.N)return end();Q.seen=Q.seen||new Set();let c,sg,k=0;const easy=!!(Q.plan&&Q.plan[Q.n]),keep=PLAY[Q.id];if(easy)PLAY[Q.id]=Q.easyL;try{do{c=gen(Q.id);sg=dedup(c);k++}while(Q.seen.has(sg)&&k<60)}finally{if(easy){if(keep===undefined)delete PLAY[Q.id];else PLAY[Q.id]=keep}}Q.seen.add(sg);c.easy=easy;Q.s0=Q.score;Q.cur=c;Q.tries=0;Q.done=false;Q.hinted=false;draw();setTimeout(()=>{if(!(NAR()&&Q&&Q.cur&&!Q.done))return;const c=Q.cur,t=Q.n===0||!(c.once||c.sh)?(c.sp||c.nr):c.sh;if(t)say(t,c.rate)},350)}
+function next(){if(Q.cur&&!Q.cur.easy)Q.ms+=Q.score-Q.s0;if(Q.n>=Q.N)return end();Q.seen=Q.seen||new Set();let c,sg,k=0;const easy=!!(Q.plan&&Q.plan[Q.n]),keep=PLAY[Q.id];if(easy)PLAY[Q.id]=Q.easyL;try{do{c=gen(Q.id);sg=dedup(c);k++}while(Q.seen.has(sg)&&k<60)}finally{if(easy){if(keep===undefined)delete PLAY[Q.id];else PLAY[Q.id]=keep}}Q.seen.add(sg);c.easy=easy;Q.s0=Q.score;Q.cur=c;Q.tries=0;Q.done=false;Q.hinted=false;draw();if(c.mem)memHide(c,3500);setTimeout(()=>{if(!(NAR()&&Q&&Q.cur&&!Q.done))return;const c=Q.cur,t=Q.n===0||!(c.once||c.sh)?(c.sp||c.nr):c.sh;if(t)say(t,c.rate)},350)}
 function draw(){
  const c=Q.cur,m=MENU.find(x=>x.id===Q.id);if(c.type==='phr')return drawPhr(c,m);if(c.type==='txt')return drawTxt(c,m);if(c.key)return drawKey(c,m);
  app.innerHTML=`<div class="top"><button class="back" onclick="menu()" aria-label="Retour">←</button><div class="bar"><i style="width:${Q.n/Q.N*100}%"></i></div><span class="stars">${Q.n+1}/${Q.N}</span></div>
@@ -535,9 +571,12 @@ function end(){
  if(defi||pl>=8)st=Math.max(st,2);
  stars+=st;let nl=sv;
  const mN=Q.plan?Q.plan.filter(x=>!x).length:Q.N,ms=Q.plan?Q.ms:sc;
- if(ms>=mN-1){if(pl>=sv)nl=Math.min(mx,pl+1)}else if(ms<=Math.floor(.4*mN)){if(pl===sv)nl=Math.max(1,sv-1)}
+ /* il faut deux séries réussies à son niveau pour monter ; réussir un niveau plus haut le valide tout de suite */
+ const okk=id+'_ok';let half=false;
+ if(ms>=mN-1){if(pl>sv){nl=pl;delete LV[okk]}else if(pl===sv&&sv<mx){if(LV[okk]){nl=sv+1;delete LV[okk]}else{LV[okk]=1;half=true}}}
+ else if(ms<=Math.floor(.4*mN)){if(pl===sv){nl=Math.max(1,sv-1);delete LV[okk]}}
  LV[id]=nl;if(pl===sv)PLAY[id]=nl;persist();
- const msg=nl>sv?'⬆️ Niveau supérieur !':nl<sv?'On s’entraîne encore un peu 🌱':pl<sv?'Bravo pour ce rappel ! Ton niveau reste le même.':pl>sv?'Tu as essayé un niveau plus haut : bravo ! Ton niveau reste le même.':'Même niveau, continue !';
+ const msg=nl>sv?'⬆️ Niveau supérieur !':half?'👍 Série réussie ! Encore une et tu montes de niveau.':nl<sv?'On s’entraîne encore un peu 🌱':pl<sv?'Bravo pour ce rappel ! Ton niveau reste le même.':pl>sv?'Tu as essayé un niveau plus haut : bravo ! Ton niveau reste le même.':'Même niveau, continue !';
  app.innerHTML=`<div class="end"><h1>${sc>=9?'Champion !':sc>=6?'Très bien !':defi||pl>=8?'Bravo, tu as relevé un défi !':'Bravo, tu as bien travaillé !'}</h1>
  <div class="s">${'⭐'.repeat(st)}</div><p class="sub">${GAMES.includes(id)?`Score : ${sc} sur ${Q.N}`:`${sc} bonnes réponses du premier coup sur ${Q.N}`}</p><p class="sub">${msg} (niveau ${nl}/${mx})</p>${sc<6?`<p class="sub">${defi||pl>=8?'Ce niveau est difficile, c’est normal de se tromper. Tu y arriveras bientôt ! 💪':'Chaque essai te fait progresser. 💪'}</p>`:''}
  ${DUR()&&SS&&LEFT()<=0?'<p class="sub">⏰ Le temps de jeu est terminé. À bientôt !</p>':`<button class="again" onclick="start('${id}')">🔁 Rejouer</button><button class="again" onclick="lvl('${id}')">🎚️ Niveau</button>`}<button class="again" onclick="menu()">🏠 Menu</button></div>`;
@@ -557,24 +596,32 @@ function key(k){if(Q.done)return;const c=Q.cur.key;
  rk()}
 /* mots à compléter */
 const DG=['ou','on','an','in','ch','oi','ai','au','eu','gn','ui','ei','ph','qu','en','eau','ill','ain','oin','ion','ail','eil'];
-function genPho(){const L=lv('pho'),w=pick(wpool(L)),t=w[0];let p,k;
+function genPho(){const L=lv('pho'),w=pick(wpool(L)),t=w[0];let p,k,d3=null;
  const dgs=DG.filter(d=>t.includes(d)).sort((a,b)=>b.length-a.length);
- if(L>=5&&dgs.length&&(L>=7||Math.random()<.6)){k=dgs[0].length;p=t.indexOf(dgs[0])}
+ /* 9-10 : le son et une lettre voisine manquent ; 6-8 : le son ; 5 : le son ou deux lettres */
+ if(L>=9&&dgs.length&&t.length>=dgs[0].length+2){d3=dgs[0];const i=t.indexOf(d3);k=d3.length+1;p=Math.max(0,Math.min(i,t.length-k))}
+ else if(L>=5&&dgs.length&&(L>=6||Math.random()<.6)){k=dgs[0].length;p=t.indexOf(dgs[0])}
  else if(L>=5){k=2;p=rnd(t.length-1)}
  else{k=1;const idx=[...t].map((c,i)=>i);p=pick(L<=2?idx.filter(i=>/[aeiouéèêâ]/.test(t[i])):idx)}
  const miss=t.slice(p,p+k),s2=new Set([miss]);let g=0;
  const isDG=DG.includes(miss),pl=isDG?DG.filter(d=>d.length===k&&d!==miss):null,V='aeiouéè',C='lrstmnpcdbvfgj',vow=k===1&&/[aeiouéèêâ]/.test(miss);
- while(s2.size<4&&g++<300){
-  if(isDG&&pl.length)s2.add(pick(pl));
+ const NO=L===8||L===10?5:4;
+ while(s2.size<NO&&g++<300){
+  if(d3)s2.add(miss.replace(d3,pick(DG.filter(x=>x.length===d3.length&&x!==d3))));
+  else if(isDG&&pl.length)s2.add(pick(pl));
   else if(k===1)s2.add(pick([...(vow?V:C)]));
   else s2.add(Math.random()<.5?pick([...C+V])+miss.slice(1):miss.slice(0,-1)+pick([...C+V]))}
  return {nr:`Trouve ${k>1?'les lettres manquantes':'la lettre manquante'} pour former le mot ${t}.`,sh:t,btn:t,q:`<div class="emo">${w[1]}</div><div class="word script">${t.slice(0,p)}<span class="blank">${miss}</span>${t.slice(p+k)}</div><p>${k>1?'Quelles lettres manquent ?':'Quelle lettre manque ?'}</p>`,opts:shuffle([...s2]).map(x=>({h:x,ok:x===miss,f:'script'}))}}
 /* phrases */
-const SENT={1:[['Le chat dort','🐱'],['Le chien court','🐶'],['La lune brille','🌙'],['Le soleil brille','☀️'],['Le bateau flotte','⛵'],['Le lion rugit','🦁'],['La vache mange','🐄'],['Le cheval galope','🐴'],['La poule pond','🐔'],['Le singe saute','🐵'],['Le vent souffle','💨']],
-2:[['Papa lit un livre','📖'],['Maman mange une pomme','🍎'],['Léa fait du vélo','🚲'],['Le poisson nage vite','🐟'],['Maman fait un gâteau','🍰'],['Papa lave la voiture','🚗'],['Le chat boit du lait','🥛'],['Paul joue au ballon','⚽'],['Le bébé dort bien','👶'],['Lola lit un livre','📚'],['Le chien mange un os','🦴']],
-3:[['Le lapin mange une banane','🐰'],['Léa mange une grosse glace','🍦'],['Le petit chat boit du lait','🐱'],['Papa roule en voiture rouge','🚗'],['La fleur pousse dans le jardin','🌸'],['Le petit oiseau chante dans l’arbre','🐦'],['Maman prépare une bonne soupe chaude','🍲'],['Le gros camion roule sur la route','🚚'],['Paul range ses jouets dans sa chambre','🧸'],['La petite souris mange du fromage','🐭']],
-4:[['Où est le chat ?','🐱'],['Qui mange la pomme ?','🍎'],['Que fait le lapin ?','🐰'],['Quel beau soleil !','☀️'],['Le chien court vite !','🐶'],['Vive les vacances !','🏖️'],['Comment tu t’appelles ?','🙋'],['Quel temps fait-il ?','🌦️'],['Bravo, tu as gagné !','🏆'],['Où va le train ?','🚂'],['Joyeux anniversaire !','🎂']]};
-function genPhr(){const L=lv('phr'),[s,e]=pick(SENT[L<=2?1:L<=4?2:L<=7?3:4]);const ws=s.split(' ');if(!/[.?!]$/.test(s))ws[ws.length-1]+='.';let t;do{t=shuffle(ws.map((w,i)=>({w,i})))}while(t.every((x,i)=>x.i===i));return {nr:'Remets les étiquettes dans l’ordre.',once:true,nb:true,type:'phr',emo:e,ws,tiles:t,placed:[]}}
+const SENT={1:[['Le chat dort','🐱'],['Le chien court','🐶'],['La lune brille','🌙'],['Le soleil brille','☀️'],['Le bateau flotte','⛵'],['Le lion rugit','🦁'],['La vache mange','🐄'],['Le cheval galope','🐴'],['La poule pond','🐔'],['Le singe saute','🐵'],['Le vent souffle','💨'],['Le lapin saute','🐰'],['La fée danse','🧚'],['Le loup hurle','🐺'],['Le bébé pleure','👶'],['La pluie tombe','🌧️'],['Le train roule','🚂'],['Le coq chante','🐓'],['La fleur pousse','🌸']],
+2:[['Papa lit un livre','📖'],['Maman mange une pomme','🍎'],['Léa fait du vélo','🚲'],['Le poisson nage vite','🐟'],['Maman fait un gâteau','🍰'],['Papa lave la voiture','🚗'],['Le chat boit du lait','🥛'],['Paul joue au ballon','⚽'],['Le bébé dort bien','👶'],['Lola lit un livre','📚'],['Le chien mange un os','🦴'],['Tom joue du piano','🎹'],['Le lion a faim','🦁'],['Mamie fait une tarte','🥧'],['Le lapin court vite','🐰'],['Papi lit le journal','📰'],['Max prend le bus','🚌'],['Nina a un vélo','🚲'],['La poule a froid','🐔']],
+3:[['Le lapin mange une banane','🐰'],['Léa mange une grosse glace','🍦'],['Papa roule en voiture rouge','🚗'],['Le chien joue avec Tom','🐶'],['Maman achète du pain chaud','🥖'],['Le bébé boit son biberon','🍼'],['Lola range son petit sac','🎒'],['Le soleil brille très fort','☀️'],['Papi arrose les belles fleurs','🌷'],['Nina lit une belle histoire','📖'],['Le poisson nage dans l’eau','🐟']],
+4:[['Le petit chat boit du lait','🐱'],['La fleur pousse dans le jardin','🌸'],['Le petit oiseau chante dans l’arbre','🐦'],['Maman prépare une bonne soupe chaude','🍲'],['Le gros camion roule sur la route','🚚'],['Paul range ses jouets dans sa chambre','🧸'],['La petite souris mange du fromage','🐭'],['Le chat dort sur le lit','🛏️'],['Tom joue au ballon avec Papa','⚽'],['La vache mange de l’herbe verte','🐄'],['Zoé fait un beau dessin bleu','🖍️'],['Le lapin se cache dans le jardin','🐰'],['Mamie tricote un pull pour Léa','🧶']],
+5:[['Où est le chat ?','🐱'],['Qui mange la pomme ?','🍎'],['Que fait le lapin ?','🐰'],['Quel beau soleil !','☀️'],['Le chien court vite !','🐶'],['Vive les vacances !','🏖️'],['Comment tu t’appelles ?','🙋'],['Quel temps fait-il ?','🌦️'],['Bravo, tu as gagné !','🏆'],['Où va le train ?','🚂'],['Joyeux anniversaire !','🎂'],['Où est mon livre ?','📖'],['Qui a pris le ballon ?','⚽'],['Que mange le lapin ?','🥕'],['Quelle belle fleur !','🌸'],['Attention au loup !','🐺']],
+6:[['Où est caché le petit chat ?','🐱'],['Qui a mangé tout le gâteau ?','🍰'],['Comme ce gâteau est bon !','🍰'],['Que fait Papa dans le jardin ?','🌳'],['Où va le gros camion rouge ?','🚚'],['Est-ce que tu viens jouer ?','🙋'],['Quel joli dessin tu as fait !','🖍️'],['Qui veut une part de tarte ?','🥧'],['Comment va ton petit chien ?','🐶'],['Regarde le bel oiseau bleu !','🐦'],['Où sont rangés mes jouets ?','🧸']]};
+/* paliers de phrases par niveau : 3 mots, 4 mots, 5 mots, 6-7 mots, questions, longues questions (les niveaux pairs mélangent deux paliers) */
+const PHP=L=>{const r=Math.random();return L<=1?1:L===2?(r<.6?1:2):L===3?2:L===4?(r<.6?2:3):L===5?3:L===6?(r<.5?3:4):L===7?4:L===8?(r<.5?4:5):L===9?(r<.5?5:6):6};
+function genPhr(){const L=lv('phr'),[s,e]=pick(SENT[PHP(L)]);const ws=s.split(' ');if(!/[.?!]$/.test(s))ws[ws.length-1]+='.';let t;do{t=shuffle(ws.map((w,i)=>({w,i})))}while(t.every((x,i)=>x.i===i));return {nr:'Remets les étiquettes dans l’ordre.',once:true,nb:true,type:'phr',emo:e,ws,tiles:t,placed:[]}}
 function drawPhr(c,m){app.innerHTML=hdr(Q.n/Q.N,`${Q.n+1}/${Q.N}`)+`<div class="q" style="background:var(${m.c})"><div class="emo">${c.emo}</div><p>Remets les étiquettes dans l’ordre</p><div class="line">`+c.placed.map(i=>`<button class="tile" onclick="unplace(${i})">${c.ws[i]}</button>`).join('')+`</div></div><div class="pool">`+c.tiles.map(t=>`<button class="tile" ${c.placed.includes(t.i)?'disabled':''} onclick="place(${t.i})">${t.w}</button>`).join('')+`</div><div class="fb" id="fb" aria-live="polite"></div>`}
 const rp=()=>drawPhr(Q.cur,curM());
 function place(i){const c=Q.cur;if(Q.done||c.placed.includes(i))return;c.placed.push(i);if(/[A-Za-zÀ-ÿ]/.test(c.ws[i]))say(c.ws[i].replace('.',''));rp();if(c.placed.length<c.ws.length)return;Q.done=true;
@@ -606,15 +653,15 @@ function newP(){const n=document.getElementById('nm').value.trim().slice(0,16);i
 }catch(e){}})();
 /* choix du niveau */
 function lvl(id){PLAY={};const m=MENU.find(x=>x.id===id),c=lvS(id);if(NAR())say(m.t);
- app.innerHTML=hdr(0,'⭐ '+stars)+`<h1>${m.t}</h1><button class="card" style="background:var(--c3);width:100%;margin-top:10px" onclick="setL('${id}',${c})"><span class="e">▶️</span>Jouer au niveau ${c}<small>Le niveau monte quand tu réussis !</small></button><p class="sub" style="margin-top:22px">Ou choisis un autre niveau :</p><div class="lvgrid">`+[...Array(MAXL(id))].map((_,i)=>`<button class="lvb t${i<3?1:i<7?2:3} ${i+1===c?'on':''}" onclick="setL('${id}',${i+1})">${i+1}</button>`).join('')+`</div><p class="sub" style="margin-top:18px">Tu peux reprendre un niveau plus facile quand tu veux.</p>`}
+ app.innerHTML=hdr(0,'⭐ '+stars)+`<h1>${m.t}</h1><button class="card" style="background:var(--c3);width:100%;margin-top:10px" onclick="setL('${id}',${c})"><span class="e">▶️</span>Jouer au niveau ${c}<small>${c>=MAXL(id)?'Tu es au dernier niveau, bravo !':LV[id+'_ok']?'Encore 1 série réussie pour monter !':'Réussis 2 séries pour monter de niveau !'}</small></button><p class="sub" style="margin-top:22px">Ou choisis un autre niveau :</p><div class="lvgrid">`+[...Array(MAXL(id))].map((_,i)=>`<button class="lvb t${i<3?1:i<7?2:3} ${i+1===c?'on':''}" onclick="setL('${id}',${i+1})">${i+1}</button>`).join('')+`</div><p class="sub" style="margin-top:18px">Tu peux reprendre un niveau plus facile quand tu veux.</p>`}
 function setL(id,n){PLAY[id]=n;start(id)}
 /* problèmes */
 const HEROES=['Léa','Tom','Lola','Théo','Zoé','Nina'],NAMES=['Maman','Papa','Mamie','Papi','Lucie','Max'],ITEMS=[['pommes','🍎'],['billes','🔵'],['bonbons','🍬'],['crayons','✏️'],['fleurs','🌸'],['gâteaux','🍰'],['ballons','🎈']],BUY=[['une pomme','🍎'],['un gâteau','🍰'],['une glace','🍦'],['un livre','📖'],['un ballon','🎈']];
 const SING={pommes:'pomme',billes:'bille',bonbons:'bonbon',crayons:'crayon',fleurs:'fleur',gâteaux:'gâteau',ballons:'ballon'},cn=(k,it)=>k>1?it:SING[it];
 function genPb(){const L=lv('pb'),n=pick(HEROES),f=pick(NAMES),[it,em0]=pick(ITEMS),MX=[5,9,12,19,20,25,30,40,60,99][L-1];
- const T=pick(L<=4?['s','a']:L<=6?['s','a','m','p']:L<=8?['s','a','m','x','p']:['s','a','m','x','t','d','p']);let t,ans,em=em0,pk=null;
- if(T==='s'){const a=R(Math.max(3,Math.floor(MX/2)),MX),b=R(1,Math.min(a-1,Math.max(2,Math.floor(MX/2))));ans=a-b;t=`${n} a ${a} ${cn(a,it)}. ${n} en donne ${b} à ${f}. Combien de ${it} reste-t-il à ${n} ?`}
- else if(T==='a'){const a=R(1,Math.max(1,Math.floor(MX/2))),b=R(1,Math.max(1,MX-a));ans=a+b;t=`${n} a ${a} ${cn(a,it)}. ${f} donne ${b} ${cn(b,it)} de plus à ${n}. Combien de ${it} y a-t-il en tout ?`}
+ const T=pick(L<=4?['s','a']:L<=6?['s','a','m','p']:L<=8?['s','a','m','x','p']:['s','a','m','x','t','d','p']);let t,ans,em=em0,pk=null,pic='';
+ if(T==='s'){const a=R(Math.max(3,Math.floor(MX/2)),MX),b=R(1,Math.min(a-1,Math.max(2,Math.floor(MX/2))));ans=a-b;t=`${n} a ${a} ${cn(a,it)}. ${n} en donne ${b} à ${f}. Combien de ${it} reste-t-il à ${n} ?`;if(L<=3)pic=`<div class="word cnt" style="font-size:1.7rem;line-height:1.3">${em0.repeat(a-b)}<span style="opacity:.3">${em0.repeat(b)}</span></div>`}
+ else if(T==='a'){const a=R(1,Math.max(1,Math.floor(MX/2))),b=R(1,Math.max(1,MX-a));ans=a+b;t=`${n} a ${a} ${cn(a,it)}. ${f} donne ${b} ${cn(b,it)} de plus à ${n}. Combien de ${it} y a-t-il en tout ?`;if(L<=3)pic=`<div class="word cnt" style="font-size:1.7rem;line-height:1.3">${em0.repeat(a)} ➕ ${em0.repeat(b)}</div>`}
  else if(T==='m'){const [o,e]=pick(BUY),d=pick(L<=6?[5,10]:L<=8?[10,20]:[10,20,50]),c=R(1,d-1);em=e;ans=d-c;t=`${n} achète ${o} qui coûte ${c} euro${c>1?'s':''}. ${n} donne ${d} euros à la marchande. Combien d’euros la marchande rend-elle ?`}
  else if(T==='x'){const [m,k]=gl(()=>{const m=R(2,5),k=pick([2,3,5,10]);return m*k<=30&&[m,k]});ans=m*k;t=`Il y a ${m} boîtes. Dans chaque boîte, il y a ${k} ${cn(k,it)}. Combien de ${it} y a-t-il en tout ?`}
  else if(T==='p'){let gb=10,pb=1,ng,np;
@@ -624,19 +671,20 @@ function genPb(){const L=lv('pb'),n=pick(HEROES),f=pick(NAMES),[it,em0]=pick(ITE
   pk=`<div class="word cnt" style="line-height:1.4"><span style="font-size:2rem">${'📦'.repeat(ng)}</span> <span class="pbox" style="font-size:1rem">${'📦'.repeat(np)}</span></div><p><span style="font-size:1.5rem">📦</span> = ${gb} € · <span class="pbox" style="font-size:.9rem">📦</span> = ${pb} €</p><p>Combien coûte tout le lot ?</p>`}
  else if(T==='t'){const g=pick(NAMES.filter(x=>x!==f)),a=R(12,Math.min(MX,60)),b=R(2,Math.floor(a/3)),c=R(2,Math.floor(a/3));ans=a-b-c;t=`${n} a ${a} ${it}. ${n} en donne ${b} à ${f}, puis ${c} à ${g}. Combien de ${it} reste-t-il à ${n} ?`}
  else{const [g,e]=gl(()=>{const g=R(2,5),e=R(2,6);return g*e<=30&&[g,e]});ans=e;t=`${g*e} ${it} sont partagés équitablement entre ${g} enfants. Combien de ${it} chaque enfant reçoit-il ?`}
- const h=pk?pk+'<button class="tile" onclick="say(Q.cur.sp,.78)">🔊 Écouter</button>':`<div class="emo" style="font-size:3rem">${em}</div><p class="ptxt">${t}</p><button class="tile" onclick="say(Q.cur.sp,.78)">🔊 Écouter</button>`;
+ const h=pk?pk+'<button class="tile" onclick="say(Q.cur.sp,.78)">🔊 Écouter</button>':`<div class="emo" style="font-size:3rem">${em}</div><p class="ptxt">${t}</p>${pic}<button class="tile" onclick="say(Q.cur.sp,.78)">🔊 Écouter</button>`;
  const sp=[...(pk?[]:['Écoute bien l’histoire.']),...t.split(/(?<=[.?])\s+/)];
  return {nr:t,sp,rate:.78,nb:true,q:h,opts:near(ans),say:t,key:L>=4?{html:h,ans,v:''}:null}}
 /* suites */
 const EMS=['🍎','🐱','⭐','🌙','🚗','🎈','🐟','🌸','🐶','🍌'];
 const PT={1:[[0,1]],2:[[0,0,1],[0,1,1]],3:[[0,1,2],[0,0,1]],4:[[0,1,1],[0,0,1,1],[0,1,2]],5:[[0,1,0,2],[0,0,1,1],[0,1,2,1]],6:[[0,1,2,0,1,3],[0,0,1,0,0,2],[0,1,0,2,0,3]]};
-function genSui(){const L=lv('sui');
- if(L>=7){let d,s0,up=true;
-  if(L===7){d=1;s0=R(1,15)}else if(L===8){d=pick([2,5,10]);s0=R(0,10)}else if(L===9){d=pick([1,2,5,10]);up=false;s0=R(40,60)}else{d=pick([2,3,4,5,10]);up=Math.random()<.6;s0=up?R(0,20):R(40,70)}
+/* suites de nombres : [part de nombres, pas possibles, sens (1 monte, -1 descend, 0 les deux), départ] ; le reste du temps, des motifs en images */
+const SUN={3:[.5,[1],1,[1,15]],4:[.5,[1],1,[10,30]],5:[.5,[2],1,[0,10]],6:[.6,[5,10],1,[0,10]],7:[.75,[2,5,10],1,[1,30]],8:[1,[1,2],-1,[20,40]],9:[1,[3,5,10],0],10:[1,[3,4,6],0]};
+function genSui(){const L=lv('sui'),sn=SUN[L];
+ if(sn&&Math.random()<sn[0]){const d=pick(sn[1]),up=sn[2]>0||(sn[2]===0&&Math.random()<.5),s0=sn[2]===0?(up?R(0,20):R(5*d,5*d+30)):R(sn[3][0],sn[3][1]);
   const seq=[0,1,2,3].map(i=>up?s0+i*d:s0-i*d),ans=up?s0+4*d:s0-4*d,s2=new Set([ans]);let g=0;
   while(s2.size<4&&g++<200){const x=ans+pick([-d,d,-1,1,2,-2]);if(x>=0)s2.add(x)}
   return {nb:true,nr:'Complète la suite.',once:true,q:`<div class="word" style="font-size:2.4rem">${seq.join(' , ')} , <span class="kv">?</span></div><p>Quel nombre vient ensuite ?</p>`,opts:shuffle([...s2]).map(x=>({h:x,ok:x===ans}))}}
- const S=shuffle(EMS).slice(0,4),U=pick(PT[L]),len=Math.min(10,U.length*2+rnd(U.length)),sh=Array.from({length:len},(_,i)=>S[U[i%U.length]]),ans=S[U[len%U.length]],pool=[...new Set(U.map(i=>S[i]))];
+ const S=shuffle(EMS).slice(0,4),U=pick(PT[Math.min(6,L)]),len=Math.min(10,U.length*2+rnd(U.length)),sh=Array.from({length:len},(_,i)=>S[U[i%U.length]]),ans=S[U[len%U.length]],pool=[...new Set(U.map(i=>S[i]))];
  while(pool.length<(L<=2?3:4))pool.push(pick(EMS.filter(e=>!pool.includes(e))));
  return {nb:true,nr:'Complète la suite.',once:true,q:`<div class="word" style="font-size:2.2rem;line-height:1.5">${sh.join(' ')} <span class="kv">❓</span></div><p>Que vient ensuite ?</p>`,opts:shuffle(pool).map(x=>({h:x,ok:x===ans}))}}
 /* morpion */
@@ -673,12 +721,15 @@ function drawAst(){app.innerHTML=hdr(0,bLabel('Étoiles'))+`<div class="q" style
 /* intrus */
 const GR={fruits:['🍎','🍌','🍇','🍓','🍊','🍒'],legumes:['🥕','🌽','🥦','🥔','🧅'],ferme:['🐄','🐷','🐔','🐑','🐴'],sauvages:['🦁','🐘','🦒','🐯','🐒'],mer:['🐟','🐙','🐬','🦀','🐳'],vehicules:['🚗','🚌','🚲','🚂','🚑'],vetements:['👕','👖','🧦','🧢','👗']};
 function genInt(){const L=lv('int'),top='<div class="emo" style="font-size:3rem">🕵️</div>';
- if(L>=7&&Math.random()<.5){const rule=pick(L>=9?['par','m5','m10']:['par']),pool=[...Array(L>=9?98:19)].map((_,i)=>i+2);let same,odd;
+ /* 8-10 : des nombres (pairs et impairs, puis dizaines et multiples de 5) */
+ if(L>=8&&Math.random()<(L>=9?.7:.5)){const rule=pick(L>=10?['par','m5','m10']:L===9?['par','m10']:['par']),pool=[...Array(L>=10?98:L===9?49:19)].map((_,i)=>i+2);let same,odd;
   if(rule==='par'){const ev=Math.random()<.5;same=shuffle(pool.filter(x=>(x%2===0)===ev)).slice(0,3);odd=pick(pool.filter(x=>(x%2===0)!==ev))}
   else if(rule==='m5'){same=shuffle(pool.filter(x=>x%5===0)).slice(0,3);odd=pick(pool.filter(x=>x%5!==0))}
   else{same=shuffle(pool.filter(x=>x%10===0)).slice(0,3);odd=pick(pool.filter(x=>x%10!==0))}
   return {nr:'Trouve l’intrus.',once:true,nb:true,q:top+'<p>Trouve le nombre qui n’est pas comme les autres !</p>',opts:shuffle([...same,odd]).map(x=>({h:x,ok:x===odd}))}}
- const subtle=[['ferme','sauvages'],['fruits','legumes'],['mer','sauvages'],['mer','ferme']],[a,b]=L<=2?shuffle(['fruits','vehicules','vetements','ferme']).slice(0,2):L<=4?shuffle(Object.keys(GR)).slice(0,2):shuffle(pick(subtle)),same=shuffle(GR[a]).slice(0,3),odd=pick(GR[b]);
+ /* 1-2 : familles très différentes ; 3-4 : deux familles au hasard ; 5 et plus : familles proches, avec de plus en plus d'images */
+ const subtle=[['ferme','sauvages'],['fruits','legumes'],['mer','sauvages'],['mer','ferme']],[a,b]=L<=2?shuffle(['fruits','vehicules','vetements','ferme']).slice(0,2):L<=4?shuffle(Object.keys(GR)).slice(0,2):shuffle(pick(subtle)),
+  n=L===4||L===6?4:L>=7?5:3,same=shuffle(GR[a]).slice(0,n),odd=pick(GR[b]);
  return {nr:'Trouve l’intrus.',once:true,nb:true,q:top+'<p>Trouve l’intrus : lequel n’est pas comme les autres ?</p>',opts:shuffle([...same,odd]).map(x=>({h:x,ok:x===odd}))}}
 /* temps de jeu, espace parents, sauvegarde */
 const DURS=[5,10,15,20,30,45,60,0];
@@ -745,7 +796,7 @@ function mkCode(){return 'CP1-'+btoa(unescape(encodeURIComponent(JSON.stringify(
 function readCode(c){try{c=String(c).replace(/\s+/g,'');if(c.indexOf('CP1-')!==0)return null;const o=JSON.parse(decodeURIComponent(escape(atob(c.slice(4)))));return o&&typeof o.p==='object'&&o.p?o:null}catch(e){return null}}
 function applyCode(o,sets,quiet){let n=0;const ids=MENU.map(x=>x.id);
  for(const k in o.p){const nm=String(k).trim().slice(0,16);if(!nm||nm==='__proto__')continue;const b=o.p[k]||{},st=Math.min(99999,Math.max(0,parseInt(b.stars)||0)),l={};
-  for(const id of ids){let v=parseInt((b.lv||{})[id]);if(!(v>=1))continue;if(o.v!==2)v=[1,4,7][v-1]||1;if(v>=1&&v<=10)l[id]=v}
+  for(const id of ids){let v=parseInt((b.lv||{})[id]);if(!(v>=1))continue;if(o.v!==2)v=[1,4,7][v-1]||1;if(v>=1&&v<=10){l[id]=v;if((b.lv||{})[id+'_ok']===1)l[id+'_ok']=1}}
   const a=D.profiles[nm];if(!a||st>(a.stars||0))D.profiles[nm]={stars:st,lv:l};n++}
  if(o.s&&sets!==false){if(DURS.includes(+o.s.min))D.set.min=+o.s.min;if(Array.isArray(o.s.off))D.set.off=o.s.off.filter(x=>typeof x==='string').slice(0,20);if(o.s.bonus==='direct'||o.s.bonus==='coffre')D.set.bonus=o.s.bonus;if(typeof o.s.hard==='boolean')D.set.hard=o.s.hard}
  if(P&&D.profiles[P]){stars=D.profiles[P].stars||0;LV=D.profiles[P].lv||{}}
