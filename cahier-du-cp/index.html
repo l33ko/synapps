@@ -404,18 +404,32 @@ function genTxt(L){
  return {nr:'Lis le texte et réponds à la question.',nb:true,rd:true,three:true,
   q:`<div class="txt script">${esc(txt)}</div><div class="qq"><b class="script">${esc(q)}</b></div>`,
   opts:shuffle([a,...wr]).map(o=>({h:esc(o),ok:o===a,f:'script rd'}))}}
-/* lis la phrase et trouve la bonne image (les images qui pourraient aussi convenir sont écartées) */
-function genLI(L){
- const [s,e]=pick((L<=4?[1]:L===5?[1,2]:[2,3]).flatMap(k=>SENT[k])),stop=/^(le|la|les|l|un|une|du|des|de|au|a|est|dans|sur|son|ses|sa|en|avec|très|pour)$/,
-  key=x=>x.toLowerCase().replace(/[.?!]/g,'').split(/[ ’']/).map(w=>w.replace(/[sx]$/,'')).filter(w=>w&&!stop.test(w)),kw=key(s),
-  em=[...new Set(shuffle([1,2,3,4].flatMap(k=>SENT[k]).filter(x=>x[1]!==e&&!('🐓🐔'.includes(e)&&'🐓🐔'.includes(x[1]))&&!key(x[0]).some(w=>kw.includes(w)))).map(x=>x[1]))].slice(0,3);
+/* mots à deux syllabes ou plus dont la première est simple (consonne + voyelle) */
+const SYL=[['lama','la'],['moto','mo'],['vélo','vé'],['tomate','to'],['lapin','la'],['banane','ba'],['bateau','ba'],['cerise','ce'],['citron','ci'],['girafe','gi'],['fusée','fu'],['camion','ca'],['soleil','so'],['requin','re'],['papillon','pa'],['gâteau','gâ']];
+const wEmo=w=>(WT.flat().find(x=>x[0]===w)||[])[1]||'';
+/* par quelle syllabe commence le mot entendu ? (les syllabes qui se prononcent pareil sont écartées) */
+function genSyl(){const [wd,sy]=pick(SYL),snd=x=>x.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/^c(?=[ei])/,'s'),s2=new Set([sy]);let g=0;
+ while(s2.size<4&&g++<200){const x=Math.random()<.5?sy[0]+pick([...'aeiou']):pick([...'lmptrsbfvn'])+sy.slice(1);if(![...s2].some(y=>snd(y)===snd(x)))s2.add(x)}
+ const nr='Écoute le mot. Par quelle syllabe commence-t-il ?';
+ return {nr,btn:wd,nb:true,sp:[nr,wd],q:`<div class="emo">${wEmo(wd)}</div><button class="big" onclick="say('${wd}')" aria-label="Écouter">🔊</button><p>Par quelle syllabe commence ce mot ?</p>`,opts:shuffle([...s2]).map(o=>({h:o,ok:o===sy,f:'script'}))}}
+/* images qui ne peuvent pas être confondues avec celle de la phrase */
+function liDis(s,e){const stop=/^(le|la|les|l|un|une|du|des|de|au|a|est|dans|sur|son|ses|sa|en|avec|très|pour)$/,
+  key=x=>x.toLowerCase().replace(/[.?!]/g,'').split(/[ ’']/).map(w=>w.replace(/[sx]$/,'')).filter(w=>w&&!stop.test(w)),kw=key(s);
+ return [...new Set(shuffle([1,2,3,4].flatMap(k=>SENT[k]).filter(x=>x[1]!==e&&!('🐓🐔'.includes(e)&&'🐓🐔'.includes(x[1]))&&!key(x[0]).some(w=>kw.includes(w)))).map(x=>x[1]))]}
+const liPick=L=>pick((L<=4?[1]:L===5?[1,2]:[2,3]).flatMap(k=>SENT[k]));
+/* lis la phrase et trouve la bonne image */
+function genLI(L){const [s,e]=liPick(L),em=liDis(s,e).slice(0,3);
  return {nr:'Lis la phrase et trouve la bonne image.',once:true,nb:true,q:`<div class="txt script" style="text-align:center">${esc(s)}.</div><p>Quelle image va avec la phrase ?</p>`,opts:shuffle([e,...em]).map(o=>({h:o,ok:o===e,f:'pic'}))}}
+/* vrai ou faux : l'image va-t-elle avec la phrase ? */
+function genVF(L){const [s,e]=liPick(L),ok=Math.random()<.5,im=ok?e:liDis(s,e)[0];
+ return {nr:'Lis la phrase. Est-ce que l’image va avec ?',once:true,nb:true,q:`<div class="emo">${im}</div><div class="txt script" style="text-align:center">${esc(s)}.</div><p>Est-ce que l’image va avec la phrase ?</p>`,opts:[{h:'👍 Vrai',ok},{h:'👎 Faux',ok:!ok}]}}
 /* Lecture : 1-3 des mots, 4-6 des phrases (puis un premier texte), 7-10 des textes */
 function genLec(){
  const L=lv('lec');if(L>=7)return genTxt(L);
  const r=Math.random();
  if(L===6&&r<.5)return genTxt(6);
- if(L>=4&&r<(L===4?.4:L===5?.6:1))return genLI(L);
+ if(L>=4&&r<(L===4?.4:L===5?.6:1))return Math.random()<.35?genVF(L):genLI(L);
+ if(L<=2&&r<.3)return genSyl();
  const pool=wpool(L),sim=L===5,g=sim?pick(WSIM):null,w=sim?pick(g):pick(pool),
   listen=Math.random()<(L>=2?.4:.3)&&!!window.speechSynthesis;
  const sc=x=>(x[0][0]===w[0][0]?0:3)+Math.abs(x[0].length-w[0].length)+Math.random();
@@ -431,9 +445,10 @@ const AZ=['azertyuiop','qsdfghjklm','wxcvbn'],ACC='éèêàâçîôù';
 const ECRLEN=L=>L<=2?[1,4]:L<=4?[1,5]:L<=6?[1,7]:L===7?[4,6]:L===8?[5,7]:L===9?[6,8]:[7,10];
 function genEcr(){
  const L=lv('ecr'),[lo,hi]=ECRLEN(L),pl=wpool(L).filter(x=>x[0].length>=lo&&x[0].length<=hi),r=Math.random();
- let mode=L<=2?(r<.5?'match':'copy'):L<=4?(r<.3?'match':r<.7?'copy':'pic'):L===5?(r<.2?'match':r<.4?'mem':r<.8?'pic':'dic'):L===6?(r<.15?'match':r<.3?'mem':r<.75?'pic':'dic'):L===7?(r<.3?'mem':r<.8?'pic':'dic'):L===8?(r<.15?'mem':r<.6?'pic':'dic'):(r<.05?'match':r<.5?'pic':'dic');
+ let mode=L<=2?(r<.4?'match':r<.8?'copy':'syl'):L<=4?(r<.25?'match':r<.6?'copy':r<.85?'pic':'syl'):L===5?(r<.2?'match':r<.4?'mem':r<.8?'pic':'dic'):L===6?(r<.15?'match':r<.3?'mem':r<.75?'pic':'dic'):L===7?(r<.3?'mem':r<.8?'pic':'dic'):L===8?(r<.15?'mem':r<.6?'pic':'dic'):(r<.05?'match':r<.5?'pic':'dic');
  if(mode==='dic'&&!window.speechSynthesis)mode='pic';
  if(mode==='match')return genEcrM();
+ if(mode==='syl')return genEcrS(L);
  const [w,e]=pick(pl),cur=Math.random()<.6,kb=L>=7,ex=L<=2?2:L<=4?3:L===5?4:6,
   bank=kb?null:shuffle([...w,...shuffle([...'abcdefghijlmnoprstuv'].filter(c=>!w.includes(c))).slice(0,ex)]).map(ch=>({ch,used:false}));
  const top=mode==='copy'?`<div class="emo">${e}</div><div class="word ${cur?'cursive':'script'}">${w}</div><p>Écris le mot</p>`:mode==='pic'?`<div class="emo">${e}</div><p>Regarde l’image et écris le mot</p>`:`<button class="big" onclick="say('${w}')" aria-label="Écouter">🔊</button>${L<=8?`<div class="emo" style="font-size:3.5rem">${e}</div>`:''}<p>Écoute le mot et écris-le</p>`;
@@ -453,9 +468,9 @@ function tk1(i){const c=Q.cur;if(Q.done||c.bank[i].used||(c.mem&&c.show))return;
 function tk2(ch){const c=Q.cur;if(Q.done||(c.mem&&c.show))return;const k=emptySlot(c);if(k<0)return;c.v[k]={ch,bi:-1};tchk()}
 function tdel(){const c=Q.cur;if(Q.done)return;let k=-1;for(let i=c.v.length-1;i>=0;i--)if(c.v[i]&&!c.v[i].lock){k=i;break}if(k<0)return;const x=c.v[k];c.v[k]=null;if(x.bi>=0)c.bank[x.bi].used=false;drawTxt(c,curM())}
 function tchk(){const c=Q.cur;drawTxt(c,curM());if(emptySlot(c)>=0)return;
- if(c.v.map(x=>x.ch).join('')===c.w){Q.done=true;if(!Q.tries)Q.score++;sfx(true);c.rev=true;drawTxt(c,curM());say(c.w);setTimeout(()=>{Q.n++;next()},1500);return}
+ if(c.v.map(x=>x.ch).join('')===c.w){Q.done=true;if(!Q.tries)Q.score++;sfx(true);c.rev=true;drawTxt(c,curM());say(c.sw||c.w);setTimeout(()=>{Q.n++;next()},1500);return}
  Q.tries++;Q.done=true;sfx(false);
- if(Q.tries>=3){c.rev=true;drawTxt(c,curM());const f=document.getElementById('fb');if(f)f.textContent='Voici le mot';say(['Voici le mot.',c.w]);setTimeout(()=>{Q.n++;next()},2300);return}
+ if(Q.tries>=3){c.rev=true;drawTxt(c,curM());const f=document.getElementById('fb');if(f)f.textContent='Voici le mot';say(['Voici le mot.',c.sw||c.w]);setTimeout(()=>{Q.n++;next()},2300);return}
  c.bad=true;drawTxt(c,curM());fbk(Q.tries===1?'Essaie encore 💪':'Presque ! Un coup de pouce 💡');
  setTimeout(()=>{
   if(!Q||Q.cur!==c)return;
@@ -466,11 +481,15 @@ function tchk(){const c=Q.cur;drawTxt(c,curM());if(emptySlot(c)>=0)return;
   if(Q.tries===2){const k=emptySlot(c);if(k>=0){const ch=c.w[k],bi=c.bank?c.bank.findIndex(b=>!b.used&&b.ch===ch):-1;c.v[k]={ch,bi,lock:true,hint:true};if(bi>=0)c.bank[bi].used=true;gave=true}}
   c.bad=false;
   /* l'indice a complété le mot : on le valide (sans point, car il y a eu des erreurs) */
-  if(emptySlot(c)<0){c.rev=true;drawTxt(c,curM());sfx(true);say(c.w);setTimeout(()=>{if(Q&&Q.cur===c){Q.n++;next()}},1500);return}
+  if(emptySlot(c)<0){c.rev=true;drawTxt(c,curM());sfx(true);say(c.sw||c.w);setTimeout(()=>{if(Q&&Q.cur===c){Q.n++;next()}},1500);return}
   Q.done=false;drawTxt(c,curM());
   if(gave)fbk("Voici une lettre pour t'aider 💡");
   /* 1re erreur : le mot est redit */
-  if(Q.tries===1)say(c.w)},1300)}
+  if(Q.tries===1)say(c.sw||c.w)},1300)}
+/* écrire la première syllabe du mot entendu */
+function genEcrS(L){const [wd,sy]=pick(SYL),nr='Écoute le mot et écris sa première syllabe.',
+  bank=shuffle([...sy,...shuffle([...'abcdefgilmnoprstuv'].filter(c=>!sy.includes(c))).slice(0,L<=2?2:3)]).map(ch=>({ch,used:false}));
+ return {type:'txt',w:sy,sw:wd,kb:false,bank,v:[...sy].map(()=>null),top:`<div class="emo">${wEmo(wd)}</div><button class="tile" onclick="say('${wd}')">🔊 Écouter le mot</button><p>Écris la première syllabe du mot</p>`,nr,nb:true,btn:wd,sp:[nr,wd]}}
 function genEcrM(){
  const L=lv('ecr'),[lo,hi]=ECRLEN(L),all=wpool(L).map(x=>x[0]),w=pick(all.filter(x=>x.length>=lo&&x.length<=hi)),toCur=Math.random()<.5;
  let dis=shuffle(all.filter(x=>x!==w));
@@ -598,16 +617,23 @@ function key(k){if(Q.done)return;const c=Q.cur.key;
  rk()}
 /* mots à compléter */
 const DG=['ou','on','an','in','ch','oi','ai','au','eu','gn','ui','ei','ph','qu','en','eau','ill','ain','oin','ion','ail','eil'];
-function genPho(){const L=lv('pho'),w=pick(wpool(L)),t=w[0];let p,k,d3=null;
+const MUET=['lit','rat','chat','loup','dent','souris','escargot','éléphant','chocolat'];
+const CONF={on:['om','an','ou'],an:['en','on','am'],en:['an','em','in'],in:['ain','un','im'],ou:['on','oi','au'],oi:['ou','io','ai'],ai:['ei','é','è'],au:['o','eau','ou'],eau:['au','o','ou'],ch:['j','s','g'],gn:['ni','n','ng'],qu:['k','c','gu'],eu:['e','ou','u'],ui:['oui','iu','u'],ain:['in','ein','an'],oin:['oi','ouin','on'],ei:['ai','é','ie'],ill:['il','y','ll'],ion:['oin','ien','on'],ail:['aill','al','eil'],eil:['ail','el','eille'],ph:['f','p','ff']};
+function genPho(){const L=lv('pho'),w=pick(wpool(L)),t=w[0];let p,k,d3=null,muet=false;
  const dgs=DG.filter(d=>t.includes(d)).sort((a,b)=>b.length-a.length);
  /* 9-10 : le son et une lettre voisine manquent ; 6-8 : le son ; 5 : le son ou deux lettres */
- if(L>=9&&dgs.length&&t.length>=dgs[0].length+2){d3=dgs[0];const i=t.indexOf(d3);k=d3.length+1;p=Math.max(0,Math.min(i,t.length-k))}
+ /* 3-6 : la lettre muette de la fin, quand le mot en a une */
+ if(L>=3&&L<=6&&MUET.includes(t)&&Math.random()<.6){k=1;p=t.length-1;muet=true}
+ else if(L>=9&&dgs.length&&t.length>=dgs[0].length+2){d3=dgs[0];const i=t.indexOf(d3);k=d3.length+1;p=Math.max(0,Math.min(i,t.length-k))}
  else if(L>=5&&dgs.length&&(L>=6||Math.random()<.6)){k=dgs[0].length;p=t.indexOf(dgs[0])}
  else if(L>=5){k=2;p=rnd(t.length-1)}
  else{k=1;const idx=[...t].map((c,i)=>i);p=pick(L<=2?idx.filter(i=>/[aeiouéèêâ]/.test(t[i])):idx)}
  const miss=t.slice(p,p+k),s2=new Set([miss]);let g=0;
  const isDG=DG.includes(miss),pl=isDG?DG.filter(d=>d.length===k&&d!==miss):null,V='aeiouéè',C='lrstmnpcdbvfgj',vow=k===1&&/[aeiouéèêâ]/.test(miss);
  const NO=L===8||L===10?5:4;
+ if(muet)shuffle([...'tsdpx'].filter(x=>x!==miss)).slice(0,3).forEach(x=>s2.add(x));
+ /* 7 et plus : des sons qui se ressemblent (on / om, an / en…) */
+ else if(!d3&&isDG&&L>=7&&CONF[miss])CONF[miss].forEach(x=>s2.add(x));
  while(s2.size<NO&&g++<300){
   if(d3)s2.add(miss.replace(d3,pick(DG.filter(x=>x.length===d3.length&&x!==d3))));
   else if(isDG&&pl.length)s2.add(pick(pl));
@@ -623,10 +649,14 @@ const SENT={1:[['Le chat dort','🐱'],['Le chien court','🐶'],['La lune brill
 6:[['Où est caché le petit chat ?','🐱'],['Qui a mangé tout le gâteau ?','🍰'],['Comme ce gâteau est bon !','🍰'],['Que fait Papa dans le jardin ?','🌳'],['Où va le gros camion rouge ?','🚚'],['Est-ce que tu viens jouer ?','🙋'],['Quel joli dessin tu as fait !','🖍️'],['Qui veut une part de tarte ?','🥧'],['Comment va ton petit chien ?','🐶'],['Regarde le bel oiseau bleu !','🐦'],['Où sont rangés mes jouets ?','🧸']]};
 /* paliers de phrases par niveau : 1 = 3 mots, 2 = 4 mots, 3 = 5 mots, 4 = 6-7 mots, 5 = questions courtes (dès le niveau 5), 6 = longues questions */
 const PHP=L=>{const r=Math.random();return L<=1?1:L===2?(r<.6?1:2):L===3?2:L===4?(r<.6?2:3):L===5?(r<.6?3:5):L===6?(r<.5?3:4):L===7?4:L===8?(r<.5?4:6):L===9?(r<.3?4:6):6};
-function genPhr(){const L=lv('phr'),[s,e]=pick(SENT[PHP(L)]);const ws=s.split(' ');if(!/[.?!]$/.test(s))ws[ws.length-1]+='.';let t;do{t=shuffle(ws.map((w,i)=>({w,i})))}while(t.every((x,i)=>x.i===i));return {nr:'Remets les étiquettes dans l’ordre.',once:true,nb:true,type:'phr',emo:e,ws,tiles:t,placed:[]}}
-function drawPhr(c,m){app.innerHTML=hdr(Q.n/Q.N,`${Q.n+1}/${Q.N}`)+`<div class="q" style="background:var(${m.c})"><div class="emo">${c.emo}</div><p>Remets les étiquettes dans l’ordre</p><div class="line">`+c.placed.map(i=>`<button class="tile" onclick="unplace(${i})">${c.ws[i]}</button>`).join('')+`</div></div><div class="pool">`+c.tiles.map(t=>`<button class="tile" ${c.placed.includes(t.i)?'disabled':''} onclick="place(${t.i})">${t.w}</button>`).join('')+`</div><div class="fb" id="fb" aria-live="polite"></div>`}
+function genPhr(){const L=lv('phr'),[s,e]=pick(SENT[PHP(L)]);const ws=s.split(' ');if(!/[.?!]$/.test(s))ws[ws.length-1]+='.';
+ /* à partir du niveau 7, parfois un mot en trop à laisser de côté */
+ let all=null;if(Math.random()<(L>=9?.5:L===8?.4:L===7?.3:0)){const low=ws.map(w=>w.toLowerCase().replace(/[.?!,]/g,''));all=[...ws,pick([...new Set(Object.values(SENT).flat().flatMap(y=>y[0].split(' ')))].filter(w=>/^[a-zà-ÿ]{3,}$/.test(w)&&!low.includes(w)))]}
+ let t;do{t=shuffle((all||ws).map((w,i)=>({w,i})))}while(t.every((x,i)=>x.i===i));
+ return {nr:all?'Remets les étiquettes dans l’ordre. Attention, il y a un mot en trop !':'Remets les étiquettes dans l’ordre.',once:!all,nb:true,type:'phr',emo:e,ws,all,tiles:t,placed:[]}}
+function drawPhr(c,m){app.innerHTML=hdr(Q.n/Q.N,`${Q.n+1}/${Q.N}`)+`<div class="q" style="background:var(${m.c})"><div class="emo">${c.emo}</div><p>Remets les étiquettes dans l’ordre</p>${c.all?'<p><b>Attention : un mot est en trop !</b></p>':''}<div class="line">`+c.placed.map(i=>`<button class="tile" onclick="unplace(${i})">${(c.all||c.ws)[i]}</button>`).join('')+`</div></div><div class="pool">`+c.tiles.map(t=>`<button class="tile" ${c.placed.includes(t.i)?'disabled':''} onclick="place(${t.i})">${t.w}</button>`).join('')+`</div><div class="fb" id="fb" aria-live="polite"></div>`}
 const rp=()=>drawPhr(Q.cur,curM());
-function place(i){const c=Q.cur;if(Q.done||c.placed.includes(i))return;c.placed.push(i);if(/[A-Za-zÀ-ÿ]/.test(c.ws[i]))say(c.ws[i].replace('.',''));rp();if(c.placed.length<c.ws.length)return;Q.done=true;
+function place(i){const c=Q.cur;if(Q.done||c.placed.includes(i))return;c.placed.push(i);{const w=(c.all||c.ws)[i];if(/[A-Za-zÀ-ÿ]/.test(w))say(w.replace('.',''))}rp();if(c.placed.length<c.ws.length)return;Q.done=true;
  if(c.placed.every((v,k)=>v===k)){if(!Q.tries)Q.score++;sfx(true);setTimeout(()=>say(c.ws.join(' ')),500);setTimeout(()=>{Q.n++;next()},2400)}
  else{Q.tries++;sfx(false);fbk('Essaie encore 💪');setTimeout(()=>{c.placed=[];Q.done=false;rp()},1300)}}
 function unplace(i){const c=Q.cur;if(Q.done)return;c.placed=c.placed.filter(x=>x!==i);rp()}
