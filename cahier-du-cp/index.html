@@ -422,7 +422,7 @@ function genLI(L){const [s,e]=liPick(L),em=liDis(s,e).slice(0,3);
  return {nr:'Lis la phrase et trouve la bonne image.',once:true,nb:true,q:`<div class="txt script" style="text-align:center">${esc(s)}.</div><p>Quelle image va avec la phrase ?</p>`,opts:shuffle([e,...em]).map(o=>({h:o,ok:o===e,f:'pic'}))}}
 /* vrai ou faux : l'image va-t-elle avec la phrase ? */
 function genVF(L){const [s,e]=liPick(L),ok=Math.random()<.5,im=ok?e:liDis(s,e)[0];
- return {nr:'Lis la phrase. Est-ce que l’image va avec ?',once:true,nb:true,q:`<div class="emo">${im}</div><div class="txt script" style="text-align:center">${esc(s)}.</div><p>Est-ce que l’image va avec la phrase ?</p>`,opts:[{h:'👍 Vrai',ok},{h:'👎 Faux',ok:!ok}]}}
+ return {nr:'Lis la phrase. Est-ce que l’image va avec ?',once:true,nb:true,q:`<div class="emo">${im}</div><div class="txt script" style="text-align:center">${esc(s)}.</div><p>Est-ce que l’image va avec la phrase ?</p>`,vf:true,opts:[{h:'👍 Vrai',ok},{h:'👎 Faux',ok:!ok}]}}
 /* Lecture : 1-3 des mots, 4-6 des phrases (puis un premier texte), 7-10 des textes */
 function genLec(){
  const L=lv('lec');if(L>=7)return genTxt(L);
@@ -487,7 +487,7 @@ function tchk(){const c=Q.cur;drawTxt(c,curM());if(emptySlot(c)>=0)return;
   /* 1re erreur : le mot est redit */
   if(Q.tries===1)say(c.sw||c.w)},1300)}
 /* écrire la première syllabe du mot entendu */
-function genEcrS(L){const [wd,sy]=pick(SYL),nr='Écoute le mot et écris sa première syllabe.',
+function genEcrS(L){const [wd,sy]=pick(SYL.filter(x=>!/^(gâ|ce|ci)$/.test(x[1]))),nr='Écoute le mot et écris sa première syllabe.',
   bank=shuffle([...sy,...shuffle([...'abcdefgilmnoprstuv'].filter(c=>!sy.includes(c))).slice(0,L<=2?2:3)]).map(ch=>({ch,used:false}));
  return {type:'txt',w:sy,sw:wd,kb:false,bank,v:[...sy].map(()=>null),top:`<div class="emo">${wEmo(wd)}</div><button class="tile" onclick="say('${wd}')">🔊 Écouter le mot</button><p>Écris la première syllabe du mot</p>`,nr,nb:true,btn:wd,sp:[nr,wd]}}
 function genEcrM(){
@@ -580,8 +580,8 @@ function ans(i,btn){
   
   setTimeout(()=>{Q.n++;next()},1100);
  }else{
-  if(Q.cur.rd){Q.tries++;btn.classList.add('bad');btn.disabled=true;sfx(false);
-   if(Q.tries>=2){Q.done=true;fbk('Voici la bonne réponse');const k=Q.cur.opts.findIndex(x=>x.ok),bs=document.querySelectorAll('.opt');if(bs[k])bs[k].classList.add('good');const q=Q.cur;setTimeout(()=>{if(Q&&Q.cur===q){Q.n++;next()}},1800)}
+  if(Q.cur.rd||Q.cur.vf){Q.tries++;btn.classList.add('bad');btn.disabled=true;sfx(false);
+   if(Q.tries>=(Q.cur.vf?1:2)){Q.done=true;fbk('Voici la bonne réponse');const k=Q.cur.opts.findIndex(x=>x.ok),bs=document.querySelectorAll('.opt');if(bs[k])bs[k].classList.add('good');const q=Q.cur;setTimeout(()=>{if(Q&&Q.cur===q){Q.n++;next()}},1800)}
    else fbk('Relis le texte 🔎');return}
   Q.tries++;btn.classList.add('bad');btn.disabled=true;sfx(false);fbk('Essaie encore 💪');
   if(Q.cur.hint&&!Q.hinted){Q.hinted=true;document.querySelector('.q').insertAdjacentHTML('beforeend',`<div class="emo">${Q.cur.hint}</div>`)}
@@ -617,7 +617,7 @@ function key(k){if(Q.done)return;const c=Q.cur.key;
  rk()}
 /* mots à compléter */
 const DG=['ou','on','an','in','ch','oi','ai','au','eu','gn','ui','ei','ph','qu','en','eau','ill','ain','oin','ion','ail','eil'];
-const MUET=['lit','rat','chat','loup','dent','souris','escargot','éléphant','chocolat'];
+const MUET=['lit','rat','chat','loup','dent','souris'];
 const CONF={on:['om','an','ou'],an:['en','on','am'],en:['an','em','in'],in:['ain','un','im'],ou:['on','oi','au'],oi:['ou','io','ai'],ai:['ei','é','è'],au:['o','eau','ou'],eau:['au','o','ou'],ch:['j','s','g'],gn:['ni','n','ng'],qu:['k','c','gu'],eu:['e','ou','u'],ui:['oui','iu','u'],ain:['in','ein','an'],oin:['oi','ouin','on'],ei:['ai','é','ie'],ill:['il','y','ll'],ion:['oin','ien','on'],ail:['aill','al','eil'],eil:['ail','el','eille'],ph:['f','p','ff']};
 function genPho(){const L=lv('pho'),w=pick(wpool(L)),t=w[0];let p,k,d3=null,muet=false;
  const dgs=DG.filter(d=>t.includes(d)).sort((a,b)=>b.length-a.length);
@@ -651,13 +651,14 @@ const SENT={1:[['Le chat dort','🐱'],['Le chien court','🐶'],['La lune brill
 const PHP=L=>{const r=Math.random();return L<=1?1:L===2?(r<.6?1:2):L===3?2:L===4?(r<.6?2:3):L===5?(r<.6?3:5):L===6?(r<.5?3:4):L===7?4:L===8?(r<.5?4:6):L===9?(r<.3?4:6):6};
 function genPhr(){const L=lv('phr'),[s,e]=pick(SENT[PHP(L)]);const ws=s.split(' ');if(!/[.?!]$/.test(s))ws[ws.length-1]+='.';
  /* à partir du niveau 7, parfois un mot en trop à laisser de côté */
- let all=null;if(Math.random()<(L>=9?.5:L===8?.4:L===7?.3:0)){const low=ws.map(w=>w.toLowerCase().replace(/[.?!,]/g,''));all=[...ws,pick([...new Set(Object.values(SENT).flat().flatMap(y=>y[0].split(' ')))].filter(w=>/^[a-zà-ÿ]{3,}$/.test(w)&&!low.includes(w)))]}
+ let all=null;if(Math.random()<(L>=9?.5:L===8?.4:L===7?.3:0)){if(!ws.some(w=>/(er|ir)[.?!]?$/.test(w)))all=[...ws,pick(['manger','dormir','courir','sauter','chanter','partir'])]}
  let t;do{t=shuffle((all||ws).map((w,i)=>({w,i})))}while(t.every((x,i)=>x.i===i));
  return {nr:all?'Remets les étiquettes dans l’ordre. Attention, il y a un mot en trop !':'Remets les étiquettes dans l’ordre.',once:!all,nb:true,type:'phr',emo:e,ws,all,tiles:t,placed:[]}}
 function drawPhr(c,m){app.innerHTML=hdr(Q.n/Q.N,`${Q.n+1}/${Q.N}`)+`<div class="q" style="background:var(${m.c})"><div class="emo">${c.emo}</div><p>Remets les étiquettes dans l’ordre</p>${c.all?'<p><b>Attention : un mot est en trop !</b></p>':''}<div class="line">`+c.placed.map(i=>`<button class="tile" onclick="unplace(${i})">${(c.all||c.ws)[i]}</button>`).join('')+`</div></div><div class="pool">`+c.tiles.map(t=>`<button class="tile" ${c.placed.includes(t.i)?'disabled':''} onclick="place(${t.i})">${t.w}</button>`).join('')+`</div><div class="fb" id="fb" aria-live="polite"></div>`}
 const rp=()=>drawPhr(Q.cur,curM());
 function place(i){const c=Q.cur;if(Q.done||c.placed.includes(i))return;c.placed.push(i);{const w=(c.all||c.ws)[i];if(/[A-Za-zÀ-ÿ]/.test(w))say(w.replace('.',''))}rp();if(c.placed.length<c.ws.length)return;Q.done=true;
  if(c.placed.every((v,k)=>v===k)){if(!Q.tries)Q.score++;sfx(true);setTimeout(()=>say(c.ws.join(' ')),500);setTimeout(()=>{Q.n++;next()},2400)}
+ else if(Q.tries>=2){Q.tries++;sfx(false);c.placed=c.ws.map((_,k)=>k);rp();fbk('Voici la bonne réponse');setTimeout(()=>{if(Q&&Q.cur===c)say(c.ws.join(' '))},1500);setTimeout(()=>{if(Q&&Q.cur===c){Q.n++;next()}},4200)}
  else{Q.tries++;sfx(false);fbk('Essaie encore 💪');setTimeout(()=>{c.placed=[];Q.done=false;rp()},1300)}}
 function unplace(i){const c=Q.cur;if(Q.done)return;c.placed=c.placed.filter(x=>x!==i);rp()}
 /* memory */
