@@ -111,6 +111,9 @@ main.rail .irail{display:flex;flex-direction:column;align-items:center;gap:10px;
 .ich:hover{background:#f6f1e2}
 .ich .ar{font-size:9px;color:var(--mute);transition:transform .15s;width:10px;flex:none}
 .icat.open .ich .ar{transform:rotate(90deg)}
+.ieye{border:1px solid transparent;background:none;border-radius:8px;padding:2px 6px;font-size:14px;line-height:1;cursor:pointer;opacity:.45;margin-left:4px}
+.ieye:hover{opacity:1;background:#fff;border-color:var(--line)}
+.ieye.on{opacity:1;background:var(--acc-soft);border-color:var(--acc)}
 .ich .n{margin-left:auto;background:#efe9d8;border-radius:999px;padding:0 8px;font-size:11.5px;color:var(--mute);font-weight:600}
 .ibody{display:none;padding:0 12px 8px 26px}
 .icat.open .ibody{display:block}
@@ -279,6 +282,12 @@ i.vn{font-style:italic;color:var(--mute);font-size:.88em}
 .cgrid select,.cgrid input{width:100%;min-width:0}
 .cgrid .pair{gap:4px}
 .cgrid .pair .btn.icon{min-width:30px;padding:4px 6px}
+.cgrid .rotb{display:flex;gap:4px}
+.cgrid .rotb .btn{flex:1;min-width:0;padding:4px 2px;justify-content:center}
+#selPanel .seg button{white-space:nowrap}
+.tsum{display:flex;align-items:center;gap:8px;cursor:pointer;margin:6px 0 2px}
+.tsum h3{flex:1;margin:0 !important}
+.tsum .ar{color:var(--mute);font-size:12px}
 .warn.mini{padding:5px 8px;margin:6px 0 2px;font-size:12px}
 .tag{font-size:11.5px;border:1px solid var(--line);border-radius:999px;padding:2px 8px;background:#fff}
 .fnpick{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:13px}
@@ -306,6 +315,16 @@ body.at-home #ioModal .exp{display:none}
 .pcard .cacts{display:flex;gap:2px;padding:4px 8px 8px;justify-content:flex-end}
 .pcard .cacts button{border:0;background:none;cursor:pointer;padding:6px 8px;border-radius:8px;color:var(--mute);font-size:14px}
 .pcard .cacts button:hover{background:var(--acc-soft);color:var(--ink)}
+.pcard .cacts button span{font-size:12.5px}
+.pcard{position:relative}
+.pcard .cmenu{display:none;position:absolute;inset:0;z-index:3;background:var(--panel);flex-direction:column;justify-content:center;gap:0;padding:8px;cursor:default}
+#legend a[data-hl]{display:inline-grid;place-items:center;min-width:28px;min-height:28px;margin:-6px -4px -6px 4px !important;border-radius:8px;color:var(--mute);text-decoration:none;font-weight:700}
+#legend a[data-hl]:hover{background:#fff;color:var(--ink)}
+.pcard.menu .cmenu{display:flex}
+.pcard .cmenu button{border:0;background:none;text-align:left;font:inherit;font-size:15px;padding:9px 12px;border-radius:10px;cursor:pointer;color:var(--ink);white-space:nowrap}
+.pcard .cmenu button:hover{background:var(--acc-soft)}
+.pcard .cmenu .danger{color:var(--warn)}
+.pcard .cmenu .close{position:absolute;top:6px;right:6px;color:var(--mute);padding:6px 10px}
 .pcard.new{border:2px dashed #b4c6a2;background:rgba(255,253,246,.55);align-items:center;justify-content:center;text-align:center;min-height:250px;gap:8px;padding:18px}
 .pcard.new .plus{width:56px;height:56px;border-radius:50%;background:var(--acc);color:#fff;display:grid;place-items:center;font-size:30px;line-height:1}
 .pcard.new b{font-family:Fraunces,Georgia,serif;font-size:17px}
@@ -681,7 +700,7 @@ function strateOf(sp){
 }
 const fnOf = sp => sp ? (Array.isArray(sp.fn) ? sp.fn : (FN_DEFAULT[sp.name] || [])) : [];
 let hl = null, palFn = null;                       // surbrillance sur le plan (« fn:azote », « st:canopee »)
-const hlMatch = (sp, k) => k.startsWith('fn:') ? fnOf(sp).includes(k.slice(3)) : strateOf(sp) === k.slice(3);
+const hlMatch = (sp, k) => k.startsWith('cat:') ? sp.cat === k.slice(4) : k.startsWith('fn:') ? fnOf(sp).includes(k.slice(3)) : strateOf(sp) === k.slice(3);
 function setHL(k){ hl = hl === k ? null : k; palFn = hl && hl.startsWith('fn:') ? hl.slice(3) : null; render(); renderInventory(); renderPalette(); }
 
 // classement botanique des fruitiers
@@ -1464,15 +1483,24 @@ function worldSVG(o){
 
   // étiquettes (vue détaillée seulement)
   if (D){
-    for (const z of zones) out += zoneLabel(z, o, s, zones.some(z2 => z2 !== z && z2.w * z2.h < z.w * z.h && inZone(z2, z.cx, z.cy)));
+    // placement des noms sans chevauchement : zones, puis linéaires, puis végétaux (les plus grands d'abord)
+    const boxes = [], hit = (bx, by, bw, bh) => boxes.some(b => bx < b[0] + b[2] && bx + bw > b[0] && by < b[1] + b[3] && by + bh > b[1]);
+    for (const z of zones){
+      const top = zones.some(z2 => z2 !== z && z2.w * z2.h < z.w * z.h && inZone(z2, z.cx, z.cy));
+      const t = zoneLabel(z, o, s, top); if (!t) continue;
+      out += t;
+      const txt = z.label || (ZONES[z.kind] || ZONES.libre).label, bw = txt.length * 7.2 / s, bh = (top ? 14 : 30) / s;
+      boxes.push([z.cx - bw / 2, top ? z.cy - z.h / 2 + 3 / s : z.cy - 12 / s, bw, bh]);
+    }
     const halo = `paint-order="stroke" stroke="rgba(255,253,246,.9)" stroke-width="${3.2 / s}" stroke-linejoin="round"`;
     for (const l of lines){
       if (!l.label) continue;
       const m = l.points[Math.floor((l.points.length - 1) / 2)], n = l.points[Math.floor((l.points.length - 1) / 2) + 1] || m;
-      out += `<text x="${(m[0] + n[0]) / 2}" y="${(m[1] + n[1]) / 2 + 4 / s}" font-size="${11 / s}" text-anchor="middle" fill="#2d3326" font-weight="600" ${halo}>${esc(l.label)}</text>`;
+      const x = (m[0] + n[0]) / 2, y = (m[1] + n[1]) / 2 + 4 / s, bw = l.label.length * 6.6 / s, bh = 13 / s;
+      if (hit(x - bw / 2, y - 10 / s, bw, bh)) continue;
+      boxes.push([x - bw / 2, y - 10 / s, bw, bh]);
+      out += `<text x="${x}" y="${y}" font-size="${11 / s}" text-anchor="middle" fill="#2d3326" font-weight="600" ${halo}>${esc(l.label)}</text>`;
     }
-    // placement des noms sans chevauchement : les plus grands végétaux d'abord
-    const boxes = [];
     const bySize = plants.slice().sort((a, b) => plantR(b) - plantR(a));
     for (const p of bySize){
       const sp = spById(p.sid), r = plantR(p, sp);
@@ -1481,7 +1509,7 @@ function worldSVG(o){
       const bw = Math.max(name.length * 6.6, showVar ? sp.variety.length * 5.8 : 0) / s, bh = (showVar ? 25 : 13) / s;
       const y0 = p.y + r + 11 / s;
       const bx = p.x - bw / 2, by = y0 - 10 / s;
-      if (boxes.some(b => bx < b[0] + b[2] && bx + bw > b[0] && by < b[1] + b[3] && by + bh > b[1])) continue;
+      if (hit(bx, by, bw, bh)) continue;
       boxes.push([bx, by, bw, bh]);
       out += `<text x="${p.x}" y="${y0}" font-size="${11 / s}" font-weight="600" text-anchor="middle" fill="#22301b" ${halo}>${esc(name)}</text>`;
       if (showVar) out += `<text x="${p.x}" y="${y0 + 12 / s}" font-size="${10 / s}" font-style="italic" text-anchor="middle" fill="#4b5a40" ${halo}>${esc(sp.variety)}</text>`;
@@ -2013,13 +2041,14 @@ function duplicateSel(){
    ============================================================ */
 let palTab = 'veg';
 const foldedCats = new Set();
+const fold = v => String(v || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
 function renderPalette(){
-  const q = $('#palSearch').value.trim().toLowerCase();
+  const q = fold($('#palSearch').value.trim());
   let h = '';
   if (palTab === 'veg'){
     h += `<div class="fnchips">${Object.entries(FONCTIONS).map(([k, f]) => `<button class="${palFn === k ? 'on' : ''}" data-fn="${k}" title="${f.label}">${f.icon} ${f.short}</button>`).join('')}</div>`;
     for (const [cat, info] of Object.entries(CATS)){
-      const list = st.species.filter(s => s.cat === cat && (!q || (s.name + ' ' + (s.variety || '')).toLowerCase().includes(q)) && (!palFn || fnOf(s).includes(palFn)));
+      const list = st.species.filter(s => s.cat === cat && (!q || fold(s.name + ' ' + (s.variety || '')).includes(q)) && (!palFn || fnOf(s).includes(palFn)));
       if (!list.length) continue;
       const groups = speciesGroups(list), folded = !q && foldedCats.has(cat);
       h += `<div class="grp fold" data-cat="${cat}">${folded ? '▸' : '▾'} ${info.label}<span class="n">${groups.length}</span></div>`;
@@ -2033,23 +2062,23 @@ function renderPalette(){
         for (const s of g.entries) if (s.variety) h += row(s, ' pvar', `<div><i class="vn" style="color:inherit;font-size:13.5px">${esc(s.variety)}</i></div><small>Ø ${fmt(s.d)} m · h ${fmt(s.h)} m</small>`);
       }
     }
-    if (!h.includes('pitem')) h += `<p class="note" style="padding:10px">Aucune espèce ne correspond. <a href="#" data-act="new-sp">Ajouter « ${esc(q)} »</a></p>`;
+    if (!h.includes('pitem')) h += `<p class="note" style="padding:10px">Aucune espèce ne correspond. <a href="#" data-act="new-sp">Ajouter « ${esc($('#palSearch').value.trim())} »</a></p>`;
   } else {
     h += `<div class="grp">Zones (glisser pour dessiner)</div>`;
     for (const [k, z] of Object.entries(ZONES)){
-      if (q && !z.label.toLowerCase().includes(q)) continue;
+      if (q && !fold(z.label).includes(q)) continue;
       const on = tool.mode === 'zone' && tool.kind === k;
       h += `<div class="pitem${on ? ' on' : ''}" data-kind="zone" data-id="${k}"><span class="sw sq" style="background:${z.fill};box-shadow:inset 0 0 0 1.5px ${z.stroke}">${z.icon || ''}</span><span class="nm"><div>${z.label}</div><small>par défaut ${fmt(z.w)} × ${fmt(z.h)} m</small></span></div>`;
     }
     h += `<div class="grp">Annotations</div>`;
     for (const [k, lab, sub, sw] of [['badge','Repère numéroté','1, 2, 3… ou a, b','<i style="display:grid;place-items:center;width:20px;height:20px;border-radius:50%;background:#2f3e66;color:#fff;font-size:11px;font-weight:700">1</i>'],['text','Étiquette de texte','liste de plantes, remarque…','<i style="font-style:normal;font-size:13px">Aa</i>']]){
-      if (q && !lab.toLowerCase().includes(q)) continue;
+      if (q && !fold(lab).includes(q)) continue;
       const on = tool.mode === 'note' && tool.kind === k;
       h += `<div class="pitem${on ? ' on' : ''}" data-kind="note" data-id="${k}"><span class="sw sq" style="background:#fff">${sw}</span><span class="nm"><div>${lab}</div><small>${sub}</small></span></div>`;
     }
     h += `<div class="grp">Linéaires (point par point)</div>`;
     for (const [k, l] of Object.entries(LINES)){
-      if (q && !l.label.toLowerCase().includes(q)) continue;
+      if (q && !fold(l.label).includes(q)) continue;
       const on = tool.mode === 'line' && tool.kind === k;
       h += `<div class="pitem${on ? ' on' : ''}" data-kind="line" data-id="${k}"><span class="sw sq" style="background:#fff"><i style="display:block;width:20px;height:${l.w ? Math.max(3, Math.min(10, l.w * 7)) : 2}px;background:${l.color};border-radius:2px"></i></span><span class="nm"><div>${l.label}</div><small>${l.w ? 'largeur ' + fmt(l.w, 2) + ' m' : 'trait'}</small></span></div>`;
     }
@@ -2117,9 +2146,11 @@ let editing = false;
 function renderInspector(){
   const it = sel && itemById(sel); let h = '';
   if (!it){
-    const P = gPoly(), free = isFree();
-    h += `<h3>Terrain</h3>`;
-    if (noContour()){
+    const P = gPoly(), free = isFree(), folded = !isMobile() && !terrainOpen && !noContour() && !editContour;
+    h += `<div class="tsum" data-act="terrain-fold" title="${folded ? 'Afficher' : 'Masquer'} les réglages du terrain"><h3>Terrain</h3>${isMobile() ? '' : `<span class="ar">${folded ? 'Réglages ▸' : 'Masquer ▾'}</span>`}</div>`;
+    if (folded){
+      h += `<p class="note"><b style="color:var(--ink)">${fmt(gArea(), 0)} m²</b> · ${free ? P.length + ' côtés' : fmt(st.garden.w) + ' × ' + fmt(st.garden.h) + ' m'}${st.bg ? ' · fond de plan' : ''}</p>`;
+    } else if (noContour()){
       h += `<div class="warn" style="background:#fdf0e2;color:#7a4a12">Le contour du terrain n'est pas encore tracé.</div><div class="acts"><button class="btn primary" data-act="draw-contour">✏ Tracer le contour</button></div>`;
     } else {
       h += `<p class="note"><b style="color:var(--ink)">${fmt(gArea(), 0)} m²</b> · périmètre ${fmt(perimeter(P))} m · ${free ? P.length + ' côtés' : 'rectangle'}</p>`;
@@ -2127,6 +2158,7 @@ function renderInspector(){
       if (!free) h += `<div class="row"><label>Dimensions</label><div class="pair"><input type="number" step="0.5" min="2" data-g="w" value="${st.garden.w}"><input type="number" step="0.5" min="2" data-g="h" value="${st.garden.h}"></div></div>`;
       h += `<div class="acts">${editContour ? '<button class="btn primary" data-act="contour-done">✓ Terminer la modification</button>' : '<button class="btn" data-act="edit-contour">✎ Modifier les angles</button>'}<button class="btn" data-act="draw-contour">✏ Redessiner</button></div>`;
     }
+    if (!folded){
     h += `<h4>Fond de plan</h4>`;
     if (!bgSrc || !st.bg){
       h += `<p class="note">Photo aérienne (capture Géoportail, Google Maps…), plan cadastral ou plan de masse à décalquer.</p><div class="acts"><button class="btn" data-act="bg-import">🖼 Importer une image</button></div>`;
@@ -2139,8 +2171,9 @@ function renderInspector(){
       h += `<label class="chk"><input type="checkbox" data-g="unlocked"${b.locked === false ? ' checked' : ''}> Déplacer le fond en le faisant glisser</label>`;
       h += `<div class="acts"><button class="btn primary" data-act="exist">🔍 Repérer l'existant</button><button class="btn" data-act="bg-calib">📏 Mettre à l'échelle</button><button class="btn" data-act="bg-import">Remplacer</button><button class="btn danger" data-act="bg-remove">Retirer</button></div>`;
     }
-    h += `<h4>Aide</h4><p class="note">Choisissez un végétal ou un aménagement à gauche, puis cliquez sur le plan (ou faites-le glisser directement).</p>`;
+    h += `<h4>Aide</h4><p class="note">${isMobile() ? 'Touchez « ＋ Ajouter », choisissez un végétal ou un aménagement, puis touchez le plan à l’endroit voulu (ou faites-le glisser directement).' : 'Choisissez un végétal ou un aménagement à gauche, puis cliquez sur le plan (ou faites-le glisser directement).'}</p>`;
     h += `<div class="kbd hide-m"><kbd>Suppr</kbd> effacer · <kbd>Ctrl</kbd>+<kbd>D</kbd> dupliquer · flèches : déplacer (<kbd>Maj</kbd> = 1 m) · <kbd>Maj</kbd> en traçant : angles à 45° · <kbd>Entrée</kbd> ou double-clic : terminer un tracé · molette / pincement : zoom · glisser le fond : se déplacer</div>`;
+    }
   } else if (it.type === 'note'){
     h += `<div class="row"><label>Texte</label><textarea data-f="text" rows="${Math.min(8, Math.max(2, String(it.text).split('\n').length + 1))}" style="width:100%;resize:vertical">${esc(it.text)}</textarea></div>`;
     h += `<div class="row"><label>Couleur</label><select data-f="color">${Object.keys(NOTE_COLORS).map(c => `<option value="${c}"${c === it.color ? ' selected' : ''}>${c}</option>`).join('')}</select></div>`;
@@ -2159,22 +2192,27 @@ function renderInspector(){
     if (st.prefs.legal && sp.cat !== 'grimpante' && li) h += `<div class="warn mini">⚠ À ${fmt(li.dist, 2)} m de la limite : ${sp.h > 2 ? '2 m' : '0,5 m'} minimum (art. 671 du Code civil).</div>`;
   } else if (it.type === 'zone'){
     const k = ZONES[it.kind];
-    h += `<div class="row"><label>Type</label><select data-f="kind">${Object.entries(ZONES).map(([kk, z]) => `<option value="${kk}"${kk === it.kind ? ' selected' : ''}>${z.label}</option>`).join('')}</select></div>`;
-    h += `<div class="row"><label>Nom</label><input type="text" data-f="label" value="${esc(it.label || '')}" placeholder="${esc(k.label)}"></div>`;
-    h += `<div class="row"><label>Dimensions</label><div class="pair"><input type="number" step="0.1" min="0.2" data-f="w" value="${it.w}"><input type="number" step="0.1" min="0.2" data-f="h" value="${it.h}"></div></div>`;
-    h += `<div class="row"><label>Orientation</label><div class="pair"><input type="number" step="1" data-f="rot" value="${it.rot || 0}"><span style="align-self:center">°</span></div></div>`;
-    h += `<div class="acts" style="margin-top:0"><button class="btn" data-rot="-15">↺ 15°</button><button class="btn" data-rot="15">↻ 15°</button><button class="btn" data-rot="90">↻ 90°</button><button class="btn" data-rot="0">Droit</button></div>`;
-    h += `<p class="note">Ou faites glisser la poignée ronde bleue au-dessus de la forme (touche <kbd>R</kbd> : +15°).</p>`;
-    h += `<p class="note">Surface : <b>${fmt(it.w * it.h, 1)} m²</b> · périmètre ${fmt(2 * (it.w + it.h))} m</p>`;
-    h += `<div class="row"><label>Notes</label><input type="text" data-f="note" value="${esc(it.note || '')}"></div>`;
+    h += `<p class="note" style="margin:0 0 4px">Surface <b>${fmt(it.w * it.h, 1)} m²</b> · périmètre ${fmt(2 * (it.w + it.h))} m</p>`;
+    h += `<div class="cgrid">`;
+    h += `<label>Type<select data-f="kind">${Object.entries(ZONES).map(([kk, z]) => `<option value="${kk}"${kk === it.kind ? ' selected' : ''}>${z.label}</option>`).join('')}</select></label>`;
+    h += `<label>Nom<input type="text" data-f="label" value="${esc(it.label || '')}" placeholder="${esc(k.label)}"></label>`;
+    h += `<label>Largeur (m)<input type="number" step="0.1" min="0.2" data-f="w" value="${it.w}"></label>`;
+    h += `<label>Profondeur (m)<input type="number" step="0.1" min="0.2" data-f="h" value="${it.h}"></label>`;
+    h += `<label>Orientation (°)<input type="number" step="1" data-f="rot" value="${it.rot || 0}"></label>`;
+    h += `<label>Tourner<span class="pair rotb"><button class="btn" data-rot="-15" title="−15°">↺</button><button class="btn" data-rot="15" title="+15°">↻</button><button class="btn" data-rot="90" title="+90°">90°</button><button class="btn" data-rot="0" title="Remettre droit">0°</button></span></label>`;
+    h += `<label class="wide">Notes<input type="text" data-f="note" value="${esc(it.note || '')}"></label>`;
+    h += `</div>`;
+    if (!isMobile()) h += `<p class="note">Ou faites glisser la poignée ronde bleue au-dessus de la forme (touche <kbd>R</kbd> : +15°).</p>`;
   } else if (it.type === 'line'){
     const k = LINES[it.kind];
-    h += `<div class="row"><label>Type</label><select data-f="kind">${Object.entries(LINES).map(([kk, l]) => `<option value="${kk}"${kk === it.kind ? ' selected' : ''}>${l.label}</option>`).join('')}</select></div>`;
-    h += `<div class="row"><label>Nom</label><input type="text" data-f="label" value="${esc(it.label || '')}" placeholder="${esc(k.label)}"></div>`;
-    if (k.editW) h += `<div class="row"><label>Largeur</label><div class="pair"><input type="number" step="0.1" min="0.1" data-f="width" value="${it.width || k.w}"><span style="align-self:center">m</span></div></div>`;
     const L = polyLen(it.points);
-    h += `<p class="note">Longueur : <b>${fmt(L, 1)} m</b>${k.editW ? ` · surface ≈ ${fmt(L * (it.width || k.w), 1)} m²` : ''} · ${it.points.length} points. Faites glisser les points pour modifier le tracé.</p>`;
-    h += `<div class="row"><label>Notes</label><input type="text" data-f="note" value="${esc(it.note || '')}"></div>`;
+    h += `<p class="note" style="margin:0 0 4px">Longueur <b>${fmt(L, 1)} m</b>${k.editW ? ` · surface ≈ ${fmt(L * (it.width || k.w), 1)} m²` : ''} · ${it.points.length} points</p>`;
+    h += `<div class="cgrid">`;
+    h += `<label>Type<select data-f="kind">${Object.entries(LINES).map(([kk, l]) => `<option value="${kk}"${kk === it.kind ? ' selected' : ''}>${l.label}</option>`).join('')}</select></label>`;
+    h += `<label>Nom<input type="text" data-f="label" value="${esc(it.label || '')}" placeholder="${esc(k.label)}"></label>`;
+    if (k.editW) h += `<label>Largeur (m)<input type="number" step="0.1" min="0.1" data-f="width" value="${it.width || k.w}"></label>`;
+    h += `<label${k.editW ? '' : ' class="wide"'}>Notes<input type="text" data-f="note" value="${esc(it.note || '')}"></label>`;
+    h += `</div>`;
   }
   if (it){
     const title = it.type === 'plant' ? spHTML(spById(it.sid)) : it.type === 'note' ? (isBadge(it) ? 'Repère' : 'Étiquette') : esc(it.label || (it.type === 'zone' ? ZONES[it.kind] : LINES[it.kind]).label);
@@ -2223,6 +2261,7 @@ $('#selPanel').addEventListener('change', e => {
   editing = false; renderInspector();
 });
 $('#selPanel').addEventListener('click', e => {
+  if (e.target.closest('[data-act="terrain-fold"]')){ if (isMobile()) return; terrainOpen = !terrainOpen; try { localStorage.setItem('jardin-terrain-open', terrainOpen ? '1' : ''); } catch(_){} renderInspector(); return; }
   const rb = e.target.closest('[data-rot]');
   if (rb){ const it = itemById(sel); if (!it || it.type !== 'zone') return; pushHistory(); const v = +rb.dataset.rot;
     it.rot = v === 0 ? 0 : normRot((it.rot || 0) + v); afterChange(); return; }
@@ -2259,7 +2298,7 @@ function plantStats(){
 }
 function renderLegend(){
   const el = $('#legend'); if (!el) return;
-  const show = st.prefs.view === 'strates' || (hl && hl.startsWith('fn:'));
+  const show = st.prefs.view === 'strates' || (hl && (hl.startsWith('fn:') || hl.startsWith('cat:')));
   if (!show){ el.style.display = 'none'; return; }
   const S = plantStats(); let h = '';
   if (st.prefs.view === 'strates'){
@@ -2267,13 +2306,16 @@ function renderLegend(){
     for (const [k, v] of Object.entries(STRATES)) if (S.st[k]) h += `<div class="lg${hl === 'st:' + k ? ' on' : ''}" data-hl="st:${k}"><i style="background:${v.color}"></i>${v.short}<span>${S.st[k]}</span></div>`;
   }
   if (hl && hl.startsWith('fn:')){ const F = FONCTIONS[hl.slice(3)]; h += `<div class="lg on" data-hl="${hl}">${F.icon} ${F.label}<span>${S.fn[hl.slice(3)] || 0}</span> <a href="#" data-hl="${hl}" style="margin-left:6px">✕</a></div>`; }
+  if (hl && hl.startsWith('cat:')){ const c = hl.slice(4), n = st.items.filter(i => i.type === 'plant' && (spById(i.sid) || {}).cat === c).length; h += `<div class="lg on" data-hl="${hl}">👁 ${esc(CATS[c] ? CATS[c].label : c)}<span>${n}</span> <a href="#" data-hl="${hl}" style="margin-left:6px">✕</a></div>`; }
   el.innerHTML = h; el.style.display = h ? 'block' : 'none';
 }
 $('#legend').addEventListener('click', e => { const d = e.target.closest('[data-hl]'); if (d){ e.preventDefault(); setHL(d.dataset.hl); } });
+let terrainOpen = false;
+try { terrainOpen = !!localStorage.getItem('jardin-terrain-open'); } catch(_){}
 let invOpen;
 try { invOpen = new Set(JSON.parse(localStorage.getItem('jardin-inv-open-v1') || '[]')); } catch(_){ invOpen = new Set(); }
 function invOpenSet(k, on){ on ? invOpen.add(k) : invOpen.delete(k); try { localStorage.setItem('jardin-inv-open-v1', JSON.stringify([...invOpen])); } catch(_){} }
-const invSec = (k, title, n, body) => `<div class="icat${invOpen.has(k) ? ' open' : ''}"><div class="ich" data-sec="${k}"><span class="ar">▶</span>${title}${n !== '' ? `<span class="n">${n}</span>` : ''}</div><div class="ibody">${body}</div></div>`;
+const invSec = (k, title, n, body, extra = '') => `<div class="icat${invOpen.has(k) ? ' open' : ''}"><div class="ich" data-sec="${k}"><span class="ar">▶</span>${title}${n !== '' ? `<span class="n">${n}</span>` : ''}${extra}</div><div class="ibody">${body}</div></div>`;
 function forestHTML(){
   const S = plantStats(); if (!S.n) return '';
   let h = `<div class="stbar">`;
@@ -2297,7 +2339,7 @@ function renderInventory(){
     for (const c of Object.keys(CATS)){
       const rs = rows.filter(([sp]) => sp.cat === c); if (!rs.length) continue;
       const n = rs.reduce((a, r) => a + r[1], 0);
-      h += invSec('c:' + c, esc(CATS[c].label), n, `<table class="inv">` + rs.map(([sp, n]) => `<tr class="clk${sp.id === curSid ? ' on' : ''}" data-sid="${sp.id}"><td><span class="dot" style="background:${sp.color}"></span>${spHTML(sp)}</td><td>× ${n}</td></tr>`).join('') + `</table>`);
+      h += invSec('c:' + c, esc(CATS[c].label), n, `<table class="inv">` + rs.map(([sp, n]) => `<tr class="clk${sp.id === curSid ? ' on' : ''}" data-sid="${sp.id}"><td><span class="dot" style="background:${sp.color}"></span>${spHTML(sp)}</td><td>× ${n}</td></tr>`).join('') + `</table>`, `<button class="ieye${hl === 'cat:' + c ? ' on' : ''}" data-hl="cat:${c}" title="Repérer cette catégorie sur le plan" aria-label="Repérer ${esc(CATS[c].label)} sur le plan">👁</button>`);
     }
   }
   if (zones.length){
@@ -2315,6 +2357,8 @@ function renderInventory(){
 }
 $('#invPanel').addEventListener('click', e => {
   const sec = e.target.closest('[data-sec]');
+  const eye = e.target.closest('.ieye');
+  if (eye){ setHL(eye.dataset.hl); if (isMobile() && hl) closeSheets(); return; }
   if (sec){ const k = sec.dataset.sec, on = !invOpen.has(k); invOpenSet(k, on); sec.parentElement.classList.toggle('open', on); return; }
   const act = e.target.closest('[data-act]');
   if (act){ if (act.dataset.act === 'inv-close') closeSheets(); else if (act.dataset.act === 'terrain'){ sel = null; render(); renderInspector(); openInspector('edit'); } return; }
@@ -2583,7 +2627,7 @@ function openConfig(form){
   if (form) setTimeout(() => { const i = $('#cfgForm input[type=text]'); if (i){ i.focus(); i.select(); } $('#cfgForm').scrollIntoView({block:'nearest'}); }, 60);
 }
 function renderConfig(){
-  const q = $('#cfgSearch').value.trim().toLowerCase();
+  const q = fold($('#cfgSearch').value.trim());
   let nav = '';
   for (const [k, c] of Object.entries(CATS)){
     const n = new Set(catalog.species.filter(x => x.cat === k).map(x => x.name)).size;
@@ -2591,7 +2635,7 @@ function renderConfig(){
   }
   $('#cfgNav').innerHTML = nav;
   $('#cfgForm').innerHTML = cfgForm ? cfgFormHTML(cfgForm) : '';
-  const list = catalog.species.filter(x => q ? (x.name + ' ' + (x.variety || '')).toLowerCase().includes(q) : x.cat === cfgCat);
+  const list = catalog.species.filter(x => q ? fold(x.name + ' ' + (x.variety || '')).includes(q) : x.cat === cfgCat);
   let h = '';
   let lastCat = null;
   for (const g of speciesGroups(list)){
@@ -2964,7 +3008,8 @@ function renderHome(){
     const s = readPlan(e.id); if (!s) continue;
     h += `<div class="pcard" data-id="${e.id}"><div class="thumb">${thumbSVG(s)}</div>` +
          `<div class="meta"><b title="${esc(e.name)}">${esc(e.name)}</b><small>${e.area ? fmt(e.area, 0) + ' m² · ' : ''}${e.plants || 0} végéta${(e.plants || 0) > 1 ? 'ux' : 'l'}</small><small>Modifié ${fmtDate(e.updated)}</small></div>` +
-         `<div class="cacts"><button data-act="rename" title="Renommer">✎</button><button data-act="share" title="Partager par un lien">🔗</button><button data-act="dup" title="Dupliquer">⧉</button><button data-act="export" title="Exporter (sauvegarde .json)">⇩</button><button data-act="del" title="Supprimer">🗑</button></div></div>`;
+         `<div class="cacts"><button data-act="menu" aria-label="Actions sur ce plan">⋯ <span>Actions</span></button></div>` +
+         `<div class="cmenu"><button data-act="rename">✎ Renommer</button><button data-act="share">🔗 Partager</button><button data-act="dup">⧉ Dupliquer</button><button data-act="export">⇩ Exporter</button><button data-act="del" class="danger">🗑 Supprimer</button><button data-act="menu-close" class="close" aria-label="Fermer">✕</button></div></div>`;
   }
   $('#homeGrid').innerHTML = h;
 }
@@ -2984,6 +3029,10 @@ $('#nameIn').addEventListener('keydown', e => { if (e.key === 'Enter') applyRena
 $('#homeGrid').addEventListener('click', e => {
   const card = e.target.closest('.pcard'); if (!card) return;
   const act = e.target.closest('[data-act]')?.dataset.act, id = card.dataset.id;
+  const opened = card.classList.contains('menu');
+  document.querySelectorAll('#homeGrid .pcard.menu').forEach(c => c.classList.remove('menu'));
+  if (act === 'menu'){ if (!opened) card.classList.add('menu'); return; }
+  if (act === 'menu-close' || (opened && !act)) return;
   if (act === 'new'){ openNew(); return; }
   if (act === 'rename'){ renameBox(id); return; }
   if (act === 'dup'){
@@ -3005,6 +3054,8 @@ $('#homeGrid').addEventListener('click', e => {
   }
   openPlan(id);
 });
+document.addEventListener('click', e => { if (!e.target.closest('#homeGrid .pcard.menu')) document.querySelectorAll('#homeGrid .pcard.menu').forEach(c => c.classList.remove('menu')); }, true);
+document.addEventListener('keydown', e => { if (e.key === 'Escape') document.querySelectorAll('#homeGrid .pcard.menu').forEach(c => c.classList.remove('menu')); });
 $('#homeImport').onclick = () => { $('#jsonIn').value = ''; openModal('ioModal'); };
 $('#homeBtn').onclick = goHome;
 $('#planName').addEventListener('change', e => {
