@@ -317,7 +317,9 @@ body.at-home #ioModal .exp{display:none}
 .pcard .cacts button:hover{background:var(--acc-soft);color:var(--ink)}
 .pcard .cacts button span{font-size:12.5px}
 .pcard{position:relative}
-.pcard .cmenu{display:none;position:absolute;inset:0;z-index:3;background:rgba(255,253,246,.97);flex-direction:column;justify-content:center;gap:0;padding:8px;cursor:default}
+.pcard .cmenu{display:none;position:absolute;inset:0;z-index:3;background:var(--panel);flex-direction:column;justify-content:center;gap:0;padding:8px;cursor:default}
+#legend a[data-hl]{display:inline-grid;place-items:center;min-width:28px;min-height:28px;margin:-6px -4px -6px 4px !important;border-radius:8px;color:var(--mute);text-decoration:none;font-weight:700}
+#legend a[data-hl]:hover{background:#fff;color:var(--ink)}
 .pcard.menu .cmenu{display:flex}
 .pcard .cmenu button{border:0;background:none;text-align:left;font:inherit;font-size:15px;padding:9px 12px;border-radius:10px;cursor:pointer;color:var(--ink);white-space:nowrap}
 .pcard .cmenu button:hover{background:var(--acc-soft)}
@@ -3052,6 +3054,8 @@ $('#homeGrid').addEventListener('click', e => {
   }
   openPlan(id);
 });
+document.addEventListener('click', e => { if (!e.target.closest('#homeGrid .pcard.menu')) document.querySelectorAll('#homeGrid .pcard.menu').forEach(c => c.classList.remove('menu')); }, true);
+document.addEventListener('keydown', e => { if (e.key === 'Escape') document.querySelectorAll('#homeGrid .pcard.menu').forEach(c => c.classList.remove('menu')); });
 $('#homeImport').onclick = () => { $('#jsonIn').value = ''; openModal('ioModal'); };
 $('#homeBtn').onclick = goHome;
 $('#planName').addEventListener('change', e => {
