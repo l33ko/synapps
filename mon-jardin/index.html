@@ -90,6 +90,46 @@ header.top{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;padding:8
 .growth input{width:110px;accent-color:var(--acc)}
 .growth output{min-width:72px;color:var(--ink)}
 .spacer{flex:1}
+header.top .dims{display:none}
+#hdView,#hdGrowth{display:contents}
+.growth .glab{white-space:nowrap}
+.gcurs{display:flex;align-items:center;gap:8px}
+.m-only{display:none}
+#moreBtn{font-weight:600}
+#moreBtn b{font-size:18px}
+#moreBtn.open{background:var(--acc);border-color:var(--acc);color:#fff}
+.mvoile{position:fixed;inset:0;z-index:40;display:none}
+.mvoile.on{display:block}
+.moremenu{position:fixed;z-index:41;background:var(--panel);display:none;flex-direction:column;box-shadow:0 10px 40px rgba(30,40,20,.3);top:58px;right:14px;width:360px;border-radius:14px;border:1px solid var(--line);max-height:calc(100vh - 80px);overflow:auto;padding-bottom:6px}
+.moremenu.on{display:flex}
+.moremenu .poignee{display:none;width:40px;height:4px;border-radius:2px;background:#d4ccb6;margin:8px auto 2px;flex:none}
+.moremenu h3{margin:0;padding:12px 18px 4px;font:600 11px 'Work Sans',system-ui,sans-serif;letter-spacing:.07em;text-transform:uppercase;color:var(--mute)}
+.moremenu .lig{display:flex;align-items:center;gap:12px;padding:10px 18px;min-height:52px;border:0;border-bottom:1px solid var(--line);background:none;width:100%;text-align:left;cursor:pointer;font:inherit;color:var(--ink)}
+.moremenu .lig:last-child{border-bottom:0}
+.moremenu .lig:hover{background:#f6f1e2}
+.moremenu .lig[hidden]{display:none}
+.moremenu .ic{width:28px;text-align:center;font-size:18px;flex:none}
+.moremenu .tx{flex:1;min-width:0}
+.moremenu .tx b{font-weight:600}
+.moremenu .tx small{display:block;color:var(--mute);font-size:12.5px;margin-top:1px}
+.moremenu .etat{color:var(--mute);font-size:18px}
+.inter{width:46px;height:27px;border-radius:14px;background:#d4ccb6;position:relative;flex:none;transition:background .15s}
+.inter::after{content:"";position:absolute;top:3px;left:3px;width:21px;height:21px;border-radius:50%;background:#fff;transition:left .15s;box-shadow:0 1px 2px rgba(0,0,0,.25)}
+.lig.on .inter{background:var(--acc)}
+.lig.on .inter::after{left:22px}
+.mbloc{padding:8px 18px 12px;border-bottom:1px solid var(--line)}
+.mtit{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.mbloc .seg{display:flex;width:100%}
+.mbloc .seg button{flex:1;padding:9px 4px}
+.mbloc .growth{display:flex;flex-direction:column;align-items:stretch;gap:4px;color:var(--ink)}
+.mbloc .growth .glab{display:none}
+.mbloc{position:relative}
+.mbloc .growth output{position:absolute;top:12px;right:18px;font-weight:600;color:var(--acc);min-width:0}
+#mnGrowth{padding-top:2px}
+.mbloc:has(#mnGrowth) .tx{padding-right:96px}
+.mbloc .gcurs input{flex:1;width:auto}
+.mbloc .gcurs small{color:var(--mute);font-size:12px}
+.mbloc .m-only{display:inline}
 
 main{flex:1;display:grid;grid-template-columns:268px 1fr 292px;min-height:0}
 aside{background:var(--panel);overflow:auto;min-height:0;-webkit-overflow-scrolling:touch}
@@ -345,7 +385,14 @@ body.at-home #ioModal .exp{display:none}
   .home-body h1{font-size:24px}
 }
 @media (max-width: 860px){
-  header.top{gap:6px 10px;padding:6px 10px}
+  header.top{gap:6px;padding:6px 8px;flex-wrap:nowrap}
+  #hdView,#hdGrowth,header.top .spacer{display:none}
+  .m-only{display:block}
+  header .m-only{display:none}
+  #moreBtn{min-width:40px;justify-content:center;padding:6px 10px}
+  .moremenu{top:auto;left:0;right:0;bottom:0;width:auto;border-radius:20px 20px 0 0;border:0;max-height:86dvh;padding-bottom:calc(10px + env(safe-area-inset-bottom))}
+  .moremenu .poignee{display:block}
+  .mvoile{background:rgba(37,50,30,.35)}
   .brand{font-size:18px}
   .growth input{width:80px}
   .hide-m{display:none !important}
@@ -416,23 +463,37 @@ body.at-home #ioModal .exp{display:none}
     <span id="dimsFree" style="display:none;color:var(--ink)">forme libre</span>
     <span>= <b id="garea"></b></span>
   </div>
-  <div class="seg" id="viewSeg">
+  <span id="hdView"><span class="seg" id="viewSeg">
     <button data-v="detail">Détaillée</button>
     <button data-v="simple">Simplifiée</button>
     <button data-v="strates" title="Couleurs par strate du jardin-forêt">Strates</button>
-  </div>
-  <label class="growth" title="Taille affichée des végétaux : de la plantation à l'âge adulte">
-    <span class="hide-m hide-l">Croissance</span>
-    <input id="growth" type="range" min="15" max="100" step="5">
+  </span></span>
+  <span id="hdGrowth"><label class="growth" title="Taille affichée des végétaux : de la plantation à l'âge adulte">
+    <span class="glab">Âge du jardin</span>
+    <span class="gcurs"><small class="m-only">Plantation</small><input id="growth" type="range" min="15" max="100" step="5" aria-label="Âge du jardin"><small class="m-only">Adulte</small></span>
     <output id="growthOut"></output>
-  </label>
+  </label></span>
   <div class="spacer"></div>
-  <button class="btn icon" id="cloudBtn" hidden title="Synchronisation">☁</button>
   <button class="btn icon" id="undoBtn" title="Annuler (Ctrl+Z)">↶</button>
   <button class="btn icon" id="redoBtn" title="Rétablir (Ctrl+Maj+Z)">↷</button>
-  <button class="btn" id="speciesBtn" title="Palette végétale (tous les plans)">⚙ <span class="hide-m hide-l">Palette</span></button>
-  <button class="btn" id="ioBtn">⇩ <span class="hide-m hide-l">Fichier</span></button>
+  <button class="btn" id="moreBtn" aria-expanded="false" aria-haspopup="dialog" title="Plus d'options">⋯<span class="hide-m"> Plus</span></button>
 </header>
+<div class="mvoile" id="moreVeil"></div>
+<div class="moremenu" id="moreMenu" role="dialog" aria-label="Plus d'options">
+  <div class="poignee"></div>
+  <div class="m-only">
+    <h3>Affichage du plan</h3>
+    <div class="mbloc"><div class="mtit"><span class="ic">👁</span><span class="tx"><b>Vue</b><small>Comment les éléments sont dessinés</small></span></div><div id="mnView"></div></div>
+    <div class="mbloc"><div class="mtit"><span class="ic">🌱</span><span class="tx"><b>Âge du jardin</b><small>Taille des végétaux, de la plantation à l'âge adulte</small></span></div><div id="mnGrowth"></div></div>
+  </div>
+  <h3>Aides au dessin</h3>
+  <button class="lig" id="snapBtn"><span class="ic">⌗</span><span class="tx"><b>Grille aimantée</b><small>Les éléments se calent tous les 0,5 m</small></span><span class="inter"></span></button>
+  <button class="lig" id="legalBtn"><span class="ic">⚖</span><span class="tx"><b>Distances légales</b><small>Signale les végétaux trop près des limites (art. 671 du Code civil)</small></span><span class="inter"></span></button>
+  <h3>Mes données</h3>
+  <button class="lig" id="cloudBtn" hidden><span class="ic ci" id="cloudIc">☁</span><span class="tx"><b>Synchroniser mes appareils</b><small id="cloudTx">Retrouver ses plans sur tous ses appareils</small></span><span class="etat">›</span></button>
+  <button class="lig" id="speciesBtn"><span class="ic">🌿</span><span class="tx"><b>Palette végétale</b><small>Espèces et variétés, communes à tous vos plans</small></span><span class="etat">›</span></button>
+  <button class="lig" id="ioBtn"><span class="ic">⇩</span><span class="tx"><b>Exporter / partager</b><small>Lien de partage, image du plan, sauvegarde, import</small></span><span class="etat">›</span></button>
+</div>
 
 <main>
   <aside id="palette">
@@ -459,8 +520,6 @@ body.at-home #ioModal .exp{display:none}
         <button id="zOut" title="Dézoomer">−</button>
         <button id="zFit" title="Tout afficher">⤢</button>
         <button id="lockBtn" title="Verrouiller les éléments du plan (empêche de les déplacer par accident)">🔓</button>
-        <button id="snapBtn" title="Aimanter à la grille (0,5 m)">⌗</button>
-        <button id="legalBtn" title="Vérifier les distances de plantation par rapport aux limites (art. 671 du Code civil)">⚖</button>
       </div>
     </div>
   </section>
@@ -2386,7 +2445,7 @@ function syncHeader(){
   $('#garea').textContent = noContour() ? '—' : fmt(gArea(), 0) + ' m²';
   document.querySelectorAll('#viewSeg button').forEach(b => b.classList.toggle('on', b.dataset.v === st.prefs.view));
   $('#growth').value = Math.round(st.prefs.growth * 100);
-  const g = st.prefs.growth; $('#growthOut').textContent = g >= 1 ? 'adulte' : Math.round(g * 100) + ' %';
+  const g = st.prefs.growth; $('#growthOut').textContent = g >= 1 ? 'adulte' : g <= .15 ? 'plantation' : Math.round(g * 100) + ' % adulte';
   $('#snapBtn').classList.toggle('on', st.prefs.snap);
   $('#legalBtn').classList.toggle('on', st.prefs.legal);
   $('#lockBtn').classList.toggle('on', locked()); $('#lockBtn').textContent = locked() ? '🔒' : '🔓';
@@ -2404,6 +2463,18 @@ $('#zIn').onclick = () => { const r = stage.getBoundingClientRect(); zoomAt(r.wi
 $('#zOut').onclick = () => { const r = stage.getBoundingClientRect(); zoomAt(r.width / 2, r.height / 2, 1 / 1.3); };
 $('#zFit').onclick = fit;
 $('#lockBtn').onclick = () => { st.prefs.lock = !locked(); save(); syncHeader(); render(); toast(locked() ? '🔒 Plan verrouillé : les éléments ne bougent plus (on peut toujours les modifier et en ajouter)' : '🔓 Plan déverrouillé : les éléments peuvent être déplacés'); };
+function moreMenu(on){
+  const m = $('#moreMenu');
+  if (on && isMobile()){ $('#mnView').appendChild($('#viewSeg')); $('#mnGrowth').appendChild($('#hdGrowth .growth') || $('#mnGrowth .growth')); }
+  if (!on){ $('#hdView').appendChild($('#viewSeg')); const gr = $('#mnGrowth .growth'); if (gr) $('#hdGrowth').appendChild(gr); }
+  m.classList.toggle('on', on); $('#moreVeil').classList.toggle('on', on);
+  $('#moreBtn').classList.toggle('open', on); $('#moreBtn').setAttribute('aria-expanded', on);
+}
+$('#moreBtn').onclick = () => moreMenu(!$('#moreMenu').classList.contains('on'));
+$('#moreVeil').onclick = () => moreMenu(false);
+$('#moreMenu .poignee').onclick = () => moreMenu(false);
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && $('#moreMenu').classList.contains('on')) moreMenu(false); });
+for (const id of ['cloudBtn', 'speciesBtn', 'ioBtn']) $('#' + id).addEventListener('click', () => moreMenu(false), true);
 $('#snapBtn').onclick = () => { st.prefs.snap = !st.prefs.snap; save(); syncHeader(); toast(st.prefs.snap ? 'Aimantation à 0,5 m activée' : 'Aimantation désactivée'); };
 $('#legalBtn').onclick = () => { st.prefs.legal = !st.prefs.legal; save(); syncHeader(); render(); renderInspector(); toast(st.prefs.legal ? 'Contrôle des distances aux limites activé' : 'Contrôle des distances désactivé'); };
 function openNew(){ $('#nName').value = ''; openModal('newModal'); setTimeout(() => $('#nName').focus(), 60); }
@@ -2970,6 +3041,7 @@ function openPlan(id){
   requestAnimationFrame(() => fit(noContour() && st.bg ? bgBBox() : undefined));
 }
 function goHome(){
+  moreMenu(false);
   saveNow(); curId = null; closeModals(); closeSheets();
   document.body.classList.add('at-home'); document.title = 'Mes plans — Mon jardin';
   if (location.hash !== '#accueil') location.hash = 'accueil';
@@ -3287,7 +3359,7 @@ function drawCloudBtn(){
   const t = !AUTH ? 'Synchroniser mes appareils' : cloudState === 'sync' ? 'Synchronisation…' : cloudState === 'offline' ? 'Hors ligne' : cloudState === 'err' ? 'Synchro en erreur' : 'Synchronisé';
   for (const b of [$('#homeCloud'), $('#cloudBtn')]){ if (!b) continue; b.hidden = !show; b.title = t; b.classList.toggle('on', !!AUTH && cloudState === 'ok'); b.classList.toggle('spin', cloudState === 'sync'); }
   const hb = $('#homeCloud'); if (hb) hb.innerHTML = `<span class="ci">${ic}</span> <span class="hide-m">${AUTH ? t : 'Synchroniser'}</span>`;
-  const eb = $('#cloudBtn'); if (eb) eb.innerHTML = `<span class="ci">${ic}</span>`;
+  if ($('#cloudIc')){ $('#cloudIc').textContent = ic; $('#cloudTx').textContent = AUTH ? `${t} · ${AUTH.email}` : 'Retrouver vos plans sur tous vos appareils'; }
   const f = $('#homeFoot');
   if (f) f.textContent = AUTH ? `Vos plans et votre palette sont synchronisés avec ${AUTH.email} : retrouvez-les sur tous vos appareils.`
     : 'Vos plans sont enregistrés dans ce navigateur, sur cet appareil.' + (CLOUD() ? ' Pour les retrouver sur vos autres appareils, utilisez ☁ Synchroniser.' : ' Pour les conserver ailleurs ou les ouvrir sur un autre appareil, utilisez ⇩ (exporter) puis « Importer un plan ».');
