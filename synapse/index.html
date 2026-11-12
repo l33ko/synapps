@@ -231,6 +231,7 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--accent);outline-off
 .wd{font-size:clamp(2.4rem,12vw,3.4rem);font-weight:800;font-stretch:85%;letter-spacing:.02em}
 .qa{font-size:clamp(2rem,10vw,3rem);font-weight:700;font-variant-numeric:tabular-nums}
 .qs{font-size:1.25rem;font-weight:600}
+.ab .was{opacity:.55;font-weight:600;margin-right:.3em}
 .ab{font-size:2rem;font-weight:800;min-height:2.4rem;letter-spacing:.14em;color:var(--lit);font-variant-numeric:tabular-nums}
 .scr{font-size:clamp(2rem,9vw,2.8rem);font-weight:800;letter-spacing:.3em;padding-left:.3em}
 .gs svg{width:72px;height:72px;display:block}
@@ -382,10 +383,29 @@ function dateKey(d){return d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDa
 function hashStr(s){var h=2166136261,i;for(i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
 function mulberry(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
 function shuffleR(a,r){a=a.slice();for(var i=a.length-1,j,t;i>0;i--){j=Math.floor(r()*(i+1));t=a[i];a[i]=a[j];a[j]=t}return a}
-function planFor(key){
- var r=mulberry(hashStr('carnet:'+key)),doms=[],by={};
- EXIDS.forEach(function(x){var d=EXDOM[x];if(!by[d]){by[d]=[];doms.push(d)}by[d].push(x)});
- return shuffleR(shuffleR(doms,r).slice(0,NEED).map(function(d){return by[d][Math.floor(r()*by[d].length)]}),r)}
+/* Séance du jour. Les premiers jours (moins de PLAN_MIN exercices avant aujourd'hui) : 5 thèmes au hasard.
+   Ensuite : 1 jeu du thème le plus faible, 1 jeu pas vu depuis le plus longtemps, 3 jeux au hasard dans 3 autres thèmes.
+   Ne dépend que des jours précédents : la séance ne bouge donc pas pendant la journée. */
+var PLAN_MIN=15,planMemo={k:'',n:-1,v:null};
+function planInfo(key,runs){
+ var r=mulberry(hashStr('carnet:'+key)),doms=[],by={},prev=(runs||[]).filter(function(x){return x.d<key});
+ if(planMemo.k===key&&planMemo.n===prev.length)return planMemo.v;
+ function memo(v){planMemo={k:key,n:prev.length,v:v};return v}
+ if(prev.length<PLAN_MIN){
+  EXIDS.forEach(function(x){var d=EXDOM[x];if(!by[d]){by[d]=[];doms.push(d)}by[d].push(x)});
+  return memo({ids:shuffleR(shuffleR(doms,r).slice(0,NEED).map(function(d){return by[d][Math.floor(r()*by[d].length)]}),r),weak:null,stale:null})}
+ var lv={},last={},ths=shuffleR(THEMES,r),weak=null,wl=99,stale=null,st=Infinity,ids=[];
+ EXIDS.forEach(function(id){lv[id]=START;last[id]=0});
+ prev.slice().sort(function(a,b){return a.ts-b.ts}).forEach(function(x){lv[x.ex]=clamp(lv[x.ex]+x.dl,1,MAXLV);last[x.ex]=x.ts});
+ function one(th){return th.ex[Math.floor(r()*th.ex.length)]}
+ ths.forEach(function(th){var m=th.ex.reduce(function(a,id){return a+lv[id]},0)/th.ex.length;if(m<wl-1e-9){wl=m;weak=th}});
+ var wx=one(weak),sth=null;
+ ths.forEach(function(th){if(th===weak)return;shuffleR(th.ex,r).forEach(function(id){if(last[id]<st){st=last[id];stale=id;sth=th}})});
+ ids=[wx,stale];
+ ths.filter(function(th){return th!==weak&&th!==sth}).slice(0,NEED-2).forEach(function(th){ids.push(one(th))});
+ var t0=new Date(+key.slice(0,4),+key.slice(5,7)-1,+key.slice(8,10)).getTime();
+ return memo({ids:shuffleR(ids,r),weak:{ex:wx,th:weak.nom},stale:{ex:stale,days:st?Math.max(1,Math.round((t0-st)/864e5)):null}})}
+function planFor(key,runs){return planInfo(key,runs).ids}
 
 /* Mémoire : empan spatial et empan de chiffres */
 function memLen(L){return 2+Math.floor(L/2)}
@@ -395,7 +415,14 @@ function digLen(L){return 3+Math.floor(L/3)}
 function digShow(L){return Math.max(450,800-L*15)}
 function makeSeq(len,cells){var s=[],i,c;for(i=0;i<len;i++){do{c=rnd(cells)}while(i>0&&c===s[i-1]);s.push(c)}return s}
 function dlMem(best,len0){var p=clamp((best-len0+2)/4,0,1);return(p-0.5)*3}
-function dlTimed(ok,ko){var n=ok+ko;if(n<3)return-0.5;return clamp((ok/n-0.8)*5,-1.5,1)*Math.min(1,n/8)}
+/* Jeux chronométrés : la justesse décide du sens (80 % = stable), la vitesse de l'ampleur de la hausse.
+   PACE[jeu] = [a, b] bonnes réponses en 45 s : en dessous de a la hausse est minime, à partir de b elle est entière. */
+var PACE={attention:[12,24],fleches:[16,30],vitesse:[12,22],calcul:[6,12],langage:[5,10],intrus:[6,12],suites:[4,8],rotation:[4,9],nback:[12,22],different:[7,14],gonogo:[15,28],plusgrand:[12,24],vraifaux:[7,14],operateur:[6,12],lettres:[4,8],miroir:[4,9],contraire:[7,14],ortho:[6,12]};
+function dlTimed(ok,ko,pace){
+ var n=ok+ko;if(n<3)return-0.5;
+ var a=clamp((ok/n-0.8)*5,-1.5,1);
+ if(!pace||a<=0)return a*Math.min(1,n/8);
+ return a*(0.15+0.85*clamp((ok-pace[0])/(pace[1]-pace[0]),0,1))}
 
 /* Attention : Stroop */
 var COL=[
@@ -835,7 +862,7 @@ function doLogout(){logout();ACC.state='off';ACC.step=1;ACC.msg='';ACC.last=0;AC
 function fr(x,d){return x.toFixed(d).replace('.',',')}
 function sgn(x){return(x>=0?'+':'−')+fr(Math.abs(x),1)}
 function nowKey(){return dateKey(new Date())}
-function plan(){return planFor(nowKey()).map(exById)}
+function plan(){return planFor(nowKey(),S.runs).map(exById)}
 function runsOf(id){return S.runs.filter(function(r){return r.ex===id})}
 function doneToday(){var d={},k=nowKey();S.runs.forEach(function(r){if(r.d===k)d[r.ex]=r});return d}
 function nextUndone(){var d=doneToday(),p=plan(),i;for(i=0;i<p.length;i++)if(!d[p[i].id])return p[i];return null}
@@ -876,7 +903,8 @@ function accChip(){
  return '<button class="acc" data-act="tab" data-v="compte" aria-label="Compte : '+(on?'sauvegarde active':'résultats sur cet appareil')+'">'+(ACC.avatar?'<img src="'+esc(ACC.avatar)+'" alt="">':PERSON)+'<span class="dot'+(on&&!ACC.err?' on':'')+'"></span></button>'}
 
 function viewHome(){
- var done=doneToday(),k=0,nx=null,now=new Date(),pl=plan();
+ var done=doneToday(),k=0,nx=null,now=new Date(),pl=plan(),pi=planInfo(nowKey(),S.runs),why='';
+ if(pi.weak)why='<p class="note why"><b>'+exById(pi.weak.ex).jeu+'</b> pour ton thème le plus faible ('+pi.weak.th+'), <b>'+exById(pi.stale.ex).jeu+'</b> '+(pi.stale.days?'pas joué depuis '+pi.stale.days+' jour'+(pi.stale.days>1?'s':''):'jamais joué')+'.</p>';
  pl.forEach(function(e){if(done[e.id])k++;else if(!nx)nx=e});
  var strip=pl.map(function(e){var d=!!done[e.id],c=!d&&nx&&nx.id===e.id,th=themeOf(e.id);
   return '<div class="pl t-'+th.id+(d?' dn':c?' nx':'')+'"><span class="blk">'+(d?CHECKL:'')+'</span><span class="lb">'+e.jeu+'</span></div>'}).join('');
@@ -893,7 +921,7 @@ function viewHome(){
  var gl=allLv(S.lv),gd=globalDelta(S.runs,S.lv,now.getTime(),7),glob='<button class="tl gtl t-all" data-act="tile" data-v="all">'+ring(gl)+'<span class="gtx"><b>Score global</b><span class="note">Moyenne de tes 7 thèmes</span><span class="td '+dcls(gd)+'">'+(gd===null?'Pas encore mesuré':sgn(gd)+' sur 7 jours')+'</span></span></button>';
  var off=ACC.state==='off'?'<section class="card" aria-label="Sauvegarde"><p>Tes résultats sont gardés sur cet appareil seulement.</p><button class="lnk" data-act="tab" data-v="compte" style="align-self:flex-start">Activer la sauvegarde</button></section>':'';
  return '<header class="hd"><div><div class="brand"><svg class="logo" viewBox="0 0 48 48" aria-hidden="true"><rect width="48" height="48" rx="11" fill="var(--accent)"/><g fill="none" stroke="var(--accent-ink)" stroke-width="2.2" stroke-linecap="round"><path d="M9 37l-3 4M8 31l-3-1M15 40l1 3M39 11l3-4M40 17l3 1M33 8l-1-3"/></g><g fill="var(--accent-ink)"><circle cx="12.5" cy="34.5" r="5.5"/><circle cx="35.5" cy="13.5" r="5.5"/><path d="M24 18.6l1.7 3.7 3.7 1.7-3.7 1.7-1.7 3.7-1.7-3.7-3.7-1.7 3.7-1.7z"/></g></svg><h1>Synapse</h1></div><p class="date">'+dt+'</p></div>'+accChip()+'</header><p class="tag">5 exercices au hasard, 7 minutes par jour : un cerveau en forme, sans effort.</p>'+off+
- '<section class="card" aria-label="Séance du jour"><div class="ch-h"><h2>Séance du jour</h2><span class="cnt">'+k+' sur '+pl.length+'</span></div><div class="plan">'+strip+'</div>'+cta+'</section>'+
+ '<section class="card" aria-label="Séance du jour"><div class="ch-h"><h2>Séance du jour</h2><span class="cnt">'+k+' sur '+pl.length+'</span></div><div class="plan">'+strip+'</div>'+why+cta+'</section>'+
  '<section class="card" aria-label="Suivi quotidien"><h2>Suivi quotidien</h2><div class="streak"><span class="sn">'+st+'</span><span>'+(st>1?'jours d’affilée':'jour d’affilée')+'</span></div><div class="wk">'+wk+'</div></section>'+
  '<section aria-label="Performance" style="display:flex;flex-direction:column;gap:10px"><div class="ch-h"><h2>Performance</h2><span class="cnt">niveau sur 20</span></div><div class="tiles">'+glob+tiles+'</div></section>'+
  '<p class="foot">Le suivi mesure tes progrès dans ces exercices. Il ne mesure pas ton QI.</p>'}
@@ -996,7 +1024,8 @@ function viewIntro(){
  '<div class="alt"><button class="btn s" data-act="tprac">S’entraîner</button><p class="note">'+(e.span?'3 séquences courtes':'3 questions')+' sans chrono. Rien n’est compté.</p></div>'}
 
 function viewResult(){
- var e=V.ex,r=V.run,n=r.ok+r.ko,acc=n?Math.round(r.ok/n*100):0,msg=r.dl>0.3?'Niveau en hausse.':r.dl<-0.3?'Niveau ajusté pour rester dans la bonne zone.':'Niveau stable.';
+ var e=V.ex,r=V.run,n=r.ok+r.ko,acc=n?Math.round(r.ok/n*100):0,msg=r.dl>0.3?'Niveau en hausse.':r.dl<-0.3?'Niveau ajusté pour rester dans la bonne zone.':'Niveau stable.',pc=PACE[e.id];
+ if(pc&&n>=3&&r.ok/n>0.8&&r.ok<pc[1])msg=(r.dl>0.3?'Niveau en hausse. ':'Précis. ')+'Pour monter plus vite, vise '+pc[1]+' bonnes réponses.';
  var lab=e.span?'longueur maximale reproduite':(r.sc>1?'bonnes réponses':'bonne réponse');
  var det=e.span?'<dt>Essais réussis</dt><dd>'+r.ok+' sur '+(r.ok+r.ko)+'</dd>':'<dt>Précision</dt><dd>'+acc+' %</dd><dt>Erreurs</dt><dd>'+r.ko+'</dd>';
  var nx=nextUndone(),single=SESS&&SESS.single,btn=single?'Retour':(nx?'Exercice suivant : '+nx.jeu:'Voir le bilan');
@@ -1029,12 +1058,23 @@ function playTimed(e,L,cfg){
  app.innerHTML='<div class="bk"><button class="lnk" data-act="home">Quitter</button><span class="ex">'+e.nom+' · '+e.jeu+'</span>'+sonBtn()+'</div><div class="tb"><i id="tb"></i></div><p class="hud"><span><b id="sc">0</b> juste</span><span id="tl">'+DUR+' s</span></p>'+(cfg.top||'')+'<div class="screen" id="stim"></div><div id="ctl"></div>';
  var stim=document.getElementById('stim'),ctl=document.getElementById('ctl'),tb=document.getElementById('tb'),sc=document.getElementById('sc'),tl=document.getElementById('tl');
  function nextItem(){item=cfg.next();cfg.show(item,stim,ctl);lock=false}
- function submit(good){if(lock)return;lock=true;sfx(good);if(good)ok++;else ko++;sc.textContent=ok;stim.classList.add(good?'good':'bad');later(160,function(){stim.classList.remove('good','bad');nextItem()})}
+ function submit(good,v){if(lock)return;lock=true;sfx(good);if(good)ok++;else ko++;sc.textContent=ok;stim.classList.add(good?'good':'bad');
+  var wait=160;
+  if(!good&&REVEAL[e.id]){wait=REV_MS;end+=REV_MS-160;showSol(cfg,item,v,ctl)}   // le chrono attend pendant qu'on lit la bonne réponse
+  later(wait,function(){stim.classList.remove('good','bad');nextItem()})}
  CUR={handle:function(a,v){if(!lock&&item)cfg.handle(a,v,item,submit)},key:function(k){if(!lock&&item&&cfg.key)cfg.key(k,item,submit)}};
  nextItem();
- tickId=setInterval(function(){var left=end-Date.now();if(left<=0){clearInterval(tickId);tickId=null;endRun(e,{sc:ok,ok:ok,ko:ko,dl:dlTimed(ok,ko)});return}tb.style.width=(left/(DUR*10)).toFixed(1)+'%';tl.textContent=Math.ceil(left/1000)+' s'},100)}
+ tickId=setInterval(function(){var left=end-Date.now();if(left<=0){clearInterval(tickId);tickId=null;endRun(e,{sc:ok,ok:ok,ko:ko,dl:dlTimed(ok,ko,PACE[e.id])});return}left=Math.min(left,DUR*1000);tb.style.width=(left/(DUR*10)).toFixed(1)+'%';tl.textContent=Math.ceil(left/1000)+' s'},100)}
 
-function ansHandle(a,v,it,submit){if(a==='ans')submit(v===it.ans)}
+function ansHandle(a,v,it,submit){if(a==='ans')submit(v===it.ans,v)}
+/* Jeux de savoir et de raisonnement : après une erreur, la bonne réponse reste affichée un instant */
+var REVEAL={calcul:1,langage:1,intrus:1,suites:1,lettres:1,operateur:1,contraire:1,ortho:1},REV_MS=1200;
+function showSol(cfg,it,v,ctl){
+ if(cfg.reveal){cfg.reveal(it);return}
+ var bs=ctl.querySelectorAll('[data-act="ans"]'),i,bv;
+ for(i=0;i<bs.length;i++){bv=bs[i].getAttribute('data-v');
+  if(bv===String(it.ans)){bs[i].classList.add('right');bs[i].insertAdjacentHTML('beforeend',mkSpan(true))}
+  else if(bv===String(v)){bs[i].classList.add('miss');bs[i].insertAdjacentHTML('beforeend',mkSpan(false))}}}
 
 function cfgAttention(L){
  var n=stroopN(L),set=shuffle(COL.slice(0,n)),cols=n===4?2:3;
@@ -1085,6 +1125,7 @@ function cfgCalcul(L){
    buf='';
    stim.innerHTML='<span class="qa">'+it.q+' =</span><span class="ab" id="ab"> </span>';
    ctl.innerHTML=keypad()},
+  reveal:function(it){var el=document.getElementById('ab');if(el)el.innerHTML='<s class="was">'+buf+'</s> '+it.a},
   handle:function(a,v,it,submit){if(a==='key')press(v,it,submit)},
   key:function(k,it,submit){if(k==='Backspace')press('del',it,submit);else press(k,it,submit)}}}
 
