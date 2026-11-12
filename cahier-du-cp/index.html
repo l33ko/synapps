@@ -255,6 +255,7 @@ html:has(body.lock){overflow:hidden}
 .nb .sl{flex:1 1 0;max-width:96px;min-width:0;display:flex;flex-direction:column;gap:5px}
 .nb .hole{font:inherit;color:inherit;height:66px;border:3px dashed var(--sh);border-radius:14px;background:rgba(255,255,255,.6);font-size:1.75rem;font-weight:700;cursor:pointer;padding:0;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.1}
 :root[data-theme="dark"] .nb .hole{background:rgba(255,255,255,.08)}
+:root[data-theme="dark"] .nb .hole:not(.lk):not(.no):not(.next),:root[data-theme="dark"] .nb .side.sel{border-color:var(--ink)}
 .nb .hole.full{border-style:solid;background:var(--card);animation:pop .25s}
 .nb .hole.lk{background:var(--c3);border-color:var(--good);border-style:solid;cursor:default}
 .nb .hole.no{background:var(--c6);border-color:var(--bad);animation:shake .3s}
@@ -327,10 +328,10 @@ html:has(body.lock){overflow:hidden}
 .nb .nfb{min-height:40px;margin:6px 0;font-size:1.35rem}
 .nb .nfb small{font-size:.95rem}
 .nb .basket{margin:18px 0 10px;padding:22px 8px 10px;min-height:110px}
-.nb .basket.big2{min-height:196px}
-.nb .bgrid{grid-template-columns:repeat(5,minmax(0,44px));gap:4px}
-.nb .pgrid{grid-template-columns:repeat(6,minmax(0,50px));gap:4px}
-.nb .nit{font-size:1.9rem}
+.nb .basket.big2{min-height:124px}
+.nb .bgrid{grid-template-columns:repeat(8,minmax(0,40px));gap:3px}
+.nb .pgrid{grid-template-columns:repeat(8,minmax(0,40px));gap:3px}
+.nb .nit{font-size:1.75rem}
 .nb .side{min-height:150px}
 .nb .side .n{font-size:3rem}
 .nb .side .heap{font-size:1.55rem}
@@ -718,7 +719,7 @@ function nbTouch(c){if(!c||c.type!=='nb'||c.busy||c.done)return false;c.hint=0;i
 function nbGood(c,msg,extra){c.busy=0;c.done=1;c.at=Date.now();c.res='good';c.fbk='good';c.fb=extra||'Bravo ! ⭐';if(!c.tries)Q.score++;sfx(true);nbSay(msg);nbDraw(c)}
 function nbBad(c,msg,count=true){c.busy=0;if(count){c.tries++;c.help=1;sfx(false)}c.res='bad';c.fbk='bad';c.fb=`${count?'Essaie encore 💪':'👆'}<small>${[].concat(msg).join(' ')}</small>`;nbSay(msg);nbDraw(c)}
 function nbCheck(){const c=Q&&Q.cur;if(!c||c.type!=='nb'||c.busy||c.done)return;({pan:nbCheckPan,ran:nbCheckRan,fab:nbCheckFab,cmp:nbCheckCmp})[c.t](c)}
-function nbNext(){const c=Q&&Q.cur;if(!c||c.type!=='nb'||!c.done||Date.now()-(c.at||0)<600)return;Q.n++;next()}
+function nbNext(){const c=Q&&Q.cur;if(!c||c.type!=='nb'||!c.done||Date.now()-(c.at||0)<350)return;Q.n++;next()}
 /* 1. le panier : toucher pour mettre, toucher pour reprendre */
 function nbDrawPan(c){const it=c.it,firstOn=c.pool.indexOf(true);
  const b=c.bask.map((pi,k)=>`<button class="nit${c.last===pi?' in':''}${c.lit===k+1?' lit':''}" onclick="nbPanOut(${pi})" aria-label="Reprendre une ${it[0]}">${it[2]}${c.help||c.lit>k?`<b>${k+1}</b>`:''}</button>`).join('');
