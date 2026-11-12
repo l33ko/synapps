@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Maquette piste A — barre minimale + menu ⋯</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f3efe3;--panel:#fffdf6;--ink:#25321e;--mute:#6c7663;--line:#e3dccb;--acc:#3d7438;--acc-soft:#e6efdc;--warn:#c8402c}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font:14px/1.35 'Work Sans',system-ui,-apple-system,sans-serif;overscroll-behavior:none}
+body{display:flex;flex-direction:column;height:100vh;height:100dvh;overflow:hidden}
+button,input{font:inherit;color:inherit}
+.btn{border:1px solid var(--line);background:#fff;border-radius:9px;padding:6px 10px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.btn:hover{background:var(--acc-soft)}
+.btn.icon{padding:0;width:38px;height:38px;justify-content:center;font-size:17px;flex:none}
+.btn:disabled{opacity:.4;cursor:default}
+
+/* bandeau maquette */
+.maq{background:#2d3a27;color:#f3efe3;font-size:12.5px;line-height:1.4;flex:none}
+.maq summary{padding:7px 12px;cursor:pointer;list-style:none;display:flex;gap:8px;align-items:center}
+.maq summary::-webkit-details-marker{display:none}
+.maq summary b{background:#e8a33d;color:#2d3a27;border-radius:6px;padding:1px 7px}
+.maq summary span.s{opacity:.85;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.maq .corps{padding:2px 14px 10px;display:grid;grid-template-columns:1fr 1fr;gap:4px 24px}
+.maq .corps p{margin:2px 0;grid-column:1/-1}
+.maq ul{margin:2px 0;padding-left:18px}
+@media(max-width:700px){.maq .corps{grid-template-columns:1fr}}
+
+/* barre du haut */
+header.top{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--panel);border-bottom:1px solid var(--line);z-index:5;flex:none}
+.nom{flex:1;min-width:0;font-family:Fraunces,Georgia,serif;font-size:19px;font-weight:600;letter-spacing:-.01em;border:1px solid transparent;background:none;border-radius:8px;padding:6px 8px;text-overflow:ellipsis;cursor:text}
+.nom:hover,.nom:focus{border-color:var(--line);background:#fff;outline:none}
+.seg{display:none;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff}
+.seg button{border:0;background:none;padding:7px 12px;cursor:pointer}
+.seg button.on{background:var(--acc);color:#fff}
+.growth{display:none;align-items:center;gap:8px;color:var(--mute)}
+.growth input{width:120px;accent-color:var(--acc)}
+.growth output{min-width:56px;color:var(--ink);font-weight:500}
+.grp{display:flex;gap:6px}
+.btn.plus{padding:0 12px 0 10px;width:auto;font-weight:500;font-size:14px}
+.btn.plus b{font-size:20px;line-height:1;margin-top:-4px}
+.btn.plus.open{background:var(--acc);color:#fff;border-color:var(--acc)}
+.pt{position:absolute;top:5px;right:5px;width:9px;height:9px;border-radius:50%;background:#e8a33d;border:2px solid var(--panel)}
+
+main{flex:1;display:grid;grid-template-columns:1fr;min-height:0;position:relative}
+aside{display:none;background:var(--panel);overflow:auto}
+.zone{position:relative;overflow:hidden;background:#e6e1d2;touch-action:none}
+#plan{position:absolute;inset:0;width:100%;height:100%}
+
+/* boutons flottants */
+.flot{position:absolute;right:12px;bottom:14px;display:flex;flex-direction:column;border:1px solid var(--line);border-radius:12px;background:var(--panel);box-shadow:0 2px 8px rgba(40,50,30,.15);overflow:hidden}
+.flot button{width:42px;height:42px;border:0;border-bottom:1px solid var(--line);background:none;font-size:18px;cursor:pointer}
+.flot button:last-child{border:0}
+.flot button:hover{background:var(--acc-soft)}
+.flot button.on{background:var(--acc);color:#fff}
+.echelle{position:absolute;left:12px;bottom:14px;background:var(--panel);border-radius:8px;padding:4px 10px 6px;font-size:12px;box-shadow:0 1px 4px rgba(0,0,0,.1)}
+.echelle i{display:block;width:60px;height:5px;border:1.5px solid var(--ink);border-top:0;margin-top:2px}
+.chips{position:absolute;left:12px;top:10px;display:flex;gap:6px;flex-wrap:wrap;pointer-events:none}
+.chips span{background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:2px 10px;font-size:12px;color:var(--mute);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.chips span b{color:var(--ink);font-weight:600}
+
+/* barre du bas (iPhone) */
+.bas{display:flex;gap:10px;padding:10px 12px calc(10px + env(safe-area-inset-bottom));background:var(--panel);border-top:1px solid var(--line);flex:none}
+.bas button{flex:1;height:48px;border-radius:14px;border:1px solid var(--line);background:#fff;font-size:16px;font-weight:600;cursor:pointer}
+.bas .vert{background:var(--acc);color:#fff;border-color:var(--acc)}
+
+/* menu ⋯ */
+.voile{position:fixed;inset:0;background:rgba(37,50,30,.35);z-index:20;display:none}
+.voile.on{display:block}
+.menu{position:fixed;z-index:21;background:var(--panel);display:none;flex-direction:column;box-shadow:0 10px 40px rgba(30,40,20,.3)}
+.menu.on{display:flex}
+.menu .poignee{width:40px;height:4px;border-radius:2px;background:#d4ccb6;margin:8px auto 2px}
+.menu h3{margin:0;padding:8px 18px 4px;font:600 11px 'Work Sans';letter-spacing:.07em;text-transform:uppercase;color:var(--mute)}
+.menu .lig{display:flex;align-items:center;gap:12px;padding:11px 18px;min-height:50px;border:0;background:none;width:100%;text-align:left;cursor:pointer;border-bottom:1px solid var(--line)}
+.menu .lig:hover{background:#f6f1e2}
+.menu .ic{width:28px;text-align:center;font-size:18px;flex:none}
+.menu .tx{flex:1;min-width:0}
+.menu .tx small{display:block;color:var(--mute);font-size:12px;margin-top:1px}
+.menu .tx b{font-weight:600}
+.menu .etat{color:var(--mute);font-size:13px}
+.menu .ok{color:var(--acc);font-weight:600}
+.inter{width:46px;height:27px;border-radius:14px;background:#d4ccb6;position:relative;flex:none;transition:.15s}
+.inter::after{content:"";position:absolute;top:3px;left:3px;width:21px;height:21px;border-radius:50%;background:#fff;transition:.15s;box-shadow:0 1px 2px rgba(0,0,0,.25)}
+.inter.on{background:var(--acc)}
+.inter.on::after{left:22px}
+.bloc{padding:10px 18px 12px;border-bottom:1px solid var(--line)}
+.bloc .titre{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.bloc .seg{display:inline-flex;width:100%}
+.bloc .seg button{flex:1;padding:9px 4px}
+.bloc .curs{display:flex;align-items:center;gap:10px}
+.bloc .curs input{flex:1;accent-color:var(--acc)}
+.bloc .curs small{color:var(--mute);font-size:12px;width:62px}
+.bloc .curs small:last-child{text-align:right}
+.val{margin-left:auto;font-weight:600;color:var(--acc)}
+.mobile-seulement{display:block}
+
+/* iPhone : feuille du bas */
+@media(max-width:899px){
+  header.top{gap:5px;padding:8px 8px}
+  .btn.icon{width:36px;height:36px}
+  .btn.plus{width:36px;padding:0}
+  .nom{font-size:17px;padding:6px 4px}
+  .menu{left:0;right:0;bottom:0;border-radius:20px 20px 0 0;max-height:86dvh;overflow:auto;padding-bottom:calc(10px + env(safe-area-inset-bottom))}
+  .hint{display:none}
+}
+/* ordinateur */
+@media(min-width:900px){
+  .maq summary span.s{white-space:normal}
+  header.top{padding:10px 16px;gap:14px}
+  .seg{display:inline-flex}
+  .growth{display:flex}
+  .nom{flex:none;width:260px;font-size:21px}
+  .spacer{flex:1}
+  main{grid-template-columns:268px 1fr 292px}
+  aside{display:block;padding:14px}
+  #palette{border-right:1px solid var(--line)}
+  #inspector{border-left:1px solid var(--line)}
+  .bas{display:none}
+  .menu{top:112px;right:16px;width:360px;border-radius:14px;border:1px solid var(--line);max-height:calc(100vh - 130px);overflow:auto}
+  .menu .poignee,.mobile-seulement{display:none}
+  .voile{background:transparent}
+  aside h4{margin:0 0 8px;font:600 11px 'Work Sans';letter-spacing:.07em;text-transform:uppercase;color:var(--mute)}
+  aside .it{display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:#fff;margin-bottom:6px}
+  aside .it i{width:22px;height:22px;border-radius:6px;flex:none}
+  aside .it small{color:var(--mute);margin-left:auto}
+}
+</style>
+</head>
+<body>
+
+<details class="maq" id="maq">
+  <summary><b>Piste A</b><span class="s">Barre minimale + menu ⋯ — une ligne, tout le reste dans une feuille avec un libellé par ligne.</span><span>▾</span></summary>
+  <div class="corps">
+    <div><strong>Points forts</strong><ul>
+      <li>Barre d'une seule ligne sur iPhone, nom du plan lisible en entier.</li>
+      <li>Chaque réglage a un libellé, une explication et son état (« Activée », « 5 ans »).</li>
+      <li>Colonne flottante réduite à 5 boutons, plus de réglages cachés derrière.</li>
+    </ul></div>
+    <div><strong>Limites</strong><ul>
+      <li>Changer de vue ou d'âge demande d'ouvrir le menu sur iPhone (2 touches).</li>
+      <li>Grille et distances légales ne sont plus à portée de pouce : un détour par ⋯.</li>
+      <li>Le menu ⋯ devient un « tiroir » : risque de s'y encombrer avec le temps.</li>
+    </ul></div>
+  </div>
+</details>
+
+<header class="top">
+  <button class="btn icon" title="Retour à mes plans" aria-label="Retour à mes plans">‹</button>
+  <input class="nom" id="nom" value="Jardin-forêt Mauguio" aria-label="Nom du plan">
+  <div class="seg" id="segBarre">
+    <button data-v="det" class="on">Détaillée</button><button data-v="sim">Simplifiée</button><button data-v="str">Strates</button>
+  </div>
+  <label class="growth">Âge du jardin <input type="range" min="0" max="10" value="10" id="ageBarre"><output id="ageOutBarre">adulte</output></label>
+  <span class="spacer"></span>
+  <div class="grp">
+    <button class="btn icon" title="Annuler" aria-label="Annuler">↶</button>
+    <button class="btn icon" title="Rétablir" aria-label="Rétablir" disabled>↷</button>
+  </div>
+  <button class="btn icon plus" id="btnMenu" aria-label="Plus d'options" aria-expanded="false" style="position:relative"><b>⋯</b><span class="hint">&nbsp;Plus</span></button>
+</header>
+
+<main>
+  <aside id="palette">
+    <h4>Ajouter</h4>
+    <div class="it"><i style="background:#8fb67a"></i>Arbre fruitier<small>12</small></div>
+    <div class="it"><i style="background:#6a9ec0"></i>Piscine / bassin</div>
+    <div class="it"><i style="background:#b88b5a"></i>Terrasse, bois</div>
+    <div class="it"><i style="background:#d9c9a0"></i>Chemin</div>
+    <div class="it"><i style="background:#c27a8f"></i>Massif de fleurs</div>
+  </aside>
+
+  <div class="zone" id="zone">
+    <svg id="plan" viewBox="-30 -20 380 280" preserveAspectRatio="xMidYMid meet">
+      <defs>
+        <pattern id="grille" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M10 0H0V10" fill="none" stroke="#9db58f" stroke-width=".4"/></pattern>
+        <pattern id="hachure" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><path d="M0 0V6" stroke="#b9ad92" stroke-width="1.2"/></pattern>
+      </defs>
+      <g id="mondeG">
+        <rect x="0" y="0" width="320" height="240" fill="#f4f6e6" stroke="#444" stroke-width="2"/>
+        <rect id="grid" x="0" y="0" width="320" height="240" fill="url(#grille)" style="display:none"/>
+        <!-- pelouse -->
+        <rect x="20" y="130" width="120" height="60" rx="3" fill="#b9d98c" opacity=".8"/>
+        <!-- maison -->
+        <g id="maison"><rect x="12" y="14" width="120" height="90" fill="#d8d0bc" stroke="#9b917a" stroke-width="1.5"/><rect x="12" y="14" width="120" height="90" fill="url(#hachure)"/>
+        <text x="72" y="56" text-anchor="middle" class="lb" font-weight="600">Maison</text><text x="72" y="70" text-anchor="middle" class="lb sm">12 × 9 m · 108 m²</text></g>
+        <!-- terrasse -->
+        <rect x="12" y="104" width="120" height="22" fill="#d9a56a" stroke="#b5823f"/>
+        <text x="72" y="119" text-anchor="middle" class="lb">Terrasse</text>
+        <!-- plage + piscine -->
+        <rect x="170" y="30" width="110" height="70" fill="#dcb67c" stroke="#b98d4f"/>
+        <rect x="182" y="42" width="86" height="46" rx="3" fill="#58b0e2" stroke="#fff" stroke-width="3"/>
+        <path d="M188 58q8-4 16 0t16 0t16 0t16 0M188 70q8-4 16 0t16 0t16 0t16 0" stroke="#bfe4f6" fill="none" stroke-width="1"/>
+        <text x="225" y="68" text-anchor="middle" class="lb" font-weight="600">Piscine</text>
+        <!-- potager -->
+        <rect x="200" y="160" width="62" height="36" fill="#9a6e45" stroke="#6e4a2a" stroke-width="1.5"/>
+        <g fill="#6fa356"><circle cx="212" cy="172" r="4"/><circle cx="226" cy="172" r="4"/><circle cx="240" cy="172" r="4"/><circle cx="254" cy="172" r="4"/><circle cx="212" cy="186" r="4"/><circle cx="226" cy="186" r="4"/><circle cx="240" cy="186" r="4"/><circle cx="254" cy="186" r="4"/></g>
+        <text x="231" y="209" text-anchor="middle" class="lb">Potager</text>
+        <!-- allée -->
+        <path d="M132 120 C 150 140, 170 150, 168 215" stroke="#e3d3a8" stroke-width="9" fill="none" stroke-linecap="round" id="allee"/>
+        <!-- haie -->
+        <g id="haie" fill="#2f6a35"><circle cx="150" cy="10" r="7"/><circle cx="164" cy="10" r="7"/><circle cx="178" cy="10" r="7"/><circle cx="192" cy="10" r="7"/><circle cx="206" cy="10" r="7"/></g>
+        <!-- arbres : data-r = rayon adulte -->
+        <g id="arbres"></g>
+        <!-- distances légales -->
+        <g id="legal" style="display:none">
+          <rect x="20" y="8" width="300" height="224" fill="none" stroke="#c8402c" stroke-width="1.2" stroke-dasharray="5 3"/>
+          <text x="300" y="228" text-anchor="end" font-size="8" fill="#c8402c" font-weight="600">2 m de la limite (arbres &gt; 2 m)</text>
+          <rect x="0" y="0" width="320" height="8" fill="#c8402c" opacity=".12"/>
+        </g>
+        <text x="160" y="-6" text-anchor="middle" class="lb" font-weight="600" font-size="9">32 m</text>
+        <text x="-8" y="120" text-anchor="middle" class="lb" font-weight="600" font-size="9" transform="rotate(-90 -8 120)">24 m</text>
+      </g>
+    </svg>
+    <style>.lb{font:500 8px 'Work Sans',sans-serif;fill:#25321e;paint-order:stroke;stroke:#fff;stroke-width:2.5px;stroke-opacity:.75}.lb.sm{font-size:6.5px;font-weight:400}</style>
+
+    <div class="chips hint"><span>Terrain <b>32 × 24 m · 768 m²</b></span></div>
+    <div class="echelle">10 m<i></i></div>
+    <div class="flot" role="toolbar" aria-label="Outils du plan">
+      <button id="zp" title="Zoomer" aria-label="Zoomer">+</button>
+      <button id="zm" title="Dézoomer" aria-label="Dézoomer">−</button>
+      <button id="zf" title="Ajuster le plan à l'écran" aria-label="Ajuster à l'écran">⤢</button>
+      <button id="cad" title="Verrouiller les déplacements" aria-label="Verrouiller les déplacements">🔓</button>
+    </div>
+  </div>
+
+  <aside id="inspector">
+    <h4>Inventaire</h4>
+    <div class="it"><i style="background:#8fb67a"></i>Olivier<small>2</small></div>
+    <div class="it"><i style="background:#c9a3d4"></i>Figuier<small>1</small></div>
+    <div class="it"><i style="background:#e8c34a"></i>Citronnier<small>1</small></div>
+    <div class="it"><i style="background:#d98a7a"></i>Amandier<small>1</small></div>
+    <div class="it"><i style="background:#2f6a35"></i>Haie de laurier-rose<small>5 m</small></div>
+    <p style="color:var(--mute);font-size:12.5px">Touchez un élément du plan pour modifier ses dimensions.</p>
+  </aside>
+</main>
+
+<div class="bas"><button class="vert">＋ Ajouter</button><button>☰ Inventaire</button></div>
+
+<!-- menu ⋯ -->
+<div class="voile" id="voile"></div>
+<div class="menu" id="menu" role="dialog" aria-label="Plus d'options">
+  <div class="poignee"></div>
+
+  <div class="mobile-seulement">
+    <h3>Affichage du plan</h3>
+    <div class="bloc">
+      <div class="titre"><span class="ic">👁</span><span class="tx"><b>Vue</b><small>Comment les éléments sont dessinés</small></span></div>
+      <div class="seg" id="segMenu" style="display:inline-flex"><button data-v="det" class="on">Détaillée</button><button data-v="sim">Simplifiée</button><button data-v="str">Strates</button></div>
+    </div>
+    <div class="bloc">
+      <div class="titre"><span class="ic">🌱</span><span class="tx"><b>Âge du jardin</b><small>Taille des végétaux, de la plantation à l'âge adulte</small></span><span class="val" id="ageOutMenu">adulte</span></div>
+      <div class="curs"><small>Plantation</small><input type="range" min="0" max="10" value="10" id="ageMenu"><small>Adulte</small></div>
+    </div>
+  </div>
+
+  <h3>Aides au dessin</h3>
+  <button class="lig" id="tGrille"><span class="ic">⌗</span><span class="tx"><b>Grille aimantée</b><small>Les éléments se calent sur une grille de 1 m</small></span><span class="inter"></span></button>
+  <button class="lig" id="tLegal"><span class="ic">⚖</span><span class="tx"><b>Distances légales</b><small>Montre les 2 m à respecter vers les voisins</small></span><span class="inter"></span></button>
+
+  <h3>Mon compte et mes données</h3>
+  <button class="lig"><span class="ic">☁</span><span class="tx"><b>Synchroniser</b><small>Dernière synchro il y a 2 minutes</small></span><span class="etat ok">✓ À jour</span></button>
+  <button class="lig"><span class="ic">🌿</span><span class="tx"><b>Palette végétale</b><small>Couleurs et tailles, communes à tous vos plans</small></span><span class="etat">›</span></button>
+  <button class="lig"><span class="ic">⇩</span><span class="tx"><b>Exporter / partager</b><small>Image, fichier, import d'un plan, lien de partage</small></span><span class="etat">›</span></button>
+</div>
+
+<script>
+const $=s=>document.querySelector(s), $$=s=>document.querySelectorAll(s);
+if(innerWidth<900) $('#maq').open=false;
+/* arbres */
+const A=[[60,160,18,'#6c8a5a','Olivier'],[160,215,16,'#6c8a5a','Olivier'],[300,70,17,'#7f9a66','Olivier'],[110,150,12,'#78b26a','Citronnier'],[260,125,13,'#a1c26b','Figuier'],[40,215,14,'#8cae5f','Amandier'],[290,205,12,'#7ea661','Poirier'],[130,185,9,'#d98a7a','Pommier']];
+const arb=$('#arbres');
+A.forEach(([x,y,r,c,n])=>{arb.insertAdjacentHTML('beforeend',`<g data-r="${r}" data-x="${x}" data-y="${y}"><circle class="o" cx="${x}" cy="${y+2}" r="${r}" fill="rgba(0,0,0,.12)"/><circle class="c" cx="${x}" cy="${y}" r="${r}" fill="${c}" stroke="#3f5a33" stroke-width="1"/><circle class="t" cx="${x}" cy="${y}" r="2" fill="#4a3a28"/><text class="n lb" x="${x}" y="${y+r+8}" text-anchor="middle">${n}</text></g>`)});
+let age=10, vue='det', echelle=1;
+function maj(){
+  const k=.25+.75*age/10;
+  $$('#arbres g').forEach(g=>{const r=g.dataset.r*k;g.querySelector('.o').setAttribute('r',r);g.querySelector('.c').setAttribute('r',r);g.querySelector('.n').setAttribute('y',+g.dataset.y+r+8);
+    g.querySelector('.c').setAttribute('fill', vue==='str'? (g.dataset.r>14?'#3f7a3a':g.dataset.r>11?'#8cb84d':'#e0b84a') : vue==='sim' ? '#9fc08a' : A.find(a=>a[0]==g.dataset.x&&a[1]==g.dataset.y)[3]);
+    g.querySelector('.n').style.display = vue==='sim'?'none':'';
+    g.querySelector('.t').style.display = vue==='det'?'':'none'});
+  $('#maison').style.opacity = vue==='sim'?.7:1;
+  const txt = age>=10?'adulte':age==0?'plantation':age+(age>1?' ans':' an');
+  ['#ageOutBarre','#ageOutMenu'].forEach(s=>$(s).textContent=txt);
+  $('#ageBarre').value=$('#ageMenu').value=age;
+  $$('.seg button').forEach(b=>b.classList.toggle('on',b.dataset.v===vue));
+}
+$$('.seg button').forEach(b=>b.onclick=()=>{vue=b.dataset.v;maj()});
+['#ageBarre','#ageMenu'].forEach(s=>$(s).oninput=e=>{age=+e.target.value;maj()});
+maj();
+/* menu */
+const m=$('#menu'),v=$('#voile'),bm=$('#btnMenu');
+function menu(o){m.classList.toggle('on',o);v.classList.toggle('on',o);bm.classList.toggle('open',o);bm.setAttribute('aria-expanded',o)}
+bm.onclick=()=>menu(!m.classList.contains('on'));v.onclick=()=>menu(false);
+document.addEventListener('keydown',e=>{if(e.key==='Escape')menu(false)});
+function bascule(btn,fn){btn.onclick=()=>{const i=btn.querySelector('.inter');i.classList.toggle('on');fn(i.classList.contains('on'))}}
+bascule($('#tGrille'),on=>$('#grid').style.display=on?'':'none');
+bascule($('#tLegal'),on=>$('#legal').style.display=on?'':'none');
+/* zoom, cadenas */
+function zoom(){const g=$('#mondeG');g.setAttribute('transform',`translate(160 120) scale(${echelle}) translate(-160 -120)`)}
+$('#zp').onclick=()=>{echelle=Math.min(2.5,echelle*1.25);zoom()};
+$('#zm').onclick=()=>{echelle=Math.max(.5,echelle/1.25);zoom()};
+$('#zf').onclick=()=>{echelle=1;zoom()};
+$('#cad').onclick=e=>{const b=e.currentTarget;b.classList.toggle('on');b.textContent=b.classList.contains('on')?'🔒':'🔓'};
+$$('.btn.icon').forEach(b=>{if(b.textContent==='↶')b.onclick=()=>{$$('.btn.icon').forEach(x=>{if(x.textContent==='↷')x.disabled=false})}});
+</script>
+</body>
+</html>

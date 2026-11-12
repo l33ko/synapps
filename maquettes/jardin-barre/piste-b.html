@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Maquette piste B — Réglages d'affichage sur le plan</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f3efe3;--panel:#fffdf6;--ink:#25321e;--mute:#6c7663;--line:#e3dccb;--acc:#3d7438;--acc-soft:#e6efdc;--warn:#c8402c}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%}
+body{font-family:'Work Sans',system-ui,sans-serif;color:var(--ink);background:var(--bg);display:flex;flex-direction:column;font-size:15px}
+button{font:inherit;color:inherit;cursor:pointer}
+.note{background:#25321e;color:#f3efe3;padding:8px 12px;font-size:12px;line-height:1.4}
+.note summary{cursor:pointer;font-weight:600}
+.note b.t{font-family:Fraunces,serif}
+.note ul{margin:6px 0 2px;padding-left:18px}
+.note .cols{display:flex;gap:24px;flex-wrap:wrap}
+.app{position:relative;flex:1;min-height:0;display:flex;flex-direction:column}
+/* barre */
+.top{display:flex;align-items:center;gap:4px;padding:8px 8px;background:var(--panel);border-bottom:1px solid var(--line);position:relative;z-index:30}
+.ib{width:34px;height:38px;border-radius:11px;border:1px solid var(--line);background:var(--panel);font-size:18px;display:grid;place-items:center;flex:none;padding:0}
+.ib:disabled{opacity:.4}
+.pname{flex:1;min-width:0;font-family:Fraunces,Georgia,serif;font-size:15.5px;font-weight:600;border:1px solid transparent;background:transparent;padding:6px 2px;border-radius:8px;color:var(--ink);text-overflow:ellipsis}
+.pname:focus{border-color:var(--line);outline:none;background:#fff}
+.planbtn{height:38px;border-radius:11px;border:1px solid var(--line);background:var(--panel);padding:0 9px;font-weight:600;font-size:14px;flex:none;display:flex;gap:5px;align-items:center}
+.planbtn.on{background:var(--acc-soft);border-color:var(--acc)}
+.dot{width:8px;height:8px;border-radius:50%;background:#4aa24a;display:inline-block}
+.menu{position:absolute;right:10px;top:54px;width:286px;background:var(--panel);border:1px solid var(--line);border-radius:14px;box-shadow:0 10px 30px #25321e30;padding:6px;display:none;z-index:40}
+.menu.open{display:block}
+.menu h4{margin:8px 10px 2px;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--mute);font-weight:600}
+.mi{display:flex;gap:10px;align-items:center;width:100%;text-align:left;background:none;border:0;padding:10px;border-radius:10px;font-size:15px}
+.mi:hover{background:var(--acc-soft)}
+.mi i{font-style:normal;width:22px;text-align:center;font-size:17px}
+.mi small{display:block;color:var(--mute);font-size:12px}
+.menu hr{border:0;border-top:1px solid var(--line);margin:4px 0}
+.toast{position:absolute;left:50%;top:62px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:8px 14px;border-radius:20px;font-size:13px;opacity:0;pointer-events:none;transition:.25s;z-index:60;white-space:nowrap}
+.toast.on{opacity:1}
+/* plan */
+.stage{position:relative;flex:1;min-height:0;overflow:hidden;background:#e7e1d2}
+.plan{position:absolute;inset:60px 0 0;display:grid;place-items:center}
+.plan svg{width:96%;max-height:92%;transition:transform .25s;transform-origin:center}
+.pill{position:absolute;left:10px;top:10px;z-index:20;display:flex;flex-direction:column;gap:8px;align-items:flex-start}
+.pillb{height:40px;padding:0 14px;border-radius:20px;background:var(--panel);border:1px solid var(--line);box-shadow:0 2px 8px #25321e22;font-weight:600;display:flex;align-items:center;gap:7px}
+.pillb.on{background:var(--acc);color:#fff;border-color:var(--acc)}
+.pillb .badge{background:var(--acc-soft);color:var(--acc);border-radius:10px;font-size:11px;padding:1px 7px}
+.pillb.on .badge{background:#ffffff30;color:#fff}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:0 10px 30px #25321e30;padding:12px 14px;width:min(340px,calc(100vw - 20px));display:none}
+.panel.open{display:block}
+.panel h5{margin:0 0 6px;font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--mute);font-weight:600;display:flex;justify-content:space-between}
+.panel h5 em{font-style:normal;color:var(--acc);text-transform:none;letter-spacing:0;font-size:13px}
+.seg{display:flex;border:1px solid var(--line);border-radius:11px;overflow:hidden}
+.seg button{flex:1;border:0;background:var(--panel);padding:9px 4px;font-size:14px;font-weight:500;border-right:1px solid var(--line)}
+.seg button:last-child{border:0}
+.seg button.on{background:var(--acc);color:#fff}
+.sect{margin-bottom:12px}
+input[type=range]{width:100%;accent-color:var(--acc);margin:4px 0 0}
+.ticks{display:flex;justify-content:space-between;font-size:11.5px;color:var(--mute)}
+.ticks span.on{color:var(--acc);font-weight:600}
+.tg{display:flex;align-items:center;gap:10px;width:100%;border:0;background:none;padding:8px 0;text-align:left;border-top:1px solid var(--line)}
+.tg i{font-style:normal;width:22px;text-align:center;font-size:17px}
+.tg span{flex:1;font-weight:500}.tg small{display:block;color:var(--mute);font-weight:400;font-size:12px}
+.sw{width:40px;height:24px;border-radius:12px;background:#cfc8b6;position:relative;flex:none;transition:.2s}
+.sw:after{content:"";position:absolute;left:3px;top:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:.2s}
+.tg.on .sw{background:var(--acc)}.tg.on .sw:after{left:19px}
+.zoom{position:absolute;right:10px;bottom:84px;z-index:20;display:flex;flex-direction:column;border-radius:14px;overflow:hidden;border:1px solid var(--line);box-shadow:0 2px 8px #25321e22;background:var(--panel)}
+.zoom button{width:44px;height:44px;border:0;background:none;font-size:20px;border-bottom:1px solid var(--line)}
+.zoom button:last-child{border:0}
+.scale{position:absolute;left:10px;bottom:84px;background:var(--panel);border-radius:8px;padding:4px 10px;font-size:12px;border:1px solid var(--line)}
+.scale div{border:1.5px solid var(--ink);border-top:0;height:6px;width:60px;margin-top:2px}
+.bottom{position:absolute;left:0;right:0;bottom:0;padding:10px;display:flex;gap:10px;z-index:20}
+.bottom button{flex:1;height:54px;border-radius:16px;font-weight:600;font-size:17px;border:1px solid var(--line);background:var(--panel);box-shadow:0 2px 8px #25321e22}
+.bottom .add{background:var(--acc);color:#fff;border-color:var(--acc)}
+.lockflag{display:none;position:absolute;right:10px;top:10px;z-index:15;background:var(--warn);color:#fff;border-radius:14px;padding:5px 11px;font-size:12.5px;font-weight:600}
+.lockflag.on{display:block}
+/* plan svg états */
+.lbl{font-family:'Work Sans';font-size:7.5px;fill:#25321e;paint-order:stroke;stroke:#fffdf6cc;stroke-width:2px;font-weight:600}
+.simple .lbl{display:none}.simple .tree{fill:#7da66f!important;stroke:none!important}
+.simple .house{fill:#d8d1c0!important}
+.strates[data-s] .tree{stroke:none}
+#grid,#legal{display:none}.showgrid #grid{display:block}.showlegal #legal{display:block}
+/* ordinateur */
+@media (min-width:760px){
+ .top{padding:10px 18px;gap:10px}.pname{font-size:20px;max-width:380px;flex:none}.top .sp{flex:1}
+ .bottom{left:50%;right:auto;transform:translateX(-50%);width:420px}
+ .zoom{bottom:84px}
+ .pill{flex-direction:row;align-items:flex-start;flex-wrap:wrap;right:70px}
+ .panel{width:auto;display:none;padding:6px 10px;border-radius:30px}
+ .panel.open{display:flex;align-items:center;gap:0}
+ .panel .sect{margin:0;padding:0 14px;border-right:1px solid var(--line);min-width:0}
+ .panel h5{margin-bottom:3px;font-size:10.5px}
+ .panel .sect.vue{width:270px}.panel .sect.age{width:240px}
+ .panel .sect.tgs{display:flex;gap:4px;border:0;padding:0 4px}
+ .tg{border:0;width:auto;flex-direction:column;gap:2px;padding:4px 10px;border-radius:12px;font-size:12.5px;text-align:center}
+ .tg span{flex:none}.tg small,.tg .sw{display:none}.tg.on{background:var(--acc-soft);color:var(--acc)}
+ .tg i{font-size:18px}
+ .seg button{padding:6px 4px;font-size:13px}
+ .plan svg{width:auto;height:88%;max-width:90%}
+ .bot-only-mobile{display:none}
+}
+@media (max-width:759px){.desk{display:none}}
+.pillrow{display:flex;gap:8px;align-items:flex-start}
+</style>
+</head>
+<body>
+<details class="note" id="note">
+<summary><b class="t">Piste B — « Réglages d'affichage sur le plan »</b> · séparer le plan affiché (pastille « Affichage ») du fichier (menu « Plan ▾ »)</summary>
+<div class="cols">
+<div><b>Points forts</b><ul><li>Barre du haut sur une seule ligne, nom du plan lisible, un seul bouton « Plan » avec libellés.</li><li>Les réglages d'affichage sont groupés, avec texte, et leur effet se voit tout de suite sur le plan derrière.</li><li>Colonne de droite réduite à + − ⤢ : plus de végétaux cachés.</li></ul></div>
+<div><b>Limites</b><ul><li>Un tap de plus pour changer de vue ou activer la grille (panneau à ouvrir).</li><li>Le cadenas et la grille sont moins visibles qu'un bouton permanent.</li><li>Le panneau couvre une partie du plan sur iPhone tant qu'il est ouvert.</li></ul></div>
+</div></div>
+</details>
+
+<div class="app" id="app">
+ <div class="top">
+  <button class="ib" title="Retour à mes plans" aria-label="Retour à mes plans" onclick="toast('Retour à la liste des plans')">‹</button>
+  <input class="pname" id="pname" value="Jardin-forêt Mauguio" aria-label="Nom du plan">
+  <span class="sp"></span>
+  <button class="ib" title="Annuler" aria-label="Annuler" onclick="toast('Annulé')">↶</button>
+  <button class="ib" title="Rétablir" aria-label="Rétablir" disabled>↷</button>
+  <button class="planbtn" id="planbtn" onclick="toggleMenu()">Plan <span>▾</span></button>
+ </div>
+ <div class="menu" id="menu">
+  <h4>Ce plan</h4>
+  <button class="mi" onclick="toast('Synchronisé à l\'instant');closeAll()"><i>☁</i><div>Synchroniser<small>Enregistré · il y a 2 min</small></div></button>
+  <button class="mi" onclick="toast('Partager : lien copié');closeAll()"><i>↗</i><div>Partager le plan</div></button>
+  <button class="mi" onclick="toast('Export : image, PDF ou fichier');closeAll()"><i>⇩</i><div>Exporter<small>Image, PDF, fichier du plan</small></div></button>
+  <button class="mi" onclick="toast('Importer un plan');closeAll()"><i>⇧</i><div>Importer un plan</div></button>
+  <hr><h4>Pour tous mes plans</h4>
+  <button class="mi" onclick="toast('Palette végétale');closeAll()"><i>🌿</i><div>Palette végétale<small>Couleurs et tailles des végétaux</small></div></button>
+ </div>
+ <div class="toast" id="toast"></div>
+
+ <div class="stage" id="stage">
+  <div class="plan" id="planwrap">
+  <svg id="svg" viewBox="0 0 340 260" class="">
+   <rect x="10" y="10" width="320" height="240" fill="#eef0dc" stroke="#3b4a30" stroke-width="2"/>
+   <g id="grid" stroke="#b8c4a4" stroke-width=".4"><path d="M10 30H330M10 50H330M10 70H330M10 90H330M10 110H330M10 130H330M10 150H330M10 170H330M10 190H330M10 210H330M10 230H330M30 10V250M50 10V250M70 10V250M90 10V250M110 10V250M130 10V250M150 10V250M170 10V250M190 10V250M210 10V250M230 10V250M250 10V250M270 10V250M290 10V250M310 10V250"/></g>
+   <g id="legal"><rect x="30" y="30" width="280" height="200" fill="none" stroke="#c8402c" stroke-width="1.2" stroke-dasharray="5 3"/><text x="32" y="27" font-size="7" fill="#c8402c" font-family="Work Sans" font-weight="600">Limite des 2 m de la clôture</text></g>
+   <rect class="house" x="30" y="30" width="110" height="80" fill="#c9c2b0" stroke="#8d8672"/><text class="lbl" x="48" y="72">Maison 12 × 9 m</text>
+   <rect x="30" y="110" width="110" height="30" fill="#d9b27c"/><text class="lbl" x="58" y="129">Terrasse</text>
+   <rect x="195" y="45" width="110" height="75" fill="#d9b27c"/><rect x="208" y="58" width="84" height="48" rx="4" fill="#58b4e6" stroke="#f6f1e2" stroke-width="4"/><text class="lbl" x="235" y="86">Piscine</text>
+   <rect x="215" y="175" width="60" height="35" fill="#8a6a45"/><text class="lbl" x="228" y="196">Potager</text>
+   <path d="M150 120 Q170 160 190 195" stroke="#e6d8b4" stroke-width="9" fill="none" stroke-linecap="round"/>
+   <g id="trees">
+    <g data-r="22" data-h="3"><circle class="tree" cx="75" cy="190" r="22" fill="#7f9a6a" stroke="#4d6340"/><text class="lbl" x="55" y="226">Olivier</text></g>
+    <g data-r="18" data-h="3"><circle class="tree" cx="160" cy="165" r="18" fill="#6f9a58" stroke="#4d6340"/><text class="lbl" x="130" y="196">Figuier</text></g>
+    <g data-r="26" data-h="3"><circle class="tree" cx="300" cy="150" r="26" fill="#86a06a" stroke="#4d6340"/><text class="lbl" x="285" y="188">Amandier</text></g>
+    <g data-r="13" data-h="2"><circle class="tree" cx="170" cy="55" r="13" fill="#4f7a43" stroke="#2f4a28"/><text class="lbl" x="143" y="80">Cyprès</text></g>
+    <g data-r="12" data-h="2"><circle class="tree" cx="152" cy="140" r="12" fill="#c9a84a" stroke="#8d7a2c"/><text class="lbl" x="122" y="158">Citronnier</text></g>
+    <g data-r="9" data-h="1"><circle class="tree" cx="55" cy="150" r="9" fill="#c98aa0" stroke="#8d5a6c"/><text class="lbl" x="30" y="168">Laurier-rose</text></g>
+   </g>
+   <text class="lbl" x="150" y="8" style="font-size:8px">32 m</text>
+  </svg>
+  </div>
+
+  <div class="pill">
+   <div class="pillrow"><button class="pillb" id="pillb" onclick="togglePanel()">👁 Affichage <span class="badge" id="badge">Détaillée</span></button></div>
+   <div class="panel" id="panel">
+    <div class="sect vue"><h5>Vue du plan</h5>
+     <div class="seg" id="seg"><button class="on" data-v="d">Détaillée</button><button data-v="s">Simplifiée</button><button data-v="t">Strates</button></div></div>
+    <div class="sect age"><h5>Âge du jardin <em id="agev">adulte</em></h5>
+     <input type="range" id="age" min="0" max="4" step="1" value="4" aria-label="Âge du jardin">
+     <div class="ticks" id="ticks"><span>plantation</span><span>2 ans</span><span>5 ans</span><span>10 ans</span><span class="on">adulte</span></div></div>
+    <div class="sect tgs">
+     <button class="tg" id="t-grid"><i>⌗</i><span>Grille aimantée<small>Calage sur une grille de 1 m</small></span><b class="sw"></b></button>
+     <button class="tg" id="t-legal"><i>⚖</i><span>Distances légales<small>Zone de 2 m près des limites</small></span><b class="sw"></b></button>
+     <button class="tg" id="t-lock"><i>🔓</i><span>Verrouiller les déplacements<small>Empêche de bouger un élément par erreur</small></span><b class="sw"></b></button>
+    </div>
+   </div>
+  </div>
+  <div class="lockflag" id="lockflag">🔒 Déplacements verrouillés</div>
+  <div class="zoom"><button onclick="zoom(.15)" aria-label="Zoom avant">+</button><button onclick="zoom(-.15)" aria-label="Zoom arrière">−</button><button onclick="zoomReset()" aria-label="Ajuster à l'écran">⤢</button></div>
+  <div class="scale">10 m<div></div></div>
+  <div class="bottom"><button class="add" onclick="toast('Catalogue : ajouter un élément')">＋ Ajouter</button><button onclick="toast('Inventaire du jardin')">☰ Inventaire</button></div>
+ </div>
+</div>
+
+<script>
+const $=s=>document.querySelector(s);
+let z=1,age=4;
+function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('on');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('on'),1800)}
+function closeAll(){$('#menu').classList.remove('open');$('#planbtn').classList.remove('on')}
+function toggleMenu(){const o=!$('#menu').classList.contains('open');closeAll();if(o){$('#menu').classList.add('open');$('#planbtn').classList.add('on');if(innerWidth<760)setPanel(false)}}
+function setPanel(o){$('#panel').classList.toggle('open',o);$('#pillb').classList.toggle('on',o)}
+function togglePanel(){const o=!$('#panel').classList.contains('open');setPanel(o);if(o)closeAll()}
+function zoom(d){z=Math.max(.6,Math.min(2.5,z+d));$('#svg').style.transform='scale('+z+')'}
+function zoomReset(){z=1;$('#svg').style.transform=''}
+const names={d:'Détaillée',s:'Simplifiée',t:'Strates'};
+$('#seg').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
+ document.querySelectorAll('#seg button').forEach(x=>x.classList.toggle('on',x===b));
+ const v=b.dataset.v,s=$('#svg');s.classList.toggle('simple',v==='s');
+ document.querySelectorAll('.tree').forEach(t=>{const h=+t.parentNode.dataset.h;
+  if(v==='t')t.setAttribute('fill',h===3?'#2f6b3a':h===2?'#7fb36a':'#d5c870');
+  else if(v==='d')t.setAttribute('fill',t.dataset.f||t.getAttribute('fill'))});
+ $('#badge').textContent=names[v];refreshBadge()});
+document.querySelectorAll('.tree').forEach(t=>t.dataset.f=t.getAttribute('fill'));
+$('#seg').addEventListener('click',e=>{if(e.target.dataset.v==='d')document.querySelectorAll('.tree').forEach(t=>t.setAttribute('fill',t.dataset.f))});
+const labels=['à la plantation','2 ans','5 ans','10 ans','adulte'],fr=[.25,.4,.6,.8,1];
+$('#age').addEventListener('input',e=>{age=+e.target.value;$('#agev').textContent=labels[age];
+ document.querySelectorAll('#ticks span').forEach((s,i)=>s.classList.toggle('on',i===age));
+ document.querySelectorAll('#trees > g').forEach(g=>g.querySelector('circle').setAttribute('r',g.dataset.r*fr[age]));refreshBadge()});
+function refreshBadge(){const v=document.querySelector('#seg .on').textContent;const ex=age<4?' · '+labels[age]:'';$('#badge').textContent=v+ex}
+const cls={'t-grid':'showgrid','t-legal':'showlegal'};
+['t-grid','t-legal','t-lock'].forEach(id=>$('#'+id).addEventListener('click',e=>{const b=e.currentTarget;b.classList.toggle('on');
+ if(cls[id])$('#svg').classList.toggle(cls[id],b.classList.contains('on'));
+ if(id==='t-lock'){b.querySelector('i').textContent=b.classList.contains('on')?'🔒':'🔓';$('#lockflag').classList.toggle('on',b.classList.contains('on'))}}));
+document.addEventListener('click',e=>{if(!e.target.closest('#menu,#planbtn'))closeAll()});
+if(innerWidth>=760){setPanel(true);$('#note').open=true}
+</script>
+</body>
+</html>

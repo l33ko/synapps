@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Maquettes — Mon jardin : barre du haut</title>
+<style>
+body{margin:0;background:#ece6d4;color:#25321e;font:15px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+.page{max-width:1500px;margin:0 auto;padding:22px 18px 60px}
+h1{font-size:24px;margin:0 0 6px}.lead{color:#6c7663;margin:0 0 14px}
+.box{background:#fffdf6;border:1px solid #e3dccb;border-radius:14px;padding:14px 18px;margin-bottom:18px}
+.box h2{font-size:15px;margin:0 0 6px}.box ul{margin:0;padding-left:20px}
+section{background:#fffdf6;border:1px solid #e3dccb;border-radius:18px;padding:18px;margin-bottom:26px}
+section h2{margin:0 0 4px;font-size:21px}section p{margin:4px 0 12px}
+.devs{display:flex;gap:22px;align-items:flex-start;flex-wrap:wrap}
+.lab{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:#6c7663;font-weight:700;margin:0 0 6px}
+.ph{width:330px;height:690px;border-radius:46px;background:#1d1d1f;padding:11px;box-shadow:0 10px 30px #0003;overflow:hidden}
+.ph .in{width:308px;height:668px;border-radius:36px;overflow:hidden;position:relative}
+.ph iframe{width:390px;height:844px;border:0;transform:scale(.79);transform-origin:0 0;position:absolute;top:0;left:0}
+.mac{width:900px;border-radius:14px;background:#2b2b2b;padding:10px 10px 14px;box-shadow:0 10px 30px #0003}
+.mac .in{width:880px;height:550px;overflow:hidden;border-radius:6px;position:relative}
+.mac iframe{width:1280px;height:800px;border:0;transform:scale(.6875);transform-origin:0 0;position:absolute;top:0;left:0}
+.pc{margin-top:14px;display:grid;grid-template-columns:1fr 1fr;gap:14px}.pc div{border-radius:12px;padding:10px 14px}
+.plus{background:#e6efdc}.moins{background:#f6e6dc}.pc h3{margin:0 0 4px;font-size:14px}.pc ul{margin:0;padding-left:18px;font-size:14px}
+a.big{display:inline-block;margin-top:10px;font-weight:700;color:#3d7438}
+.cmp{display:flex;gap:14px;flex-wrap:wrap}.cmp img{width:300px;border-radius:12px;border:1px solid #e3dccb}
+@media(max-width:1000px){.mac{transform:scale(.7);transform-origin:0 0;margin-bottom:-170px}}
+@media(max-width:700px){.pc{grid-template-columns:1fr}.mac{display:none}}
+</style></head><body><div class="page">
+<h1>Mon jardin — barre du haut de l'écran du plan</h1>
+<p class="lead">Deux pistes à comparer avant de coder. Données fictives, rien n'est enregistré. Tout est cliquable dans les cadres.</p>
+<div class="box"><h2>Le besoin</h2><ul>
+<li>Sur iPhone, la barre du haut prend 4 lignes (près d'un cinquième de l'écran) et le nom du plan est coupé.</li>
+<li>☁ ⚙ ⇩ ne se comprennent pas ; le curseur « adulte » n'explique pas qu'il règle l'âge du jardin.</li>
+<li>La colonne de 6 boutons flottants cache des végétaux au bord droit.</li>
+<li>Objectif : une ligne sur iPhone, nom lisible, chaque réglage avec son texte, rien ne disparaît.</li></ul>
+<div class="cmp" style="margin-top:10px"><img src="actuel-iphone.png" alt="Barre actuelle sur iPhone"></div></div>
+
+<section id="A"><h2>Piste A — Barre minimale + menu ⋯</h2>
+<p>Une ligne : ‹, nom du plan, ↶ ↷ et ⋯. Le menu ⋯ regroupe tout le reste avec un libellé et l'état de chaque réglage : vue, âge du jardin (plantation… adulte), grille aimantée, distances légales, synchronisation, palette végétale, exporter / partager. Sur le plan ne restent que + − ⤢ et le cadenas. Sur ordinateur, la barre montre en plus la vue et l'âge en clair.</p>
+<div class="devs"><div><p class="lab">iPhone</p><div class="ph"><div class="in"><iframe src="piste-a.html" loading="lazy" title="Piste A sur iPhone"></iframe></div></div></div>
+<div><p class="lab">Ordinateur</p><div class="mac"><div class="in"><iframe src="piste-a.html" loading="lazy" title="Piste A sur ordinateur"></iframe></div></div></div></div>
+<a class="big" href="piste-a.html" target="_blank">Ouvrir la piste A en grand ↗</a>
+<div class="pc"><div class="plus"><h3>Points forts</h3><ul><li>La plus légère à l'écran : une ligne, 4 boutons flottants au lieu de 6.</li><li>Un seul endroit à retenir : « tout est dans ⋯ ».</li><li>Chaque réglage a son nom et son état.</li></ul></div>
+<div class="moins"><h3>Limites</h3><ul><li>Sur iPhone, changer de vue ou d'âge demande un détour par ⋯.</li><li>Le menu mélange réglages d'affichage et fichier ; il peut grossir.</li></ul></div></div></section>
+
+<section id="B"><h2>Piste B — Affichage sur le plan, fichier dans « Plan ▾ »</h2>
+<p>Une ligne : ‹, nom du plan, ↶ ↷ et « Plan ▾ » (synchroniser, partager, exporter, importer, palette végétale). Les réglages d'affichage — vue, âge du jardin, grille aimantée, distances légales, cadenas — passent dans une pastille « 👁 Affichage » posée sur le plan, qui ouvre un petit panneau. La colonne de droite ne garde que + − ⤢. Sur ordinateur, ce panneau devient une petite barre d'outils posée sur le plan.</p>
+<div class="devs"><div><p class="lab">iPhone</p><div class="ph"><div class="in"><iframe src="piste-b.html" loading="lazy" title="Piste B sur iPhone"></iframe></div></div></div>
+<div><p class="lab">Ordinateur</p><div class="mac"><div class="in"><iframe src="piste-b.html" loading="lazy" title="Piste B sur ordinateur"></iframe></div></div></div></div>
+<a class="big" href="piste-b.html" target="_blank">Ouvrir la piste B en grand ↗</a>
+<div class="pc"><div class="plus"><h3>Points forts</h3><ul><li>Sépare clairement « ce que je vois » et « mon fichier ».</li><li>La pastille rappelle la vue en cours ; on voit le plan changer en réglant.</li><li>Sur ordinateur, les réglages restent sous la main, sans clic de plus.</li></ul></div>
+<div class="moins"><h3>Limites</h3><ul><li>Sur iPhone, le panneau Affichage couvre une partie du plan tant qu'il est ouvert.</li><li>Le cadenas n'est plus visible en permanence.</li><li>Deux endroits à connaître au lieu d'un.</li></ul></div></div></section>
+</div></body></html>
