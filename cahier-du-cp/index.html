@@ -267,7 +267,7 @@ html:has(body.lock){overflow:hidden}
 .nb .ndots{display:grid;grid-template-columns:repeat(5,6px);gap:2px;margin-top:3px}
 .nb .ndots i{width:6px;height:6px;border-radius:50%;background:var(--unit)}
 /* fabriquer : barres de dix et cubes */
-.nb .mat{--w:clamp(21px,calc((min(100vw,620px) - 112px)/11.4),30px);--c:calc(var(--w)*1.2);--h:calc(var(--c)*5 + 16px);position:relative;background:var(--card);border:3px solid var(--sh);border-radius:20px;padding:10px;margin-bottom:12px;display:flex;gap:14px;justify-content:center}
+.nb .mat{--w:clamp(17px,calc((min(100vw,620px) - 112px)/11.4),30px);--c:calc(var(--w)*1.2);--h:calc(var(--c)*5 + 16px);position:relative;background:var(--card);border:3px solid var(--sh);border-radius:20px;padding:10px;margin-bottom:12px;display:flex;gap:14px;justify-content:center}
 .nb .mat.good{background:var(--c3);border-color:var(--good);animation:pop .4s}
 .nb .mat.bad{border-color:var(--bad);animation:shake .3s}
 .nb .zone{display:flex;flex-direction:column;gap:4px}
@@ -317,6 +317,7 @@ html:has(body.lock){overflow:hidden}
 @keyframes nbmiam{50%{transform:rotate(2deg)}}
 .nb .eq{display:inline-flex;gap:14px;align-items:center;font-size:2.2rem;line-height:1}
 .nb .eq .sg{color:var(--good)}
+@media (max-width:360px){.nb .mat{gap:8px;padding:8px}}
 @media (max-width:640px),(max-height:860px){
 .nb .cons{padding:8px 12px;margin-bottom:10px}
 .nb .cons .big{width:56px;height:56px;font-size:1.6rem}
@@ -714,10 +715,10 @@ const nbDots=n=>`<span class="ndots" aria-hidden="true">${'<i></i>'.repeat(n)}</
 const nbShow=h=>{app.innerHTML=hdr(Q.n/Q.N,`${Q.n+1}/${Q.N}`)+`<div class="nb">${h}</div>`};
 function nbDraw(c){({pan:nbDrawPan,ran:nbDrawRan,fab:nbDrawFab,cmp:nbDrawCmp})[c.t](c)}
 function nbTouch(c){if(!c||c.type!=='nb'||c.busy||c.done)return false;c.hint=0;if(c.res==='bad'||c.res==='msg'){c.res='';c.fb='';c.fbk='';c.no=[]}return true}
-function nbGood(c,msg,extra){c.busy=0;c.done=1;c.res='good';c.fbk='good';c.fb=extra||'Bravo ! ⭐';if(!c.tries)Q.score++;sfx(true);nbSay(msg);nbDraw(c)}
+function nbGood(c,msg,extra){c.busy=0;c.done=1;c.at=Date.now();c.res='good';c.fbk='good';c.fb=extra||'Bravo ! ⭐';if(!c.tries)Q.score++;sfx(true);nbSay(msg);nbDraw(c)}
 function nbBad(c,msg,count=true){c.busy=0;if(count){c.tries++;c.help=1;sfx(false)}c.res='bad';c.fbk='bad';c.fb=`${count?'Essaie encore 💪':'👆'}<small>${[].concat(msg).join(' ')}</small>`;nbSay(msg);nbDraw(c)}
 function nbCheck(){const c=Q&&Q.cur;if(!c||c.type!=='nb'||c.busy||c.done)return;({pan:nbCheckPan,ran:nbCheckRan,fab:nbCheckFab,cmp:nbCheckCmp})[c.t](c)}
-function nbNext(){const c=Q&&Q.cur;if(!c||c.type!=='nb'||!c.done)return;Q.n++;next()}
+function nbNext(){const c=Q&&Q.cur;if(!c||c.type!=='nb'||!c.done||Date.now()-(c.at||0)<600)return;Q.n++;next()}
 /* 1. le panier : toucher pour mettre, toucher pour reprendre */
 function nbDrawPan(c){const it=c.it,firstOn=c.pool.indexOf(true);
  const b=c.bask.map((pi,k)=>`<button class="nit${c.last===pi?' in':''}${c.lit===k+1?' lit':''}" onclick="nbPanOut(${pi})" aria-label="Reprendre une ${it[0]}">${it[2]}${c.help||c.lit>k?`<b>${k+1}</b>`:''}</button>`).join('');
