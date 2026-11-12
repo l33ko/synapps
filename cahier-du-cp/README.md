@@ -14,11 +14,11 @@ L'interface imite un cahier à lignes Seyès, avec de gros boutons faciles à to
 - **Phrases** : remettre des étiquettes dans l'ordre pour construire une phrase, avec la majuscule au début et le point à la fin. Chaque étiquette touchée est lue à voix haute.
 
 **Mathématiques**
+- **Nombres** : l'enfant fabrique la réponse en touchant, puis valide avec le bouton vert. Quatre activités : mettre le bon nombre de fruits dans le panier (niveaux 1 à 4), ranger des étiquettes du plus petit au plus grand, fabriquer un nombre avec des barres de dix et des cubes, toucher le plus grand pour le crocodile. Nombres jusqu'à 10 (niveaux 1-2), 20 (3-4), 59 (5-6), 99 (7) ; défis aux niveaux 8 à 10 (nombres proches, chiffres inversés comme 46 et 64, rangement du plus grand au plus petit).
 - **Calcul** (additions et soustractions) : un seul exercice. Que des additions simples aux niveaux 1 à 3, puis des soustractions faciles mélangées dès le niveau 4 (de plus en plus difficiles ensuite). De 0 à 5 jusqu'à 99, avec le passage de la dizaine aux niveaux avancés.
 - **Compléments** : 7 + ? = 10, puis jusqu'à 20 et 100.
 - **Problèmes** : petites histoires de la vie courante (donner des pommes, la monnaie rendue par la marchande, des boîtes qui contiennent le même nombre d'objets, et à partir du niveau 5 des paquets de dix et des unités à dénombrer : « Combien y en a-t-il ? »), lues lentement, phrase par phrase, avec des pauses. Aux niveaux avancés, certaines demandent deux étapes et d'autres un partage équitable.
 - **Doubles et moitiés** : doubles, moitiés, groupes égaux, puis les tables de 2, 3, 4, 5 et 10 aux derniers niveaux seulement.
-- **Maths mélangées** : un défi qui combine additions, soustractions, compléments et doubles.
 
 **Jeux**
 - **Memory** : associer chaque image à son mot.
@@ -29,7 +29,7 @@ L'interface imite un cahier à lignes Seyès, avec de gros boutons faciles à to
 - **Montée de niveau en deux séries** : il faut réussir deux séries à son niveau pour monter (la barre du menu montre un demi-cran après la première) ; réussir un niveau plus haut le valide tout de suite ; une série ratée fait redescendre d'un niveau.
 - **Exercices ajoutés (lot 2)** : en Lecture, « par quelle syllabe commence le mot ? » (niveaux 1-2) et « vrai ou faux : l'image va-t-elle avec la phrase ? » (4-6) ; en Écriture, écrire la première syllabe du mot entendu (1-4) ; dans Mots à compléter, la lettre muette de la fin (3-6) et des sons qui se ressemblent comme on/om ou an/en (7 et plus) ; dans Phrases, un mot en trop à laisser de côté (à partir du 7).
 - **Séries qui rassurent** : à partir du niveau 4, 4 questions sur 10 sont plus faciles (dont les 2 dernières), pour que l'enfant finisse sur une réussite. Le niveau ne monte ou ne baisse qu'en fonction des 6 questions du vrai niveau. À la fin, un message d'encouragement et au moins 2 étoiles quand l'enfant a tenté un niveau au-dessus du sien.
-- **Niveaux difficiles (réglage parents)** : les niveaux 8 à 10 peuvent être désactivés ; les exercices s'arrêtent alors au niveau 7 (sauf Maths mélangées, Problèmes, Doubles et moitiés et Compléments). Activés par défaut.
+- **Niveaux difficiles (réglage parents)** : les niveaux 8 à 10 peuvent être désactivés ; les exercices s'arrêtent alors au niveau 7 (sauf Problèmes, Doubles et moitiés et Compléments). Activés par défaut.
 - **Intrus** : trouver l'élément qui n'est pas comme les autres.
 
 ## Lien avec le programme de CP
@@ -79,7 +79,7 @@ Le bouton « Parents » du menu ouvre la configuration, protégée par un petit 
 
 - **Temps de jeu** : 5, 10, 15, 20, 30, 45 ou 60 minutes, ou sans limite. Par défaut, une session dure **15 minutes**. À la fin, l'enfant termine son exercice en cours, puis l'écran se verrouille. Une nouvelle session peut être lancée à la main, et une démarre automatiquement chaque jour.
 - **Voix et consignes** : activer ou couper les consignes orales, choisir la voix parmi les voix françaises de l'appareil et la tester.
-- **Modules proposés** : désactiver Maths mélangées, Problèmes, Doubles et moitiés ou Compléments.
+- **Modules proposés** : désactiver Problèmes, Doubles et moitiés ou Compléments.
 - **Sauvegarde** : le code `CP1-` pour passer d'un appareil à un autre.
 - Ce contrôle n'est pas une protection absolue : vider les données du navigateur ou changer de navigateur remet le compteur à zéro.
 

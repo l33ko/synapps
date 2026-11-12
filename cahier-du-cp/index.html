@@ -51,10 +51,10 @@
 <link rel="apple-touch-icon" href="icon-180.png">
 <link href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Playwrite+FR+Trad&display=swap" rel="stylesheet">
 <style>
-:root{--paper:#fffaf0;--line:#c9dcf7;--margin:#f4a0b8;--ink:#2b2d6e;--card:#fff;--c1:#ffc4d6;--c2:#bfe3ff;--c3:#c4f0b6;--c4:#ffe58f;--c5:#dacbff;--c6:#ffcfa0;--good:#2e9e4f;--bad:#d8553d;--sh:#2b2d6e;
+:root{--paper:#fffaf0;--line:#c9dcf7;--margin:#f4a0b8;--ink:#2b2d6e;--card:#fff;--c1:#ffc4d6;--c2:#bfe3ff;--c3:#c4f0b6;--c4:#ffe58f;--c5:#dacbff;--c6:#ffcfa0;--good:#2e9e4f;--bad:#d8553d;--sh:#2b2d6e;--diz:#5aa9f0;--dizt:#1f6fd0;--uni:#ffa94d;--unit:#c9620a;
 box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--paper:#191b3a;--line:#2b3066;--margin:#7d3a58;--ink:#f1efff;--card:#262a5a;--c1:#5c2a43;--c2:#233f66;--c3:#24502f;--c4:#5a4a1c;--c5:#3d3270;--c6:#5c3a1f;--good:#5ed17f;--bad:#ff8a70;--sh:#0c0d22}}
-:root[data-theme="dark"]{color-scheme:dark;--paper:#191b3a;--line:#2b3066;--margin:#7d3a58;--ink:#f1efff;--card:#262a5a;--c1:#5c2a43;--c2:#233f66;--c3:#24502f;--c4:#5a4a1c;--c5:#3d3270;--c6:#5c3a1f;--good:#5ed17f;--bad:#ff8a70;--sh:#0c0d22}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--paper:#191b3a;--line:#2b3066;--margin:#7d3a58;--ink:#f1efff;--card:#262a5a;--c1:#5c2a43;--c2:#233f66;--c3:#24502f;--c4:#5a4a1c;--c5:#3d3270;--c6:#5c3a1f;--good:#5ed17f;--bad:#ff8a70;--sh:#0c0d22;--diz:#3f7fc4;--dizt:#8cc4ff;--uni:#d98a36;--unit:#ffb866}}
+:root[data-theme="dark"]{color-scheme:dark;--paper:#191b3a;--line:#2b3066;--margin:#7d3a58;--ink:#f1efff;--card:#262a5a;--c1:#5c2a43;--c2:#233f66;--c3:#24502f;--c4:#5a4a1c;--c5:#3d3270;--c6:#5c3a1f;--good:#5ed17f;--bad:#ff8a70;--sh:#0c0d22;--diz:#3f7fc4;--dizt:#8cc4ff;--uni:#d98a36;--unit:#ffb866}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 *{box-sizing:border-box}
 body{margin:0;min-height:100vh;min-height:100dvh;font-family:'Andika','Comic Sans MS',sans-serif;color:var(--ink);background-color:var(--paper);
@@ -212,6 +212,132 @@ html,body{touch-action:pan-x pan-y;-webkit-text-size-adjust:100%}
 body.lock{overflow:hidden;overscroll-behavior:none}
 html:has(body.lock){overflow:hidden}
 @media (max-width:380px){.opt{font-size:1.6rem}}
+/* ---------- module Nombres : on fabrique la réponse en touchant ---------- */
+.nb .cons{display:grid;grid-template-columns:auto 1fr;align-items:center;gap:2px 12px;padding:10px 14px;min-height:0;margin-bottom:14px}
+.nb .cons .big{grid-row:1/3;width:64px;height:64px;font-size:1.8rem;padding:0}
+.nb .cons .npic{display:flex;align-items:center;justify-content:center;gap:10px;font-size:2.1rem;line-height:1;min-height:52px}
+.nb .cons p{font-size:1.05rem}
+.nb .num{font-size:3.1rem;font-weight:700;line-height:1}
+.nb .num .d{color:var(--dizt)}.nb .num .u{color:var(--unit)}
+.nb .arr{font-size:1.5rem;opacity:.6}
+.nb .xb{display:inline-block;width:12px;height:44px;border:2px solid var(--sh);border-radius:3px;background:var(--diz)}
+.nb .xc{display:inline-block;width:22px;height:22px;border:2px solid var(--sh);border-radius:4px;background:var(--uni)}
+.nb .nfb{text-align:center;font-size:1.5rem;font-weight:700;min-height:44px;margin:10px 0 8px;line-height:1.2}
+.nb .nfb small{display:block;font-size:1rem;font-weight:400}
+.nb .nfb.good{color:var(--good)}.nb .nfb.bad{color:var(--bad)}
+.nb .nok{width:100%;display:flex;align-items:center;justify-content:center;min-height:64px;padding:8px 6px}
+.nb .nok svg{width:44px;height:44px}
+.nb .nok.wait{opacity:.45}
+.nb .ncnt{display:inline-flex;align-items:center;justify-content:center;min-width:2.1em;height:2.1em;padding:0 .35em;border-radius:99px;background:var(--ink);color:var(--paper);font-size:1.25rem;font-weight:700;font-style:normal}
+.nb .hand{position:relative}
+.nb .hand::after{content:'👆';position:absolute;left:50%;top:62%;margin-left:-.5em;font-size:1.9rem;line-height:1;animation:nbbob 1s ease-in-out infinite;pointer-events:none;z-index:3}
+@keyframes nbbob{50%{transform:translateY(-7px)}}
+/* le panier */
+.nb .basket{position:relative;background:var(--c4);border:3px solid var(--sh);border-radius:16px 16px 34px 34px;padding:26px 12px 14px;margin:20px 0 12px;min-height:128px;background-image:repeating-linear-gradient(45deg,rgba(43,45,110,.07) 0 6px,transparent 6px 12px)}
+.nb .basket.big2{min-height:226px}
+.nb .basket .tag{position:absolute;top:-22px;left:10px;font-size:2.2rem;line-height:1;display:flex;align-items:center;gap:6px}
+.nb .basket.good{background-color:var(--c3);border-color:var(--good);animation:pop .4s}
+.nb .basket.bad{border-color:var(--bad);animation:shake .3s}
+.nb .bgrid{display:grid;grid-template-columns:repeat(5,minmax(0,52px));gap:6px;justify-content:center}
+.nb .pgrid{display:grid;grid-template-columns:repeat(6,minmax(0,56px));gap:6px;justify-content:center}
+.nb .nit{font:inherit;position:relative;aspect-ratio:1;border:0;background:none;padding:0;font-size:2.15rem;line-height:1;cursor:pointer;border-radius:14px;display:flex;align-items:center;justify-content:center}
+.nb .nit:active{transform:scale(.9)}
+.nb .nit:disabled{opacity:.16;filter:grayscale(1);cursor:default}
+.nb .nit.in{animation:pop .3s}
+.nb .nit b{position:absolute;right:-2px;bottom:-2px;min-width:1.5em;height:1.5em;border-radius:99px;background:var(--ink);color:var(--paper);font-size:.8rem;display:flex;align-items:center;justify-content:center;border:2px solid var(--paper)}
+.nb .nit.lit b{animation:pop .25s}
+/* ranger */
+.nb .scale{display:flex;align-items:flex-end;gap:8px;margin:2px 4px 6px}
+.nb .scale .s1{font-size:1.4rem;line-height:1}.nb .scale .s2{font-size:2.6rem;line-height:1}
+.nb .scale i{flex:1;height:26px;background:var(--c5);border:0;clip-path:polygon(0 100%,100% 0,100% 100%)}
+.nb .scale.desc i{clip-path:polygon(0 0,100% 100%,0 100%)}
+.nb .nslots{display:flex;gap:8px;justify-content:center;align-items:flex-end;margin-bottom:16px;border-bottom:3px solid var(--sh)}
+.nb .sl{flex:1 1 0;max-width:96px;min-width:0;display:flex;flex-direction:column;gap:5px}
+.nb .hole{font:inherit;color:inherit;height:66px;border:3px dashed var(--sh);border-radius:14px;background:rgba(255,255,255,.6);font-size:1.75rem;font-weight:700;cursor:pointer;padding:0;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.1}
+:root[data-theme="dark"] .nb .hole{background:rgba(255,255,255,.08)}
+.nb .hole.full{border-style:solid;background:var(--card);animation:pop .25s}
+.nb .hole.lk{background:var(--c3);border-color:var(--good);border-style:solid;cursor:default}
+.nb .hole.no{background:var(--c6);border-color:var(--bad);animation:shake .3s}
+.nb .hole.next{border-color:#e8336d;background:rgba(255,229,143,.55)}
+.nb .sl .st{background:var(--c5);border:3px solid var(--sh);border-radius:6px 6px 0 0;border-bottom:0}
+.nb .npool{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;min-height:70px}
+.nb .ntile{font:inherit;color:inherit;background:var(--card);border:3px solid var(--sh);border-radius:14px;padding:6px 10px;min-width:62px;min-height:62px;font-size:1.9rem;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.1}
+.nb .ntile:active{transform:scale(.95)}
+.nb .ntile:disabled{opacity:.2;cursor:default}
+.nb .ndots{display:grid;grid-template-columns:repeat(5,6px);gap:2px;margin-top:3px}
+.nb .ndots i{width:6px;height:6px;border-radius:50%;background:var(--unit)}
+/* fabriquer : barres de dix et cubes */
+.nb .mat{--w:clamp(21px,calc((min(100vw,620px) - 112px)/11.4),30px);--c:calc(var(--w)*1.2);--h:calc(var(--c)*5 + 16px);position:relative;background:var(--card);border:3px solid var(--sh);border-radius:20px;padding:10px;margin-bottom:12px;display:flex;gap:14px;justify-content:center}
+.nb .mat.good{background:var(--c3);border-color:var(--good);animation:pop .4s}
+.nb .mat.bad{border-color:var(--bad);animation:shake .3s}
+.nb .zone{display:flex;flex-direction:column;gap:4px}
+.nb .zone .lab{font-size:.8rem;font-weight:700;text-align:center;line-height:1.2}
+.nb .zone.zd .lab{color:var(--dizt)}.nb .zone.zu .lab{color:var(--unit)}
+.nb .zone .zin{height:var(--h);border-radius:10px;border:2px dashed rgba(127,127,127,.5);padding:0;box-sizing:content-box}
+.nb .zd .zin{width:calc(var(--w)*9 + 32px);display:flex;gap:4px}
+.nb .zu .zin{width:calc(var(--c)*2 + 4px);display:grid;grid-template-columns:repeat(2,var(--c));grid-template-rows:repeat(5,var(--c));grid-auto-flow:column;gap:4px;align-content:start}
+.nb .zu.only .zin{width:calc(var(--c)*5 + 16px);height:calc(var(--c)*2 + 4px);grid-template-columns:repeat(5,var(--c));grid-template-rows:repeat(2,var(--c));grid-auto-flow:row}
+.nb .barre{width:var(--w);height:var(--h);padding:0;border:2.5px solid var(--sh);border-radius:5px;cursor:pointer;background:var(--diz);background-image:repeating-linear-gradient(to bottom,transparent 0 calc(10% - 2px),var(--sh) calc(10% - 2px) 10%)}
+.nb .cube{width:var(--c);height:var(--c);padding:0;border:2.5px solid var(--sh);border-radius:5px;cursor:pointer;background:var(--uni)}
+.nb .barre.in2,.nb .cube.in2{animation:pop .3s}
+.nb .barre.lit,.nb .cube.lit{box-shadow:0 0 0 4px #e8336d;z-index:1;position:relative}
+.nb .barre.fus{animation:pop .5s;box-shadow:0 0 0 4px var(--uni)}
+.nb .mat .ncnt{position:absolute;top:-18px;left:10px;font-size:1.4rem}
+.nb .adds{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.nb .adds.one{grid-template-columns:1fr}
+.nb .add{display:flex;align-items:center;justify-content:center;gap:10px;font-size:1rem;line-height:1.15;padding:6px 8px;min-height:74px}
+.nb .add .pl{font-size:2.2rem;line-height:1}
+.nb .add.b{background:var(--c2)}.nb .add.c{background:var(--c6)}
+.nb .add i.ab{width:14px;height:56px;border:2px solid var(--sh);border-radius:3px;background:var(--diz);background-image:repeating-linear-gradient(to bottom,transparent 0 calc(10% - 1.5px),var(--sh) calc(10% - 1.5px) 10%);flex:none}
+.nb .add i.ac{width:26px;height:26px;border:2px solid var(--sh);border-radius:4px;background:var(--uni);flex:none}
+.nb .add.no{animation:shake .3s}
+.nb .mini{display:flex;gap:3px;align-items:flex-end;justify-content:center;margin-top:6px;min-height:44px}
+.nb .mini .b{width:7px;height:44px;border:1.5px solid var(--sh);border-radius:2px;background:var(--diz)}
+.nb .mini .us{display:grid;grid-template-rows:repeat(5,7px);grid-auto-flow:column;gap:2px;margin-left:3px}
+.nb .mini .us i{width:7px;height:7px;border:1.5px solid var(--sh);border-radius:1px;background:var(--uni)}
+/* comparer : le crocodile */
+.nb .duel{display:grid;grid-template-columns:1fr clamp(78px,24%,130px) 1fr;gap:6px;align-items:center;margin-bottom:6px}
+.nb .side{font:inherit;color:inherit;background:var(--card);border:3px solid var(--sh);border-radius:22px;min-height:170px;padding:8px 4px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:transform .15s}
+.nb .side .n{font-size:3.4rem;font-weight:700;line-height:1}
+.nb .side .heap{display:flex;flex-wrap:wrap;justify-content:center;gap:1px 2px;font-size:1.75rem;line-height:1.15;max-width:7.2em}
+.nb .side .n.sm{font-size:1.5rem;margin-top:4px;background:var(--ink);color:var(--paper);border-radius:99px;min-width:1.9em;padding:2px 8px}
+.nb .side.sel{background:var(--c4);transform:scale(1.04);border-width:5px}
+.nb .side.good{background:var(--c3);border-color:var(--good);animation:pop .4s}
+.nb .side.bad{background:var(--c6);border-color:var(--bad);animation:shake .3s}
+.nb .croc{width:100%;display:block;overflow:visible}
+.nb .croc .flip{transform-origin:60px 45px;transition:transform .25s}
+.nb .croc.l .flip{transform:scaleX(-1)}
+.nb .croc .cup,.nb .croc .clo{transform-origin:26px 52px;transition:transform .3s}
+.nb .croc.open .cup{transform:rotate(-24deg)}
+.nb .croc.open .clo{transform:rotate(15deg)}
+.nb .croc.idle .flip{animation:nblook 2.6s steps(1) infinite}
+.nb .croc.miam .clo{animation:nbmiam .28s 3}
+.nb .croc.non{animation:shake .3s 2}
+@keyframes nblook{50%{transform:scaleX(-1)}}
+@keyframes nbmiam{50%{transform:rotate(2deg)}}
+.nb .eq{display:inline-flex;gap:14px;align-items:center;font-size:2.2rem;line-height:1}
+.nb .eq .sg{color:var(--good)}
+@media (max-width:640px),(max-height:860px){
+.nb .cons{padding:8px 12px;margin-bottom:10px}
+.nb .cons .big{width:56px;height:56px;font-size:1.6rem}
+.nb .num{font-size:2.7rem}
+.nb .cons .npic{font-size:1.9rem;min-height:46px}
+.nb .cons p{font-size:1rem}
+.nb .nfb{min-height:40px;margin:6px 0;font-size:1.35rem}
+.nb .nfb small{font-size:.95rem}
+.nb .basket{margin:18px 0 10px;padding:22px 8px 10px;min-height:110px}
+.nb .basket.big2{min-height:196px}
+.nb .bgrid{grid-template-columns:repeat(5,minmax(0,44px));gap:4px}
+.nb .pgrid{grid-template-columns:repeat(6,minmax(0,50px));gap:4px}
+.nb .nit{font-size:1.9rem}
+.nb .side{min-height:150px}
+.nb .side .n{font-size:3rem}
+.nb .side .heap{font-size:1.55rem}
+.nb .add{min-height:66px}
+.nb .nok{min-height:58px}
+.nb .ntile{min-width:52px;min-height:56px;font-size:1.7rem}
+.nb .hole{font-size:1.5rem}
+}
 </style>
 </head>
 <body>
@@ -236,17 +362,17 @@ const MENU=[
  {id:'pho',t:'Mots à compléter',e:'🔤',s:'lettres manquantes',c:'--c5'},
  {id:'phr',t:'Phrases',e:'🧩',s:'remets les étiquettes',c:'--c6'},
  {id:'mem',t:'Memory',e:'🃏',s:'image et mot',c:'--c2'},
+ {id:'nb',t:'Nombres',e:'🔢',s:'compter, ranger, comparer',c:'--c4'},
  {id:'add',t:'Calcul',e:'<b class="sym" style="background:#2e9e4f">+</b> <b class="sym" style="background:#e08a1e">−</b>',s:'des petits aux grands nombres',c:'--c3'},
  {id:'cmp',t:'Compléments',e:'🧮',s:'7 + ? = 10, puis 20, 100',c:'--c3'},
  {id:'mul',t:'Doubles et moitiés',e:'<b class="sym" style="background:#7a5bd6">×</b>',s:'puis les tables',c:'--c5'},
  {id:'pb',t:'Problèmes',e:'🛒',s:'pommes, monnaie…',c:'--c4'},
  {id:'sui',t:'Suites',e:'🔗',s:'que vient ensuite ?',c:'--c5'},
- {id:'mix',t:'Maths mélangées',e:'🎲',s:'le grand défi',c:'--c6'},
  {id:'int',t:'Intrus',e:'🕵️',s:'lequel est différent ?',c:'--c1'}];
 const app=document.getElementById('app');
 let TH=(()=>{try{return localStorage.getItem('cp-theme')||'light'}catch(e){return'light'}})();document.documentElement.dataset.theme=TH;
 function togTheme(){TH=TH==='dark'?'light':'dark';try{localStorage.setItem('cp-theme',TH)}catch(e){}document.documentElement.dataset.theme=TH;menu()}
-let stars=0,Q=null,LV={},P='',D={profiles:{},last:'',set:{min:15},ver:2},DBREF=null,PLAY={};const NOHARD=['mix','pb','mul','cmp'],HARD=()=>!(D.set&&D.set.hard===false),MAXL=id=>NOHARD.includes(id)||HARD()?10:7;
+let stars=0,Q=null,LV={},P='',D={profiles:{},last:'',set:{min:15},ver:2},DBREF=null,PLAY={};const NOHARD=['pb','mul','cmp'],HARD=()=>!(D.set&&D.set.hard===false),MAXL=id=>NOHARD.includes(id)||HARD()?10:7;
 const lvS=id=>Math.min(MAXL(id),Math.max(1,parseInt(LV[id])||1)),lv=id=>Math.min(MAXL(id),PLAY[id]||lvS(id));
 const mig=ps=>{for(const k in ps){const l=(ps[k]&&ps[k].lv)||{};for(const id in l)l[id]=[1,4,7][(parseInt(l[id])||1)-1]||1}};
 try{D=JSON.parse(localStorage.getItem('cp-data'))||D}catch(e){}
@@ -283,7 +409,7 @@ const vnum=n=>{if(n<20)return VU[n];const t=Math.floor(n/10),u=n%10;
  return 'quatre-vingt-'+VU[10+u]};
 try{fetch('voix/index.json').then(r=>r.ok?r.json():null).then(j=>{VIDX=j}).catch(()=>{})}catch(e){}
 function vseg(t){if(!VIDX)return null;
- const w=vnorm(String(t).replace(/\b(\d+) (?=(?:pomme|bille|fleur)s?\b)/g,(m,d)=>+d<=99?' '+vnum(+d).replace(/(^| et |-)un$/,'$1une')+' ':m).replace(/\d+/g,m=>' '+(+m<=99?vnum(+m):'?')+' ')).split(' ').filter(Boolean),n=w.length;if(!n)return null;
+ const w=vnorm(String(t).replace(/\b(\d+) (?=(?:pomme|bille|fleur|fraise|banane|poire)s?\b)/g,(m,d)=>+d<=99?' '+vnum(+d).replace(/(^| et |-)un$/,'$1une')+' ':m).replace(/\d+/g,m=>' '+(+m<=99?vnum(+m):'?')+' ')).split(' ').filter(Boolean),n=w.length;if(!n)return null;
  const best=[0],prev=[];
  for(let i=1;i<=n;i++){best[i]=null;for(let j=0;j<i;j++){if(best[j]==null)continue;const k=w.slice(j,i).join(' ');if(VIDX[k]&&(best[i]==null||best[j]+1<best[i])){best[i]=best[j]+1;prev[i]=j}}}
  if(best[n]==null)return null;const out=[];for(let i=n;i>0;i=prev[i])out.unshift(VIDX[w.slice(prev[i],i).join(' ')]);return out}
@@ -554,7 +680,107 @@ function genMath(op,L,KL){L=L||1;
 /* additions et soustractions : que des additions aux niveaux faciles, soustractions faciles dès le niveau 4 */
 const SOUM=[0,0,0,1,2,3,4,6,8,10],SOUP=[0,0,0,.25,.35,.45,.5,.5,.5,.5];
 function genAS(){const L=lv('add');return Math.random()<SOUP[L-1]?genMath('sou',SOUM[L-1],L):genMath('add',L)}
-function gen(id){return id==='add'?genAS():id==='lec'?genLec():id==='ecr'?genEcr():id==='pho'?genPho():id==='phr'?genPhr():id==='sui'?genSui():id==='pb'?genPb():id==='int'?genInt():genMath(id==='mix'?pick(['add','sou','cmp','mul'].filter(o=>!OFF(o))):id,lv(id))}
+/* ---------- module Nombres : l'enfant fabrique la réponse en touchant, puis valide avec le bouton vert ---------- */
+const NBIT=[['pomme','pommes','🍎'],['fraise','fraises','🍓'],['banane','bananes','🍌'],['poire','poires','🍐']];
+const NBCHECK='<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M9 25l10 10 20-23" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const NBARROW='<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M8 24h30M27 11l13 13-13 13" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const nbWait=ms=>new Promise(r=>setTimeout(r,ms)),nbSay=t=>{if(NAR())say(t)},nbLive=c=>!!Q&&Q.cur===c;
+/* nombres de chaque niveau : [mini, maxi] pour le panier, ranger, fabriquer, comparer */
+const NBR={1:{pan:[2,5],ran:[1,6],fab:[1,5],cmp:[1,5]},2:{pan:[3,10],ran:[1,10],fab:[2,9],cmp:[1,10]},3:{pan:[6,14],ran:[1,15],fab:[10,15],cmp:[1,15]},4:{pan:[11,20],ran:[1,20],fab:[11,20],cmp:[1,20]},
+ 5:{ran:[10,39],fab:[21,39],cmp:[10,39]},6:{ran:[10,59],fab:[21,59],cmp:[10,59]},7:{ran:[10,99],fab:[21,99],cmp:[10,99]},8:{ran:[10,99],fab:[60,99],cmp:[10,99]},9:{ran:[10,99],fab:[50,99],cmp:[10,99]},10:{ran:[10,99],fab:[50,99],cmp:[10,99]}};
+function genNb(){const L=lv('nb'),acts=L<=4?['pan','cmp','ran','fab']:['fab','ran','cmp'],t=acts[(Q.n||0)%acts.length],P=NBR[L][t];
+ const base={type:'nb',t,L,tries:0,done:0,help:0,fb:'',fbk:'',res:'',hint:(Q.n||0)===0,nb:true};
+ if(t==='pan'){const n=R(P[0],P[1]),it=pick(NBIT);
+  return {...base,q:`nb:pan:${n}`,n,it,pool:Array(L<=2?12:24).fill(true),bask:[],lit:0,sp:`Mets ${n} ${n>1?it[1]:it[0]} dans le panier.`}}
+ if(t==='ran'){const k=L<=2?3:L<=4?4:L<=8?5:6,desc=L>=10,s=new Set();let g=0;
+  if(L===8){const b=10*R(1,8);while(s.size<k&&g++<200)s.add(b+R(0,19))} /* des nombres proches */
+  else{if(L>=9){const d=R(1,8),u=R(d+1,9);s.add(10*d+u);s.add(10*u+d)} /* deux nombres aux chiffres inversés */
+   while(s.size<k&&g++<300)s.add(R(P[0],P[1]))}
+  const nums=shuffle([...s]);
+  return {...base,q:`nb:ran:${nums.join('-')}`,nums,desc,slots:Array(nums.length).fill(null),lock:[],no:[],sp:desc?'Range les nombres, du plus grand au plus petit.':'Range les nombres, du plus petit au plus grand.'}}
+ if(t==='fab'){const n=R(P[0],P[1]);
+  return {...base,q:`nb:fab:${n}`,n,d:0,u:0,lit:0,run:0,sp:L<=2?`Fabrique ${n} avec des cubes.`:`Fabrique ${n} avec des barres de dix et des cubes.`}}
+ let a,b,g=0;
+ do{if(L>=9&&Math.random()<.6){const d=R(1,8),u=R(d+1,9);a=10*d+u;b=10*u+d} /* chiffres inversés : 46 et 64 */
+  else if(L>=8){a=R(P[0],P[1]);b=Math.max(10,Math.min(99,a+pick([-3,-2,-1,1,2,3])))} /* nombres proches */
+  else{a=R(P[0],P[1]);b=R(P[0],P[1])}
+  if(Math.random()<.5)[a,b]=[b,a]}while(a===b&&g++<100);
+ return {...base,q:`nb:cmp:${a}-${b}`,a,b,pick:null,it:pick(NBIT),sp:'Touche le plus grand. Le crocodile veut le manger !'}}
+const nbCons=(pic,txt)=>`<div class="q cons" style="background:var(--c4)"><button class="big" onclick="say(Q.cur.sp)" aria-label="Écouter la consigne">🔊</button><div class="npic" aria-hidden="true">${pic}</div><p>${txt}</p></div>`;
+const nbFoot=(c,ready=true)=>`<div class="nfb ${c.fbk}" role="status">${c.fb}</div><button class="opt go nok${ready||c.done?'':' wait'}" onclick="${c.done?'nbNext()':'nbCheck()'}" aria-label="${c.done?'Question suivante':'Valider ma réponse'}">${c.done?NBARROW:NBCHECK}</button>`;
+const nbNum=(n,col)=>col&&n>9?`<span class="num"><span class="d">${Math.floor(n/10)}</span><span class="u">${n%10}</span></span>`:`<span class="num">${n}</span>`;
+const nbMini=n=>`<span class="mini" aria-hidden="true">${'<i class="b"></i>'.repeat(Math.floor(n/10))}${n%10?`<span class="us">${'<i></i>'.repeat(n%10)}</span>`:''}</span>`;
+const nbDots=n=>`<span class="ndots" aria-hidden="true">${'<i></i>'.repeat(n)}</span>`;
+const nbShow=h=>{app.innerHTML=hdr(Q.n/Q.N,`${Q.n+1}/${Q.N}`)+`<div class="nb">${h}</div>`};
+function nbDraw(c){({pan:nbDrawPan,ran:nbDrawRan,fab:nbDrawFab,cmp:nbDrawCmp})[c.t](c)}
+function nbTouch(c){if(!c||c.type!=='nb'||c.busy||c.done)return false;c.hint=0;if(c.res==='bad'||c.res==='msg'){c.res='';c.fb='';c.fbk='';c.no=[]}return true}
+function nbGood(c,msg,extra){c.busy=0;c.done=1;c.res='good';c.fbk='good';c.fb=extra||'Bravo ! ⭐';if(!c.tries)Q.score++;sfx(true);nbSay(msg);nbDraw(c)}
+function nbBad(c,msg,count=true){c.busy=0;if(count){c.tries++;c.help=1;sfx(false)}c.res='bad';c.fbk='bad';c.fb=`${count?'Essaie encore 💪':'👆'}<small>${[].concat(msg).join(' ')}</small>`;nbSay(msg);nbDraw(c)}
+function nbCheck(){const c=Q&&Q.cur;if(!c||c.type!=='nb'||c.busy||c.done)return;({pan:nbCheckPan,ran:nbCheckRan,fab:nbCheckFab,cmp:nbCheckCmp})[c.t](c)}
+function nbNext(){const c=Q&&Q.cur;if(!c||c.type!=='nb'||!c.done)return;Q.n++;next()}
+/* 1. le panier : toucher pour mettre, toucher pour reprendre */
+function nbDrawPan(c){const it=c.it,firstOn=c.pool.indexOf(true);
+ const b=c.bask.map((pi,k)=>`<button class="nit${c.last===pi?' in':''}${c.lit===k+1?' lit':''}" onclick="nbPanOut(${pi})" aria-label="Reprendre une ${it[0]}">${it[2]}${c.help||c.lit>k?`<b>${k+1}</b>`:''}</button>`).join('');
+ const p=c.pool.map((on,pi)=>`<button class="nit${c.hint&&pi===firstOn?' hand':''}" ${on?'':'disabled'} onclick="nbPanIn(${pi})" aria-label="Mettre une ${it[0]} dans le panier">${it[2]}</button>`).join('');
+ nbShow(nbCons(`${nbNum(c.n)}<span>${it[2]}</span><span class="arr">➜</span><span>🧺</span>`,`Mets <b>${c.n}</b> ${c.n>1?it[1]:it[0]} dans le panier.`)
+ +`<div class="basket${c.pool.length>12?' big2':''} ${c.res}"><span class="tag">🧺${c.help?`<b class="ncnt" aria-label="${c.bask.length} dans le panier">${c.bask.length}</b>`:''}</span><div class="bgrid">${b}</div></div><div class="pgrid">${p}</div>`+nbFoot(c,c.bask.length>0));c.last=null}
+function nbPanIn(pi){const c=Q&&Q.cur;if(!nbTouch(c)||!c.pool[pi])return;c.pool[pi]=false;c.bask.push(pi);c.last=pi;nbDraw(c)}
+function nbPanOut(pi){const c=Q&&Q.cur;if(!nbTouch(c))return;c.bask=c.bask.filter(x=>x!==pi);c.pool[pi]=true;nbDraw(c)}
+async function nbCheckPan(c){const m=c.bask.length,it=c.it;if(!m)return nbBad(c,'Touche les fruits pour les mettre dans le panier.',false);
+ c.busy=1;c.res='';c.fb='';for(let k=1;k<=m;k++){if(!nbLive(c))return;c.lit=k;nbDraw(c);await nbWait(m>12?110:190)}
+ if(!nbLive(c))return;await nbWait(250);if(!nbLive(c))return;c.lit=0;
+ if(m===c.n){c.help=1;nbGood(c,['Bravo !',`${c.n} ${c.n>1?it[1]:it[0]}`])}else nbBad(c,[`Tu as mis ${m} ${m>1?it[1]:it[0]}.`,`Il en faut ${c.n}.`])}
+/* 2. ranger : on touche les étiquettes dans l'ordre */
+function nbDrawRan(c){const k=c.nums.length,used=c.slots.filter(x=>x!=null),nx=c.slots.indexOf(null),low=c.L<=2;
+ const sl=c.slots.map((ni,j)=>{const lk=c.lock.includes(j),no=c.no.includes(j),h=8+(c.desc?k-1-j:j)*Math.round(36/k);
+  return `<div class="sl"><button class="hole${ni!=null?' full':''}${lk?' lk':''}${no?' no':''}${j===nx&&!c.done?' next':''}" onclick="nbRanOut(${j})" ${ni==null||lk?'tabindex="-1"':''} aria-label="${ni!=null?`Case ${j+1} : ${c.nums[ni]}${lk?', bien placé':', toucher pour reprendre'}`:`Case ${j+1}, vide`}">${ni!=null?c.nums[ni]+(low?nbDots(c.nums[ni]):''):''}</button><i class="st" style="height:${h}px"></i></div>`}).join('');
+ const firstFree=c.nums.findIndex((_,ni)=>!used.includes(ni));
+ const pool=c.nums.map((n,ni)=>`<button class="ntile${c.hint&&ni===firstFree?' hand':''}" ${used.includes(ni)?'disabled':''} onclick="nbRanIn(${ni})" aria-label="${n}">${n}${low?nbDots(n):''}</button>`).join('');
+ const mo='<span style="font-size:1.3rem">🐭</span>',el='<span style="font-size:2.5rem">🐘</span>';
+ nbShow(nbCons(`${c.desc?el:mo}<span class="arr">➜</span>${c.desc?mo:el}`,c.desc?`Range du plus <b>grand</b> au plus <b>petit</b>.`:`Range du plus <b>petit</b> au plus <b>grand</b>.`)
+ +`<div class="scale${c.desc?' desc':''}" aria-hidden="true"><span class="${c.desc?'s2':'s1'}">${c.desc?'🐘':'🐭'}</span><i></i><span class="${c.desc?'s1':'s2'}">${c.desc?'🐭':'🐘'}</span></div><div class="nslots">${sl}</div><div class="npool">${pool}</div>`+nbFoot(c,nx<0))}
+function nbRanIn(ni){const c=Q&&Q.cur;if(!nbTouch(c))return;const j=c.slots.indexOf(null);if(j<0||c.slots.includes(ni))return;c.slots[j]=ni;nbDraw(c)}
+function nbRanOut(j){const c=Q&&Q.cur;if(!c||c.type!=='nb'||c.slots[j]==null||c.lock.includes(j)||!nbTouch(c))return;c.slots[j]=null;nbDraw(c)}
+async function nbCheckRan(c){if(c.slots.includes(null))return nbBad(c,c.desc?'Touche les étiquettes une par une, la plus grande d’abord.':'Touche les étiquettes une par une, la plus petite d’abord.',false);
+ const so=[...c.nums].sort((a,b)=>c.desc?b-a:a-b);c.no=[];c.slots.forEach((ni,j)=>{if(c.nums[ni]===so[j]){if(!c.lock.includes(j))c.lock.push(j)}else c.no.push(j)});
+ if(!c.no.length)return nbGood(c,'Bravo ! C’est bien rangé.');
+ c.busy=1;c.tries++;sfx(false);c.fbk='bad';c.fb=`Essaie encore 💪<small>${c.lock.length?'Les étiquettes vertes sont bien placées.':c.desc?'Cherche d’abord le plus grand.':'Cherche d’abord le plus petit.'}</small>`;
+ nbSay(c.lock.length?'Presque ! Les étiquettes vertes sont bien placées. Range les autres.':c.desc?'Essaie encore. Cherche d’abord le plus grand nombre.':'Essaie encore. Cherche d’abord le plus petit nombre.');nbDraw(c);
+ await nbWait(900);if(!nbLive(c))return;c.no.forEach(j=>c.slots[j]=null);c.no=[];c.busy=0;c.res='bad';nbDraw(c)}
+/* 3. fabriquer un nombre : barres de dix et cubes */
+function nbDrawFab(c){const only=c.L<=2,col=c.L>=3&&c.L<=6;let k=0;
+ const bars=Array.from({length:c.d},(_,i)=>`<button class="barre${c.last==='d'&&i===c.d-1?(c.fus?' fus':' in2'):''}${c.lit===++k?' lit':''}" onclick="nbFabRem(10)" aria-label="Enlever une barre de dix"></button>`).join('');
+ const cubes=Array.from({length:c.u},(_,i)=>`<button class="cube${c.last==='u'&&i===c.u-1?' in2':''}${c.lit===++k?' lit':''}" onclick="nbFabRem(1)" aria-label="Enlever un cube"></button>`).join('');
+ const showCnt=c.help||c.busy||c.done;
+ nbShow(nbCons(`${nbNum(c.n,col)}<span class="arr">➜</span>${only?'':'<i class="xb"></i>'}<i class="xc"></i>`,only?`Fabrique <b>${c.n}</b> avec des cubes.`:`Fabrique <b>${c.n}</b> avec des barres et des cubes.`)
+ +`<div class="mat ${c.res}">${showCnt?`<b class="ncnt" aria-label="Tu as fabriqué ${c.busy?c.run:c.d*10+c.u}">${c.busy?c.run:c.d*10+c.u}</b>`:''}
+ ${only?'':`<div class="zone zd"><span class="lab">dizaines</span><div class="zin">${bars}</div></div>`}
+ <div class="zone zu${only?' only':''}"><span class="lab">${only?'cubes':'unités'}</span><div class="zin">${cubes}</div></div></div>
+ <div class="adds${only?' one':''}">${only?'':`<button class="opt add b${c.hint?' hand':''}${c.shk==='d'?' no':''}" onclick="nbFabAdd(10)" aria-label="Ajouter une barre de dix"><span class="pl">+</span><i class="ab"></i><span>une barre<br>de 10</span></button>`}
+ <button class="opt add c${c.hint&&only?' hand':''}${c.shk==='u'?' no':''}" onclick="nbFabAdd(1)" aria-label="Ajouter un cube"><span class="pl">+</span><i class="ac"></i><span>un cube</span></button></div>`+nbFoot(c,c.d+c.u>0));c.last=null;c.fus=0;c.shk=null}
+function nbFabAdd(v){const c=Q&&Q.cur;if(!nbTouch(c))return;const only=c.L<=2;
+ if(v===10){if(c.d>=9){c.shk='d';return nbDraw(c)}c.d++;c.last='d'}
+ else if(c.u>=9){if(only||c.d>=9){c.shk='u';return nbDraw(c)}c.u=0;c.d++;c.last='d';c.fus=1;c.fb='<small>10 cubes, ça fait une barre de 10 !</small>';c.fbk='';nbSay('Dix cubes, ça fait une barre de dix !');c.res='msg';return nbDraw(c)}
+ else{c.u++;c.last='u'}nbDraw(c)}
+function nbFabRem(v){const c=Q&&Q.cur;if(!nbTouch(c))return;v===10?c.d--:c.u--;nbDraw(c)}
+async function nbCheckFab(c){const m=c.d+c.u,v=c.d*10+c.u;if(!m)return nbBad(c,'Touche les boutons plus pour ajouter des barres et des cubes.',false);
+ c.busy=1;c.res='';c.fb='';c.run=0;for(let k=1;k<=m;k++){if(!nbLive(c))return;c.lit=k;c.run+=k<=c.d?10:1;nbDraw(c);await nbWait(m>10?170:260)}
+ if(!nbLive(c))return;await nbWait(300);if(!nbLive(c))return;c.lit=0;c.busy=0;
+ v===c.n?nbGood(c,['Bravo ! Tu as fabriqué',`${c.n}`]):nbBad(c,[`Tu as fabriqué ${v}.`,`Il faut ${c.n}.`])}
+/* 4. comparer : le crocodile ouvre la bouche vers le plus grand */
+function nbCroc(c){const cls=c.pick==null?'idle':(c.pick?'':'l')+' open'+(c.res==='good'?' miam':c.res==='bad'?' non':'');
+ return `<svg class="croc ${cls}" viewBox="0 0 120 92" role="img" aria-label="Crocodile"><g class="flip"><g class="clo"><path d="M26 52h84q8 2 4 9-3 5-12 5H46q-18 0-20-14z" fill="#3f9d4d" stroke="#2b2d6e" stroke-width="3" stroke-linejoin="round"/><path d="M58 52l5-9 5 9zM74 52l5-9 5 9zM90 52l5-9 5 9z" fill="#fff" stroke="#2b2d6e" stroke-width="2" stroke-linejoin="round"/></g><g class="cup"><path d="M58 52l5 9 5-9zM74 52l5 9 5-9zM90 52l5 9 5-9z" fill="#fff" stroke="#2b2d6e" stroke-width="2" stroke-linejoin="round"/><path d="M8 52q-2-24 20-28 6-14 18-12 9 2 10 14l48 10q12 3 10 12-1 4-6 4z" fill="#57b85f" stroke="#2b2d6e" stroke-width="3" stroke-linejoin="round"/><circle cx="42" cy="24" r="8" fill="#fff" stroke="#2b2d6e" stroke-width="3"/><circle cx="44" cy="24" r="3.4" fill="#2b2d6e"/><circle cx="104" cy="42" r="2.2" fill="#2b2d6e"/></g></g></svg>`}
+function nbSide(c,w){const n=w?c.b:c.a,L=c.L,sel=c.pick===w,st=sel&&c.res?(' '+c.res):sel?' sel':'';
+ const inner=L<=2?`<span class="heap" aria-hidden="true">${c.it[2].repeat(n)}</span>${c.help||c.done?`<span class="n sm">${n}</span>`:''}`:`<span class="n">${n}</span>${L<=4||c.help||c.done?nbMini(n):''}`;
+ return `<button class="side${st}${c.hint&&w===0?' hand':''}" onclick="nbCmpPick(${w})" aria-label="${L<=2?`${n} ${c.it[1]}`:n}${sel?', choisi':''}">${inner}</button>`}
+function nbDrawCmp(c){nbShow(nbCons(`<span>🐊</span><span class="arr">➜</span><span style="font-size:1.1rem">●</span><span style="font-size:2.6rem;color:var(--good)">●</span>`,`Touche le plus <b>grand</b> : le crocodile veut le manger !`)
+ +`<div class="duel">${nbSide(c,0)}${nbCroc(c)}${nbSide(c,1)}</div>`+nbFoot(c,c.pick!=null))}
+function nbCmpPick(w){const c=Q&&Q.cur;if(!nbTouch(c))return;c.pick=w;nbDraw(c)}
+function nbCheckCmp(c){if(c.pick==null)return nbBad(c,'Touche le plus grand des deux.',false);
+ const big=Math.max(c.a,c.b),small=Math.min(c.a,c.b),ok=(c.pick?c.b:c.a)===big;
+ if(ok)return nbGood(c,['Miam !',`${big}`,'c’est plus grand que',`${small}`],`<span class="eq">${c.a} <span class="sg">${c.a<c.b?'&lt;':'&gt;'}</span> ${c.b} ⭐</span>`);
+ nbBad(c,'Beurk ! Le crocodile veut le plus grand.')}
+function gen(id){return id==='add'?genAS():id==='lec'?genLec():id==='ecr'?genEcr():id==='pho'?genPho():id==='phr'?genPhr():id==='sui'?genSui():id==='pb'?genPb():id==='int'?genInt():id==='nb'?genNb():genMath(id,lv(id))}
 
 /* série mélangée : à partir du niveau 4, 4 questions sur 10 plus faciles (dont les deux dernières) pour finir sur une réussite */
 const EASYAT=[2,5,8,9];
@@ -566,7 +792,7 @@ const WKEY=['lec','ecr','pho'],dedup=c=>c&&WKEY.includes(Q.id)&&c.btn&&!c.rd?'mo
 const sigQ=c=>c?[c.q,c.ws&&c.ws.join(' '),c.say,c.btn,c.nr,(c.opts||[]).filter(o=>o.ok).map(o=>o.h||o.t||o.v||'').join()].join('|'):'';
 function next(){if(Q.cur&&!Q.cur.easy)Q.ms+=Q.score-Q.s0;if(Q.n>=Q.N)return end();Q.seen=Q.seen||new Set();let c,sg,k=0;const easy=!!(Q.plan&&Q.plan[Q.n]),keep=PLAY[Q.id];if(easy)PLAY[Q.id]=Q.easyL;try{do{c=gen(Q.id);sg=dedup(c);k++}while(Q.seen.has(sg)&&k<60)}finally{if(easy){if(keep===undefined)delete PLAY[Q.id];else PLAY[Q.id]=keep}}Q.seen.add(sg);c.easy=easy;Q.s0=Q.score;Q.cur=c;Q.tries=0;Q.done=false;Q.hinted=false;draw();if(c.mem)memHide(c,3500);setTimeout(()=>{if(!(NAR()&&Q&&Q.cur&&!Q.done))return;const c=Q.cur,t=Q.n===0||!(c.once||c.sh)?(c.sp||c.nr):c.sh;if(t)say(t,c.rate)},350)}
 function draw(){
- const c=Q.cur,m=MENU.find(x=>x.id===Q.id);if(c.type==='phr')return drawPhr(c,m);if(c.type==='txt')return drawTxt(c,m);if(c.key)return drawKey(c,m);
+ const c=Q.cur,m=MENU.find(x=>x.id===Q.id);if(c.type==='nb')return nbDraw(c);if(c.type==='phr')return drawPhr(c,m);if(c.type==='txt')return drawTxt(c,m);if(c.key)return drawKey(c,m);
  app.innerHTML=`<div class="top"><button class="back" onclick="menu()" aria-label="Retour">←</button><div class="bar"><i style="width:${Q.n/Q.N*100}%"></i></div><span class="stars">${Q.n+1}/${Q.N}</span></div>
  <div class="q" style="background:var(${m.c})">${c.q}${c.say&&c.nr===c.say?'':spk(c)}</div>
  <div class="opts ${c.three?'three':''}">`+c.opts.map((o,i)=>`<button class="opt ${o.f||''}" onclick="ans(${i},this)">${o.h}</button>`).join('')+`</div><div class="fb" id="fb" aria-live="polite"></div>`;
@@ -801,7 +1027,7 @@ function gate(ok){const a=6+rnd(4),b=3+rnd(2);GATE={a,b,ok};
 function gateOk(){const v=+document.getElementById('gin').value;
  if(GATE&&v===GATE.a*GATE.b){const f=GATE.ok;GATE=null;f()}
  else if(GATE){const f=GATE.ok;sfx(false);gate(f);const m=document.getElementById('gm');if(m)m.textContent='Mauvaise réponse, voici un autre calcul.'}}
-const DIS=[['mix','Maths mélangées'],['pb','Problèmes'],['mul','Doubles et moitiés'],['cmp','Compléments']];
+const DIS=[['pb','Problèmes'],['mul','Doubles et moitiés'],['cmp','Compléments']];
 function togMod(id){const a=(D.set.off||[]).filter(x=>x!==id);if(!OFF(id))a.push(id);D.set.off=a;saveD();persist();parentPanel()}
 function closeCfg(){closeOvT();if(!Q&&P)menu()}
 function parentPanel(){const ovEl=document.getElementById('ov'),h=ovEl.querySelector('h1'),keep=OVM==='other'&&ovEl.style.display==='block'&&h&&h.textContent.includes('Configuration')?ovEl.scrollTop:0;parentPanel0();ovEl.scrollTop=keep}
@@ -815,7 +1041,7 @@ ${!cur?`<p class="sub" style="font-size:.9rem">Sans limite de temps, il n'y a pa
 <h2 class="h2">🔊 Voix et consignes</h2><div class="row"><button class="chip ${NAR()?'on':''}" onclick="togNar()">${NAR()?'Consignes orales : oui':'Consignes orales : non'}</button></div>
 <select id="vsel" class="inp" style="width:100%;margin-bottom:10px" onchange="setVoice(this.value)"><option value="">Voix automatique</option>${fr.map(v=>`<option value="${esc(v.name)}" ${v.name===pv?'selected':''}>${HQ(v)?'★ ':''}${esc(v.name)}${v.localService?'':' (en ligne)'}</option>`).join('')}</select>
 <button class="chip" onclick="testVoice()">🔈 Tester la voix</button><p class="sub" style="font-size:.85rem;margin:10px 0 0">La voix « Alice » (enregistrée) lit les mots, les phrases et les consignes ; la voix ci-dessus ne sert que pour le reste, comme les énoncés des problèmes. Pour une voix plus naturelle (★), installe une voix « améliorée » ou « premium » dans les réglages de ton appareil. Sur Mac : Réglages Système › Accessibilité › Contenu énoncé › Voix du système › Gérer les voix › Français.</p><p class="msg" id="vm" style="font-size:.85rem;font-weight:400"></p>
-<h2 class="h2">🎯 Niveaux difficiles</h2><p class="sub" style="font-size:.95rem;margin-bottom:8px">Les niveaux 8 à 10 sont plus durs que le programme de CP. Sans eux, chaque exercice s'arrête au niveau 7 (sauf Maths mélangées, Problèmes, Doubles et moitiés et Compléments).</p>
+<h2 class="h2">🎯 Niveaux difficiles</h2><p class="sub" style="font-size:.95rem;margin-bottom:8px">Les niveaux 8 à 10 sont plus durs que le programme de CP. Sans eux, chaque exercice s'arrête au niveau 7 (sauf Problèmes, Doubles et moitiés et Compléments).</p>
 <div class="row"><button class="chip ${HARD()?'on':''}" onclick="togHard()">${HARD()?'✓ Niveaux 8 à 10 : activés':'✖ Niveaux 8 à 10 : désactivés'}</button></div>
 <h2 class="h2">🧩 Modules proposés</h2><p class="sub">Touche pour activer ou désactiver :</p><div class="row">${DIS.map(d=>`<button class="chip ${OFF(d[0])?'':'on'}" onclick="togMod('${d[0]}')">${OFF(d[0])?'✖ ':'✓ '}${d[1]}</button>`).join('')}</div>
 <h2 class="h2">☁️ Retrouver mes données</h2><p class="sub">${cloudLine()}</p><div class="row"><button class="chip" onclick="cloud('p')">${AUTH?'Synchronisation':'Se connecter avec un e-mail'}</button><button class="chip" onclick="backup(1)">💾 Code de sauvegarde</button></div>
