@@ -476,7 +476,7 @@ body.at-home #ioModal .exp{display:none}
   <div class="spacer"></div>
   <button class="btn icon" id="undoBtn" title="Annuler (Ctrl+Z)">↶</button>
   <button class="btn icon" id="redoBtn" title="Rétablir (Ctrl+Maj+Z)">↷</button>
-  <button class="btn" id="moreBtn" aria-expanded="false" aria-haspopup="dialog" title="Plus d'options">⋯<span class="hide-m"> Plus</span></button>
+  <button class="btn" id="moreBtn" aria-expanded="false" aria-haspopup="dialog" aria-controls="moreMenu" title="Plus d'options">⋯<span class="hide-m"> Plus</span></button>
 </header>
 <div class="mvoile" id="moreVeil"></div>
 <div class="moremenu" id="moreMenu" role="dialog" aria-label="Plus d'options">
@@ -2472,6 +2472,7 @@ function moreMenu(on){
 }
 $('#moreBtn').onclick = () => moreMenu(!$('#moreMenu').classList.contains('on'));
 $('#moreVeil').onclick = () => moreMenu(false);
+matchMedia('(max-width: 860px)').addEventListener('change', () => { if ($('#moreMenu').classList.contains('on')) moreMenu(false); });
 $('#moreMenu .poignee').onclick = () => moreMenu(false);
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && $('#moreMenu').classList.contains('on')) moreMenu(false); });
 for (const id of ['cloudBtn', 'speciesBtn', 'ioBtn']) $('#' + id).addEventListener('click', () => moreMenu(false), true);
